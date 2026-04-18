@@ -1,0 +1,16 @@
+{
+    "name": "ProjetoVN.Dialogue",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f224320d92960dd4aaf6aeee46ddf5dc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
