@@ -1,4 +1,4 @@
-# Sistema de Diálogos (Dialogue System)
+# Sistema de Diálogos
 
 O sistema foi desenhado visando ser de fácil uso por Game Designers diretamente via Unity Editor (usando ScriptableObjects), possuir total desacoplamento da interface de usuário (UI) e integrar-se de forma nativa com o `MessageBroker` do projeto para disparos de eventos.
 
