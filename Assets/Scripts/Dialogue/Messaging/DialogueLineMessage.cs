@@ -4,15 +4,13 @@ namespace Assets.Scripts.Dialogue.Messaging
 {
     public readonly struct DialogueLineMessage : IMessage
     {
-        public readonly string CharacterId;
+        public readonly string SpeakerName;
         public readonly string Text;
-        public readonly int LineIndex;
 
-        public DialogueLineMessage(string characterId, string text, int lineIndex)
+        public DialogueLineMessage(string speakerName, string text)
         {
-            CharacterId = characterId;
+            SpeakerName = speakerName;
             Text = text;
-            LineIndex = lineIndex;
         }
     }
 }
