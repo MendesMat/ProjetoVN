@@ -14,7 +14,7 @@ namespace Assets.Scripts.Dialogue.Logic
 
         public void StartDialogue(DialogueData data)
         {
-            if (data == null || data.Nodes.Count == 0) return;
+            if (data == null || data.DialogueNodes.Count == 0) return;
 
             _currentData = data;
             _currentNodeIndex = 0;
@@ -29,7 +29,7 @@ namespace Assets.Scripts.Dialogue.Logic
 
             _currentNodeIndex++;
 
-            if (_currentNodeIndex < _currentData.Nodes.Count)
+            if (_currentNodeIndex < _currentData.DialogueNodes.Count)
             {
                 ProcessCurrentNode();
             }
@@ -43,7 +43,7 @@ namespace Assets.Scripts.Dialogue.Logic
         {
             if (!IsActive || !_isWaitingForChoice) return;
 
-            var currentNode = _currentData.Nodes[_currentNodeIndex];
+            var currentNode = _currentData.DialogueNodes[_currentNodeIndex];
             if (choiceIndex < 0 || choiceIndex >= currentNode.Choices.Count) return;
 
             var choice = currentNode.Choices[choiceIndex];
@@ -66,7 +66,7 @@ namespace Assets.Scripts.Dialogue.Logic
 
         private void ProcessCurrentNode()
         {
-            var node = _currentData.Nodes[_currentNodeIndex];
+            var node = _currentData.DialogueNodes[_currentNodeIndex];
 
             foreach (var trigger in node.Triggers)
             {
@@ -88,9 +88,9 @@ namespace Assets.Scripts.Dialogue.Logic
 
         private void FinishCurrentDialogue()
         {
-            if (_currentData.NextDialogue != null)
+            if (_currentData.NextDialogueData != null)
             {
-                StartDialogue(_currentData.NextDialogue);
+                StartDialogue(_currentData.NextDialogueData);
             }
             else
             {

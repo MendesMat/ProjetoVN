@@ -8,9 +8,9 @@ namespace Assets.Scripts.Dialogue.Data
     public class DialogueNode
     {
         public string SpeakerName;
-        [TextArea(3, 10)]
+        [TextArea(0, 200)]
         public string Text;
-        public List<DialogueChoice> Choices = new List<DialogueChoice>();
-        public List<DialogueTrigger> Triggers = new List<DialogueTrigger>();
+        public List<DialogueChoice> Choices = new ();
+        public List<DialogueTrigger> Triggers = new ();
     }
 }

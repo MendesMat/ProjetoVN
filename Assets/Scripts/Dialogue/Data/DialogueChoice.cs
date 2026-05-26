@@ -8,6 +8,6 @@ namespace Assets.Scripts.Dialogue.Data
     {
         public string Text;
         public DialogueData TargetDialogue;
-        public List<DialogueTrigger> Triggers = new List<DialogueTrigger>();
+        public List<DialogueTrigger> Triggers = new ();
     }
 }
