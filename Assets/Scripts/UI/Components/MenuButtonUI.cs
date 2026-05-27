@@ -30,6 +30,7 @@ namespace ProjetoVN.UI.Components
                 decorateImage.SetActive(false);
             }
         }
+
         protected override void Awake()
         {
             base.Awake();
@@ -37,8 +38,8 @@ namespace ProjetoVN.UI.Components
             {
                 button.onClick.AddListener(HandleClick);
             }
-
         }
+
         void OnDestroy()
         {
             if (button != null)
@@ -47,11 +48,13 @@ namespace ProjetoVN.UI.Components
             }
 
         }
+
         private void HandleClick()
         {
             if (button != null && button.interactable == false) { return; }
             onClick?.Invoke();
         }
+
         public void OnSubmit(BaseEventData eventData)
         {
             if (invokeClickOnSubmit == false || button == null || button.interactable == false) { return; }
@@ -70,10 +73,12 @@ namespace ProjetoVN.UI.Components
                 decorateImage.SetActive(IsHighlighted);
             }
         }
+
         public void AddListener(UnityAction callback)
         {
             onClick.AddListener(callback);
         }
+
         public void RemoveListener(UnityAction callback)
         {
             onClick.RemoveListener(callback);

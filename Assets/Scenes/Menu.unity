@@ -4428,12 +4428,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 282796492}
-        m_TargetAssemblyTypeName: ProjetoVN.UIFramework.UIWindowManager, ProjetoVN.Core
+        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, Assembly-CSharp
         m_MethodName: OpenWindow
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1921894231}
-          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UIFramework.UIWindow, ProjetoVN.Core
+          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5335,12 +5335,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 282796492}
-        m_TargetAssemblyTypeName: ProjetoVN.UIFramework.UIWindowManager, ProjetoVN.Core
+        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, Assembly-CSharp
         m_MethodName: OpenWindow
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 850518382}
-          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UIFramework.UIWindow, ProjetoVN.Core
+          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
