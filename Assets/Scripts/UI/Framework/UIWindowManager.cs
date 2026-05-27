@@ -1,6 +1,7 @@
+using ProjetoVN.UI.Framework;
 using UnityEngine;
 
-namespace ProjetoVN.UIFramework
+namespace ProjetoVN.UI.Framework
 {
     public class UIWindowManager : MonoBehaviour
     {

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 
-namespace ProjetoVN
+namespace ProjetoVN.UI.Input
 {
     public class UIInputRouter : MonoBehaviour
     {

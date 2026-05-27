@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-namespace ProjetoVN.UIFramework
+
+namespace ProjetoVN.UI.Framework
 {
     public class UIWindow : MonoBehaviour
     {
@@ -18,11 +19,13 @@ namespace ProjetoVN.UIFramework
             Root.SetActive(true);
             SelectDefault();
         }
+
         public void Hide()
         {
             SaveCurrentSelection();
             root.SetActive(false);
         }
+
         public void SelectDefault()
         {
             if (EventSystem.current == null) { return; }
@@ -32,13 +35,14 @@ namespace ProjetoVN.UIFramework
             if ((rememberLastSelected == true && lastSelected != null && lastSelected.activeInHierarchy == true))
             {
                 target = lastSelected;
-
             }
+
             if (target != null)
             {
                 EventSystem.current.SetSelectedGameObject(target);
             }
         }
+
         private void SaveCurrentSelection()
         {
             if (EventSystem.current == null) { return; }

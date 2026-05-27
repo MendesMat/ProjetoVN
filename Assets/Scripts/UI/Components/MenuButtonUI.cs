@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TMPro;
+using ProjetoVN.UI.Components;
 
-namespace ProjetoVN.UIFramework.Components
+namespace ProjetoVN.UI.Components
 {
     public class MenuButtonUI : UISelectableBase, ISubmitHandler
     {

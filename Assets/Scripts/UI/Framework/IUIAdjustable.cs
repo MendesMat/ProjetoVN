@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjetoVN.UIFramework
+namespace ProjetoVN.UI.Framework
 {
     public interface IUIAdjustable
     {

@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
-namespace ProjetoVN.UIFramework.Components
+namespace ProjetoVN.UI.Components
 {
     
 

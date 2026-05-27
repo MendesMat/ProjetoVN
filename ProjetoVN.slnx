@@ -1,4 +1,5 @@
 ﻿<Solution>
   <Project Path="ProjetoVN.Core.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="ProjetoVN.Dialogue.csproj" />
 </Solution>

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace ProjetoVN.UIFramework.Components
+namespace ProjetoVN.UI.Components
 {
     [RequireComponent(typeof(Button))]
     public abstract class UISelectableBase : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
