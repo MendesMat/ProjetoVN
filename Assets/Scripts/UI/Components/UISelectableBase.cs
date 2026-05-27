@@ -57,8 +57,9 @@ namespace ProjetoVN.UI.Components
             {
                 EventSystem.current.SetSelectedGameObject(gameObject);
             }
-                RefreshVisual();
-            }
+
+            RefreshVisual();
+        }
 
         public void OnPointerExit(PointerEventData eventData)
         {

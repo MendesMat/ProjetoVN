@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TMPro;
 using ProjetoVN.UI.Components;
+using System.Reflection.Emit;
 
 namespace ProjetoVN.UI.Components
 {
