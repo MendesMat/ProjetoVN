@@ -1,13 +1,8 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace ProjetoVN.PointNClick
 {
-    [RequireComponent(typeof(Collider2D))]
-    public class InteractableItem : MonoBehaviour,
-        IPointerEnterHandler,
-        IPointerExitHandler,
-        IPointerClickHandler
+    public class InteractableItem : MonoBehaviour
     {
         [Header("Highlight Settings")]
         [SerializeField] private float highlightScaleMultiplier = 1.08f;
@@ -22,25 +17,13 @@ namespace ProjetoVN.PointNClick
             DisableOutline();
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            ApplyHighlight();
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            RemoveHighlight();
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            Debug.Log($"Interagiu com: {gameObject.name}");
-        }
+        public void OnHoverEnter() => ApplyHighlight();
+        public void OnHoverExit() => RemoveHighlight();
+        public void OnClick() => Debug.Log($"Interagiu com: {gameObject.name}");
 
         private void ApplyHighlight()
         {
-            if (isHighlighted)
-                return;
+            if (isHighlighted) return;
 
             isHighlighted = true;
             transform.localScale = originalScale * highlightScaleMultiplier;
@@ -49,8 +32,7 @@ namespace ProjetoVN.PointNClick
 
         private void RemoveHighlight()
         {
-            if (!isHighlighted)
-                return;
+            if (!isHighlighted) return;
 
             isHighlighted = false;
             transform.localScale = originalScale;
@@ -59,14 +41,12 @@ namespace ProjetoVN.PointNClick
 
         private void EnableOutline()
         {
-            if (outlineObject != null)
-                outlineObject.SetActive(true);
+            if (outlineObject != null) outlineObject.SetActive(true);
         }
 
         private void DisableOutline()
         {
-            if (outlineObject != null)
-                outlineObject.SetActive(false);
+            if (outlineObject != null) outlineObject.SetActive(false);
         }
     }
 }

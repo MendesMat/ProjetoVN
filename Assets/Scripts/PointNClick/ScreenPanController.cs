@@ -21,9 +21,7 @@ namespace ProjetoVN.PointNClick
         private void Update()
         {
             PanDirection direction = DetectPanDirection();
-
-            if (direction == PanDirection.None)
-                return;
+            if (direction == PanDirection.None) return;
 
             ApplyPan(direction);
         }
@@ -31,20 +29,13 @@ namespace ProjetoVN.PointNClick
         private PanDirection DetectPanDirection()
         {
             Mouse mouse = Mouse.current;
-
-            if (mouse == null)
-                return PanDirection.None;
+            if (mouse == null) return PanDirection.None;
 
             float mouseX = mouse.position.ReadValue().x;
+            if (!IsMouseInsideScreen(mouseX)) return PanDirection.None;
 
-            if (!IsMouseInsideScreen(mouseX))
-                return PanDirection.None;
-
-            if (mouseX < edgeThreshold)
-                return PanDirection.Right;
-
-            if (mouseX > Screen.width - edgeThreshold)
-                return PanDirection.Left;
+            if (mouseX < edgeThreshold) return PanDirection.Right;
+            if (mouseX > Screen.width - edgeThreshold) return PanDirection.Left;
 
             return PanDirection.None;
         }
