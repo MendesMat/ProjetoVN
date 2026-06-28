@@ -11,11 +11,6 @@ namespace Assets.Scripts.Core.StateMachine.States
             base.Enter();
         }
 
-        public override void Update()
-        {
-            // Lógica para avançar texto de diálogo poderia ir aqui
-        }
-
         public override void Exit()
         {
             base.Exit();

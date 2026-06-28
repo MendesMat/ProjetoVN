@@ -1,3 +1,5 @@
+using Assets.Scripts.Core.Messaging;
+using Assets.Scripts.Core.Messaging.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +19,22 @@ namespace ProjetoVN.PointNClick
         [SerializeField] private Transform environmentContainer;
 
         private enum PanDirection { None, Left, Right }
+
+        private void Awake()
+        {
+            MessageBroker.Subscribe<TogglePlayerInputMessage>(OnTogglePlayerInput);
+        }
+
+        private void OnDestroy()
+        {
+            MessageBroker.Unsubscribe<TogglePlayerInputMessage>(OnTogglePlayerInput);
+        }
+
+        private void OnTogglePlayerInput(TogglePlayerInputMessage message)
+        {
+            Debug.Log($"[ScreenPanController] ← TogglePlayerInputMessage: {(message.IsEnabled ? "ATIVADO" : "DESATIVADO")}");
+            enabled = message.IsEnabled;
+        }
 
         private void Update()
         {

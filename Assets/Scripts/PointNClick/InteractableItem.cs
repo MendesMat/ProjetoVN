@@ -1,41 +1,45 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ProjetoVN.PointNClick
 {
     public class InteractableItem : MonoBehaviour
     {
+        [Header("Interaction")]
+        public UnityEvent OnInteract;
+
         [Header("Highlight Settings")]
         [SerializeField] private float highlightScaleMultiplier = 1.08f;
         [SerializeField] private GameObject outlineObject;
 
-        private Vector3 originalScale;
-        private bool isHighlighted;
+        private Vector3 _originalScale;
+        private bool _isHighlighted;
 
         private void Awake()
         {
-            originalScale = transform.localScale;
+            _originalScale = transform.localScale;
             DisableOutline();
         }
 
         public void OnHoverEnter() => ApplyHighlight();
         public void OnHoverExit() => RemoveHighlight();
-        public void OnClick() => Debug.Log($"Interagiu com: {gameObject.name}");
+        public void OnClick() => OnInteract?.Invoke();
 
         private void ApplyHighlight()
         {
-            if (isHighlighted) return;
+            if (_isHighlighted) return;
 
-            isHighlighted = true;
-            transform.localScale = originalScale * highlightScaleMultiplier;
+            _isHighlighted = true;
+            transform.localScale = _originalScale * highlightScaleMultiplier;
             EnableOutline();
         }
 
         private void RemoveHighlight()
         {
-            if (!isHighlighted) return;
+            if (!_isHighlighted) return;
 
-            isHighlighted = false;
-            transform.localScale = originalScale;
+            _isHighlighted = false;
+            transform.localScale = _originalScale;
             DisableOutline();
         }
 

@@ -11,16 +11,16 @@ namespace Assets.Scripts.Dialogue.Logic
 
         private void Awake()
         {
-            if (Instance == null)
+            if (Instance != null && Instance != this)
             {
-                Instance = this;
-                _controller = new DialogueController();
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
+                Debug.LogWarning($"[DialogueManager] Duplicata encontrada em {gameObject.name}. Destruindo objeto.");
                 Destroy(gameObject);
+                return;
             }
+
+            Instance = this;
+            _controller = new DialogueController();
+            DontDestroyOnLoad(gameObject);
         }
 
         public void StartDialogue(DialogueData data)

@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 2610264906688883528}
   - component: {fileID: 8643298043129472026}
   - component: {fileID: 750652041598132640}
+  - component: {fileID: 3767635908661548701}
   m_Layer: 0
   m_Name: Interactable
   m_TagString: Untagged
@@ -243,5 +244,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc3ae67cfbf608488b52f714cce4667, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.PointNClick::ProjetoVN.PointNClick.InteractableItem
+  OnInteract:
+    m_PersistentCalls:
+      m_Calls: []
   highlightScaleMultiplier: 1.15
   outlineObject: {fileID: 1544456734847976344}
+--- !u!114 &3767635908661548701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4927568511473781550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.InteractableDialogueTrigger
+  dialogueData: {fileID: 11400000, guid: 7e64585b1ca1c1d48a75b27278142726, type: 2}

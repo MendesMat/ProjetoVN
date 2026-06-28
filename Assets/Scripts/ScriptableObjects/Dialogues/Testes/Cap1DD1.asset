@@ -10,19 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa85f3a9c3020e24796674282ffb710f, type: 3}
-  m_Name: Cap1Cena1
+  m_Name: Cap1DD1
   m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.Data.DialogueData
   DialogueNodes:
-  - SpeakerName: Gotica
-    Text: Oi! Tudo bem?
-    Choices:
-    - Text: Tudo bem!
-      TargetDialogue: {fileID: 0}
-      Triggers: []
-    - Text: "N\xC3O!"
-      TargetDialogue: {fileID: 0}
-      Triggers:
-      - TriggerType: ScreenShake
-        Parameter: 
+  - SpeakerName: "G\xF3tica"
+    Text: Acho que cheguei muito cedo...
+    Choices: []
     Triggers: []
-  NextDialogueData: {fileID: 11400000, guid: 791c5935f24c9e9459b46f57f14caa29, type: 2}
+  - SpeakerName: "G\xF3tica"
+    Text: "A escola est\xE1 mais quieta do que eu imaginava."
+    Choices: []
+    Triggers: []
+  NextDialogueData: {fileID: 11400000, guid: 63a9c136cca873043abecbeb694be668, type: 2}
