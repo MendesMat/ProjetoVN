@@ -1,5 +1,5 @@
 using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Core.Messaging.Messages;
+using ProjetoVN.PointNClick.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 

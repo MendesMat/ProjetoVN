@@ -1,7 +1,7 @@
 using UnityEngine;
 using Assets.Scripts.Core.StateMachine.States;
 using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Core.Messaging.Messages;
+using Assets.Scripts.Core.StateMachine.Messages;
 
 namespace Assets.Scripts.Core.StateMachine
 {

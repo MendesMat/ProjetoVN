@@ -1,0 +1,9 @@
+﻿<Solution>
+  <Project Path="MerryYellow.CodeAssist.Editor.csproj" />
+  <Project Path="ProjetoVN.Dialogue.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="ProjetoVN.Core.csproj" />
+  <Project Path="ProjetoVN.Inventory.csproj" />
+  <Project Path="ProjetoVN.GameFlow.csproj" />
+  <Project Path="ProjetoVN.PointNClick.csproj" />
+</Solution>

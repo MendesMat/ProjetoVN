@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Core.Messaging.Messages;
+using Assets.Scripts.Core.StateMachine.Messages;
 using UnityEngine;
 
 namespace Assets.Scripts.Core.StateMachine

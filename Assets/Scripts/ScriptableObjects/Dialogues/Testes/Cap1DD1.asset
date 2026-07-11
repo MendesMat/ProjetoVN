@@ -15,7 +15,16 @@ MonoBehaviour:
   DialogueNodes:
   - SpeakerName: "G\xF3tica"
     Text: Acho que cheguei muito cedo...
-    Choices: []
+    Choices:
+    - Text: Sim
+      TargetDialogue: {fileID: 11400000, guid: 29b985e3a1541d9408fd43766d228093, type: 2}
+      Triggers: []
+    - Text: "N\xE3o"
+      TargetDialogue: {fileID: 11400000, guid: 6378ef270fb4f33439237d44b7c30639, type: 2}
+      Triggers: []
+    - Text: Talvez
+      TargetDialogue: {fileID: 11400000, guid: 57b36f5988891e343894f06339011eda, type: 2}
+      Triggers: []
     Triggers: []
   - SpeakerName: "G\xF3tica"
     Text: "A escola est\xE1 mais quieta do que eu imaginava."
