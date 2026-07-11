@@ -21,7 +21,7 @@ Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica
 
 - **`DialogueLineMessage`**: Publicada sempre que uma nova fala deve ser apresentada na tela. Carrega quem está falando e o texto. A UI deve assinar essa mensagem para atualizar seus Textos/TextMeshPro.
 - **`DialogueChoicesMessage`**: Publicada quando um nó exige uma decisão do jogador. Carrega uma lista em modo somente-leitura das escolhas possíveis.
-- **`DialogueTriggerMessage`**: Publicada sempre que um gatilho é encontrado em um nó de diálogo ou ao selecionar uma escolha. Sistemas como Câmera, Áudio ou Animação devem assinar para reagir (`ShakeScreen`, `PlayBGM`, etc.).
+- **`DialogueTriggerMessage`**: Publicada sempre que um gatilho é encontrado em um nó de diálogo ou ao selecionar uma escolha. Sistemas externos devem assinar para reagir (`ShakeScreen`, `PlayBGM`, etc.).
 
 ### 3. Camada de Lógica (Logic)
 Localizada em `Assets/Scripts/Dialogue/Logic`, responsável pela máquina que processa e avança na história.
@@ -78,3 +78,8 @@ void OnDialogueTrigger(DialogueTriggerMessage msg) {
     }
 }
 ```
+
+### 6. Integração com o GameFlow (Orquestrador)
+Para arquitetura geral, é crucial entender que o Diálogo **não dita regras de input**. Quando o `DialogueManager` inicia ou encerra um diálogo, o módulo `GameFlow` (via `GameStateController`) está escutando:
+- O início dispara a troca para o `DialogueState` e publica a `TogglePlayerInputMessage(false)`, que automaticamente trava interações do `PointNClick`.
+- O término (após o último nó) envia a `DialogueEndedMessage`. O `GameFlow` detecta, volta pro `GameplayState` e destrava os inputs enviando `TogglePlayerInputMessage(true)`.
