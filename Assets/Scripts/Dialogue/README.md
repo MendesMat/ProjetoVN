@@ -41,7 +41,9 @@ Localizada em `Assets/Scripts/Dialogue/UI`.
   - `continueIndicator`: o `>>`. Aparece a cada fala e some quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança o diálogo em qualquer lugar, e um `>>` clicável avançaria duas falas por clique (uma no press, pelo input, outra no release, pelo botão).
 - **`DialogueChoiceButton`**: um por botão de escolha, com o `choiceIndex` e o `OnClick` do `Button` ligado a `OnClicked()`.
 
-A arte fica em `Assets/UI/` (SVGs, importados como **UI SVGImage** e desenhados com o componente `SVGImage` do pacote `com.unity.vectorgraphics`). `Exemplo.svg` é o mockup de layout, não é usado em cena. A montagem de referência está em `Assets/Scenes/[Teste] Mecanicas.unity`, em `UI/Canvas_Game/DialogueUI`.
+A arte fica em `Assets/UI/` (SVGs importados como **Textured Sprite** e desenhados com `Image` comum do uGUI). `Exemplo.svg` é o mockup de layout, não é usado em cena.
+
+Não use o tipo "UI SVGImage": ele desenha a arte como malha de triângulos sem anti-aliasing, e as bordas ficam serrilhadas (nem o canvas Overlay nem o URP deste projeto suavizam). Como Textured Sprite, o importador rasteriza o SVG com 4 amostras por pixel, o que dá bordas suaves. Cada SVG é rasterizado a ~2x o tamanho que ocupa na tela em 1080p (ex.: a caixa ocupa 1500×368 e a textura tem 3000×736). **Se um elemento for aumentado na tela, aumente também `Texture Size` no importador**, senão ele volta a ficar borrado. A montagem de referência está em `Assets/Scenes/[Teste] Mecanicas.unity`, em `UI/Canvas_Game/DialogueUI`.
 
 #### Dados inválidos nunca travam o jogo
 `StartDialogue` retorna `bool`. Um `DialogueData` nulo ou sem nós loga um aviso (com o nome do asset) e retorna `false`, **sem publicar `DialogueStartedMessage`**. Como o `GameFlow` só entra em `DialogueState` ao ouvir o Started, o jogo continua em `GameplayState` com o input liberado em vez de ficar preso esperando um `DialogueEndedMessage` que nunca viria.
