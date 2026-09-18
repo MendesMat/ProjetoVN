@@ -26,10 +26,11 @@ Paths are relative to `Assets/Scripts/` unless they start with `Assets/` or `Pro
 
 ## Current architecture in one paragraph
 
-The project uses feature modules with asmdefs: **Core** (MessageBroker, StateMachine) ← **Dialogue**, **Inventory**, **PointNClick** ← **GameFlow** (orchestrator). **UI** lives in Assembly-CSharp. The dependency graph has no cycles.
-- **Content:** authored data is read-only ScriptableObjects (`DialogueData`, `ItemDataSO`), wired to scene objects with UnityEvents.
-- **Logic:** plain C# classes (`DialogueController`, `InventoryService`/`InventoryModel`) behind thin MonoBehaviour singletons (`DialogueManager`, `InventoryManager`).
+The project uses feature modules with asmdefs: **Core** (MessageBroker, StateMachine) ← **Dialogue**, **Inventory**, **PointNClick** ← **GameFlow** (orchestrator, also references **Inventory** directly since ARCH-09's `GameSaveManager` needs it) ← **UI** (its own asmdef since ARCH-15, referencing only Core and Inventory). The dependency graph has no cycles.
+- **Content:** authored data is read-only ScriptableObjects (`DialogueData`, `ItemDataSO`), wired to scene objects with UnityEvents. An `ItemRegistry` SO (ARCH-09) maps stable string ids back to `ItemDataSO` assets for save/load.
+- **Logic:** plain C# classes (`DialogueController`, `InventoryService`/`InventoryModel`) behind thin MonoBehaviour singletons (`DialogueManager`, `InventoryManager`, `GameSaveManager`).
 - **Communication:** mostly a static, synchronous, strongly-typed pub/sub `MessageBroker`.
+- **Lifecycle (since ARCH-08):** all four managers (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, plus `GameSaveManager`) live on one `Assets/Resources/Managers.prefab`, spawned exactly once by `ManagersBootstrap` (`RuntimeInitializeOnLoadMethod(AfterSceneLoad)`) and `DontDestroyOnLoad`'d as a unit. No scene authors these components directly any more.
 - **Execution model:** everything runs on the main thread, with no async, coroutines, threads or Jobs. There are **no true race conditions**. The real risks are **ordering, reentrancy and lifecycle** problems caused by using the bus for commands, queries and state.
 
 ## Communication rules (agreed)
@@ -41,7 +42,7 @@ These rules drive most items below. They must be reflected in the READMEs (ARCH-
 | **Command:** exactly one owner must do it | Direct method call on the owner (singleton or serialized reference) | `DialogueManager.Instance.StartDialogue(data)`, `InventoryManager.Instance.TryUse(item)` |
 | **Query:** you need an answer | Direct call / property. **Never** request-response over the bus | `InventoryManager.Instance.HasItem(item)` |
 | **State that late joiners must know** | Queryable property as the source of truth, optionally plus a change notification | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
-| **Notification:** "X happened", 0..N listeners, crosses modules | `MessageBroker` message (readonly struct) | `DialogueStartedMessage`, `DialogueEndedMessage`, `DialogueTriggerMessage`, `ItemCollectedMessage`, `ItemUsedMessage` |
+| **Notification:** "X happened", 0..N listeners, crosses modules | `MessageBroker` message (readonly struct) | `DialogueStartedMessage`, `DialogueEndedMessage`, `DialogueTriggerMessage`, `ItemCollectedMessage`, `ItemUsedMessage`, `InventoryReplacedMessage` |
 | **Scene object composition** | UnityEvents in the Inspector | `InteractableItem.OnInteract` → `Collect` / `Interact` / `TriggerDialogue` |
 | **Module must query a module it cannot reference** | Small interface owned by the querying module (only when needed) | Future dialogue conditions (ARCH-17) |
 
@@ -63,8 +64,8 @@ Additional rules:
 | ARCH-05 | Replace README messaging rules | Important | 2A | Trivial | — | DONE |
 | ARCH-06 | Simplify state machine, remove demo code | Important | 2A | Medium | ARCH-02, ARCH-03 | DONE |
 | ARCH-07 | Inventory data ownership & pullable UI | Important | 2A | Low | ARCH-04 | DONE |
-| ARCH-08 | Persistent managers & scene lifecycle | Important | 2B (trigger) | Low–Medium | ARCH-02, ARCH-06, ARCH-07 | TODO |
-| ARCH-09 | Persistence foundation: GameState + stable IDs | Important | 2B (trigger) | Medium | ARCH-07 (ARCH-08 recommended) | TODO |
+| ARCH-08 | Persistent managers & scene lifecycle | Important | 2B (trigger) | Low–Medium | ARCH-02, ARCH-06, ARCH-07 | DONE |
+| ARCH-09 | Persistence foundation: GameState + stable IDs | Important | 2B (trigger) | Medium | ARCH-07 (ARCH-08 recommended) | DONE |
 | ARCH-10 | EditMode tests: DialogueController & MessageBroker | Minor | 3 | Low | ARCH-01, ARCH-03 | DONE |
 | ARCH-11 | DialogueController publish order & reentrancy | Minor | 3 | Low | ARCH-03, ARCH-10 | DEFERRED |
 | ARCH-12 | Typed dialogue trigger identifiers | Minor | 3 | Low | ARCH-11 | DEFERRED |
@@ -87,10 +88,10 @@ Phases group items by **kind**. This list gives the **order**, based on dependen
 5. **ARCH-06:** GameFlow is fresh in mind; moves the input-gate writes into state `Enter()`.
 6. **ARCH-04 → ARCH-07:** inventory API first, then data ownership (same API direction; avoids changing signatures twice).
 7. **Opportunistic, when touching the area:** ARCH-13, ARCH-14, ARCH-15, ARCH-16. (Done as of 2026-09-17.)
-8. **Active now (triggers fired 2026-09-18 — see [Open questions](#open-questions-answers-change-priorities)):**
-   - **ARCH-08 → ARCH-09, in that order:** a second gameplay scene and save/load are both coming soon, and ARCH-09 recommends ARCH-08 first. Do these next, before authoring more rooms/dialogue content.
-   - **ARCH-18:** typewriter/fades/voice lines are coming soon; design the presentation lifecycle when that dialogue UI work starts (after ARCH-08/09, since it only depends on ARCH-03).
-9. **Still triggered by something that hasn't happened:**
+8. **ARCH-08 → ARCH-09** (triggers fired 2026-09-18, both **done** the same day): persistent managers first, then GameState + stable IDs, as recommended.
+9. **Active now:**
+   - **ARCH-18:** typewriter/fades/voice lines are coming soon; design the presentation lifecycle when that dialogue UI work starts (its only dependency, ARCH-03, is done).
+10. **Still triggered by something that hasn't happened:**
    - **ARCH-11 → ARCH-12:** before the first `DialogueTriggerMessage` consumer.
    - **ARCH-17:** when conditional choices are needed.
    - **ARCH-19:** only when profiling shows memory or load-time problems.
@@ -340,7 +341,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - `InventoryPresenter` rebuilds from `InventoryManager.Items` in `OnEnable` and then applies both messages incrementally; `_activeSlots` is keyed by `ItemDataSO`. The serialized `itemDatabase` list was removed from the script **and** from `[Teste] CameraPan.unity`. It logs a warning and opens empty if there is no `InventoryManager`.
   - Verified by compilation only; the Play Mode checks in the DoD have not been run.
 
-### 2B — Important, milestone triggers have now fired
+### 2B — Important, milestone triggers fired and both items are done
 
 > **Trigger check, 2026-09-17:** both were still `DEFERRED`. `[Teste] CameraPan.unity` was the only gameplay scene and there was no `SceneManager`/`LoadScene` call anywhere in `Assets/Scripts`, so ARCH-08 had not fired. There was no save/load code (no `JsonUtility`, no `persistentDataPath`) and authored content was still 8 test dialogues plus 1 test item, so ARCH-09 had not fired either.
 >
@@ -349,7 +350,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
 > **New evidence for ARCH-08's problem, observed 2026-09-18:** Play Mode verification (after committing ARCH-01–16) reproduced the singleton-ordering risk live, not just in theory. At scene start in `[Teste] CameraPan.unity`, the console logs `[InventoryPresenter] Não há InventoryManager. O painel abrirá vazio.` — `InventoryPresenter.OnEnable()` (on `Canvas`, a root earlier in the scene hierarchy) runs before `InventoryManager.Awake()` (on `GameController`, the last root) has set `Instance`. The incremental path still works (collecting an item afterwards correctly updates the panel via `ItemCollectedMessage`), but the initial rebuild silently opens empty. This is exactly the "no bootstrap, so a scene without a well-ordered managers object breaks on Play" problem ARCH-08 already described, now confirmed rather than inferred.
 
 ### ARCH-08 — Persistent managers & scene lifecycle
-- **Priority:** Important · **Trigger:** before adding a second gameplay scene or any scene transition — **fired 2026-09-18** · **Complexity:** Low–Medium · **Depends on:** ARCH-02, ARCH-06, ARCH-07 · **Status:** TODO
+- **Priority:** Important · **Trigger:** before adding a second gameplay scene or any scene transition — **fired 2026-09-18** · **Complexity:** Low–Medium · **Depends on:** ARCH-02, ARCH-06, ARCH-07 · **Status:** DONE
 - **Current problem:**
   - `DialogueManager`, `InventoryManager`, `GameStateController` and `StateMachine` share one GameObject in `[Teste] CameraPan.unity`, and two singletons each call `DontDestroyOnLoad` on it.
   - Duplicate handling is now consistent (`Destroy(gameObject)` everywhere, fixed 2026-09-18 in `InventoryManager`), but nothing else about manager lifecycle changed.
@@ -372,10 +373,14 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - Loading a scene twice leaves exactly one of each manager and one subscription per handler.
   - No per-manager DDOL code remains.
 - **Notes:**
-  - *2026-09-18:* Trigger fired (project owner confirmed a second scene is coming soon); status moved `DEFERRED` → `TODO`. Not yet implemented — see [Execution order](#execution-order) for sequencing (do this before ARCH-09).
+  - *2026-09-18 (fired):* Trigger fired (project owner confirmed a second scene is coming soon); status moved `DEFERRED` → `TODO`.
+  - *2026-09-18 (implemented):* `GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager` (the exact four components already on the scene's `GameController` GameObject, none of which had any scene-local serialized reference) were saved as a single `Assets/Resources/Managers.prefab` via `create_prefab` on the live Editor, then the scene's own `GameController` instance was deleted so only the bootstrap's copy exists. New `GameFlow/ManagersBootstrap.cs` spawns it once via `[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]`, `DontDestroyOnLoad`'s the root, and resets its static guard on `SubsystemRegistration` (same pattern as `MessageBroker`/`PlayerInputGate`, the only other two `RuntimeInitializeOnLoadMethod` users in the codebase). `DialogueManager`/`InventoryManager` no longer self-DDOL or self-guard against duplicates in `Awake` (the bootstrap now guarantees exactly one spawn); both clear `Instance` in a new `OnDestroy`.
+  - **Fixed the race this item's problem statement documents, not just described it:** `InventoryPresenter`'s first `Rebuild()` call moved from `OnEnable()` to a new `Start()` (`OnEnable()` only rebuilds on *subsequent* activations, guarded by an `_initialized` flag). This matters because `AfterSceneLoad` fires after the initial scene's `Awake`/`OnEnable` but before its `Start()` — so only `Start()` is guaranteed to run after the bootstrap has spawned `InventoryManager`. Verified live: entering Play mode no longer logs `[InventoryPresenter] Não há InventoryManager`, and `UnityEngine.Object.FindObjectsByType<InventoryManager>().Length == 1` after an in-session `SceneManager.LoadScene` reload of the same scene, with the collected key's world object correctly staying hidden across that reload (see ARCH-09's `IsWorldObjectConsumed` check).
+  - **Not built:** a bootstrap *scene* fallback (the roadmap allows either) — the `Resources`-prefab path alone is enough for a single-scene project and is simpler to keep working than maintaining two bootstrap paths. Revisit only if a scene is ever opened directly without going through normal Play (e.g. a dedicated test scene) and the missing managers become a real friction point.
+  - **New dependency:** `ProjetoVN.GameFlow.asmdef` now also references `ProjetoVN.Inventory` (needed for `GameSaveManager`, ARCH-09). No cycle: `Inventory`'s asmdef only references `Core`.
 
 ### ARCH-09 — Persistence foundation: GameState + stable IDs
-- **Priority:** Important · **Trigger:** before implementing save/load, **or** before authoring large amounts of content (IDs get more expensive to retrofit) — **fired 2026-09-18** · **Complexity:** Medium · **Depends on:** ARCH-07 (ARCH-08 recommended) · **Status:** TODO
+- **Priority:** Important · **Trigger:** before implementing save/load, **or** before authoring large amounts of content (IDs get more expensive to retrofit) — **fired 2026-09-18** · **Complexity:** Medium · **Depends on:** ARCH-07 (ARCH-08 recommended) · **Status:** DONE
 - **Current problem:**
   - Runtime state is scattered: the inventory lives in the DDOL manager and the dialogue position in `DialogueController`.
   - Collected world objects are only `SetActive(false)`, so after a scene reload they respawn and can be collected again.
@@ -401,7 +406,14 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - `GameState` round-trips through JSON in a test.
   - Save/load restores the inventory, and the UI rebuilds.
 - **Notes:**
-  - *2026-09-18:* Trigger fired (project owner confirmed save/load is needed for the first playable); status moved `DEFERRED` → `TODO`. Not yet implemented — see [Execution order](#execution-order) for sequencing (do this after ARCH-08, before authoring more content).
+  - *2026-09-18 (fired):* Trigger fired (project owner confirmed save/load is needed for the first playable); status moved `DEFERRED` → `TODO`. Scope confirmed with the project owner: full save/load now, not just the data foundation.
+  - *2026-09-18 (implemented):* `ItemDataSO.id` (already existed, free-text, only warned on empty) is now resolved through a new `ItemRegistry` ScriptableObject (`Inventory` module, one authored instance at `Assets/Scripts/ScriptableObjects/Items/ItemRegistry.asset`) with an `OnValidate` duplicate-id check (`#if UNITY_EDITOR`, same style as `ItemDataSO`'s own validation). `CollectableItemBehaviour` got a `persistentId` string generated once via `Reset()` (plus a `[ContextMenu("Regenerate Persistent Id")]` for the prefab-duplication collision case the roadmap warns about — no automatic scene-wide scanner was built for that, since no concrete collision has happened yet).
+  - **Consumed-world-object tracking lives in `InventoryManager`, not a new service:** `CollectableItemBehaviour` (Inventory module) can't depend on GameFlow without creating a cycle (GameFlow already depends on Inventory), so `IsWorldObjectConsumed`/`MarkWorldObjectConsumed`/`ConsumedWorldObjectIds`/`ReplaceConsumedWorldObjectIds` were added directly to `InventoryManager`. `CollectableItemBehaviour.Start()` hides itself if already consumed; `Collect()` marks itself consumed in addition to calling `InventoryManager.Instance.Collect(itemData)`. This alone — once ARCH-08's persistent managers exist — already satisfies "stays collected across scene reloads" **within a running session**, with no disk I/O: verified live via `SceneManager.LoadScene` on the same scene while Play mode was running.
+  - `GameState` (POCO: `ownedItemIds`, `consumedWorldObjectIds`, `currentScene`) and `GameSaveManager` (`Save()`/`Load()` via `JsonUtility` to `Application.persistentDataPath/savegame.json`) live in `GameFlow/Persistence/`, added to the `Managers` prefab. `InventoryModel`/`InventoryService`/`InventoryManager` each got a `ReplaceAll` pass-through so loading a save doesn't hit the "reject duplicates" `Collect()` path or fire spurious `ItemCollectedMessage`s.
+  - **Found and fixed during verification, not anticipated in the original plan:** `ReplaceAll` silently updating the model doesn't reach `InventoryPresenter` on its own — the presenter only reacts to `ItemCollectedMessage`/`ItemUsedMessage`, neither of which `ReplaceAll` publishes. A `Load()` (or any bulk restore) would leave the panel showing stale contents until the panel was hidden and re-shown. Fixed with a new `InventoryReplacedMessage` (empty notification struct, `Inventory/Messages/`), published by `InventoryService.ReplaceAll`, that `InventoryPresenter` subscribes to and reacts to with a full `Rebuild()`. Caught by testing with active-child counts (`GetChild(i).gameObject.activeSelf`) instead of the pooled panel's raw `Transform.childCount`, which never shrinks — returned slots are deactivated, not removed, so a naive child-count check would have looked correct by coincidence and hidden the bug.
+  - **No UI/keybind wiring** — there's no save/load menu yet, so `Save()`/`Load()` are public methods on `GameSaveManager.Instance`, verified by calling them directly through the connected Editor's `eval`. Wire them to a menu when one exists.
+  - **Explicitly out of scope, matching this project's "no speculative building" stance:** no flags/variables list in `GameState` (nothing reads flags yet; that's ARCH-17, still deferred); `currentScene` is captured but not acted on (no scene-transition loader exists to consume it yet); no automatic save-on-quit/load-on-boot hook (not requested).
+  - Verified end-to-end in Play mode via the connected Editor: collected the key, called `Save()`, read the resulting JSON directly off disk (`{"ownedItemIds":["item-teste-01"],"consumedWorldObjectIds":["<guid>"],"currentScene":"[Teste] CameraPan"}`), wiped the in-memory inventory via `ReplaceAll(empty)` (panel correctly went to 0 active slots), called `Load()`, and confirmed both the model and the panel were restored to 1 item. All 20 EditMode tests pass (18 existing + 2 new `GameStateTests` covering the JSON round-trip with and without content).
 
 ---
 
@@ -606,6 +618,7 @@ These were evaluated during the audit and **should not be refactored**. Change o
 
 | Date | Change |
 |---|---|
+| 2026-09-18 | **ARCH-08 and ARCH-09 implemented and Play Mode-verified.** All persistent managers (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, new `GameSaveManager`) now live on one `Assets/Resources/Managers.prefab`, spawned once by a new `ManagersBootstrap` and never scene-authored again. This also fixed the `InventoryPresenter`/`InventoryManager` ordering race found the same day (moved the presenter's first rebuild from `OnEnable` to `Start`, the only point guaranteed to run after the bootstrap). New `ItemRegistry` SO plus a `persistentId` on `CollectableItemBehaviour` give items and world objects stable ids; `GameSaveManager.Save()`/`Load()` round-trip a `GameState` through JSON to `Application.persistentDataPath`. Along the way, found and fixed a real gap the plan hadn't anticipated: bulk inventory restores didn't reach the UI, since `ReplaceAll` published no message — fixed with a new `InventoryReplacedMessage`. `GameFlow`'s asmdef now also references `Inventory` (no cycle). Verified live via the connected Editor: zero console errors through the whole session, exactly one `InventoryManager` after an in-session scene reload, a collected item's world object staying hidden across that reload with no disk I/O, and a full save → wipe → load round-trip restoring both the model and the UI. 20/20 EditMode tests pass (18 existing + 2 new `GameStateTests`). |
 | 2026-09-18 | **Closed the last open question.** Player Settings confirms Scripting Backend is Mono; project owner confirmed the target is PC/Mac/Linux only. Recorded as [D-15](#decisions-to-keep) (Mono is low-stakes given ARCH-06 already removed the only reflection-based construction, and there's no plan to need IL2CPP). No code or setting changes made. |
 | 2026-09-18 | **Committed and Play Mode-verified the 2026-09-17 refactor; un-deferred ARCH-08/09/18.** The entire ARCH-01–16 working tree (previously uncommitted) was split into 11 reviewable commits by module (`742bb83`…`e8590e7`). A read-only integrity scan found no dangling references from the deletions, plus one out-of-scope stale `m_EditorClassIdentifier` string in `ButtonSemBorda.prefab` (fixed). Live Play Mode verification via the connected Editor CLI exercised the full dialogue lifecycle (start/choice/end, gate toggling, no soft-lock), the inventory loop (collect key → locked door → unlocked door), and re-ran all 18 EditMode tests (still 18/18) — all with zero unexpected console errors. Two small bugs found during this pass were fixed: `DialogueChoiceButton` missing a null-check on `DialogueManager.Instance`, and `InventoryManager` destroying only the component instead of the GameObject on a duplicate singleton. One new bug was found and left open: `InventoryPresenter.OnEnable()` can race `InventoryManager.Awake()` at scene start (documented under ARCH-08). Asked the project owner about the roadmap's open questions: a second scene, save/load, and dialogue presentation effects are all coming soon, so ARCH-08, ARCH-09 and ARCH-18 moved from `DEFERRED` to `TODO` and were resequenced ahead of the Phase 4 optional items. |
 | 2026-09-15 | Roadmap created from the architectural audit (commit `2757f98`). No code changed. |
