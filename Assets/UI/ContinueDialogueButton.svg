@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 116 104">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #fff3fb;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+      }
+
+      .cls-3 {
+        fill: rgba(214, 139, 189, .28);
+      }
+
+      .cls-2 {
+        stroke: rgba(255, 240, 251, .78);
+        stroke-width: 4px;
+      }
+
+      .cls-4 {
+        fill: rgba(18, 6, 17, .62);
+      }
+
+      .cls-5 {
+        fill: rgba(75, 28, 63, .82);
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <rect id="advance_button_shadow" data-name="advance button shadow" class="cls-4" x="4" y="10" width="112" height="94" rx="38" ry="38"/>
+      <g id="advance_button_glass" data-name="advance button / glass">
+        <rect class="cls-5" x="0" width="104" height="86" rx="36" ry="36"/>
+        <rect class="cls-3" x="0" width="104" height="86" rx="36" ry="36"/>
+        <rect class="cls-2" x="2" y="2" width="100" height="82" rx="34" ry="34"/>
+      </g>
+      <g id="advance_icon_double_chevron" data-name="advance icon / double chevron">
+        <path id="Vector" class="cls-1" d="M32,25l18,18-18,18"/>
+        <path id="Vector_2" data-name="Vector 2" class="cls-1" d="M55,25l18,18-18,18"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -16,6 +16,10 @@ namespace ProjetoVN.Dialogue.UI
         [SerializeField] private GameObject[] choiceButtonObjects;
         [SerializeField] private TMP_Text[] choiceTexts;
 
+        [Header("Opcionais")]
+        [SerializeField] private GameObject speakerNameplate;
+        [SerializeField] private GameObject continueIndicator;
+
         #region Unity Lifecycle
 
         private void Start()
@@ -44,14 +48,17 @@ namespace ProjetoVN.Dialogue.UI
         {
             speakerNameText.text = message.SpeakerName;
             dialogueText.text = message.Text;
+            SetActiveIfAssigned(speakerNameplate, !string.IsNullOrWhiteSpace(message.SpeakerName));
             ShowDialogueBox();
             HideChoices();
+            SetActiveIfAssigned(continueIndicator, true);
         }
 
         private void OnChoicesAvailable(DialogueChoicesMessage message)
         {
             PopulateChoiceButtons(message);
             ShowChoices();
+            SetActiveIfAssigned(continueIndicator, false);
         }
 
         private void OnDialogueEnded(DialogueEndedMessage message)
@@ -82,6 +89,12 @@ namespace ProjetoVN.Dialogue.UI
         {
             dialogueBox.SetActive(false);
             dialogueChoices.SetActive(false);
+            SetActiveIfAssigned(continueIndicator, false);
+        }
+
+        private static void SetActiveIfAssigned(GameObject target, bool active)
+        {
+            if (target != null) target.SetActive(active);
         }
         #endregion
     }
