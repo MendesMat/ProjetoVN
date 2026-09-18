@@ -993,7 +993,7 @@ Transform:
   m_GameObject: {fileID: 539863019}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -20, y: 0, z: 0}
+  m_LocalPosition: {x: -20.9, y: 0, z: 0}
   m_LocalScale: {x: -1.25, y: 1.25, z: 1.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2165,6 +2165,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.Inventory::ProjetoVN.Inventory.CollectableItemBehaviour
   itemData: {fileID: 11400000, guid: 66320ee0ac9cdda4bb59f1ee560d781c, type: 2}
+  persistentId: 7b715867-22b9-44dc-83e3-c41274425c7c
 --- !u!114 &1408548157 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
@@ -2878,90 +2879,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1892194247}
   m_CullTransparentMesh: 1
---- !u!1 &1939895117
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1939895118}
-  - component: {fileID: 1939895119}
-  - component: {fileID: 1939895122}
-  - component: {fileID: 1939895123}
-  - component: {fileID: 1939895124}
-  m_Layer: 0
-  m_Name: GameController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1939895118
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.44931, y: 0.04194, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1939895119
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c685a454336b6e845af982171371ab64, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.GameStateController
---- !u!114 &1939895122
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb1d2f73852a05f48bd358c39dbbc0fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Logic.DialogueManager
---- !u!114 &1939895123
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60cc8564674d1b643a2ea455a8b40040, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Input.DialogueInputHandler
-  advanceDialogueAction: {fileID: 5943475663930878217, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
---- !u!114 &1939895124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4624677673d8f4489ad6e26c24d3b52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Inventory::ProjetoVN.Inventory.InventoryManager
 --- !u!1 &1992784038
 GameObject:
   m_ObjectHideFlags: 0
@@ -2988,7 +2905,7 @@ Transform:
   m_GameObject: {fileID: 1992784038}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 20, y: 0, z: 0}
+  m_LocalPosition: {x: 20.9, y: 0, z: 0}
   m_LocalScale: {x: -1.25, y: 1.25, z: -1.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3347,4 +3264,3 @@ SceneRoots:
   - {fileID: 1024403302}
   - {fileID: 976018721}
   - {fileID: 1862411468}
-  - {fileID: 1939895118}

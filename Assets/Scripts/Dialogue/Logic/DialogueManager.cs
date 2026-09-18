@@ -11,16 +11,13 @@ namespace ProjetoVN.Dialogue.Logic
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Debug.LogWarning("[DialogueManager] Duplicata encontrada. Destruindo objeto.", this);
-                Destroy(gameObject);
-                return;
-            }
-
             Instance = this;
             _controller = new DialogueController();
-            DontDestroyOnLoad(gameObject);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         public bool StartDialogue(DialogueData data)
