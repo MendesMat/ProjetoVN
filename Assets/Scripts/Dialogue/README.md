@@ -2,6 +2,8 @@
 
 O sistema foi desenhado visando ser de fácil uso por Game Designers diretamente via Unity Editor (usando ScriptableObjects), possuir total desacoplamento da interface de usuário (UI) e integrar-se de forma nativa com o `MessageBroker` do projeto para disparos de eventos.
 
+> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+
 ---
 
 ## Arquitetura e Camadas
@@ -19,6 +21,8 @@ Localizada em `Assets/Scripts/Dialogue/Data`, responsável por como a história 
 ### 2. Camada de Mensageria (Messaging)
 Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica `IMessage` do `Core` para estabelecer a ponte de comunicação com o resto do jogo.
 
+- **`DialogueStartedMessage`**: Publicada na transição **inativo → ativo**, logo antes do primeiro nó ser processado. **Não** é publicada ao encadear diálogos (`NextDialogueData` ou `TargetDialogue` de uma escolha): uma conversa, por mais encadeada que seja, dispara um único Started e um único Ended.
+- **`DialogueEndedMessage`**: Publicada quando a conversa termina de verdade, ou seja, quando não há mais nós nem encadeamento pendente.
 - **`DialogueLineMessage`**: Publicada sempre que uma nova fala deve ser apresentada na tela. Carrega quem está falando e o texto. A UI deve assinar essa mensagem para atualizar seus Textos/TextMeshPro.
 - **`DialogueChoicesMessage`**: Publicada quando um nó exige uma decisão do jogador. Carrega uma lista em modo somente-leitura das escolhas possíveis.
 - **`DialogueTriggerMessage`**: Publicada sempre que um gatilho é encontrado em um nó de diálogo ou ao selecionar uma escolha. Sistemas externos devem assinar para reagir (`ShakeScreen`, `PlayBGM`, etc.).
@@ -28,6 +32,11 @@ Localizada em `Assets/Scripts/Dialogue/Logic`, responsável pela máquina que pr
 
 - **`DialogueController`**: Motor C# puro que navega na árvore de dados. Dispara mensagens no momento certo e decide se aguarda um input de escolha ou pode avançar sequencialmente.
 - **`DialogueManager` (MonoBehaviour)**: Componente que deve viver na cena ou de forma global (`DontDestroyOnLoad`). Gerencia o `DialogueController` e expõe a API (`AdvanceDialogue`, `MakeChoice`, `StartDialogue`) para que a mecânica de Input do jogo consiga interagir.
+
+#### Dados inválidos nunca travam o jogo
+`StartDialogue` retorna `bool`. Um `DialogueData` nulo ou sem nós loga um aviso (com o nome do asset) e retorna `false`, **sem publicar `DialogueStartedMessage`**. Como o `GameFlow` só entra em `DialogueState` ao ouvir o Started, o jogo continua em `GameplayState` com o input liberado em vez de ficar preso esperando um `DialogueEndedMessage` que nunca viria.
+
+A mesma proteção vale no meio de uma conversa: se o `NextDialogueData` encadeado ou o `TargetDialogue` de uma escolha for inválido, o aviso é logado e o diálogo **encerra normalmente** (publicando `DialogueEndedMessage`), em vez de deixar o jogador travado.
 
 ---
 
@@ -40,13 +49,15 @@ O funcionamento diário na Unity segue este roteiro:
 2. Adicione "Nodes" no Inspector e preencha os nomes, textos e opções de resposta.
 
 ### 2. Iniciando um Diálogo
-Use o `DialogueManager.Instance` para dar início a uma conversa e conecte-o aos seus scripts de Interação ou de *Eventos de Cena*:
+Iniciar um diálogo é um **comando**, e comando vai por chamada direta ao dono, nunca pelo `MessageBroker`. Use o `DialogueManager.Instance` e conecte-o aos seus scripts de Interação ou de *Eventos de Cena*:
 ```csharp
+// Retorna false (e loga um aviso) se o DialogueData for nulo ou não tiver nós.
 DialogueManager.Instance.StartDialogue(meuDialogueData);
 ```
+Em objetos de cena, o caminho pronto é o componente `InteractableDialogueTrigger` (módulo `GameFlow`), cujo método `TriggerDialogue()` é ligado ao `UnityEvent` `OnInteract` do `InteractableItem` no Inspector.
 
 ### 3. Conectando a UI (Desacoplada)
-Seu script de Interface Gráfica não deve acessar o `DialogueManager` para puxar os textos. Ao invés disso, deve se inscrever no `MessageBroker` em seu `OnEnable`:
+As falas são **notificações** ("há uma nova linha para mostrar"), então a UI se inscreve no `MessageBroker` em seu `OnEnable` em vez de ficar consultando o `DialogueManager` a cada frame. Se um dia a view precisar saber o *estado* do diálogo (e não só reagir a uma fala nova), aí sim ela lê o `DialogueManager` diretamente — ler estado de um manager é permitido pelas regras de comunicação.
 ```csharp
 void OnEnable() {
     MessageBroker.Subscribe<DialogueLineMessage>(OnNewLine);
@@ -80,6 +91,8 @@ void OnDialogueTrigger(DialogueTriggerMessage msg) {
 ```
 
 ### 6. Integração com o GameFlow (Orquestrador)
-Para arquitetura geral, é crucial entender que o Diálogo **não dita regras de input**. Quando o `DialogueManager` inicia ou encerra um diálogo, o módulo `GameFlow` (via `GameStateController`) está escutando:
-- O início dispara a troca para o `DialogueState` e publica a `TogglePlayerInputMessage(false)`, que automaticamente trava interações do `PointNClick`.
-- O término (após o último nó) envia a `DialogueEndedMessage`. O `GameFlow` detecta, volta pro `GameplayState` e destrava os inputs enviando `TogglePlayerInputMessage(true)`.
+Para arquitetura geral, é crucial entender que o Diálogo **é dono do seu próprio ciclo de vida** e **não dita regras de input**. Ele apenas anuncia o que aconteceu; quem decide o estado do jogo é o `GameFlow` (via `GameStateController`), que assina as duas notificações:
+- O início publica a **`DialogueStartedMessage`**, *antes* da primeira fala aparecer. O `GameFlow` troca para o `DialogueState` e trava as interações do `PointNClick` pelo `PlayerInputGate`.
+- O término (após o último nó, sem encadeamento pendente) publica a **`DialogueEndedMessage`**. O `GameFlow` detecta, volta pro `GameplayState` e destrava o input.
+
+O módulo `Dialogue` não conhece o `GameFlow` nem o `PointNClick`, e a direção das dependências entre assemblies continua sendo `Core ← Dialogue ← GameFlow`.

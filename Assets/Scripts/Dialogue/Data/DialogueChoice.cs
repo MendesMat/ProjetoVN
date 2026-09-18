@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Assets.Scripts.Dialogue.Data
+namespace ProjetoVN.Dialogue.Data
 {
     [Serializable]
     public class DialogueChoice

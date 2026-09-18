@@ -1,6 +1,6 @@
-using Assets.Scripts.Core.Messaging;
+using ProjetoVN.Core.Messaging;
 
-namespace Assets.Scripts.Dialogue.Messaging
+namespace ProjetoVN.Dialogue.Messaging
 {
     public readonly struct DialogueTriggerMessage : IMessage
     {

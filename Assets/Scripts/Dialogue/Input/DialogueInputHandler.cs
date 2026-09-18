@@ -1,8 +1,8 @@
-using Assets.Scripts.Dialogue.Logic;
+using ProjetoVN.Dialogue.Logic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Assets.Scripts.Dialogue.Input
+namespace ProjetoVN.Dialogue.Input
 {
     public class DialogueInputHandler : MonoBehaviour
     {

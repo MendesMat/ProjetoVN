@@ -1,9 +1,9 @@
-using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Dialogue.Messaging;
+using ProjetoVN.Core.Messaging;
+using ProjetoVN.Dialogue.Messaging;
 using TMPro;
 using UnityEngine;
 
-namespace Assets.Scripts.Dialogue.UI
+namespace ProjetoVN.Dialogue.UI
 {
     public class DialogueUIController : MonoBehaviour
     {

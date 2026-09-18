@@ -1,7 +1,7 @@
-using Assets.Scripts.Dialogue.Data;
+using ProjetoVN.Dialogue.Data;
 using UnityEngine;
 
-namespace Assets.Scripts.Dialogue.Logic
+namespace ProjetoVN.Dialogue.Logic
 {
     public class DialogueManager : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace Assets.Scripts.Dialogue.Logic
         {
             if (Instance != null && Instance != this)
             {
-                Debug.LogWarning($"[DialogueManager] Duplicata encontrada em {gameObject.name}. Destruindo objeto.");
+                Debug.LogWarning("[DialogueManager] Duplicata encontrada. Destruindo objeto.", this);
                 Destroy(gameObject);
                 return;
             }
@@ -23,15 +23,9 @@ namespace Assets.Scripts.Dialogue.Logic
             DontDestroyOnLoad(gameObject);
         }
 
-        public void StartDialogue(DialogueData data)
+        public bool StartDialogue(DialogueData data)
         {
-            if (data == null)
-            {
-                Debug.LogWarning("DialogueManager: Tried to start a null DialogueData.");
-                return;
-            }
-
-            _controller.StartDialogue(data);
+            return _controller != null && _controller.StartDialogue(data);
         }
 
         public void AdvanceDialogue()

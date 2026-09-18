@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Scripts.Dialogue.Data
+namespace ProjetoVN.Dialogue.Data
 {
     [CreateAssetMenu(fileName = "DialogueDataSO", menuName = "Dialogue/Dialogue Data")]
     public class DialogueData : ScriptableObject

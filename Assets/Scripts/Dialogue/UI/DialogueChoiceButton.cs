@@ -1,7 +1,7 @@
-using Assets.Scripts.Dialogue.Logic;
+using ProjetoVN.Dialogue.Logic;
 using UnityEngine;
 
-namespace Assets.Scripts.Dialogue.UI
+namespace ProjetoVN.Dialogue.UI
 {
     public class DialogueChoiceButton : MonoBehaviour
     {
@@ -9,6 +9,12 @@ namespace Assets.Scripts.Dialogue.UI
 
         public void OnClicked()
         {
+            if (DialogueManager.Instance == null)
+            {
+                Debug.LogError("[DialogueChoiceButton] Não há DialogueManager na cena. Clique ignorado.", this);
+                return;
+            }
+
             DialogueManager.Instance.MakeChoice(choiceIndex);
         }
     }

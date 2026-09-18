@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Dialogue.Data;
-using Assets.Scripts.Dialogue.Messaging;
+using ProjetoVN.Core.Messaging;
+using ProjetoVN.Dialogue.Data;
+using ProjetoVN.Dialogue.Messaging;
 using UnityEngine;
 
-namespace Assets.Scripts.Dialogue.Logic
+namespace ProjetoVN.Dialogue.Logic
 {
     public class DialogueController
     {
@@ -27,21 +27,43 @@ namespace Assets.Scripts.Dialogue.Logic
         private bool HasChoices(DialogueNode node) => node.Choices != null && node.Choices.Count > 0;
         private bool HasNextDialogueData() => _currentData.NextDialogueData != null;
 
+        private static bool IsPlayable(DialogueData data, string context)
+        {
+            if (data == null)
+            {
+                Debug.LogWarning($"[DialogueController] {context}: DialogueData nulo. Diálogo ignorado.");
+                return false;
+            }
+
+            if (data.DialogueNodes == null || data.DialogueNodes.Count == 0)
+            {
+                Debug.LogWarning($"[DialogueController] {context}: '{data.name}' não tem nós. Diálogo ignorado.");
+                return false;
+            }
+
+            return true;
+        }
+
         private void ClearDialogueState()
         {
             _currentData = null;
+            _isWaitingForChoice = false;
         }
         #endregion
 
         #region Dialogue Controls
-        public void StartDialogue(DialogueData data)
+        public bool StartDialogue(DialogueData data)
         {
-            if (data == null || data.DialogueNodes.Count == 0) return;
+            if (!IsPlayable(data, "StartDialogue")) return false;
 
-            Debug.Log($"[DialogueController] Iniciando diálogo: '{data.name}' ({data.DialogueNodes.Count} nós)");
+            bool isNewSession = !IsActive;
 
             InitializeDialogueState(data);
+
+            if (isNewSession) MessageBroker.Publish(new DialogueStartedMessage());
+
             ProcessCurrentNode();
+            return true;
         }
 
         public void NextNode()
@@ -63,10 +85,9 @@ namespace Assets.Scripts.Dialogue.Logic
             if (!CanSelectChoice()) return;
             if (!IsValidChoiceIndex(choiceIndex)) return;
 
-            var choice = CurrentNode.Choices[choiceIndex];
-            Debug.Log($"[DialogueController] Escolha selecionada [{choiceIndex}]: '{choice.Text}'");
+            DialogueChoice choice = CurrentNode.Choices[choiceIndex];
 
-            PublishTriggers(choice.Triggers, "Escolha");
+            PublishTriggers(choice.Triggers);
             ProcessChoiceTarget(choice);
         }
         #endregion
@@ -79,46 +100,40 @@ namespace Assets.Scripts.Dialogue.Logic
             _isWaitingForChoice = false;
         }
 
-        private void ProcessCurrentNode()
-        {
-            string textPreview = CurrentNode.Text.Length > 40 ? CurrentNode.Text[..40] + "..." : CurrentNode.Text;
-            Debug.Log($"[DialogueController] Nó [{_currentNodeIndex}] | {CurrentNode.SpeakerName}: \"{textPreview}\"");
-
-            PublishTriggers(CurrentNode.Triggers, "Nó");
-            PublishLineMessage();
-            HandleNodeChoices();
-        }
-
         private void FinishCurrentDialogue()
         {
-            if (HasNextDialogueData())
-            {
-                Debug.Log($"[DialogueController] Encadeando para: '{_currentData.NextDialogueData.name}'");
+            if (HasNextDialogueData() && StartDialogue(_currentData.NextDialogueData)) return;
 
-                StartDialogue(_currentData.NextDialogueData);
-                return;
-            }
-
-            Debug.Log("[DialogueController] Diálogo concluído. → DialogueEndedMessage");
-
-            ClearDialogueState();
-            MessageBroker.Publish(new DialogueEndedMessage());
+            EndDialogue();
         }
 
         private void ProcessChoiceTarget(DialogueChoice choice)
         {
             if (choice.TargetDialogue != null)
             {
-                StartDialogue(choice.TargetDialogue);
+                if (!StartDialogue(choice.TargetDialogue)) EndDialogue();
                 return;
             }
 
             _isWaitingForChoice = false;
             NextNode();
         }
+
+        private void EndDialogue()
+        {
+            ClearDialogueState();
+            MessageBroker.Publish(new DialogueEndedMessage());
+        }
         #endregion
 
         #region Message Publishers
+        private void ProcessCurrentNode()
+        {
+            PublishTriggers(CurrentNode.Triggers);
+            PublishLineMessage();
+            HandleNodeChoices();
+        }
+
         private void HandleNodeChoices()
         {
             if (!HasChoices(CurrentNode))
@@ -126,8 +141,6 @@ namespace Assets.Scripts.Dialogue.Logic
                 _isWaitingForChoice = false;
                 return;
             }
-
-            Debug.Log($"[DialogueController] Aguardando escolha ({CurrentNode.Choices.Count} opções).");
 
             _isWaitingForChoice = true;
             MessageBroker.Publish(new DialogueChoicesMessage(CurrentNode.Choices));
@@ -138,16 +151,12 @@ namespace Assets.Scripts.Dialogue.Logic
             MessageBroker.Publish(new DialogueLineMessage(CurrentNode.SpeakerName, CurrentNode.Text));
         }
 
-        private void PublishTriggers(IEnumerable<DialogueTrigger> triggers, string source)
+        private void PublishTriggers(IEnumerable<DialogueTrigger> triggers)
         {
             if (triggers == null) return;
 
-            foreach (var trigger in triggers)
-            {
-                Debug.Log($"[DialogueController] → Trigger ({source}): '{trigger.TriggerType}' | Param: '{trigger.Parameter}'");
-
+            foreach (DialogueTrigger trigger in triggers)
                 MessageBroker.Publish(new DialogueTriggerMessage(trigger.TriggerType, trigger.Parameter));
-            }
         }
         #endregion
     }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Assets.Scripts.Dialogue.Data
+namespace ProjetoVN.Dialogue.Data
 {
     [Serializable]
     public class DialogueTrigger

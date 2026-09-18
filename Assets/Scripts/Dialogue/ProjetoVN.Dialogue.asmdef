@@ -1,6 +1,6 @@
 {
     "name": "ProjetoVN.Dialogue",
-    "rootNamespace": "",
+    "rootNamespace": "ProjetoVN.Dialogue",
     "references": [
         "GUID:f224320d92960dd4aaf6aeee46ddf5dc",
         "GUID:75469ad4d38634e559750d17036d5f7c",

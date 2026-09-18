@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Dialogue.Data;
+using ProjetoVN.Core.Messaging;
+using ProjetoVN.Dialogue.Data;
 
-namespace Assets.Scripts.Dialogue.Messaging
+namespace ProjetoVN.Dialogue.Messaging
 {
     public readonly struct DialogueChoicesMessage : IMessage
     {
