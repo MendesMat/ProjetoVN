@@ -1,4 +1,3 @@
-using ProjetoVN.UI.Framework;
 using UnityEngine;
 
 namespace ProjetoVN.UI.Framework
@@ -6,35 +5,36 @@ namespace ProjetoVN.UI.Framework
     public class UIWindowManager : MonoBehaviour
     {
         [SerializeField] private UIWindow startingWindow;
+
         private UIWindow currentWindow;
 
         private void Start()
         {
-            if (startingWindow != null)
-            {
-                currentWindow = startingWindow;
-                OpenWindow(startingWindow);
-              
-            }
-
+            if (startingWindow != null) OpenWindow(startingWindow);
         }
+
         public void OpenWindow(UIWindow newWindow)
         {
-            if(newWindow == null) { return; }
-            if(newWindow == currentWindow)
+            if (newWindow == null) return;
+
+            if (newWindow == currentWindow)
             {
                 currentWindow.SelectDefault();
                 return;
             }
-            currentWindow.Hide();
+
+            if (currentWindow != null) currentWindow.Hide();
+
             currentWindow = newWindow;
             currentWindow.Show();
         }
+
         public void CloseCurrentWindow()
         {
-            if(currentWindow == null) { return; }
+            if (currentWindow == null) return;
+
             currentWindow.Hide();
-            currentWindow = null;  
+            currentWindow = null;
         }
     }
 }

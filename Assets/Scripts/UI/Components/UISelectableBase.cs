@@ -19,7 +19,7 @@ namespace ProjetoVN.UI.Components
 
         protected bool IsHighlighted => isPointerOver == true || isSelected == true;
 
-        protected bool IsInterectable => button == false || button.interactable;
+        protected bool IsInteractable => button == null || button.interactable;
 
         #region Unity
         protected virtual void Reset()
@@ -63,7 +63,7 @@ namespace ProjetoVN.UI.Components
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            isSelected = false;
+            isPointerOver = false;
             RefreshVisual();
         }
 

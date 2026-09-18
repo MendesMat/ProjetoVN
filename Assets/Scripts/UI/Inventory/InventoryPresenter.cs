@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using System.Linq;
-using Assets.Scripts.Core.Messaging;
+using ProjetoVN.Core.Messaging;
 using ProjetoVN.Inventory;
 using ProjetoVN.Inventory.Messages;
 using UnityEngine;
@@ -12,15 +11,16 @@ namespace ProjetoVN.UI.Inventory
         [Header("Configuração")]
         [SerializeField] private Transform slotsContainer;
         [SerializeField] private GameObject itemSlotGameObject;
-        [SerializeField] private List<ItemDataSO> itemDatabase;
 
-        private readonly Dictionary<string, GameObject> _activeSlots = new();
+        private readonly Dictionary<ItemDataSO, GameObject> _activeSlots = new();
         private readonly Queue<GameObject> _slotPool = new();
 
         private void OnEnable()
         {
             MessageBroker.Subscribe<ItemCollectedMessage>(OnItemCollected);
             MessageBroker.Subscribe<ItemUsedMessage>(OnItemUsed);
+
+            Rebuild();
         }
 
         private void OnDisable()
@@ -29,35 +29,52 @@ namespace ProjetoVN.UI.Inventory
             MessageBroker.Unsubscribe<ItemUsedMessage>(OnItemUsed);
         }
 
-        private void OnItemCollected(ItemCollectedMessage message) =>
-            AddSlot(message.CollectedItem);
+        private void OnItemCollected(ItemCollectedMessage message) => AddSlot(message.CollectedItem);
 
-        private void OnItemUsed(ItemUsedMessage message) =>
-            RemoveSlot(message.UsedItem);
+        private void OnItemUsed(ItemUsedMessage message) => RemoveSlot(message.UsedItem);
 
-        private void AddSlot(Item item)
+        private void Rebuild()
         {
-            if (_activeSlots.ContainsKey(item.Id)) return;
+            ClearAllSlots();
 
-            var slot = GetSlotFromPool();
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogWarning("[InventoryPresenter] Não há InventoryManager. O painel abrirá vazio.", this);
+                return;
+            }
+
+            foreach (ItemDataSO item in InventoryManager.Instance.Items)
+                AddSlot(item);
+        }
+
+        private void AddSlot(ItemDataSO item)
+        {
+            if (item == null || _activeSlots.ContainsKey(item)) return;
+
+            GameObject slot = GetSlotFromPool();
             slot.name = $"Slot_{item.Id}";
 
             var slotUI = slot.GetComponent<ItemSlotUI>();
-            if (slotUI != null)
-            {
-                ItemDataSO data = FindItemData(item.Id);
-                slotUI.Setup(item.Name, data != null ? data.Icon : null);
-            }
+            if (slotUI != null) slotUI.Setup(item.ItemName, item.Icon);
 
-            _activeSlots[item.Id] = slot;
+            _activeSlots[item] = slot;
         }
 
-        private void RemoveSlot(Item item)
+        private void RemoveSlot(ItemDataSO item)
         {
-            if (!_activeSlots.TryGetValue(item.Id, out GameObject slot)) return;
+            if (item == null) return;
+            if (!_activeSlots.TryGetValue(item, out GameObject slot)) return;
 
             ReturnSlotToPool(slot);
-            _activeSlots.Remove(item.Id);
+            _activeSlots.Remove(item);
+        }
+
+        private void ClearAllSlots()
+        {
+            foreach (GameObject slot in _activeSlots.Values)
+                ReturnSlotToPool(slot);
+
+            _activeSlots.Clear();
         }
 
         private GameObject GetSlotFromPool()
@@ -78,8 +95,5 @@ namespace ProjetoVN.UI.Inventory
             slot.SetActive(false);
             _slotPool.Enqueue(slot);
         }
-
-        private ItemDataSO FindItemData(string itemId) =>
-            itemDatabase.FirstOrDefault(data => data.Id == itemId);
     }
 }

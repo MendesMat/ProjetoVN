@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using TMPro;
-using ProjetoVN.UI.Components;
-using System.Reflection.Emit;
 
 namespace ProjetoVN.UI.Components
 {
@@ -64,7 +62,7 @@ namespace ProjetoVN.UI.Components
 
         protected override void RefreshVisual()
         {
-            Color targetColor = IsInterectable == true ? (IsHighlighted == true ? highlightedTextColor : normalTextColor) : disabledTextColor;
+            Color targetColor = IsInteractable ? (IsHighlighted ? highlightedTextColor : normalTextColor) : disabledTextColor;
             if (label != null)
             {
                 label.color = targetColor;

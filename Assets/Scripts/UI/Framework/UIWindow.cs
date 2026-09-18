@@ -23,7 +23,7 @@ namespace ProjetoVN.UI.Framework
         public void Hide()
         {
             SaveCurrentSelection();
-            root.SetActive(false);
+            Root.SetActive(false);
         }
 
         public void SelectDefault()
