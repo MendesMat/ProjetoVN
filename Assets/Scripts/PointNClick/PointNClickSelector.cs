@@ -1,5 +1,3 @@
-using Assets.Scripts.Core.Messaging;
-using ProjetoVN.PointNClick.Messages;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,12 +11,6 @@ namespace ProjetoVN.PointNClick
         private void Awake()
         {
             _mainCamera = Camera.main;
-            MessageBroker.Subscribe<TogglePlayerInputMessage>(OnTogglePlayerInput);
-        }
-
-        private void OnDestroy()
-        {
-            MessageBroker.Unsubscribe<TogglePlayerInputMessage>(OnTogglePlayerInput);
         }
 
         private void OnDisable()
@@ -28,20 +20,23 @@ namespace ProjetoVN.PointNClick
 
         private void Update()
         {
+            if (!PlayerInputGate.IsEnabled)
+            {
+                ClearHoverState();
+                return;
+            }
+
             Mouse mouse = Mouse.current;
             if (mouse == null) return;
 
             InteractableItem itemUnderMouse = FindItemUnderMouse(mouse);
             UpdateHoverState(itemUnderMouse);
 
-            if (_hoveredItem != null && mouse.leftButton.wasPressedThisFrame)
-                _hoveredItem.OnClick();
-        }
+            if (_hoveredItem == null) return;
+            if (!mouse.leftButton.wasPressedThisFrame) return;
+            if (!PlayerInputGate.CanClickThisFrame) return;
 
-        private void OnTogglePlayerInput(TogglePlayerInputMessage message)
-        {
-            Debug.Log($"[PointNClickSelector] ← TogglePlayerInputMessage: {(message.IsEnabled ? "ATIVADO" : "DESATIVADO")}");
-            enabled = message.IsEnabled;
+            _hoveredItem.OnClick();
         }
 
         private InteractableItem FindItemUnderMouse(Mouse mouse)
