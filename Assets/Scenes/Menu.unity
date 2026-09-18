@@ -1208,7 +1208,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UIFramework.Components.MenuButtonUI
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 416742223}
   selectOnHover: 1
   label: {fileID: 60445021}
@@ -1636,7 +1636,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UIFramework.Components.MenuButtonUI
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 588167049}
   selectOnHover: 1
   label: {fileID: 2116829339}
@@ -4371,7 +4371,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UIFramework.Components.MenuButtonUI
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 1368388932}
   selectOnHover: 1
   label: {fileID: 1887520429}
@@ -4428,12 +4428,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 282796492}
-        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, ProjetoVN.UI
         m_MethodName: OpenWindow
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1921894231}
-          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, ProjetoVN.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5335,12 +5335,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 282796492}
-        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: ProjetoVN.UI.Framework.UIWindowManager, ProjetoVN.UI
         m_MethodName: OpenWindow
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 850518382}
-          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, Assembly-CSharp
+          m_ObjectArgumentAssemblyTypeName: ProjetoVN.UI.Framework.UIWindow, ProjetoVN.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -5669,7 +5669,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UIFramework.Components.MenuButtonUI
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 1756711927}
   selectOnHover: 1
   label: {fileID: 1507106962}

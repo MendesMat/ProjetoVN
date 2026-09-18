@@ -107,6 +107,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: abcc806c3759edf41b97abac496cf73f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UI.Inventory.ItemSlotUI
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Inventory.ItemSlotUI
   iconImage: {fileID: 0}
   nameLabel: {fileID: 0}

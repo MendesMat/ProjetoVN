@@ -260,5 +260,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.InteractableDialogueTrigger
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
   dialogueData: {fileID: 11400000, guid: 7e64585b1ca1c1d48a75b27278142726, type: 2}

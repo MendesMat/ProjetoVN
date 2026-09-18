@@ -227,11 +227,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a05d10782e95ac4188be96c5d148ba4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UI.Inventory.InventoryPresenter
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Inventory.InventoryPresenter
   slotsContainer: {fileID: 190077944}
   itemSlotGameObject: {fileID: 6349605831523065598, guid: 16e88cc52e196994389bea2f84af5a0e, type: 3}
-  itemDatabase:
-  - {fileID: 11400000, guid: 66320ee0ac9cdda4bb59f1ee560d781c, type: 2}
 --- !u!114 &190077947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,8 +341,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 287637554}
-        m_TargetAssemblyTypeName: Assets.Scripts.Dialogue.UI.DialogueChoiceButton,
-          ProjetoVN.Dialogue
+        m_TargetAssemblyTypeName: ProjetoVN.Dialogue.UI.DialogueChoiceButton, ProjetoVN.Dialogue
         m_MethodName: OnClicked
         m_Mode: 1
         m_Arguments:
@@ -404,7 +401,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3c4035df1a1d484580fad30efb8e3d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.UI.DialogueChoiceButton
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueChoiceButton
   choiceIndex: 2
 --- !u!1 &296317339
 GameObject:
@@ -771,8 +768,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 387788772}
-        m_TargetAssemblyTypeName: Assets.Scripts.Dialogue.UI.DialogueChoiceButton,
-          ProjetoVN.Dialogue
+        m_TargetAssemblyTypeName: ProjetoVN.Dialogue.UI.DialogueChoiceButton, ProjetoVN.Dialogue
         m_MethodName: OnClicked
         m_Mode: 1
         m_Arguments:
@@ -832,7 +828,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3c4035df1a1d484580fad30efb8e3d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.UI.DialogueChoiceButton
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueChoiceButton
   choiceIndex: 3
 --- !u!1 &523876886
 GameObject:
@@ -1714,7 +1710,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 27abc6ea465be4e44ba4343b9437fa7c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.UI.DialogueUIController
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueUIController
   dialogueBox: {fileID: 834521965}
   dialogueChoices: {fileID: 2035787300}
   speakerNameText: {fileID: 1892194249}
@@ -1819,8 +1815,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1107919724}
-        m_TargetAssemblyTypeName: Assets.Scripts.Dialogue.UI.DialogueChoiceButton,
-          ProjetoVN.Dialogue
+        m_TargetAssemblyTypeName: ProjetoVN.Dialogue.UI.DialogueChoiceButton, ProjetoVN.Dialogue
         m_MethodName: OnClicked
         m_Mode: 1
         m_Arguments:
@@ -1880,7 +1875,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3c4035df1a1d484580fad30efb8e3d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.UI.DialogueChoiceButton
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueChoiceButton
   choiceIndex: 0
 --- !u!1 &1378041918
 GameObject:
@@ -2180,7 +2175,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.InteractableDialogueTrigger
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
 --- !u!1 &1538218388
 GameObject:
   m_ObjectHideFlags: 0
@@ -2417,7 +2412,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.InteractableDialogueTrigger
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
 --- !u!1 &1549455981 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
@@ -2892,7 +2887,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1939895118}
-  - component: {fileID: 1939895120}
   - component: {fileID: 1939895119}
   - component: {fileID: 1939895122}
   - component: {fileID: 1939895123}
@@ -2930,20 +2924,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c685a454336b6e845af982171371ab64, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.GameStateController
-  stateMachineRef: {fileID: 1939895120}
---- !u!114 &1939895120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939895117}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbc4f4a63f1b7b45b663b7a2a36ccfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::Assets.Scripts.Core.StateMachine.StateMachine
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.GameStateController
 --- !u!114 &1939895122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2955,7 +2936,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb1d2f73852a05f48bd358c39dbbc0fd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.Logic.DialogueManager
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Logic.DialogueManager
 --- !u!114 &1939895123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2967,7 +2948,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 60cc8564674d1b643a2ea455a8b40040, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.Input.DialogueInputHandler
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Input.DialogueInputHandler
   advanceDialogueAction: {fileID: 5943475663930878217, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
 --- !u!114 &1939895124
 MonoBehaviour:
@@ -3157,8 +3138,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2030613490}
-        m_TargetAssemblyTypeName: Assets.Scripts.Dialogue.UI.DialogueChoiceButton,
-          ProjetoVN.Dialogue
+        m_TargetAssemblyTypeName: ProjetoVN.Dialogue.UI.DialogueChoiceButton, ProjetoVN.Dialogue
         m_MethodName: OnClicked
         m_Mode: 1
         m_Arguments:
@@ -3218,7 +3198,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3c4035df1a1d484580fad30efb8e3d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.UI.DialogueChoiceButton
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueChoiceButton
   choiceIndex: 1
 --- !u!1 &2035787300
 GameObject:
@@ -3289,7 +3269,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: Assets.Scripts.GameStates.InteractableDialogueTrigger, Assembly-CSharp
+      value: ProjetoVN.GameFlow.InteractableDialogueTrigger, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -3358,7 +3338,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.GameStates.InteractableDialogueTrigger
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

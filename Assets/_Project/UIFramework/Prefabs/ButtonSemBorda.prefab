@@ -208,8 +208,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjetoVN.UIFramework.Components.MenuButtonUI
+  m_Name:
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 4215378421114216173}
   selectOnHover: 1
   label: {fileID: 5011986057948592240}

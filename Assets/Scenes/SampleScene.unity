@@ -393,64 +393,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &540354488
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 540354491}
-  - component: {fileID: 540354493}
-  - component: {fileID: 540354492}
-  m_Layer: 0
-  m_Name: Test State Machine
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &540354491
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540354488}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &540354492
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540354488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69a8818a390c4fc4a91e659b063441ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::Assets.Scripts.Core.StateMachine.StateController
-  _stateMachineRef: {fileID: 540354493}
---- !u!114 &540354493
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540354488}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbc4f4a63f1b7b45b663b7a2a36ccfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::Assets.Scripts.Core.StateMachine.StateMachine
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,7 +645,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb1d2f73852a05f48bd358c39dbbc0fd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Dialogue::Assets.Scripts.Dialogue.Logic.DialogueManager
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Logic.DialogueManager
 --- !u!1 &1958186281
 GameObject:
   m_ObjectHideFlags: 0
@@ -955,6 +897,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 619394802}
-  - {fileID: 540354491}
   - {fileID: 2031750867}
   - {fileID: 1041742241}
