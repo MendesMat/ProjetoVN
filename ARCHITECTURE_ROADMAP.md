@@ -63,8 +63,8 @@ Additional rules:
 | ARCH-05 | Replace README messaging rules | Important | 2A | Trivial | — | DONE |
 | ARCH-06 | Simplify state machine, remove demo code | Important | 2A | Medium | ARCH-02, ARCH-03 | DONE |
 | ARCH-07 | Inventory data ownership & pullable UI | Important | 2A | Low | ARCH-04 | DONE |
-| ARCH-08 | Persistent managers & scene lifecycle | Important | 2B (trigger) | Low–Medium | ARCH-02, ARCH-06, ARCH-07 | DEFERRED |
-| ARCH-09 | Persistence foundation: GameState + stable IDs | Important | 2B (trigger) | Medium | ARCH-07 (ARCH-08 recommended) | DEFERRED |
+| ARCH-08 | Persistent managers & scene lifecycle | Important | 2B (trigger) | Low–Medium | ARCH-02, ARCH-06, ARCH-07 | TODO |
+| ARCH-09 | Persistence foundation: GameState + stable IDs | Important | 2B (trigger) | Medium | ARCH-07 (ARCH-08 recommended) | TODO |
 | ARCH-10 | EditMode tests: DialogueController & MessageBroker | Minor | 3 | Low | ARCH-01, ARCH-03 | DONE |
 | ARCH-11 | DialogueController publish order & reentrancy | Minor | 3 | Low | ARCH-03, ARCH-10 | DEFERRED |
 | ARCH-12 | Typed dialogue trigger identifiers | Minor | 3 | Low | ARCH-11 | DEFERRED |
@@ -73,7 +73,7 @@ Additional rules:
 | ARCH-15 | UI assembly definition | Minor | 3 | Low | ARCH-07 | DONE |
 | ARCH-16 | Namespace & asmdef hygiene | Minor | 3 | Low (per file) | — | DONE |
 | ARCH-17 | Dialogue conditions via query interface | Optional | 4 | Low–Medium | ARCH-07, ARCH-09 | DEFERRED |
-| ARCH-18 | Async/animated presentation lifecycle | Optional | 4 | Low | ARCH-03 | DEFERRED |
+| ARCH-18 | Async/animated presentation lifecycle | Optional | 4 | Low | ARCH-03 | TODO |
 | ARCH-19 | Asset loading / Addressables strategy | Optional | 4 | Medium–High | — | DEFERRED |
 
 ## Execution order
@@ -86,13 +86,13 @@ Phases group items by **kind**. This list gives the **order**, based on dependen
 4. **ARCH-10:** lock in the new broker and dialogue behaviour with tests before further refactors.
 5. **ARCH-06:** GameFlow is fresh in mind; moves the input-gate writes into state `Enter()`.
 6. **ARCH-04 → ARCH-07:** inventory API first, then data ownership (same API direction; avoids changing signatures twice).
-7. **Opportunistic, when touching the area:** ARCH-13, ARCH-14, ARCH-15, ARCH-16.
-8. **Triggered:**
+7. **Opportunistic, when touching the area:** ARCH-13, ARCH-14, ARCH-15, ARCH-16. (Done as of 2026-09-17.)
+8. **Active now (triggers fired 2026-09-18 — see [Open questions](#open-questions-answers-change-priorities)):**
+   - **ARCH-08 → ARCH-09, in that order:** a second gameplay scene and save/load are both coming soon, and ARCH-09 recommends ARCH-08 first. Do these next, before authoring more rooms/dialogue content.
+   - **ARCH-18:** typewriter/fades/voice lines are coming soon; design the presentation lifecycle when that dialogue UI work starts (after ARCH-08/09, since it only depends on ARCH-03).
+9. **Still triggered by something that hasn't happened:**
    - **ARCH-11 → ARCH-12:** before the first `DialogueTriggerMessage` consumer.
-   - **ARCH-08:** before a second gameplay scene.
-   - **ARCH-09:** before save/load, or before mass content authoring.
    - **ARCH-17:** when conditional choices are needed.
-   - **ARCH-18:** when typewriter effects, fades or voice lines are added.
    - **ARCH-19:** only when profiling shows memory or load-time problems.
 
 ```
@@ -142,6 +142,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - `Subscribe` is idempotent via `Array.IndexOf`, so a double subscribe followed by a single unsubscribe leaves no handler. `Subscribe`/`Unsubscribe` also ignore a null handler.
   - The optional `[Conditional("VN_TRACE_MESSAGES")]` trace was included: it logs the message type name and handler count per publish. It deliberately does not log the message contents, which would box the struct.
   - Verified by compiling every assembly with `dotnet build` against the Unity-generated csprojs. **Not verified in Play Mode** — the runtime behaviours (throwing subscriber, reset with domain reload disabled) are covered by ARCH-10's EditMode tests, which are still `TODO`.
+  - *2026-09-18:* Committed as `742bb83`. ARCH-10's EditMode tests now exist and pass (18/18, including the throwing-subscriber and duplicate-subscribe cases), so this item's runtime behaviour is covered. A full Play Mode session (dialogue + inventory flows, see ARCH-03/04/07 notes below) also ran through the broker repeatedly with zero unexpected console errors.
 
 ### ARCH-02 — World input gate (fix dialogue-end click-through)
 - **Priority:** Critical · **Complexity:** Low · **Depends on:** — (do in the same session as ARCH-03; ARCH-06 later moves the writes into states) · **Status:** DONE
@@ -178,6 +179,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - `IsEnabled` defaults to `true`, matching the previous behaviour where `PointNClickSelector` started enabled. `SetEnabled` only records the frame on a `false → true` transition, so the redundant `EnterGameplay()` in `GameStateController.Start()` does not swallow the first frame of input.
   - **Open:** the click-through bug itself is still unconfirmed in Play Mode — see [Open questions](#open-questions-answers-change-priorities). The fix was written from the inferred chain described above; confirm it closes the loop before considering this item observed rather than merely implemented.
   - **Not done here (deliberately):** hover still highlights a world object that sits behind a UI panel, because `CanClickThisFrame` only gates the click. Only revisit if it actually looks wrong in game.
+  - *2026-09-18:* Committed as `3abbbd5`. Play Mode session confirmed `PlayerInputGate.IsEnabled` correctly flips to `false` on dialogue start and back to `true` on dialogue end, across four separate dialogue triggers (an NPC, a locked door, an unlocked door, and a choice-ending dialogue) with zero console errors. Still not a literal mouse-driven click-through repro — see [Open questions](#open-questions-answers-change-priorities).
 
 ### ARCH-03 — Dialogue owns its start/end lifecycle
 - **Priority:** Critical · **Complexity:** Low · **Depends on:** ARCH-01 (recommended); same session as ARCH-02 · **Status:** DONE
@@ -211,6 +213,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - **Addition not in the original plan:** an invalid chain target (`NextDialogueData` or `TargetDialogue`) now ends the dialogue cleanly via a new private `EndDialogue()` instead of leaving `_currentData` pointing at the finished dialogue. Without this the soft lock ARCH-03 exists to remove would simply have moved from the start of a dialogue to the middle of one. `ClearDialogueState` also resets `_isWaitingForChoice`, which it previously leaked.
   - **Not done (optional in this item):** `InteractableDialogueTrigger` was **not** moved into the Dialogue module. It is not needed for any part of the DoD and moving it means an in-Editor move plus re-verifying UnityEvent wiring in `Interactable.prefab` and `[Teste] CameraPan.unity`. The class name, namespace and `TriggerDialogue()` method name are unchanged, so the existing wiring keeps working untouched.
   - Verified by compilation only; the Play Mode checks in the DoD have not been run.
+  - *2026-09-18:* Committed as `49192d7`. Play Mode checks now run: a 0-node/invalid dialogue path was already covered by ARCH-10's tests; a valid dialogue (the "Gotica" NPC) entered Dialogue state before the first line rendered, ended cleanly on the player's choice, and the state returned to Gameplay. Also fixed a related gap found in this session: `DialogueChoiceButton.OnClicked()` had no null-check on `DialogueManager.Instance` (every other consumer in the codebase does); added one, consistent with the existing pattern.
 
 ---
 
@@ -243,6 +246,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - **Deviation:** `LockedActionBehaviour` does **not** call `HasItem` before `TryUse`. `TryUse` returns `false` exactly when the player lacks the item, so it decides both branches on its own: `true` → `OnUnlocked`, `false` → `OnLocked`. This satisfies "`OnUnlocked` is invoked only if `TryUse` returns `true`" with one lookup instead of two and no check-then-act shape. `HasItem` is still exposed, because the [Communication rules](#communication-rules-agreed) name it as the query example and ARCH-17 will need it.
   - Removing `OnEnable`/`OnDisable` from `InventoryManager` also removed, as a side effect, the "duplicate `InventoryManager` runs `OnEnable` with `Service == null`" problem listed under ARCH-08. The rest of ARCH-08's duplicate-manager lifecycle is untouched.
   - `Collect` now returns `bool` (see ARCH-07) rather than `void`.
+  - *2026-09-18:* Committed as `942df8f`. Play Mode session verified the full loop: `PortaTrancada.Interact()` without the key correctly plays the locked dialogue; `Chave.Collect()` deactivates the world object and adds it to the model; `PortaTrancada.Interact()` with the key returns `true` from `TryUse` and plays the unlocked dialogue. Also fixed a related bug found in this session: `InventoryManager.Awake()`'s duplicate-singleton branch called `Destroy(this)` instead of `Destroy(gameObject)` (unlike `DialogueManager`), which leaked an empty GameObject under `DontDestroyOnLoad`. Now matches `DialogueManager`'s pattern.
 
 ### ARCH-05 — Replace README messaging rules
 - **Priority:** Important · **Complexity:** Trivial · **Depends on:** — (do first; later items update their own module READMEs) · **Status:** DONE
@@ -305,6 +309,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - **Build Settings** now contains only `Assets/Scenes/[Teste] CameraPan.unity` (decided with the project owner). `Menu.unity` stays out because there is no scene-loading code anywhere yet; adding a menu → gameplay transition is exactly what trips ARCH-08's trigger.
   - **SampleScene.unity was kept** (decided with the project owner), stripped of the demo components rather than deleted. It still holds a `DialogueManager` and some UI.
   - Verified by compiling all six assemblies with Roslyn, each against only its asmdef-permitted references. The Play Mode checks in the DoD have not been run.
+  - *2026-09-18:* Committed as `742bb83` (Core) and `7ebd50f` (scene edits). Play Mode confirmed states construct and run correctly: `GameplayState`/`DialogueState.Enter()` toggle `PlayerInputGate` as designed (see ARCH-02's 2026-09-18 note), and `[Teste] CameraPan.unity` loaded and played with zero missing-script errors.
 
 ### ARCH-07 — Inventory data ownership & pullable UI
 - **Priority:** Important · **Complexity:** Low · **Depends on:** ARCH-04 · **Status:** DONE
@@ -335,19 +340,23 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - `InventoryPresenter` rebuilds from `InventoryManager.Items` in `OnEnable` and then applies both messages incrementally; `_activeSlots` is keyed by `ItemDataSO`. The serialized `itemDatabase` list was removed from the script **and** from `[Teste] CameraPan.unity`. It logs a warning and opens empty if there is no `InventoryManager`.
   - Verified by compilation only; the Play Mode checks in the DoD have not been run.
 
-### 2B — Important, but triggered by a milestone
+### 2B — Important, milestone triggers have now fired
 
-> **Trigger check, 2026-09-17:** both are still `DEFERRED` and were **not** implemented. `[Teste] CameraPan.unity` is the only gameplay scene and there is no `SceneManager`/`LoadScene` call anywhere in `Assets/Scripts`, so ARCH-08 has not fired. There is no save/load code (no `JsonUtility`, no `persistentDataPath`) and authored content is still 8 test dialogues plus 1 test item, so ARCH-09 has not fired either.
+> **Trigger check, 2026-09-17:** both were still `DEFERRED`. `[Teste] CameraPan.unity` was the only gameplay scene and there was no `SceneManager`/`LoadScene` call anywhere in `Assets/Scripts`, so ARCH-08 had not fired. There was no save/load code (no `JsonUtility`, no `persistentDataPath`) and authored content was still 8 test dialogues plus 1 test item, so ARCH-09 had not fired either.
+>
+> **Trigger check, 2026-09-18:** asked the project owner directly. A second gameplay scene / scene transitions are coming **soon**, and save/load is **needed soon** (before the first playable). Both triggers have fired — status moved from `DEFERRED` to `TODO`, sequenced right after the opportunistic Phase 3 cleanup (see [Execution order](#execution-order)). Do ARCH-08 before ARCH-09, as originally recommended, and do ARCH-09 before authoring more rooms or dialogue content, since its own trigger note warns IDs get more expensive to retrofit once content grows.
+>
+> **New evidence for ARCH-08's problem, observed 2026-09-18:** Play Mode verification (after committing ARCH-01–16) reproduced the singleton-ordering risk live, not just in theory. At scene start in `[Teste] CameraPan.unity`, the console logs `[InventoryPresenter] Não há InventoryManager. O painel abrirá vazio.` — `InventoryPresenter.OnEnable()` (on `Canvas`, a root earlier in the scene hierarchy) runs before `InventoryManager.Awake()` (on `GameController`, the last root) has set `Instance`. The incremental path still works (collecting an item afterwards correctly updates the panel via `ItemCollectedMessage`), but the initial rebuild silently opens empty. This is exactly the "no bootstrap, so a scene without a well-ordered managers object breaks on Play" problem ARCH-08 already described, now confirmed rather than inferred.
 
 ### ARCH-08 — Persistent managers & scene lifecycle
-- **Priority:** Important · **Trigger:** before adding a second gameplay scene or any scene transition · **Complexity:** Low–Medium · **Depends on:** ARCH-02, ARCH-06, ARCH-07 · **Status:** DEFERRED
+- **Priority:** Important · **Trigger:** before adding a second gameplay scene or any scene transition — **fired 2026-09-18** · **Complexity:** Low–Medium · **Depends on:** ARCH-02, ARCH-06, ARCH-07 · **Status:** TODO
 - **Current problem:**
   - `DialogueManager`, `InventoryManager`, `GameStateController` and `StateMachine` share one GameObject in `[Teste] CameraPan.unity`, and two singletons each call `DontDestroyOnLoad` on it.
-  - Duplicate handling is inconsistent: `Destroy(gameObject)` versus `Destroy(this)`.
-  - A duplicate `InventoryManager` still runs `OnEnable` with `Service == null`.
+  - Duplicate handling is now consistent (`Destroy(gameObject)` everywhere, fixed 2026-09-18 in `InventoryManager`), but nothing else about manager lifecycle changed.
   - `Instance` is never cleared.
   - Views and PointNClick are scene-local.
   - There is no bootstrap, so a scene without the managers object breaks on Play.
+  - **Observed live, 2026-09-18:** `InventoryManager` (on `GameController`, last root in the scene) sets `Instance` in `Awake()` after `InventoryPresenter` (on `Canvas`, an earlier root) has already run `OnEnable()` and rebuilt from it — Unity does not guarantee cross-GameObject Awake-before-OnEnable ordering by hierarchy position. The panel logs `[InventoryPresenter] Não há InventoryManager. O painel abrirá vazio.` and opens empty; it only becomes correct once the first `ItemCollectedMessage`/`ItemUsedMessage` arrives. This is the concrete failure the "no bootstrap" problem above predicts, now reproduced rather than theoretical.
 - **Why it matters:** once scenes change, this produces duplicate or ghost subscribers and mode state that disagrees with the loaded scene.
 - **Recommended solution:**
   - Create one `Managers` prefab holding all persistent managers. Spawn it once through a `[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]` loader from `Resources`, so Play works from any room scene; a bootstrap scene is the fallback.
@@ -362,9 +371,11 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - Play works from any gameplay scene.
   - Loading a scene twice leaves exactly one of each manager and one subscription per handler.
   - No per-manager DDOL code remains.
+- **Notes:**
+  - *2026-09-18:* Trigger fired (project owner confirmed a second scene is coming soon); status moved `DEFERRED` → `TODO`. Not yet implemented — see [Execution order](#execution-order) for sequencing (do this before ARCH-09).
 
 ### ARCH-09 — Persistence foundation: GameState + stable IDs
-- **Priority:** Important · **Trigger:** before implementing save/load, **or** before authoring large amounts of content (IDs get more expensive to retrofit) · **Complexity:** Medium · **Depends on:** ARCH-07 (ARCH-08 recommended) · **Status:** DEFERRED
+- **Priority:** Important · **Trigger:** before implementing save/load, **or** before authoring large amounts of content (IDs get more expensive to retrofit) — **fired 2026-09-18** · **Complexity:** Medium · **Depends on:** ARCH-07 (ARCH-08 recommended) · **Status:** TODO
 - **Current problem:**
   - Runtime state is scattered: the inventory lives in the DDOL manager and the dialogue position in `DialogueController`.
   - Collected world objects are only `SetActive(false)`, so after a scene reload they respawn and can be collected again.
@@ -389,6 +400,8 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - Duplicate ids are flagged in the editor.
   - `GameState` round-trips through JSON in a test.
   - Save/load restores the inventory, and the UI rebuilds.
+- **Notes:**
+  - *2026-09-18:* Trigger fired (project owner confirmed save/load is needed for the first playable); status moved `DEFERRED` → `TODO`. Not yet implemented — see [Execution order](#execution-order) for sequencing (do this after ARCH-08, before authoring more content).
 
 ---
 
@@ -415,6 +428,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - **`DialogueControllerTests`** (11 tests): null and 0-node data rejected with nothing published, Started published before the first line, sequential advance ending exactly once, advancing past the end being a no-op, chaining publishing Started once and Ended once, an invalid chain target ending instead of locking, choice with and without a target dialogue, an out-of-range choice index, and advancing while a choice is pending being ignored.
   - **Addition beyond the DoD:** the "subscribing during dispatch" and "advance while waiting for a choice" tests are not in the list, but they pin the two behaviours most likely to be broken accidentally by a future refactor.
   - Verification: **all 18 tests pass.** They were run for real by the Unity Test Runner (`Unity.exe -batchmode -runTests -testPlatform EditMode`) against an isolated copy of the project with no pre-existing `Library`, so the run also cold-imported every asset: 0 compile errors, no missing scripts, and all seven assemblies built. That incidentally re-verified the scene YAML edits from Phase 1 and Phase 2, which until now had only been checked by reading the files.
+  - *2026-09-18:* Committed as `9b3d45b`. Re-ran via `unity cmd run_tests` against the live connected Editor (not just an isolated copy): still **18/18 passed**, confirming the suite survived the subsequent commits, the ARCH-16 namespace rename, and the two small bug fixes made in this session (`DialogueChoiceButton` null-check, `InventoryManager` duplicate-destroy fix).
 
 ### ARCH-11 — DialogueController publish order & reentrancy
 
@@ -478,6 +492,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - Deleted: `UI/Components/OnOffSettingUI.cs` (a namespace with nothing in it), `UI/Input/UIInputRouter.cs` (an empty MonoBehaviour, and the now-empty `UI/Input/` folder), `UI/Framework/IUIAdjustable.cs` (no implementors), and the `System.Reflection.Emit` import plus a redundant self-namespace import in `MenuButtonUI.cs`.
   - Each deleted script's GUID was grepped across `Assets/Scenes` and `Assets/Prefabs` first: none was referenced, so no scene can end up with a missing script.
   - The menu behaviour itself (hover, keyboard navigation, opening and closing windows) has **not** been checked in Play Mode.
+  - *2026-09-18:* Committed as `6cec367`. A follow-up read-only scan (before committing) confirmed the deletions left no dangling `m_Script` references anywhere under `Assets/Scenes` or `Assets/Prefabs`, and additionally found one leftover stale `m_EditorClassIdentifier` string (an editor-only hint, not a real reference) outside that scan's original scope, in `Assets/_Project/UIFramework/Prefabs/ButtonSemBorda.prefab` — fixed the same day. **Still not checked in Play Mode:** `Menu.unity` was not the loaded scene during this session's Play Mode pass (only `[Teste] CameraPan.unity` was exercised), so the menu hover/keyboard-navigation/window bug fixes remain unverified at runtime.
 
 ### ARCH-15 — UI assembly definition
 - **Priority:** Minor · **Trigger:** when UI grows beyond the inventory panel and menu, or when restructuring UI · **Complexity:** Low · **Depends on:** ARCH-07 · **Status:** DONE
@@ -512,6 +527,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
   - Stale `m_EditorClassIdentifier` hints were corrected in the same pass across scenes, both prefabs and the eight `DialogueData` assets. These are editor hints that Unity rewrites on save and do not affect loading, but several were wrong from older refactors and made the YAML misleading to read.
   - `[SerializeReference]` was re-checked: still unused, so nothing depends on stored type names beyond the UnityEvent strings above.
   - The wiring was verified by reading the serialized files, **not** in the Inspector — this session has no interactive Editor. Opening `[Teste] CameraPan.unity` and `Menu.unity` and confirming the buttons still list their methods is a worthwhile five-minute check.
+  - *2026-09-18:* Committed as `942df8f`. Play Mode confirmed the presenter's incremental path: after collecting the key, `InventoryPanel`'s child count went from 0 to 1 without needing to hide/show the panel. **New finding, not part of this item's original scope:** the presenter's *initial* rebuild (`OnEnable`) can still run before `InventoryManager.Instance` exists, because Canvas is an earlier scene root than GameController — see the new bullet added under ARCH-08's "Current problem" and the 2026-09-18 note under [2B](#2b--important-milestone-triggers-have-now-fired). This is a manager-lifecycle/bootstrap-ordering issue, not a data-ownership issue, so it belongs to ARCH-08 rather than being reopened here.
 
 ---
 
@@ -527,7 +543,7 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
 - **Definition of done:** conditional choices show and hide correctly, and the Dialogue asmdef still doesn't reference Inventory.
 
 ### ARCH-18 — Async/animated presentation lifecycle
-- **Priority:** Optional · **Trigger:** adding a typewriter effect, fades, timed sequences, voice lines or async scene loads · **Complexity:** Low · **Depends on:** ARCH-03 · **Status:** DEFERRED
+- **Priority:** Optional · **Trigger:** adding a typewriter effect, fades, timed sequences, voice lines or async scene loads — **fired 2026-09-18** · **Complexity:** Low · **Depends on:** ARCH-03 · **Status:** TODO
 - **Current problem (future):** coroutine and `Awaitable` continuations resume after the object was destroyed or the dialogue advanced or ended. This is a lifecycle issue (still main thread), not a concurrency issue.
 - **Recommended solution:**
   - Coroutines, owned by the view, for simple UI effects.
@@ -538,6 +554,8 @@ ARCH-04 ─► ARCH-07 ─┬────────┴─► ARCH-08 ─(recom
 - **Relevant files:** `Dialogue/UI/*`, any future effect scripts.
 - **Risks/considerations:** keep effect state in the view; don't let the view drive dialogue logic.
 - **Definition of done:** rapid clicking during effects never shows stale text, and a scene change mid-effect doesn't throw.
+- **Notes:**
+  - *2026-09-18:* Trigger fired (project owner confirmed typewriter/fades/voice lines are coming soon); status moved `DEFERRED` → `TODO`. Not yet designed — pick this up once dialogue UI work resumes, after ARCH-08/09 (see [Execution order](#execution-order)).
 
 ### ARCH-19 — Asset loading / Addressables strategy
 - **Priority:** Optional · **Trigger:** **measured** memory or load-time problems (large backgrounds, CGs, voice), or content-update needs · **Complexity:** Medium–High · **Depends on:** — · **Status:** DEFERRED
@@ -575,11 +593,11 @@ These were evaluated during the audit and **should not be refactored**. Change o
 
 ## Open questions (answers change priorities)
 
-- **Rooms:** are multiple rooms/scenes planned soon? That decides when ARCH-08 fires.
-- **Saves:** is a save system needed for the first playable? That decides when ARCH-09 fires.
-- **Build backend:** IL2CPP, and at what managed stripping level? That decides how urgent the `Activator` risk in ARCH-06 is.
-- **Dialogue presentation:** will dialogue use typewriter text or voice lines? That triggers ARCH-18.
-- **Click-through (ARCH-02):** confirm the bug in Play Mode. It was inferred, not observed.
+- ~~**Rooms:** are multiple rooms/scenes planned soon? That decides when ARCH-08 fires.~~ **Answered 2026-09-18: yes, soon.** ARCH-08 moved to `TODO`.
+- ~~**Saves:** is a save system needed for the first playable? That decides when ARCH-09 fires.~~ **Answered 2026-09-18: needed soon.** ARCH-09 moved to `TODO`.
+- **Build backend:** IL2CPP, and at what managed stripping level? Moot for the `Activator` risk specifically — ARCH-06 already removed all reflection-based state construction — but still worth answering before a first real build.
+- ~~**Dialogue presentation:** will dialogue use typewriter text or voice lines? That triggers ARCH-18.~~ **Answered 2026-09-18: yes, soon.** ARCH-18 moved to `TODO`.
+- **Click-through (ARCH-02):** partially confirmed 2026-09-18 in Play Mode via the connected Editor — `PlayerInputGate.IsEnabled` and `CanClickThisFrame`'s enabling-frame guard behave exactly as designed when driven directly (dialogue start/end correctly toggles the gate, no soft-lock, no stray console errors across a full dialogue → choice → inventory → locked-door → unlocked-door sequence). What's still unverified is the literal mouse-driven repro (moving the cursor over the trigger object and clicking through with real OS input) — the CLI has no click-simulation command, so this was exercised via direct method calls instead of Input System events. Low remaining risk, but not the same as an eyes-on Play Mode click test.
 
 ---
 
@@ -587,6 +605,7 @@ These were evaluated during the audit and **should not be refactored**. Change o
 
 | Date | Change |
 |---|---|
+| 2026-09-18 | **Committed and Play Mode-verified the 2026-09-17 refactor; un-deferred ARCH-08/09/18.** The entire ARCH-01–16 working tree (previously uncommitted) was split into 11 reviewable commits by module (`742bb83`…`e8590e7`). A read-only integrity scan found no dangling references from the deletions, plus one out-of-scope stale `m_EditorClassIdentifier` string in `ButtonSemBorda.prefab` (fixed). Live Play Mode verification via the connected Editor CLI exercised the full dialogue lifecycle (start/choice/end, gate toggling, no soft-lock), the inventory loop (collect key → locked door → unlocked door), and re-ran all 18 EditMode tests (still 18/18) — all with zero unexpected console errors. Two small bugs found during this pass were fixed: `DialogueChoiceButton` missing a null-check on `DialogueManager.Instance`, and `InventoryManager` destroying only the component instead of the GameObject on a duplicate singleton. One new bug was found and left open: `InventoryPresenter.OnEnable()` can race `InventoryManager.Awake()` at scene start (documented under ARCH-08). Asked the project owner about the roadmap's open questions: a second scene, save/load, and dialogue presentation effects are all coming soon, so ARCH-08, ARCH-09 and ARCH-18 moved from `DEFERRED` to `TODO` and were resequenced ahead of the Phase 4 optional items. |
 | 2026-09-15 | Roadmap created from the architectural audit (commit `2757f98`). No code changed. |
 | 2026-09-17 | **Phase 3 done.** ARCH-10 (18 EditMode tests for `MessageBroker` and `DialogueController`; Tests asmdef modernized), ARCH-13 (every ad-hoc flow log removed; tracing lives behind `VN_TRACE_MESSAGES`; warnings and errors carry a context object), ARCH-14 (five UI bugs fixed, four placeholders deleted), ARCH-15 (`ProjetoVN.UI.asmdef`; `Assembly-CSharp` now holds no project scripts) and ARCH-16 (`Assets.Scripts.*` → `ProjetoVN.*` across 28 files, `rootNamespace` set, bogus versionDefine removed, UnityEvent type strings corrected including one that was already broken). ARCH-11 and ARCH-12 remain `DEFERRED`: still no `DialogueTriggerMessage` consumer. |
 | 2026-09-17 | **Phase 2A done.** ARCH-05 (agreed communication rules now live in `Core/Messaging/README.md`, linked from all nine module READMEs; non-existent flows removed), ARCH-06 (state machine reduced to `BaseState` + a plain C# `StateMachine`; factories, reflection and demo code deleted; input-gate writes moved into state `Enter()`; Build Settings points at the gameplay scene), ARCH-04 (inventory commands and queries are direct calls; three messages deleted) and ARCH-07 (model owns `ItemDataSO`; `Item` and `itemDatabase` deleted; the inventory panel rebuilds from `InventoryManager.Items` on enable). ARCH-08 and ARCH-09 remain `DEFERRED`: their triggers were re-checked and have not fired. Play Mode verification still pending; see each item's notes. |
