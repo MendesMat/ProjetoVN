@@ -4,6 +4,8 @@ Este diretório funciona como o banco de dados principal do jogo, mas com uma pe
 
 As definições das classes e a lógica desses objetos (como `ItemDataSO` ou `DialogueData`) residem dentro de seus respectivos módulos lógicos (`Inventory`, `Dialogue`, etc). Esta pasta centraliza as instâncias criadas pelos Game Designers para facilitar a organização.
 
+> Ver também as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+
 ---
 
 ## Estrutura de Pastas de Dados
