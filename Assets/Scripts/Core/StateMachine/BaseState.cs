@@ -1,23 +1,16 @@
-using System;
-
-namespace Assets.Scripts.Core.StateMachine
+namespace ProjetoVN.Core.StateMachine
 {
     public abstract class BaseState
     {
-        protected IStateMachine StateMachine { get; }
-        public event Action<BaseState> OnStateExit;
+        protected StateMachine StateMachine { get; }
 
-        protected BaseState(IStateMachine stateMachine)
+        protected BaseState(StateMachine stateMachine)
         {
             StateMachine = stateMachine;
         }
 
         public virtual void Enter() { }
         public virtual void Update() { }
-        public virtual void FixedUpdate() { }
-        public virtual void Exit()
-        {
-            OnStateExit?.Invoke(this);
-        }
+        public virtual void Exit() { }
     }
 }

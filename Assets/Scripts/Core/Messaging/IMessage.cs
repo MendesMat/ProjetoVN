@@ -1,4 +1,4 @@
-namespace Assets.Scripts.Core.Messaging
+namespace ProjetoVN.Core.Messaging
 {
     public interface IMessage { }
 }

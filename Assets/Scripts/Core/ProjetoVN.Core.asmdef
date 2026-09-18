@@ -1,6 +1,6 @@
 {
     "name": "ProjetoVN.Core",
-    "rootNamespace": "",
+    "rootNamespace": "ProjetoVN.Core",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -9,12 +9,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [
-        {
-            "name": "com.unity.inputsystem",
-            "expression": "1.18",
-            "define": "1.18"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

@@ -1,6 +1,31 @@
 # Sistema de Mensageria (Messaging System)
 
-Este sistema provê uma forma desacoplada de comunicação entre diferentes componentes do projeto, utilizando o padrão **Publisher/Subscriber (Pub/Sub)**. Isso permite que partes do código interajam sem precisar conhecer diretamente a existência uma da outra.
+Este sistema provê comunicação entre componentes do projeto usando o padrão **Publisher/Subscriber (Pub/Sub)**, para que partes do código possam **avisar** que algo aconteceu sem conhecer quem está ouvindo.
+
+> **Leia primeiro as [Regras de comunicação](#regras-de-comunicação) abaixo.** Elas valem para o projeto inteiro e definem o que *deve* e o que *não deve* passar por este barramento. O plano arquitetural que as originou está em [`ARCHITECTURE_ROADMAP.md`](../../../../ARCHITECTURE_ROADMAP.md), na raiz do repositório.
+
+---
+
+## Regras de comunicação
+
+Estas regras são a referência única do projeto. **Todo README de módulo aponta para cá.** O erro que elas existem para evitar é usar um barramento de notificações para comandos, consultas e estado: uma consulta em pub/sub falha em silêncio com 0 ouvintes e responde duas vezes com 2, e um estado enviado como evento nunca chega a quem ainda não existia.
+
+| Interação | Use | Exemplo neste projeto |
+|---|---|---|
+| **Comando:** exatamente um dono precisa executar | Chamada direta de método no dono (singleton ou referência serializada) | `DialogueManager.Instance.StartDialogue(data)`, `InventoryManager.Instance.TryUse(item)` |
+| **Consulta:** você precisa de uma resposta | Chamada direta / propriedade. **Nunca** requisição-resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
+| **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
+| **Notificação:** "X aconteceu", 0..N ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`) | `DialogueStartedMessage`, `DialogueEndedMessage`, `DialogueTriggerMessage`, `ItemCollectedMessage`, `ItemUsedMessage` |
+| **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect` / `Interact` / `TriggerDialogue` |
+| **Um módulo precisa consultar outro que não pode referenciar** | Uma interface pequena, de posse do módulo que consulta (só quando for realmente necessário) | Condições de diálogo (ARCH-17, ainda não implementado) |
+
+Regras adicionais:
+
+- A UI pode **ler** estado dos managers; ela **modifica** apenas chamando os métodos do dono.
+- Um handler de mensagem não pode assumir que outro handler rodou antes ou depois dele.
+- Estado estático deve ser resetado em `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`.
+
+---
 
 ## Arquitetura e Scripts
 
@@ -12,19 +37,19 @@ O sistema é composto por três pilares principais localizados nesta pasta:
 
 ### 2. [MessageBroker.cs]
 - **Funcionalidade**: Gerenciador central de mensagens.
-- **Detalhes**: É uma classe estática que atua como o intermediário (broker). Ela mantém dicionários internos para mapear quais funções (*handlers*) estão interessadas em quais tipos de mensagens.
+- **Detalhes**: É uma classe estática que atua como o intermediário (broker). Os handlers de cada tipo de mensagem ficam guardados em um *holder* genérico próprio (`Handlers<T>`), fortemente tipado, sem conversões nem boxing.
 - **Principais Funcionalidades**:
-    - **Subscribe**: Permite que um objeto declare interesse em um tipo de mensagem. Internamente, ele cria um *wrapper* para lidar com a conversão de tipos de forma segura.
+    - **Subscribe**: Permite que um objeto declare interesse em um tipo de mensagem. É **idempotente**: assinar o mesmo handler duas vezes registra uma única entrada, então um único `Unsubscribe` sempre desfaz a assinatura.
     - **Unsubscribe**: Remove o interesse de um objeto, evitando que funções sejam chamadas em objetos que já foram destruídos (importante para evitar *Memory Leaks* na Unity).
-    - **Publish**: Dispara a mensagem para todos os ouvintes registrados.
-    - **Clear**: Limpa todos os registros, útil para limpeza de memória entre transições de cenas.
+    - **Publish**: Dispara a mensagem para todos os ouvintes registrados, **isolando exceções**: se um handler estourar, o erro é logado com `Debug.LogException` e os demais handlers continuam recebendo a mensagem.
+    - **Clear**: Limpa todos os registros. Também é chamado automaticamente no início de cada Play Mode (veja "Garantias" abaixo). `Clear<T>()` limpa apenas um tipo de mensagem.
 
-### 3. [Messages/StateChangedMessage.cs]
-- **Funcionalidade**: Exemplo de implementação de mensagem.
-- **Detalhes**: Uma `readonly struct` que transporta dados sobre mudanças de estado.
-- **Dados**:
-    - `Previous`: O estado do qual a máquina está saindo.
-    - `Next`: O estado para o qual a máquina está indo.
+### 3. Mensagens concretas
+As mensagens vivem no módulo que as **publica**, não aqui. Exemplos em uso:
+`Dialogue/Messaging/DialogueStartedMessage.cs`, `DialogueEndedMessage`, `DialogueLineMessage`,
+`DialogueChoicesMessage`, `DialogueTriggerMessage`, e `Inventory/Messages/ItemCollectedMessage.cs`,
+`ItemUsedMessage`. Todas são `readonly struct` implementando `IMessage`, e todas descrevem
+algo que **já aconteceu**.
 
 ---
 
@@ -33,33 +58,53 @@ O sistema é composto por três pilares principais localizados nesta pasta:
 O fluxo de comunicação segue uma ordem lógica de eventos:
 
 ### 1. Preparação (Definição)
-Define-se uma estrutura de dados que implementa `IMessage`. Ela deve conter todas as informações necessárias para quem for recebê-la.
-*Exemplo: `StateChangedMessage`.*
+Define-se uma `readonly struct` que implementa `IMessage`, no módulo que vai publicá-la. Ela deve conter todas as informações necessárias para quem for recebê-la, e o nome deve estar no passado ("aconteceu"), não no imperativo.
+*Exemplo: `ItemCollectedMessage`.*
 
 ### 2. Contratação (Subscribe)
 Um componente interessado (Ouvinte) se registra no `MessageBroker`. Geralmente isso é feito no `OnEnable` (Unity).
 ```csharp
 void OnEnable() {
-    MessageBroker.Subscribe<StateChangedMessage>(MinhaFuncaoDeResposta);
+    MessageBroker.Subscribe<ItemCollectedMessage>(MinhaFuncaoDeResposta);
 }
 ```
 
 ### 3. Gatilho (Publish)
 Um evento acontece no jogo e o componente responsável (Emissor) "grita" para o sistema que algo mudou, sem saber quem está ouvindo.
 ```csharp
-MessageBroker.Publish(new StateChangedMessage(estadoAntigo, novoEstado));
+MessageBroker.Publish(new ItemCollectedMessage(item));
 ```
 
 ### 4. Reação
-O `MessageBroker` recebe a mensagem e a entrega imediatamente para todos que fizeram o "Subscribe" anteriormente, executando suas respectivas funções.
+O `MessageBroker` recebe a mensagem e a entrega imediatamente (de forma síncrona, na mesma pilha de chamada de quem publicou) para todos que fizeram o "Subscribe" anteriormente, executando suas respectivas funções.
 
 ### 5. Finalização (Unsubscribe)
 O ouvinte deve sempre se remover do registro quando não for mais necessário (geralmente no `OnDisable` ou `OnDestroy`).
 ```csharp
 void OnDisable() {
-    MessageBroker.Unsubscribe<StateChangedMessage>(MinhaFuncaoDeResposta);
+    MessageBroker.Unsubscribe<ItemCollectedMessage>(MinhaFuncaoDeResposta);
 }
 ```
+
+---
+
+## Garantias do Broker
+
+Estas garantias existem para que um erro em um único assinante nunca trave o jogo inteiro. Conte com elas ao escrever handlers:
+
+- **Isolamento de exceções**: um handler que estoura não interrompe os outros nem propaga a exceção para quem publicou. A exceção é sempre logada, nunca engolida em silêncio.
+- **Snapshot durante o despacho**: assinar ou cancelar a assinatura *dentro* de um handler é seguro. A lista de handlers é substituída (copy-on-write) em vez de mutada, então o `Publish` em andamento termina de percorrer o conjunto que existia quando começou. Consequência: um handler removido durante o despacho ainda recebe a mensagem em voo.
+- **Ordem não garantida**: na prática a ordem é a de inscrição, mas **nenhum handler deve assumir** que outro rodou antes ou depois dele.
+- **Assinatura idempotente**: `Subscribe` duas vezes com o mesmo handler registra apenas uma entrada.
+- **Reset automático**: um `[RuntimeInitializeOnLoadMethod(SubsystemRegistration)]` chama `Clear()` no início de cada Play Mode, então o broker começa vazio mesmo com "Enter Play Mode Options → no domain reload" ligado. Isso não dispensa o `Unsubscribe`, que continua obrigatório durante a execução.
+- **Rastreamento opcional**: com o define `VN_TRACE_MESSAGES`, cada `Publish` loga o tipo da mensagem e quantos handlers a receberam, e a `StateMachine` loga cada troca de estado.
+
+### Por que o console fica quieto por padrão
+Os módulos **não** logam o próprio fluxo. Não existe "→ entrando em diálogo", "← mensagem recebida" ou "nó 3 processado" em lugar nenhum: esse rastreamento inteiro mora atrás do define acima, em um único lugar. O console em Play Mode mostra então só o que exige atenção — avisos e erros — em vez de enterrá-los em ruído, e as chamadas de log não alocam strings em build.
+
+Para ligar o rastreamento: **Project Settings → Player → Scripting Define Symbols**, adicione `VN_TRACE_MESSAGES`.
+
+Avisos e erros continuam sendo logados normalmente e, quando quem loga é um componente ou asset, passam `this` como contexto (`Debug.LogWarning(msg, this)`), para que clicar na mensagem selecione o objeto culpado na Hierarchy ou no Project.
 
 ---
 
@@ -67,3 +112,5 @@ void OnDisable() {
 - **Desacoplamento**: O emissor da mensagem não precisa de uma referência para o ouvinte.
 - **Escalabilidade**: Você pode adicionar novos ouvintes sem alterar o código de quem envia a mensagem.
 - **Organização**: Facilita a comunicação entre sistemas complexos como UI, Áudio e Lógica de Jogo.
+
+Esses benefícios valem **para notificações**. Para comandos e consultas, o barramento só troca uma chamada legível por um salto indireto, sem ganho de desacoplamento quando as duas pontas já compilam no mesmo assembly. Veja as [Regras de comunicação](#regras-de-comunicação).

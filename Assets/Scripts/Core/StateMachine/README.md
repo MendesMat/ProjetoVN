@@ -1,70 +1,63 @@
-# State Machine System
+# State Machine
 
-Este documento descreve o funcionamento e a arquitetura do sistema de máquina de estados (State Machine) localizado em `Assets/Scripts/Core/StateMachine`.
+Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo e, no futuro, inventário ou pausa). Fica em `Assets/Scripts/Core/StateMachine`.
 
-O sistema foi projetado para ser extensível, desacoplado e integrado ao sistema de mensagens do projeto.
-
----
-
-## Fluxo de Funcionamento
-
-O funcionamento da State Machine segue uma lógica de registro, criação sob demanda e execução de ciclo de vida:
-
-1.  **Definição**: Novos estados são criados herdando de `BaseState`.
-2.  **Registro**: As fábricas de estados são registradas no `StateMachine` via `RegisterState`.
-3.  **Requisição**: Quando uma troca de estado é solicitada, o sistema usa `GetOrCreateState` para recuperar uma instância existente ou criar uma nova usando a fábrica registrada.
-4.  **Transição**: O `ChangeState` encerra o estado atual (`Exit`), atualiza para o novo e inicia o novo estado (`Enter`).
-5.  **Ciclo de Vida**: O `StateMachine` (como `MonoBehaviour`) repassa os eventos de `Update` e `FixedUpdate` da Unity para o estado ativo.
-6.  **Comunicação**: Mudanças de estado notificam ouvintes através de eventos C# tradicionais e via `MessageBroker`.
+> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../../ARCHITECTURE_ROADMAP.md).
 
 ---
 
-## Scripts e Funcionalidades
+## O que este sistema deliberadamente **não** tem
 
-### 1. BaseState.cs
-**Papel**: Classe base abstrata para todos os estados do sistema.
+Isto é tão importante quanto o que ele tem, porque a versão anterior tinha tudo isso para servir dois estados vazios:
 
--   **Funcionalidades**:
-    -   Define os métodos virtuais de ciclo de vida: `Enter()`, `Update()`, `FixedUpdate()` e `Exit()`.
-    -   Fornece acesso à `IStateMachine` para que os estados possam solicitar transições.
-    -   Possui o evento `OnStateExit` disparado quando o estado termina.
-
-### 2. IStateMachine.cs & StateMachine.cs
-**Papel**: O núcleo do sistema que gerencia qual estado está ativo.
-
--   **IStateMachine**: Interface que define o contrato público (mudar estado, registrar fábricas, histórico).
--   **StateMachine (Implementação)**:
-    -   **Cache de Estados**: Mantém um dicionário (`stateCache`) para reaproveitar instâncias de estados, evitando alocações desnecessárias.
-    -   **Fábricas**: Gerencia um dicionário de `IStateFactory` para saber como instanciar cada tipo de estado.
-    -   **Histórico (Stack)**: Permite salvar o estado anterior em uma pilha para suportar operações de "Voltar" (`PopState`).
-    -   **Integração Unity**: Como herda de `MonoBehaviour`, ele é o responsável por chamar o `Update` e `FixedUpdate` do estado atual.
-    -   **Notificação**: Dispara eventos e publica mensagens (`StateChangedMessage`) no `MessageBroker`.
-
-### 3. IStateFactory.cs & StateFactory.cs
-**Papel**: Define como os estados são instanciados.
-
--   **IStateFactory**: Interface simples para o padrão Factory.
--   **StateFactory<T>**: Implementação genérica que pode instanciar estados automaticamente via `Activator` ou usar um método customizado passado por parâmetro. Isso permite injeção de dependências nos estados se necessário.
-
-### 4. StateController.cs
-**Papel**: Componente de alto nível que orquestra o uso da State Machine em um contexto específico.
-
--   **Funcionalidades**:
-    -   Atua como o "ponto de entrada" para configurar a State Machine no Inspector.
-    -   **Registro de Fábricas**: No `Awake`, ele registra quais estados (`MenuState`, `InventoryState`, etc.) a State Machine deve conhecer.
-    -   **Comandos de Transição**: Oferece métodos públicos como `OnOpenMenu()` ou `OnOpenInventory()` que facilitam a chamada de `ChangeState`.
-    -   **Logs e Debug**: Escuta as mudanças de estado para logar a transição no Console da Unity, tanto via eventos diretos quanto via `MessageBroker`.
+- **Sem fábricas e sem `Activator`.** Estados são criados com `new`. Construtores alcançados só por reflexão podem ser removidos pelo *managed stripping* do IL2CPP, e isso quebra **apenas na build**, nunca no Editor.
+- **Sem `IStateMachine`.** Há uma implementação só; a interface só servia para o Inspector guardar um `MonoBehaviour` e fazer cast.
+- **Sem registro prévio.** Não existe `RegisterState`: quem cria o estado é quem o usa.
+- **Sem `MonoBehaviour`.** A máquina é C# puro; o dono repassa o `Update`.
+- **Sem `StateChangedMessage`.** Troca de estado não é notificação de módulo cruzado; quem precisa saber é o próprio dono.
+- **Sem estados hierárquicos nem tabelas de transição.** Uma Visual Novel não precisa disso.
 
 ---
 
-## Como Adicionar um Novo Estado
+## Scripts
 
-1.  Crie uma nova classe herdando de `BaseState`.
-2.  No `StateController` (ou classe equivalente), registre a fábrica para esse novo tipo no método `RegisterFactories()`:
-    ```csharp
-    stateMachine.RegisterState<MeuNovoEstado>(new StateFactory<MeuNovoEstado>());
-    ```
-3.  Solicite a mudança para o novo estado quando necessário:
-    ```csharp
-    stateMachine.ChangeState(stateMachine.GetOrCreateState<MeuNovoEstado>());
-    ```
+### `BaseState.cs`
+Classe base de qualquer modo. Expõe `Enter()`, `Update()` e `Exit()`, e dá acesso protegido à `StateMachine` para que um estado possa pedir uma transição.
+
+**O estado é dono dos seus efeitos colaterais.** O que precisa valer enquanto ele estiver ativo é ligado no `Enter()` e desligado no `Exit()`. É por isso que `GameplayState.Enter()` libera o `PlayerInputGate` e `DialogueState.Enter()` o bloqueia: quem troca de estado não precisa lembrar de mexer no input, isso vem junto com o modo.
+
+### `StateMachine.cs`
+C# puro. API completa:
+
+| Membro | O que faz |
+|---|---|
+| `CurrentState` | O modo ativo. |
+| `ChangeState(next)` | Troca de modo: `Exit()` no atual, `Enter()` no novo. Ignora a chamada se `next` já for o estado atual. |
+| `Push(overlay)` | Empilha o modo atual e entra em um modo sobreposto (inventário, pausa). |
+| `Pop()` | Volta para o modo que estava embaixo. |
+| `Tick()` | Repassa o `Update` para o estado ativo. O dono chama isto do seu próprio `Update`. |
+
+`Push`/`Pop` dão `Exit`/`Enter` completos no modo de baixo. Isso é intencional: como os efeitos colaterais moram no `Enter`/`Exit`, a simetria garante que abrir e fechar um overlay deixa o jogo exatamente como estava.
+
+---
+
+## Como adicionar um novo estado
+
+São dois passos, e nenhum deles envolve registrar nada:
+
+1. Crie a classe:
+   ```csharp
+   public sealed class PauseState : BaseState
+   {
+       public PauseState(StateMachine stateMachine) : base(stateMachine) { }
+
+       public override void Enter() => Time.timeScale = 0f;
+       public override void Exit()  => Time.timeScale = 1f;
+   }
+   ```
+2. No dono da máquina (hoje o `GameStateController`, no módulo `GameFlow`), crie a instância no `Awake` e troque para ela quando for o caso:
+   ```csharp
+   _pauseState = new PauseState(_stateMachine);
+   // ...
+   _stateMachine.Push(_pauseState);   // ou ChangeState, se não for um overlay
+   ```

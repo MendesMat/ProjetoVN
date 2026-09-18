@@ -1,56 +1,85 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace Assets.Scripts.Core.Messaging
+namespace ProjetoVN.Core.Messaging
 {
     public static class MessageBroker
     {
-        private static readonly Dictionary<Type, List<Action<IMessage>>> _handlers = new();
-        private static readonly Dictionary<object, Action<IMessage>> _wrappers = new();
+        private static readonly List<Action> _clearActions = new();
+
+        private static class Handlers<T> where T : IMessage
+        {
+            public static Action<T>[] Snapshot = Array.Empty<Action<T>>();
+
+            static Handlers()
+            {
+                _clearActions.Add(() => Snapshot = Array.Empty<Action<T>>());
+            }
+        }
 
         public static void Subscribe<T>(Action<T> handler) where T : IMessage
         {
-            Type messageType = typeof(T);
+            if (handler == null) return;
 
-            if (!_handlers.ContainsKey(messageType))
-                _handlers[messageType] = new List<Action<IMessage>>();
+            Action<T>[] current = Handlers<T>.Snapshot;
+            if (Array.IndexOf(current, handler) >= 0) return;
 
-            Action<IMessage> wrapper = msg => handler((T)msg);
-            _wrappers[handler] = wrapper;
-            _handlers[messageType].Add(wrapper);
+            var updated = new Action<T>[current.Length + 1];
+            Array.Copy(current, updated, current.Length);
+            updated[current.Length] = handler;
+
+            Handlers<T>.Snapshot = updated;
         }
 
         public static void Unsubscribe<T>(Action<T> handler) where T : IMessage
         {
-            Type messageType = typeof(T);
+            if (handler == null) return;
 
-            if (!_handlers.TryGetValue(messageType, out List<Action<IMessage>> handlers))
+            Action<T>[] current = Handlers<T>.Snapshot;
+            int index = Array.IndexOf(current, handler);
+            if (index < 0) return;
+
+            if (current.Length == 1)
+            {
+                Handlers<T>.Snapshot = Array.Empty<Action<T>>();
                 return;
+            }
 
-            if (!_wrappers.TryGetValue(handler, out Action<IMessage> wrapper))
-                return;
+            var updated = new Action<T>[current.Length - 1];
+            Array.Copy(current, updated, index);
+            Array.Copy(current, index + 1, updated, index, current.Length - index - 1);
 
-            handlers.Remove(wrapper);
-            _wrappers.Remove(handler);
+            Handlers<T>.Snapshot = updated;
         }
 
         public static void Publish<T>(T message) where T : IMessage
         {
-            Type messageType = typeof(T);
+            Action<T>[] snapshot = Handlers<T>.Snapshot;
+            TracePublish<T>(snapshot.Length);
 
-            if (!_handlers.TryGetValue(messageType, out List<Action<IMessage>> handlers))
-                return;
-
-            foreach (Action<IMessage> handler in handlers.ToArray())
-                handler.Invoke(message);
+            for (int i = 0; i < snapshot.Length; i++)
+            {
+                try { snapshot[i].Invoke(message); }
+                catch (Exception exception) { Debug.LogException(exception); }
+            }
         }
 
         public static void Clear()
         {
-            _handlers.Clear();
-            _wrappers.Clear();
+            for (int i = 0; i < _clearActions.Count; i++)
+                _clearActions[i].Invoke();
         }
 
-        public static void Clear<T>() where T : IMessage => _handlers.Remove(typeof(T));
+        public static void Clear<T>() where T : IMessage => Handlers<T>.Snapshot = Array.Empty<Action<T>>();
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetOnPlayModeStart() => Clear();
+
+        [System.Diagnostics.Conditional("VN_TRACE_MESSAGES")]
+        private static void TracePublish<T>(int handlerCount) where T : IMessage
+        {
+            Debug.Log($"[MessageBroker] Publish<{typeof(T).Name}> → {handlerCount} handler(s).");
+        }
     }
 }
