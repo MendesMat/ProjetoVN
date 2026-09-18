@@ -8,19 +8,17 @@ namespace ProjetoVN.Inventory
         public static InventoryManager Instance { get; private set; }
 
         private InventoryService _service;
+        private readonly HashSet<string> _consumedWorldObjectIds = new();
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Debug.LogWarning("[InventoryManager] Duplicata encontrada. Destruindo objeto.", this);
-                Destroy(gameObject);
-                return;
-            }
-
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             _service = new InventoryService(new InventoryModel());
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         public IReadOnlyList<ItemDataSO> Items => _service.Items;
@@ -47,6 +45,21 @@ namespace ProjetoVN.Inventory
             }
 
             return _service.TryUseItem(item);
+        }
+
+        public void ReplaceAll(IEnumerable<ItemDataSO> items) => _service.ReplaceAll(items);
+
+        public bool IsWorldObjectConsumed(string persistentId) => _consumedWorldObjectIds.Contains(persistentId);
+
+        public void MarkWorldObjectConsumed(string persistentId) => _consumedWorldObjectIds.Add(persistentId);
+
+        public IReadOnlyCollection<string> ConsumedWorldObjectIds => _consumedWorldObjectIds;
+
+        public void ReplaceConsumedWorldObjectIds(IEnumerable<string> ids)
+        {
+            _consumedWorldObjectIds.Clear();
+            foreach (string id in ids)
+                _consumedWorldObjectIds.Add(id);
         }
     }
 }

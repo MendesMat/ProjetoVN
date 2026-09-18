@@ -32,5 +32,11 @@ namespace ProjetoVN.Inventory
             MessageBroker.Publish(new ItemUsedMessage(item));
             return true;
         }
+
+        public void ReplaceAll(IEnumerable<ItemDataSO> items)
+        {
+            _model.ReplaceAll(items);
+            MessageBroker.Publish(new InventoryReplacedMessage());
+        }
     }
 }

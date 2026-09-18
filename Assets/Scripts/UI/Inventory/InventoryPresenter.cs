@@ -14,24 +14,36 @@ namespace ProjetoVN.UI.Inventory
 
         private readonly Dictionary<ItemDataSO, GameObject> _activeSlots = new();
         private readonly Queue<GameObject> _slotPool = new();
+        private bool _initialized;
 
         private void OnEnable()
         {
             MessageBroker.Subscribe<ItemCollectedMessage>(OnItemCollected);
             MessageBroker.Subscribe<ItemUsedMessage>(OnItemUsed);
+            MessageBroker.Subscribe<InventoryReplacedMessage>(OnInventoryReplaced);
 
-            Rebuild();
+            if (_initialized)
+                Rebuild();
         }
 
         private void OnDisable()
         {
             MessageBroker.Unsubscribe<ItemCollectedMessage>(OnItemCollected);
             MessageBroker.Unsubscribe<ItemUsedMessage>(OnItemUsed);
+            MessageBroker.Unsubscribe<InventoryReplacedMessage>(OnInventoryReplaced);
+        }
+
+        private void Start()
+        {
+            _initialized = true;
+            Rebuild();
         }
 
         private void OnItemCollected(ItemCollectedMessage message) => AddSlot(message.CollectedItem);
 
         private void OnItemUsed(ItemUsedMessage message) => RemoveSlot(message.UsedItem);
+
+        private void OnInventoryReplaced(InventoryReplacedMessage message) => Rebuild();
 
         private void Rebuild()
         {

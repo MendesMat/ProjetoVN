@@ -19,5 +19,13 @@ namespace ProjetoVN.Inventory
         public bool Remove(ItemDataSO item) => item != null && _items.Remove(item);
 
         public bool Contains(ItemDataSO item) => item != null && _items.Contains(item);
+
+        public void ReplaceAll(IEnumerable<ItemDataSO> items)
+        {
+            _items.Clear();
+            foreach (ItemDataSO item in items)
+                if (item != null && !_items.Contains(item))
+                    _items.Add(item);
+        }
     }
 }
