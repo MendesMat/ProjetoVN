@@ -14,6 +14,9 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 - **`States/`**: Os estados concretos:
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
+- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
+- **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Ainda não há menu de save; na cena de teste, use o painel de debug.
+- **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
 
 ---
 

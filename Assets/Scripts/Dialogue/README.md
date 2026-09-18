@@ -31,7 +31,17 @@ Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica
 Localizada em `Assets/Scripts/Dialogue/Logic`, responsável pela máquina que processa e avança na história.
 
 - **`DialogueController`**: Motor C# puro que navega na árvore de dados. Dispara mensagens no momento certo e decide se aguarda um input de escolha ou pode avançar sequencialmente.
-- **`DialogueManager` (MonoBehaviour)**: Componente que deve viver na cena ou de forma global (`DontDestroyOnLoad`). Gerencia o `DialogueController` e expõe a API (`AdvanceDialogue`, `MakeChoice`, `StartDialogue`) para que a mecânica de Input do jogo consiga interagir.
+- **`DialogueManager` (MonoBehaviour)**: Vive no prefab persistente `Assets/Prefabs/Resources/Managers.prefab`, criado uma única vez pelo `ManagersBootstrap` (módulo `GameFlow`) — **não** coloque um `DialogueManager` em cenas. Gerencia o `DialogueController` e expõe a API (`AdvanceDialogue`, `MakeChoice`, `StartDialogue`) para que a mecânica de Input do jogo consiga interagir.
+
+### 4. Camada de Apresentação (UI)
+Localizada em `Assets/Scripts/Dialogue/UI`.
+
+- **`DialogueUIController`**: assina `DialogueLineMessage`, `DialogueChoicesMessage` e `DialogueEndedMessage` e liga/desliga a caixa, as escolhas e os textos. Dois campos opcionais (nulos em cenas antigas, sem erro):
+  - `speakerNameplate`: escondido quando o `SpeakerName` da fala está vazio. Deixe o `SpeakerName` vazio para **narração**.
+  - `continueIndicator`: o `>>`. Aparece a cada fala e some quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança o diálogo em qualquer lugar, e um `>>` clicável avançaria duas falas por clique (uma no press, pelo input, outra no release, pelo botão).
+- **`DialogueChoiceButton`**: um por botão de escolha, com o `choiceIndex` e o `OnClick` do `Button` ligado a `OnClicked()`.
+
+A arte fica em `Assets/UI/` (SVGs, importados como **UI SVGImage** e desenhados com o componente `SVGImage` do pacote `com.unity.vectorgraphics`). `Exemplo.svg` é o mockup de layout, não é usado em cena. A montagem de referência está em `Assets/Scenes/[Teste] Mecanicas.unity`, em `UI/Canvas_Game/DialogueUI`.
 
 #### Dados inválidos nunca travam o jogo
 `StartDialogue` retorna `bool`. Um `DialogueData` nulo ou sem nós loga um aviso (com o nome do asset) e retorna `false`, **sem publicar `DialogueStartedMessage`**. Como o `GameFlow` só entra em `DialogueState` ao ouvir o Started, o jogo continua em `GameplayState` com o input liberado em vez de ficar preso esperando um `DialogueEndedMessage` que nunca viria.

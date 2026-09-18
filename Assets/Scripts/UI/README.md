@@ -26,11 +26,16 @@ Uma UI que se monta **apenas** a partir de eventos fica errada dependendo de qua
 
 O `InventoryPresenter` faz exatamente isso:
 
-1. No `OnEnable`, assina `ItemCollectedMessage` e `ItemUsedMessage` **e** se reconstrói a partir de `InventoryManager.Instance.Items`.
-2. A partir daí, cada `ItemCollectedMessage` adiciona um slot e cada `ItemUsedMessage` remove um.
-3. No `OnDisable`, cancela as assinaturas.
+1. No `OnEnable`, assina `ItemCollectedMessage`, `ItemUsedMessage` e `InventoryReplacedMessage`.
+2. Reconstrói-se a partir de `InventoryManager.Instance.Items` — **no `Start` na primeira vez**, e no `OnEnable` nas ativações seguintes. A primeira reconstrução não pode ser no `OnEnable`: os managers são criados pelo `ManagersBootstrap` só depois do `Awake`/`OnEnable` da cena, e o `Start` é o primeiro ponto garantido depois disso.
+3. A partir daí, cada `ItemCollectedMessage` adiciona um slot, cada `ItemUsedMessage` remove um e cada `InventoryReplacedMessage` (publicada quando um save é carregado) reconstrói tudo.
+4. No `OnDisable`, cancela as assinaturas.
 
-O passo 1 é o que faz o painel estar certo quando o jogador coleta um item com o inventário fechado e só depois o abre. É também o que permitirá reconstruir a tela depois de carregar um save.
+O passo 2 é o que faz o painel estar certo quando o jogador coleta um item com o inventário fechado e só depois o abre.
+
+### O prefab do slot
+
+`Assets/Prefabs/UI/SlotUI.prefab`: raiz com `Image` de fundo, `LayoutElement` (140×140) e `ItemSlotUI`; filhos `Icon` (`Image`, escondido quando o item não tem ícone) e `Name` (TMP). As referências `iconImage` e `nameLabel` do `ItemSlotUI` precisam estar ligadas no prefab. Slots devolvidos ao pool são **desativados, não destruídos**, então `transform.childCount` do painel não diz quantos itens estão visíveis — conte os filhos ativos.
 
 As mensagens carregam o próprio `ItemDataSO`, então o slot lê nome e ícone direto do asset. **Não** mantenha uma lista de itens no Inspector da UI para procurar ícones: isso seria uma segunda fonte de verdade, e foi justamente o que essa estrutura eliminou.
 
