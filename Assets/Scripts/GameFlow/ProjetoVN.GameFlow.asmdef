@@ -1,6 +1,6 @@
 {
     "name": "ProjetoVN.GameFlow",
-    "rootNamespace": "",
+    "rootNamespace": "ProjetoVN.GameFlow",
     "references": [
         "GUID:f224320d92960dd4aaf6aeee46ddf5dc",
         "GUID:5154efaf2e3550d4890bdb8dc40259ff",

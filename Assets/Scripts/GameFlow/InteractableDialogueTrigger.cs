@@ -1,6 +1,5 @@
-using Assets.Scripts.Core.Messaging;
-using Assets.Scripts.Dialogue.Data;
-using Assets.Scripts.Dialogue.Messaging;
+using ProjetoVN.Dialogue.Data;
+using ProjetoVN.Dialogue.Logic;
 using UnityEngine;
 
 namespace ProjetoVN.GameFlow
@@ -13,12 +12,17 @@ namespace ProjetoVN.GameFlow
         {
             if (dialogueData == null)
             {
-                Debug.LogWarning($"[InteractableDialogueTrigger] Nenhum DialogueData atribuído em '{gameObject.name}'.");
+                Debug.LogWarning("[InteractableDialogueTrigger] Nenhum DialogueData atribuído.", this);
                 return;
             }
 
-            Debug.Log($"[InteractableDialogueTrigger] Clique em '{gameObject.name}' → DialogueRequestMessage: '{dialogueData.name}'");
-            MessageBroker.Publish(new DialogueRequestMessage(dialogueData));
+            if (DialogueManager.Instance == null)
+            {
+                Debug.LogError("[InteractableDialogueTrigger] Não há DialogueManager na cena. Clique ignorado.", this);
+                return;
+            }
+
+            DialogueManager.Instance.StartDialogue(dialogueData);
         }
     }
 }
