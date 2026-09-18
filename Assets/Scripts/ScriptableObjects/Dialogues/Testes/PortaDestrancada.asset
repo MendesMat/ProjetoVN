@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PortaDestrancada
   m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Data.DialogueData
   DialogueNodes:
-  - SpeakerName: A chave serviu! Destrancou a porta.
-    Text: 
+  - SpeakerName:
+    Text: A chave serviu! Destrancou a porta.
     Choices: []
     Triggers: []
   NextDialogueData: {fileID: 0}

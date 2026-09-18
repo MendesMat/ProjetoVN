@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PortaTrancada
   m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Data.DialogueData
   DialogueNodes:
-  - SpeakerName: "A porta est\xE1 trancada."
-    Text: 
+  - SpeakerName:
+    Text: "A porta est\xE1 trancada."
     Choices: []
     Triggers: []
   NextDialogueData: {fileID: 0}
