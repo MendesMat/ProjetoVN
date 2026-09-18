@@ -1,5 +1,3 @@
-using Assets.Scripts.Core.Messaging;
-using ProjetoVN.Inventory.Messages;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -17,28 +15,20 @@ namespace ProjetoVN.Inventory
         {
             if (requiredItem == null)
             {
-                Debug.LogError($"[LockedActionBehaviour] 'requiredItem' não foi atribuído em '{gameObject.name}'.");
+                Debug.LogError("[LockedActionBehaviour] 'requiredItem' não foi atribuído.", this);
                 return;
             }
 
-            MessageBroker.Publish(new CheckItemRequestMessage(requiredItem.Id, OnCheckResult));
-        }
-
-        private void OnCheckResult(bool hasRequiredItem)
-        {
-            if (!hasRequiredItem)
+            if (InventoryManager.Instance == null)
             {
-                OnLocked?.Invoke();
+                Debug.LogError("[LockedActionBehaviour] Não há InventoryManager na cena. Interação ignorada.", this);
                 return;
             }
 
-            Unlock();
-        }
-
-        private void Unlock()
-        {
-            MessageBroker.Publish(new UseItemCommandMessage(requiredItem.Id));
-            OnUnlocked?.Invoke();
+            if (InventoryManager.Instance.TryUse(requiredItem))
+                OnUnlocked?.Invoke();
+            else
+                OnLocked?.Invoke();
         }
     }
 }

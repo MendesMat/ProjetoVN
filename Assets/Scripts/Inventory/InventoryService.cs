@@ -1,4 +1,5 @@
-using Assets.Scripts.Core.Messaging;
+using System.Collections.Generic;
+using ProjetoVN.Core.Messaging;
 using ProjetoVN.Inventory.Messages;
 
 namespace ProjetoVN.Inventory
@@ -12,21 +13,23 @@ namespace ProjetoVN.Inventory
             _model = model;
         }
 
-        public bool HasItem(string itemId) => _model.HasItem(itemId);
+        public IReadOnlyList<ItemDataSO> Items => _model.Items;
 
-        public void CollectItem(Item item)
+        public bool HasItem(ItemDataSO item) => _model.Contains(item);
+
+        public bool CollectItem(ItemDataSO item)
         {
-            _model.AddItem(item);
+            if (!_model.Add(item)) return false;
+
             MessageBroker.Publish(new ItemCollectedMessage(item));
+            return true;
         }
 
-        public bool TryUseItem(string itemId)
+        public bool TryUseItem(ItemDataSO item)
         {
-            if (!_model.HasItem(itemId)) return false;
+            if (!_model.Remove(item)) return false;
 
-            Item usedItem = _model.FindById(itemId);
-            _model.RemoveItem(itemId);
-            MessageBroker.Publish(new ItemUsedMessage(usedItem));
+            MessageBroker.Publish(new ItemUsedMessage(item));
             return true;
         }
     }

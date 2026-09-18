@@ -1,5 +1,3 @@
-using Assets.Scripts.Core.Messaging;
-using ProjetoVN.Inventory.Messages;
 using UnityEngine;
 
 namespace ProjetoVN.Inventory
@@ -12,11 +10,17 @@ namespace ProjetoVN.Inventory
         {
             if (itemData == null)
             {
-                Debug.LogError($"[CollectableItemBehaviour] 'itemData' não foi atribuído em '{gameObject.name}'.");
+                Debug.LogError("[CollectableItemBehaviour] 'itemData' não foi atribuído.", this);
                 return;
             }
 
-            MessageBroker.Publish(new CollectItemCommandMessage(itemData.ToDomainItem()));
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError("[CollectableItemBehaviour] Não há InventoryManager na cena. Coleta ignorada.", this);
+                return;
+            }
+
+            InventoryManager.Instance.Collect(itemData);
             gameObject.SetActive(false);
         }
     }

@@ -1,6 +1,6 @@
 {
     "name": "ProjetoVN.Inventory",
-    "rootNamespace": "",
+    "rootNamespace": "ProjetoVN.Inventory",
     "references": [
         "GUID:f224320d92960dd4aaf6aeee46ddf5dc"
     ],

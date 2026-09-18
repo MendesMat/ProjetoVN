@@ -1,27 +1,23 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ProjetoVN.Inventory
 {
     public sealed class InventoryModel
     {
-        private readonly List<Item> _items = new();
-        public IReadOnlyList<Item> Items => _items.AsReadOnly();
+        private readonly List<ItemDataSO> _items = new();
 
+        public IReadOnlyList<ItemDataSO> Items => _items;
 
-        public void AddItem(Item item) => _items.Add(item);
-
-        public bool RemoveItem(string itemId)
+        public bool Add(ItemDataSO item)
         {
-            Item itemToRemove = FindById(itemId);
-            if (itemToRemove == null) return false;
+            if (item == null || Contains(item)) return false;
 
-            _items.Remove(itemToRemove);
+            _items.Add(item);
             return true;
         }
 
-        public bool HasItem(string itemId) => FindById(itemId) != null;
+        public bool Remove(ItemDataSO item) => item != null && _items.Remove(item);
 
-        public Item FindById(string itemId) => _items.FirstOrDefault(i => i.Id == itemId);
+        public bool Contains(ItemDataSO item) => item != null && _items.Contains(item);
     }
 }

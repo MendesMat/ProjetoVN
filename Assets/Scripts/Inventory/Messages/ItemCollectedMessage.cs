@@ -1,12 +1,12 @@
-using Assets.Scripts.Core.Messaging;
+using ProjetoVN.Core.Messaging;
 
 namespace ProjetoVN.Inventory.Messages
 {
     public readonly struct ItemCollectedMessage : IMessage
     {
-        public Item CollectedItem { get; }
+        public ItemDataSO CollectedItem { get; }
 
-        public ItemCollectedMessage(Item collectedItem)
+        public ItemCollectedMessage(ItemDataSO collectedItem)
         {
             CollectedItem = collectedItem;
         }
