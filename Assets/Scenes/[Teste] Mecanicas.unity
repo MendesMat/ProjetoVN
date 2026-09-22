@@ -3768,7 +3768,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ProjetoVN.Inventory.LockedActionBehaviour, ProjetoVN.Inventory
+      value: ProjetoVN.GameFlow.LockedActionBehaviour, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -3848,6 +3848,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1549455983}
+    - targetCorrespondingSourceObject: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1549455984}
   m_SourcePrefab: {fileID: 100100000, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
 --- !u!4 &1549455979 stripped
 Transform:
@@ -3881,8 +3884,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21fec084eae806d4aaf0956d2cead1f1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Inventory::ProjetoVN.Inventory.LockedActionBehaviour
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.LockedActionBehaviour
   requiredItem: {fileID: 11400000, guid: 66320ee0ac9cdda4bb59f1ee560d781c, type: 2}
+  requiredFlagId: 
+  unlockedFlagId: porta-mecanicas-destrancada
   OnUnlocked:
     m_PersistentCalls:
       m_Calls:
@@ -3915,6 +3920,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  OnOpened:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1549455984}
+        m_TargetAssemblyTypeName: ProjetoVN.GameFlow.DevTools.PlaceholderTint, ProjetoVN.GameFlow
+        m_MethodName: Apply
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnAlreadyUnlocked:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1549455983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3928,6 +3951,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
   dialogueData: {fileID: 11400000, guid: 2c5a47f0ce4199649afc255a0d3e8677, type: 2}
+--- !u!114 &1549455984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549455981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b29e2ed80014c7c469d7013f77a7367f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.DevTools.PlaceholderTint
+  target: {fileID: 0}
+  tint: {r: 0, g: 1, b: 0, a: 1}
 --- !u!1 &1596781283
 GameObject:
   m_ObjectHideFlags: 0

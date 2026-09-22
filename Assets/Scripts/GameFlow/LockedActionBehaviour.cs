@@ -1,0 +1,139 @@
+using ProjetoVN.Core.State;
+using ProjetoVN.Inventory;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace ProjetoVN.GameFlow
+{
+    /// <summary>
+    /// Portão de cena: libera uma ação quando os requisitos são atendidos e <b>lembra</b> que já
+    /// liberou. A memória é uma flag de história (<see cref="StoryFlags"/>), então ela já entra no
+    /// save por <c>GameState.storyFlagIds</c> e sobrevive a recarregar a cena.
+    /// <para>
+    /// Os quatro eventos separam <b>estado</b> de <b>ação</b>, e essa é a distinção que importa:
+    /// <c>OnOpened</c> é "este portão está aberto" (dispara ao destrancar e de novo a cada carga de
+    /// cena em que ele já esteja aberto), enquanto <c>OnAlreadyUnlocked</c> é "o jogador interagiu
+    /// com um portão aberto" (dispara só por clique). Ligar uma troca de cena no primeiro
+    /// teleportaria o jogador sozinho no <c>Start()</c>; ela pertence ao segundo.
+    /// </para>
+    /// <para>
+    /// Mora no <c>GameFlow</c>, e não no <c>Inventory</c>, porque combina item (Inventory) com flag
+    /// (Core): é progressão de história, não regra de inventário. É ligado ao objeto pelo
+    /// <c>UnityEvent</c> <c>OnInteract</c> do <c>InteractableItem</c>, igual ao
+    /// <see cref="InteractableDialogueTrigger"/>.
+    /// </para>
+    /// </summary>
+    public sealed class LockedActionBehaviour : MonoBehaviour
+    {
+        [Header("Requisitos (preencha pelo menos um; valem juntos)")]
+        [Tooltip("Item exigido. É consumido ao destrancar. Vazio = portão só de flag.")]
+        [SerializeField] private ItemDataSO requiredItem;
+
+        [Tooltip("Flag exigida. NÃO é consumida. Vazio = portão só de item.")]
+        [SerializeField] private string requiredFlagId;
+
+        [Header("Memória")]
+        [Tooltip("Flag ligada ao destrancar. É o que mantém o portão aberto depois. " +
+                 "Vazio = sem memória: o portão consome o item e volta a trancar.")]
+        [SerializeField] private string unlockedFlagId;
+
+        [Header("Events")]
+        [Tooltip("O momento em que destrancou: a narrativa do 'a chave serviu'. Dispara uma vez só.")]
+        public UnityEvent OnUnlocked;
+
+        [Tooltip("Faltou o requisito.")]
+        public UnityEvent OnLocked;
+
+        [Tooltip("ESTADO, não ação: 'este portão está aberto'. Dispara ao destrancar e de novo no " +
+                 "Start() de toda cena em que ele já esteja aberto. Use para aparência e passagem " +
+                 "(sprite, collider). Nunca ligue aqui algo iniciado pelo jogador — isso dispararia sozinho.")]
+        public UnityEvent OnOpened;
+
+        [Tooltip("AÇÃO do jogador sobre um portão já aberto — atravessar, trocar de cena. " +
+                 "É um gancho puro: se nada estiver ligado aqui, nada acontece (de propósito).")]
+        public UnityEvent OnAlreadyUnlocked;
+
+        public void Interact()
+        {
+            if (!HasRequirement())
+            {
+                Debug.LogError("[LockedActionBehaviour] Nem 'requiredItem' nem 'requiredFlagId' foram preenchidos: este portão não tranca nada. Interação ignorada.", this);
+                return;
+            }
+
+            // StoryFlags.IsSet("") é sempre false, então um 'unlockedFlagId' vazio nunca entra aqui:
+            // o portão simplesmente fica sem memória, exatamente como era antes.
+            if (StoryFlags.IsSet(unlockedFlagId))
+            {
+                OnAlreadyUnlocked?.Invoke();
+                return;
+            }
+
+            // A flag é checada ANTES do item de propósito: ela não consome nada. Na ordem inversa,
+            // um portão que exige os dois gastaria a chave do jogador só para descobrir que a flag
+            // ainda não estava ligada. Não inverta.
+            if (!string.IsNullOrWhiteSpace(requiredFlagId) && !StoryFlags.IsSet(requiredFlagId))
+            {
+                OnLocked?.Invoke();
+                return;
+            }
+
+            if (requiredItem == null)
+            {
+                Unlock();
+                return;
+            }
+
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError("[LockedActionBehaviour] Não há InventoryManager na cena. Interação ignorada.", this);
+                return;
+            }
+
+            if (!InventoryManager.Instance.TryUse(requiredItem))
+            {
+                OnLocked?.Invoke();
+                return;
+            }
+
+            Unlock();
+        }
+
+        private bool HasRequirement() =>
+            requiredItem != null || !string.IsNullOrWhiteSpace(requiredFlagId);
+
+        /// <summary>
+        /// Restaura o estado aberto ao carregar a cena. <c>ManagersBootstrap</c> roda em
+        /// <c>AfterSceneLoad</c>, ou seja, antes de qualquer <c>Start()</c>, e <c>StoryFlags</c> é
+        /// estático — então aqui a flag já reflete a sessão (ou o save) atual.
+        /// </summary>
+        private void Start()
+        {
+            if (StoryFlags.IsSet(unlockedFlagId)) OnOpened?.Invoke();
+        }
+
+        /// <summary>Grava a memória e dispara os eventos. <c>Set</c> ignora sozinho um id vazio.</summary>
+        private void Unlock()
+        {
+            StoryFlags.Set(unlockedFlagId);
+
+            // Estado antes da narrativa: o portão já está visualmente aberto quando a fala aparece.
+            OnOpened?.Invoke();
+            OnUnlocked?.Invoke();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (!HasRequirement())
+                Debug.LogWarning("[LockedActionBehaviour] Nem 'requiredItem' nem 'requiredFlagId' foram preenchidos: este portão abriria sempre. Preencha pelo menos um.", this);
+
+            if (string.IsNullOrWhiteSpace(unlockedFlagId))
+                Debug.LogWarning("[LockedActionBehaviour] O campo 'unlockedFlagId' está vazio: este portão não lembra que foi aberto e vai trancar de novo depois de consumir o item. Preencha um id único (ex.: \"porta-mecanicas-destrancada\").", this);
+
+            if (!string.IsNullOrWhiteSpace(unlockedFlagId) && unlockedFlagId == requiredFlagId)
+                Debug.LogWarning("[LockedActionBehaviour] 'requiredFlagId' e 'unlockedFlagId' são a mesma flag: o portão se considera aberto antes de abrir, e OnUnlocked nunca dispara. Use ids diferentes.", this);
+        }
+#endif
+    }
+}
