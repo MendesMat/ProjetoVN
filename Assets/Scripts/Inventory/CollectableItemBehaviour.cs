@@ -38,7 +38,12 @@ namespace ProjetoVN.Inventory
                 return;
             }
 
-            InventoryManager.Instance.Collect(itemData);
+            if (!InventoryManager.Instance.Collect(itemData))
+            {
+                Debug.LogWarning("[CollectableItemBehaviour] O item já estava no inventário. O objeto continua no mundo.", this);
+                return;
+            }
+
             InventoryManager.Instance.MarkWorldObjectConsumed(persistentId);
             gameObject.SetActive(false);
         }

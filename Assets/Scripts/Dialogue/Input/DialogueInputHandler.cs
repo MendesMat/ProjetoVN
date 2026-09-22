@@ -11,12 +11,20 @@ namespace ProjetoVN.Dialogue.Input
         #region Unity Lifecycle
         private void OnEnable()
         {
+            if (advanceDialogueAction == null)
+            {
+                Debug.LogError("[DialogueInputHandler] 'advanceDialogueAction' não foi atribuído. O diálogo não poderá avançar.", this);
+                return;
+            }
+
             advanceDialogueAction.action.Enable();
             advanceDialogueAction.action.performed += OnAdvanceDialogue;
         }
 
         private void OnDisable()
         {
+            if (advanceDialogueAction == null) return;
+
             advanceDialogueAction.action.performed -= OnAdvanceDialogue;
             advanceDialogueAction.action.Disable();
         }

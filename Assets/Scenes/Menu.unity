@@ -781,7 +781,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 741e81649b1909a4995f51d20c6536db, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::ProjetoVN.UIFramework.UIWindowManager
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Framework.UIWindowManager
   startingWindow: {fileID: 850518382}
 --- !u!4 &282796493
 Transform:
@@ -2892,7 +2892,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9164c7e144b11c54683f8da4d4aa11ad, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::ProjetoVN.UIFramework.UIWindow
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Framework.UIWindow
   root: {fileID: 850518378}
   firstSelected: {fileID: 1756711924}
   rememberLastSelected: 1
@@ -6293,7 +6293,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9164c7e144b11c54683f8da4d4aa11ad, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: ProjetoVN.Core::ProjetoVN.UIFramework.UIWindow
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Framework.UIWindow
   root: {fileID: 1921894227}
   firstSelected: {fileID: 1522841112}
   rememberLastSelected: 0

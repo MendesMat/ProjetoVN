@@ -18,8 +18,15 @@ namespace ProjetoVN.PointNClick
 
         private enum PanDirection { None, Left, Right }
 
+        private void Awake()
+        {
+            if (environmentContainer == null)
+                Debug.LogError("[ScreenPanController] 'environmentContainer' não foi atribuído. O cenário não vai se mover.", this);
+        }
+
         private void Update()
         {
+            if (environmentContainer == null) return;
             if (!PlayerInputGate.IsEnabled) return;
 
             PanDirection direction = DetectPanDirection();
