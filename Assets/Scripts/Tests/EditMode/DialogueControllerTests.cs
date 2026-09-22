@@ -58,6 +58,28 @@ namespace ProjetoVN.Tests.EditMode
             return data;
         }
 
+        /// <summary>Efeito de teste: conta execuções e permite observar o estado no momento em que roda.</summary>
+        private sealed class SpyEffect : DialogueEffectSO
+        {
+            public int ExecutionCount;
+            public System.Action OnExecuted;
+
+            public override void Execute()
+            {
+                ExecutionCount++;
+                OnExecuted?.Invoke();
+            }
+        }
+
+        private sealed class ThrowingEffect : DialogueEffectSO
+        {
+            public override void Execute() => throw new System.InvalidOperationException("falha proposital");
+        }
+
+        private static SpyEffect Effect() => ScriptableObject.CreateInstance<SpyEffect>();
+
+        private static ThrowingEffect BrokenEffect() => ScriptableObject.CreateInstance<ThrowingEffect>();
+
         #endregion
 
         #region Dados inválidos
@@ -236,6 +258,192 @@ namespace ProjetoVN.Tests.EditMode
             Assert.AreEqual(1, _lines.Count, "clicar para avançar não pode pular uma escolha pendente");
         }
 
+        #endregion
+
+        #region Efeitos
+        [Test]
+        public void StartDialogue_ExecutesTheFirstNodeEffects_Once()
+        {
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect effect = Effect();
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            _controller.StartDialogue(root);
+
+            Assert.AreEqual(1, effect.ExecutionCount);
+        }
+
+        [Test]
+        public void ProcessNode_ExecutesEffectsAfterPublishingTheLine()
+        {
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect effect = Effect();
+            int linesWhenEffectRan = -1;
+            effect.OnExecuted = () => linesWhenEffectRan = _lines.Count;
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            _controller.StartDialogue(root);
+
+            Assert.AreEqual(1, linesWhenEffectRan,
+                "o efeito não pode rodar antes da fala, senão a UI mostra um estado que o jogador ainda não viu acontecer");
+        }
+
+        [Test]
+        public void ProcessNode_ExecutesEffectsAfterPublishingTheChoices()
+        {
+            DialogueData root = Dialogue("Raiz", "Pergunta");
+            root.DialogueNodes[0].Choices.Add(new DialogueChoice { Text = "Escolha" });
+
+            SpyEffect effect = Effect();
+            int choicesWhenEffectRan = -1;
+            effect.OnExecuted = () => choicesWhenEffectRan = _choices.Count;
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            _controller.StartDialogue(root);
+
+            Assert.AreEqual(1, choicesWhenEffectRan, "as escolhas precisam estar na tela antes do efeito rodar");
+        }
+
+        [Test]
+        public void NextNode_ExecutesEachNodeEffectsExactlyOnce()
+        {
+            DialogueData root = Dialogue("Raiz", "Primeira", "Segunda");
+            SpyEffect first = Effect();
+            SpyEffect second = Effect();
+            root.DialogueNodes[0].Effects.Add(first);
+            root.DialogueNodes[1].Effects.Add(second);
+
+            _controller.StartDialogue(root);
+            Assert.AreEqual(1, first.ExecutionCount);
+            Assert.AreEqual(0, second.ExecutionCount, "o efeito do nó seguinte não pode rodar adiantado");
+
+            _controller.NextNode();
+            Assert.AreEqual(1, first.ExecutionCount, "avançar não pode reexecutar o efeito do nó anterior");
+            Assert.AreEqual(1, second.ExecutionCount);
+        }
+
+        [Test]
+        public void Chaining_ExecutesTheChainedDialogueEffects()
+        {
+            DialogueData next = Dialogue("Proximo", "Continuação");
+            SpyEffect effect = Effect();
+            next.DialogueNodes[0].Effects.Add(effect);
+
+            DialogueData root = Dialogue("Raiz", "Fala");
+            root.NextDialogueData = next;
+
+            _controller.StartDialogue(root);
+            _controller.NextNode();
+
+            Assert.AreEqual(1, effect.ExecutionCount, "um diálogo encadeado precisa rodar seus próprios efeitos");
+        }
+
+        [Test]
+        public void SelectChoice_ExecutesOnlyTheChosenChoiceEffects()
+        {
+            DialogueData root = Dialogue("Raiz", "Pergunta");
+            SpyEffect chosen = Effect();
+            SpyEffect notChosen = Effect();
+
+            var first = new DialogueChoice { Text = "Sim" };
+            first.Effects.Add(chosen);
+            var second = new DialogueChoice { Text = "Não" };
+            second.Effects.Add(notChosen);
+
+            root.DialogueNodes[0].Choices.Add(first);
+            root.DialogueNodes[0].Choices.Add(second);
+
+            _controller.StartDialogue(root);
+            _controller.SelectChoice(0);
+
+            Assert.AreEqual(1, chosen.ExecutionCount);
+            Assert.AreEqual(0, notChosen.ExecutionCount,
+                "a escolha recusada não pode alterar o jogo");
+        }
+
+        [Test]
+        public void SelectChoice_ExecutesChoiceEffectsBeforeTheTargetDialogueLine()
+        {
+            DialogueData target = Dialogue("Alvo", "Obrigada pela chave!");
+
+            DialogueData root = Dialogue("Raiz", "Pergunta");
+            SpyEffect effect = Effect();
+            int linesWhenEffectRan = -1;
+            effect.OnExecuted = () => linesWhenEffectRan = _lines.Count;
+
+            var choice = new DialogueChoice { Text = "Entregar a chave", TargetDialogue = target };
+            choice.Effects.Add(effect);
+            root.DialogueNodes[0].Choices.Add(choice);
+
+            _controller.StartDialogue(root);
+            _controller.SelectChoice(0);
+
+            Assert.AreEqual(1, linesWhenEffectRan,
+                "o efeito da escolha precisa valer antes da resposta aparecer");
+            Assert.AreEqual("Obrigada pela chave!", _lines[1].Text);
+        }
+
+        [Test]
+        public void ProcessNode_WithANullEffectInTheList_RunsTheRest()
+        {
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect effect = Effect();
+            root.DialogueNodes[0].Effects.Add(null);
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            Assert.DoesNotThrow(() => _controller.StartDialogue(root));
+            Assert.AreEqual(1, effect.ExecutionCount,
+                "um slot vazio no Inspector não pode impedir os outros efeitos do nó");
+        }
+
+        [Test]
+        public void ProcessNode_WithAThrowingEffect_RunsTheRemainingEffects()
+        {
+            LogAssert.Expect(LogType.Exception, new Regex("InvalidOperationException: falha proposital"));
+
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect survivor = Effect();
+            root.DialogueNodes[0].Effects.Add(BrokenEffect());
+            root.DialogueNodes[0].Effects.Add(survivor);
+
+            _controller.StartDialogue(root);
+
+            Assert.AreEqual(1, survivor.ExecutionCount,
+                "um asset de conteúdo quebrado não pode derrubar o resto do diálogo");
+            Assert.IsTrue(_controller.IsActive, "o diálogo precisa continuar jogável depois de um efeito com defeito");
+        }
+
+        [Test]
+        public void NextNode_AfterTheDialogueEnded_RunsNoEffect()
+        {
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect effect = Effect();
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            _controller.StartDialogue(root);
+            _controller.NextNode(); // termina o diálogo
+            _controller.NextNode(); // no-op
+
+            Assert.AreEqual(1, effect.ExecutionCount);
+        }
+
+        [Test]
+        public void AnEffectThatStartsAnotherDialogue_IsRefusedInsteadOfCorruptingState()
+        {
+            LogAssert.Expect(LogType.Warning, new Regex("no meio da execução de efeitos"));
+
+            DialogueData intruder = Dialogue("Intruso", "Não deveria aparecer");
+
+            DialogueData root = Dialogue("Raiz", "Fala");
+            SpyEffect effect = Effect();
+            effect.OnExecuted = () => _controller.StartDialogue(intruder);
+            root.DialogueNodes[0].Effects.Add(effect);
+
+            _controller.StartDialogue(root);
+
+            Assert.AreEqual(1, _lines.Count, "o diálogo intruso não pode roubar o fluxo no meio de um nó");
+            Assert.AreEqual("Fala", _lines[0].Text);
+        }
         #endregion
     }
 }

@@ -8,6 +8,6 @@ namespace ProjetoVN.Dialogue.Data
     {
         public string Text;
         public DialogueData TargetDialogue;
-        public List<DialogueTrigger> Triggers = new ();
+        public List<DialogueEffectSO> Effects = new ();
     }
 }

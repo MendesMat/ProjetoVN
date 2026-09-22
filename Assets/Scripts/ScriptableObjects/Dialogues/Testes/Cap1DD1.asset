@@ -18,16 +18,18 @@ MonoBehaviour:
     Choices:
     - Text: Sim
       TargetDialogue: {fileID: 11400000, guid: 29b985e3a1541d9408fd43766d228093, type: 2}
-      Triggers: []
+      Effects:
+      - {fileID: 11400000, guid: d293dadefc6429b4db8ae5bdbd5247c7, type: 2}
+      - {fileID: 11400000, guid: 1c33b22bb6d4801459fbb7957ba7e863, type: 2}
     - Text: "N\xE3o"
       TargetDialogue: {fileID: 11400000, guid: 6378ef270fb4f33439237d44b7c30639, type: 2}
-      Triggers: []
+      Effects: []
     - Text: Talvez
       TargetDialogue: {fileID: 11400000, guid: 57b36f5988891e343894f06339011eda, type: 2}
-      Triggers: []
-    Triggers: []
+      Effects: []
+    Effects: []
   - SpeakerName: "G\xF3tica"
     Text: "A escola est\xE1 mais quieta do que eu imaginava."
     Choices: []
-    Triggers: []
+    Effects: []
   NextDialogueData: {fileID: 11400000, guid: 63a9c136cca873043abecbeb694be668, type: 2}

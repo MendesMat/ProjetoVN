@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ProjetoVN.Core.Messaging;
 using ProjetoVN.Dialogue.Data;
@@ -12,6 +13,7 @@ namespace ProjetoVN.Dialogue.Logic
         private DialogueData _currentData;
         private int _currentNodeIndex;
         private bool _isWaitingForChoice;
+        private bool _isExecutingEffects;
         #endregion
 
         #region Properties
@@ -54,6 +56,13 @@ namespace ProjetoVN.Dialogue.Logic
         #region Dialogue Controls
         public bool StartDialogue(DialogueData data)
         {
+            if (_isExecutingEffects)
+            {
+                Debug.LogWarning($"[DialogueController] StartDialogue: um efeito tentou iniciar '{(data != null ? data.name : "null")}' " +
+                                 "no meio da execução de efeitos. Isso seria sobrescrito logo em seguida. Diálogo ignorado.");
+                return false;
+            }
+
             if (!IsPlayable(data, "StartDialogue")) return false;
 
             bool isNewSession = !IsActive;
@@ -87,7 +96,13 @@ namespace ProjetoVN.Dialogue.Logic
 
             DialogueChoice choice = CurrentNode.Choices[choiceIndex];
 
-            PublishTriggers(choice.Triggers);
+            // ARCH-11: libera a espera antes dos efeitos, para que um efeito reentrante caia em
+            // CanSelectChoice() e seja ignorado de graça, e para que ProcessChoiceTarget não precise mexer nisso.
+            _isWaitingForChoice = false;
+
+            // Efeitos da escolha rodam ANTES do alvo resolver: "tome a chave" precisa valer
+            // antes da fala de resposta aparecer.
+            ExecuteEffects(choice.Effects);
             ProcessChoiceTarget(choice);
         }
         #endregion
@@ -115,7 +130,6 @@ namespace ProjetoVN.Dialogue.Logic
                 return;
             }
 
-            _isWaitingForChoice = false;
             NextNode();
         }
 
@@ -129,9 +143,15 @@ namespace ProjetoVN.Dialogue.Logic
         #region Message Publishers
         private void ProcessCurrentNode()
         {
-            PublishTriggers(CurrentNode.Triggers);
+            // ARCH-11: o nó é capturado antes de publicar, porque um efeito pode trocar o diálogo atual.
+            DialogueNode node = CurrentNode;
+
+            // Ordem deliberada: estado assentado → fala → escolhas → efeitos.
+            // Efeitos por último garante que a UI já mostrou o que o jogador precisa ver
+            // antes de qualquer sistema reagir à mudança de estado.
             PublishLineMessage();
             HandleNodeChoices();
+            ExecuteEffects(node.Effects);
         }
 
         private void HandleNodeChoices()
@@ -151,12 +171,35 @@ namespace ProjetoVN.Dialogue.Logic
             MessageBroker.Publish(new DialogueLineMessage(CurrentNode.SpeakerName, CurrentNode.Text));
         }
 
-        private void PublishTriggers(IEnumerable<DialogueTrigger> triggers)
-        {
-            if (triggers == null) return;
+        #endregion
 
-            foreach (DialogueTrigger trigger in triggers)
-                MessageBroker.Publish(new DialogueTriggerMessage(trigger.TriggerType, trigger.Parameter));
+        #region Effects
+        /// <summary>
+        /// Executa os efeitos de um nó ou escolha. Cada efeito é isolado por try/catch pelo mesmo
+        /// motivo que MessageBroker.Publish isola handlers: um asset de conteúdo quebrado não pode
+        /// travar o fluxo do diálogo.
+        /// </summary>
+        private void ExecuteEffects(List<DialogueEffectSO> effects)
+        {
+            if (effects == null || effects.Count == 0) return;
+
+            _isExecutingEffects = true;
+
+            try
+            {
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    DialogueEffectSO effect = effects[i];
+                    if (effect == null) continue; // slot vazio no Inspector
+
+                    try { effect.Execute(); }
+                    catch (Exception exception) { Debug.LogException(exception); }
+                }
+            }
+            finally
+            {
+                _isExecutingEffects = false;
+            }
         }
         #endregion
     }

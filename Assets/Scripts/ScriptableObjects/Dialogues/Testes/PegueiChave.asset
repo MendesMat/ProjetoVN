@@ -16,5 +16,5 @@ MonoBehaviour:
   - SpeakerName: 
     Text: "Peguei uma chave... O que ser\xE1 que ela abre?"
     Choices: []
-    Triggers: []
+    Effects: []
   NextDialogueData: {fileID: 0}

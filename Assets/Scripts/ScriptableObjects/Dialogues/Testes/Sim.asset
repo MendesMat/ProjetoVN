@@ -16,5 +16,5 @@ MonoBehaviour:
   - SpeakerName: Gotica
     Text: Ele falou sim.
     Choices: []
-    Triggers: []
+    Effects: []
   NextDialogueData: {fileID: 0}

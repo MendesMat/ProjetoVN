@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ProjetoVN.Core.State;
 using ProjetoVN.Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -37,6 +38,7 @@ namespace ProjetoVN.GameFlow.Persistence
             {
                 ownedItemIds = InventoryManager.Instance.Items.Select(item => item.Id).ToList(),
                 consumedWorldObjectIds = InventoryManager.Instance.ConsumedWorldObjectIds.ToList(),
+                storyFlagIds = StoryFlags.All.ToList(),
                 currentScene = SceneManager.GetActiveScene().name
             };
 
@@ -64,9 +66,14 @@ namespace ProjetoVN.GameFlow.Persistence
             }
 
             var state = JsonUtility.FromJson<GameState>(File.ReadAllText(SavePath));
+            if (state == null)
+            {
+                Debug.LogError("[GameSaveManager] O save está corrompido e não pôde ser lido. Load ignorado.", this);
+                return false;
+            }
 
             var restoredItems = new List<ItemDataSO>();
-            foreach (string id in state.ownedItemIds)
+            foreach (string id in state.ownedItemIds ?? new List<string>())
             {
                 if (itemRegistry.TryGetById(id, out ItemDataSO item))
                     restoredItems.Add(item);
@@ -75,7 +82,10 @@ namespace ProjetoVN.GameFlow.Persistence
             }
 
             InventoryManager.Instance.ReplaceAll(restoredItems);
-            InventoryManager.Instance.ReplaceConsumedWorldObjectIds(state.consumedWorldObjectIds);
+            InventoryManager.Instance.ReplaceConsumedWorldObjectIds(state.consumedWorldObjectIds ?? new List<string>());
+
+            // ReplaceAll trata null internamente, então um save anterior ao campo storyFlagIds carrega limpo.
+            StoryFlags.ReplaceAll(state.storyFlagIds);
             return true;
         }
     }

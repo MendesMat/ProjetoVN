@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ProjetoVN.Core.State;
 using ProjetoVN.GameFlow.Persistence;
 using ProjetoVN.Inventory;
 using UnityEngine;
@@ -32,6 +33,10 @@ namespace ProjetoVN.GameFlow.DevTools
 
         public void ResetSession()
         {
+            // Flags são estáticas e não dependem do InventoryManager, então limpe-as primeiro:
+            // assim um reset continua valendo mesmo se o inventário não estiver disponível.
+            StoryFlags.ClearAll();
+
             if (InventoryManager.Instance == null)
             {
                 Debug.LogError("[SaveLoadDebugPanel] Não há InventoryManager.", this);

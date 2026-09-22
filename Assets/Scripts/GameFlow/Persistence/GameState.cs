@@ -8,6 +8,7 @@ namespace ProjetoVN.GameFlow.Persistence
     {
         public List<string> ownedItemIds = new();
         public List<string> consumedWorldObjectIds = new();
+        public List<string> storyFlagIds = new();
         public string currentScene = "";
     }
 }

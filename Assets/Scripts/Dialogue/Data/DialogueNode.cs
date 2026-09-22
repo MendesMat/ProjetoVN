@@ -11,6 +11,6 @@ namespace ProjetoVN.Dialogue.Data
         [TextArea(0, 200)]
         public string Text;
         public List<DialogueChoice> Choices = new ();
-        public List<DialogueTrigger> Triggers = new ();
+        public List<DialogueEffectSO> Effects = new ();
     }
 }

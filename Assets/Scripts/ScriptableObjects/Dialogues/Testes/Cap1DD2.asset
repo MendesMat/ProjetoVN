@@ -16,5 +16,5 @@ MonoBehaviour:
   - SpeakerName: "G\xF3tica"
     Text: "J\xE1 vou aproveitar pra pegar uma cadeira no fundo."
     Choices: []
-    Triggers: []
+    Effects: []
   NextDialogueData: {fileID: 0}
