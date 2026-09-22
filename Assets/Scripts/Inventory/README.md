@@ -12,7 +12,9 @@ O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógic
 - **`InventoryModel`**: Guarda a lista de `ItemDataSO` que o jogador possui. Não copia os dados do item: guarda a referência ao próprio asset, então não existe uma segunda fonte de verdade para divergir.
 - **`InventoryService`**: As regras. Só publica uma notificação quando o estado realmente mudou.
 - **`InventoryManager` (MonoBehaviour)**: A API do inventário para o resto do jogo.
-- **`CollectableItemBehaviour`** e **`LockedActionBehaviour`**: Utilitários de cena, ligados aos objetos pelo `UnityEvent` `OnInteract` do `InteractableItem`.
+- **`CollectableItemBehaviour`**: Utilitário de cena, ligado ao objeto pelo `UnityEvent` `OnInteract` do `InteractableItem`.
+
+> `LockedActionBehaviour` **saiu deste módulo** (ARCH-22). Ele passou a combinar item (Inventory) com flag de história (`StoryFlags`, em Core) e a lembrar que já foi aberto, o que é progressão de história e não regra de inventário. Agora mora em [`GameFlow`](../GameFlow/README.md).
 
 ---
 
@@ -41,13 +43,14 @@ Todos recebem `ItemDataSO`, nunca uma string de id. Quem chama deve tratar o `nu
 3. Se o item entrou de fato, o `InventoryService` publica **`ItemCollectedMessage`** (carregando o `ItemDataSO`).
    - *Consequência:* o `InventoryPresenter` (módulo `UI`) adiciona o slot correspondente.
 
-### 2. Usando um Item (porta trancada)
-1. O jogador clica na porta, cujo `OnInteract` chama `LockedActionBehaviour.Interact()`.
-2. O behaviour chama `InventoryManager.Instance.TryUse(requiredItem)`.
-3. **Se retornou `true`**, o item foi consumido e o `InventoryService` publicou **`ItemUsedMessage`**; o behaviour dispara `OnUnlocked`.
-   **Se retornou `false`**, o jogador não tinha o item: nada foi consumido, nada foi publicado, e o behaviour dispara `OnLocked`.
+### 2. Usando um Item
+1. Algo na cena chama `InventoryManager.Instance.TryUse(item)`.
+2. **Se retornou `true`**, o item foi consumido e o `InventoryService` publicou **`ItemUsedMessage`**.
+   **Se retornou `false`**, o jogador não tinha o item: nada foi consumido e nada foi publicado.
 
-Consultar antes com `HasItem` seria um segundo lookup sem nada a ganhar: `TryUse` falha exatamente quando o jogador não tem o item, então ele já decide os dois caminhos. `OnUnlocked` nunca dispara sem o consumo ter acontecido.
+Consultar antes com `HasItem` seria um segundo lookup sem nada a ganhar: `TryUse` falha exatamente quando o jogador não tem o item, então ele já decide os dois caminhos.
+
+O caso concreto — a porta trancada — vive em [`GameFlow/LockedActionBehaviour`](../GameFlow/README.md). Atenção a uma diferença que veio com a ARCH-22: uma porta que **já foi aberta** dispara `OnUnlocked` sem chamar `TryUse`, porque ela lembra pela flag. Ou seja, `OnUnlocked` não implica mais que um consumo acabou de acontecer.
 
 ### 3. Consultas de Estado
 Sistemas da cena que precisem bifurcar conforme os itens do jogador chamam `InventoryManager.Instance.HasItem(item)` **diretamente**. Nunca faça pergunta pelo `MessageBroker`: com 0 ouvintes ela falha em silêncio, e com 2 ela responde duas vezes.

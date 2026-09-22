@@ -15,7 +15,7 @@ Estas regras são a referência única do projeto. **Todo README de módulo apon
 | **Comando:** exatamente um dono precisa executar | Chamada direta de método no dono (singleton ou referência serializada) | `DialogueManager.Instance.StartDialogue(data)`, `InventoryManager.Instance.TryUse(item)` |
 | **Consulta:** você precisa de uma resposta | Chamada direta / propriedade. **Nunca** requisição-resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
 | **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
-| **Notificação:** "X aconteceu", 0..N ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`) | `DialogueStartedMessage`, `DialogueEndedMessage`, `DialogueTriggerMessage`, `ItemCollectedMessage`, `ItemUsedMessage` |
+| **Notificação:** "X aconteceu", 0..N ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`) | `DialogueStartedMessage`, `DialogueEndedMessage`, `ItemCollectedMessage`, `ItemUsedMessage`, `InventoryReplacedMessage` |
 | **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect` / `Interact` / `TriggerDialogue` |
 | **Um módulo precisa consultar outro que não pode referenciar** | Uma interface pequena, de posse do módulo que consulta (só quando for realmente necessário) | Condições de diálogo (ARCH-17, ainda não implementado) |
 
@@ -47,9 +47,15 @@ O sistema é composto por três pilares principais localizados nesta pasta:
 ### 3. Mensagens concretas
 As mensagens vivem no módulo que as **publica**, não aqui. Exemplos em uso:
 `Dialogue/Messaging/DialogueStartedMessage.cs`, `DialogueEndedMessage`, `DialogueLineMessage`,
-`DialogueChoicesMessage`, `DialogueTriggerMessage`, e `Inventory/Messages/ItemCollectedMessage.cs`,
-`ItemUsedMessage`. Todas são `readonly struct` implementando `IMessage`, e todas descrevem
+`DialogueChoicesMessage`, e `Inventory/Messages/ItemCollectedMessage.cs`, `ItemUsedMessage`,
+`InventoryReplacedMessage`. Todas são `readonly struct` implementando `IMessage`, e todas descrevem
 algo que **já aconteceu**.
+
+> **Uma mensagem sem assinante é um bug esperando acontecer.** A `DialogueTriggerMessage` foi publicada
+> por meses com zero ouvintes: o roteiro "disparava" gatilhos que não faziam nada, sem erro nenhum.
+> Ela foi removida em `ARCH-20` e substituída por chamada direta (`DialogueEffectSO.Execute()`), porque
+> aquilo era um **comando com dono**, não uma notificação. Antes de criar uma mensagem nova, confirme
+> que existe quem a escute — e que mais de um sistema pode legitimamente querer escutá-la.
 
 ---
 

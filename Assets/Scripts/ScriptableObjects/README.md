@@ -12,6 +12,7 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO` ou `Di
 
 - **`Dialogues/`**: Contém todos os nós e roteiros do jogo. Cada arquivo representa uma conversa, cena ou capítulo da Visual Novel.
 - **`Items/`**: Contém os metadados de cada item coletável no jogo (Ícone, nome, ID, propriedades de uso).
+- **`DialogueEffects/`**: Contém os efeitos que um nó ou escolha pode disparar (`GiveItemEffect`, `SetFlagEffect`, ...). Arraste-os na lista `Effects` do nó ou da escolha no Inspector. As classes vivem em `GameFlow/DialogueEffects/`; ver o [README do Dialogue](../Dialogue/README.md#5-efeitos-effects).
 
 ---
 
@@ -22,3 +23,4 @@ A regra de uso de ScriptableObjects neste projeto é focada no princípio de ser
 1. Os objetos nesta pasta nunca devem sofrer mutação (alteração de seus dados) durante a execução do jogo. Eles servem como plantas (blueprints).
 2. Se um módulo precisar modificar o estado de um item (ex: reduzir quantidade, marcar diálogo como lido), o módulo deve copiar os dados necessários para a memória volátil (`Model`) ou em um sistema de *Save Data* persistente (JSON/PlayerPrefs).
 3. Essa divisão garante que ao jogar no Editor da Unity, você não sobrescreva acidentalmente os dados bases do jogo salvando as modificações sujas daquele Play Mode de volta nos arquivos `.asset`.
+4. **Isso vale em dobro para `DialogueEffects/`.** Um mesmo asset de efeito costuma estar ligado a vários nós, então ele precisa ser totalmente **sem estado**: só campos de configuração preenchidos no Inspector, nada escrito em runtime.

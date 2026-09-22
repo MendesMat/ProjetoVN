@@ -14,9 +14,9 @@ O sistema é dividido em três camadas lógicas: **Data**, **Messaging** e **Log
 Localizada em `Assets/Scripts/Dialogue/Data`, responsável por como a história é escrita e salva.
 
 - **`DialogueData` (ScriptableObject)**: Representa uma cena, arquivo ou fase. Contém uma lista sequencial de diálogos (`DialogueNode`). Você pode encadear diálogos apontando para um próximo `DialogueData`.
-- **`DialogueNode`**: Representa a fala de um personagem, armazenando o nome (`SpeakerName`), o texto (`Text`), e opcionalmente uma lista de escolhas para o jogador e/ou gatilhos de eventos.
-- **`DialogueChoice`**: Representa uma opção que o jogador pode tomar. Pode carregar um novo `DialogueData` como resposta, e disparar eventos.
-- **`DialogueTrigger`**: Define eventos (Triggers) que podem ocorrer tanto no início de um nó (Node) quanto na seleção de uma escolha. Consiste em uma string de Tipo (`TriggerType`) e um parâmetro opcional (`Parameter`).
+- **`DialogueNode`**: Representa a fala de um personagem, armazenando o nome (`SpeakerName`), o texto (`Text`), e opcionalmente uma lista de escolhas para o jogador e/ou uma lista de efeitos (`Effects`).
+- **`DialogueChoice`**: Representa uma opção que o jogador pode tomar. Pode carregar um novo `DialogueData` como resposta, e uma lista de efeitos (`Effects`) que valem só se a opção for escolhida.
+- **`DialogueEffectSO`** (abstrata): Base dos efeitos colaterais de um nó ou escolha — dar um item, ligar uma flag. As implementações concretas ficam em `GameFlow`; ver a [seção 5](#5-efeitos-effects).
 
 ### 2. Camada de Mensageria (Messaging)
 Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica `IMessage` do `Core` para estabelecer a ponte de comunicação com o resto do jogo.
@@ -25,7 +25,10 @@ Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica
 - **`DialogueEndedMessage`**: Publicada quando a conversa termina de verdade, ou seja, quando não há mais nós nem encadeamento pendente.
 - **`DialogueLineMessage`**: Publicada sempre que uma nova fala deve ser apresentada na tela. Carrega quem está falando e o texto. A UI deve assinar essa mensagem para atualizar seus Textos/TextMeshPro.
 - **`DialogueChoicesMessage`**: Publicada quando um nó exige uma decisão do jogador. Carrega uma lista em modo somente-leitura das escolhas possíveis.
-- **`DialogueTriggerMessage`**: Publicada sempre que um gatilho é encontrado em um nó de diálogo ou ao selecionar uma escolha. Sistemas externos devem assinar para reagir (`ShakeScreen`, `PlayBGM`, etc.).
+> Efeitos de roteiro **não** passam por mensagem. Dar um item ou ligar uma flag é um **comando com um
+> dono definido**, então o `DialogueController` chama `DialogueEffectSO.Execute()` diretamente. A
+> `DialogueTriggerMessage` existia para isso e foi removida: nunca teve um assinante, e uma notificação
+> com 0 ouvintes falha em silêncio (ver `ARCH-20` no roadmap).
 
 ### 3. Camada de Lógica (Logic)
 Localizada em `Assets/Scripts/Dialogue/Logic`, responsável pela máquina que processa e avança na história.
@@ -98,15 +101,41 @@ DialogueManager.Instance.AdvanceDialogue();
 DialogueManager.Instance.MakeChoice(0);
 ```
 
-### 5. Respondendo a Gatilhos (Triggers)
-Qualquer sistema do jogo pode reagir a um evento do roteiro ouvindo os Triggers.
+### 5. Efeitos (Effects)
+Um nó ou uma escolha pode alterar o estado do jogo através de uma lista de **`DialogueEffectSO`** —
+assets de ScriptableObject arrastados no Inspector. A base abstrata mora aqui, mas as implementações
+concretas moram em `GameFlow`, que é quem enxerga `Inventory` e `Core`:
+
+| Efeito | O que faz |
+|---|---|
+| `GiveItemEffect` | Coloca um `ItemDataSO` no inventário |
+| `RemoveItemEffect` | Tira um `ItemDataSO` do inventário |
+| `SetFlagEffect` | Liga uma flag em `StoryFlags` (`Core/State`) |
+| `ClearFlagEffect` | Desliga uma flag |
+
+Para criar um efeito novo, herde de `DialogueEffectSO` **dentro de `GameFlow`** e adicione um
+`[CreateAssetMenu]`. O campo em `DialogueNode`/`DialogueChoice` é da classe base, então a referência
+funciona entre assemblies sem que `Dialogue` precise conhecer a subclasse:
+
 ```csharp
-void OnDialogueTrigger(DialogueTriggerMessage msg) {
-    if (msg.TriggerType == "PlayBGM") {
-        audioManager.PlayMusic(msg.Parameter);
-    }
+[CreateAssetMenu(menuName = "Dialogue/Effects/Play Music")]
+public sealed class PlayMusicEffect : DialogueEffectSO
+{
+    [SerializeField] private AudioClip track;
+
+    public override void Execute() => AudioManager.Instance.PlayMusic(track);
 }
 ```
+
+Regras que valem para todo efeito:
+- **Sem estado de runtime.** O asset é compartilhado entre nós; escrever num `[SerializeField]`
+  durante o Play suja o `.asset` e vaza entre sessões (ver `D-02` no roadmap).
+- **`Execute()` não recebe contexto.** Quem protege a direção da dependência é o assembly onde a
+  subclasse vive, não um objeto de contexto (que seria um service locator — ver `D-04`).
+- **Uma exceção não derruba o diálogo.** O `DialogueController` isola cada efeito em try/catch, igual
+  ao que o `MessageBroker` faz com handlers.
+- **Ordem:** os efeitos de um nó rodam *depois* da fala e das escolhas serem publicadas; os de uma
+  escolha rodam *antes* do diálogo-alvo começar.
 
 ### 6. Integração com o GameFlow (Orquestrador)
 Para arquitetura geral, é crucial entender que o Diálogo **é dono do seu próprio ciclo de vida** e **não dita regras de input**. Ele apenas anuncia o que aconteceu; quem decide o estado do jogo é o `GameFlow` (via `GameStateController`), que assina as duas notificações:

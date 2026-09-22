@@ -15,7 +15,22 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
 - **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
-- **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Ainda não há menu de save; na cena de teste, use o painel de debug.
+- **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e **flags de história** (`StoryFlags`, do módulo `Core`). Ainda não há menu de save; na cena de teste, use o painel de debug.
+- **`LockedActionBehaviour`**: Portão de cena. Libera uma ação quando os requisitos são atendidos (um `ItemDataSO`, que é consumido, e/ou uma flag de história, que não é) e **lembra** que liberou, gravando `unlockedFlagId` em `StoryFlags` — que já entra no save, então a porta continua aberta depois de recarregar a cena ou carregar um save. Mora aqui, e não no `Inventory`, porque combina item (Inventory) com flag (Core): é progressão de história, não regra de inventário. Ligado ao objeto pelo `OnInteract` do `InteractableItem`, igual ao `InteractableDialogueTrigger`.
+  - Quatro eventos, e a distinção que importa é **estado × ação**:
+
+    | Evento | Quando dispara | Para quê |
+    |---|---|---|
+    | `OnLocked` | interagiu e faltou o requisito | a fala de "está trancada" |
+    | `OnUnlocked` | o instante em que destrancou (uma vez só) | a fala de "a chave serviu" |
+    | **`OnOpened`** | **ao destrancar _e_ no `Start()` de toda cena em que já esteja aberto** | **estado**: sprite, collider, passagem liberada |
+    | `OnAlreadyUnlocked` | o jogador interagiu com um portão já aberto | **ação**: atravessar, trocar de cena |
+
+  - `OnOpened` é o que mantém o portão aberto: como ele também roda no `Start()`, recarregar a cena ou carregar um save traz o portão de volta já aberto. **Nunca ligue nele algo iniciado pelo jogador** — uma troca de cena ligada ali teleportaria o jogador sozinho ao carregar. Isso pertence ao `OnAlreadyUnlocked`, que só dispara por clique.
+  - Ao autorar, a flag é checada **antes** do item, para que um portão que exige os dois não gaste a chave só para descobrir que a flag não estava ligada.
+  - *Limitação conhecida:* um `Load()` no meio da cena restaura a flag, mas o `Start()` já rodou, então a aparência do portão só se acerta ao recarregar a cena — o mesmo comportamento do `CollectableItemBehaviour`. É para isso que o painel de debug tem o botão **Reload Scene** ao lado do Load.
+- **`DevTools/PlaceholderTint`**: Marcador visual provisório. Hoje está ligado ao **`OnOpened`** das duas portas, pintando-as de verde — ou seja, verde quer dizer "esta porta está aberta", e não "você clicou nela". Existe como componente porque um `UnityEvent` do Inspector não aceita argumento do tipo `Color`, então não dá para ligar `SpriteRenderer.color` direto. Troque pela arte de porta aberta quando existir.
+- **`DialogueEffects/`**: As implementações concretas de `DialogueEffectSO` (`GiveItemEffect`, `RemoveItemEffect`, `SetFlagEffect`, `ClearFlagEffect`). Elas moram **aqui**, e não no módulo `Dialogue`, porque precisam enxergar `Inventory` e `Core` — e `Dialogue` não referencia nenhum dos dois. O campo em `DialogueNode`/`DialogueChoice` é da classe base abstrata, então a referência de asset resolve entre assemblies sem inverter a dependência. Ver o [README do Dialogue](../Dialogue/README.md#5-efeitos-effects).
 - **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
 
 ---
