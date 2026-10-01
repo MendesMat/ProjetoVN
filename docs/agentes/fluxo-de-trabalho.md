@@ -105,7 +105,7 @@ O critério é: livre o que é reversível e fica dentro da branch; perguntar o 
 | Acrescentar referência a um asmdef | Perguntar antes |
 | Mudar uma decisão `D-xx` | Perguntar antes, e registrar em `decisoes.md` |
 | Apagar assets de conteúdo (roteiro, itens, salas, arte) | Perguntar antes |
-| Fazer merge de PR | **Nunca.** É do Matheus |
+| Fazer merge de PR | **Nunca por iniciativa própria.** A decisão é do Matheus; o agente só mescla com ordem explícita dele na conversa, para aquele PR |
 | `git push --force`, reescrever histórico de `main` | **Nunca** |
 
 Uma issue pode conceder uma autorização específica no próprio texto (a #3 autoriza instalar o Yarn Spinner). Essa autorização vale só para aquela issue.
@@ -115,6 +115,7 @@ Uma issue pode conceder uma autorização específica no próprio texto (a #3 au
 - **Branch:** `issue-<número>-<resumo-em-minúsculas>`, criada a partir de `main` atualizada. Exemplo: `issue-4-story-state`.
 - **Commits:** em português, no imperativo, com o número da issue no início. Exemplo: `#4: StoryState guarda número e texto`. Commits pequenos, um assunto cada.
 - **PR:** um por issue, com o modelo de `.github/PULL_REQUEST_TEMPLATE.md`. O corpo cita `Closes #N`.
+- **Merge:** sempre **squash and merge**, com a branch apagada em seguida. Cada issue vira um único commit em `main`, com o título `#N: <título da issue> (#<número do PR>)`. Os commits intermediários (inclusive os da fase vermelha da TDD) ficam só no PR.
 - **Arquivos do Unity:** todo arquivo novo dentro de `Assets/` tem um `.meta` que precisa ser commitado junto. Antes de commitar, confira `git status` por `.meta` sem par e por arquivos que o Editor alterou sem relação com a issue (esses não entram no commit).
 - **Cenas:** arquivos `.unity` não se mesclam bem. Trabalhar uma issue por vez é o que evita o conflito.
 

@@ -33,7 +33,7 @@ Cada fase é uma conversa nova, com contexto zerado.
 7. **Estado estático é zerado** em `RuntimeInitializeOnLoadMethod(SubsystemRegistration)`.
 8. **Conteúdo novo não exige código.** Todo campo exposto no Inspector tem tooltip e validação.
 9. **Sem threads, sem `Task.Run`, sem reflexão para construir objetos; acesso a arquivo só no `GameSaveManager`.**
-10. **Você nunca faz merge.** Pergunte antes de instalar pacote, alterar `ProjectSettings/`, mudar um asmdef ou apagar conteúdo.
+10. **Você não faz merge por iniciativa própria;** só com ordem explícita do Matheus, e sempre por squash. Pergunte antes de instalar pacote, alterar `ProjectSettings/`, mudar um asmdef ou apagar conteúdo.
 11. **Documentação é parte da entrega,** no mesmo PR.
 
 ## Verificar o trabalho
