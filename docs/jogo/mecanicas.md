@@ -1,0 +1,170 @@
+# Mecânicas
+
+Cada seção descreve o que a mecânica faz para o jogador, o que já existe em `main`, o que falta e em que issue isso entra. As decisões citadas (`D-xx`) estão em [../arquitetura/decisoes.md](../arquitetura/decisoes.md).
+
+**Estado:** `existe` (funciona e está testado ou verificado), `parcial` (funciona, mas falta parte), `planejada` (nada no código).
+
+| Mecânica | Estado | Módulo | Issues |
+|---|---|---|---|
+| [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
+| [Inventário](#inventário) | existe | `Inventory`, `UI` | #6 |
+| [Portões](#portões) | existe | `GameFlow` | #4, #7 |
+| [Diálogo](#diálogo) | parcial | `Dialogue` | #3, #5, #11 |
+| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #4, #7 |
+| [Personagens](#personagens) | planejada | — | #10 |
+| [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
+| [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
+| [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18 |
+| [Áudio](#áudio) | planejada | — | #19, #20 |
+
+A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
+
+---
+
+## Exploração por clique
+
+**Para o jogador:** passar o mouse sobre um objeto interativo o destaca; clicar aciona o objeto. Encostar o mouse na borda esquerda ou direita da tela desloca o cenário.
+
+**Existe:**
+- Detecção por `Physics2D.OverlapPoint` sob o cursor; destaque por escala e contorno.
+- Pan de borda com limites mínimo e máximo.
+- Cliques e pan param durante diálogos, e um clique sobre a interface não atinge o mundo.
+
+**Regras:**
+- O clique que encerra um diálogo não aciona o objeto que está sob o cursor.
+- O módulo não sabe o que o objeto faz. O comportamento é ligado no Inspector (D-07).
+
+**Limitação conhecida:** o destaque ainda aparece em um objeto que esteja atrás de um painel de interface; só o clique é barrado.
+
+## Inventário
+
+**Para o jogador:** itens coletados aparecem em um painel. Alguns são consumidos ao abrir um portão.
+
+**Existe:**
+- Coletar, usar (consumir) e consultar.
+- O mesmo item não entra duas vezes; não há quantidades.
+- O painel sempre reflete o inventário, mesmo se o item foi coletado com o painel fechado.
+- Um objeto coletado não reaparece ao recarregar a cena.
+
+**Falta:**
+- O roteiro dar, tirar e consultar itens por comando (#6). Hoje isso é feito por assets de efeito.
+
+**Fora do escopo:** usar ou examinar um item pelo painel; combinar itens.
+
+## Portões
+
+**Para o jogador:** uma porta trancada diz que está trancada. Com a chave, ela abre, a chave é consumida e a porta continua aberta dali em diante.
+
+**Existe:**
+- Requisito por item (consumido), por flag (não consumida) ou pelos dois.
+- O portão lembra que foi aberto, inclusive depois de recarregar a cena ou carregar um save.
+- Quatro eventos para quem monta a cena: trancado, destrancou agora, está aberto (estado), jogador interagiu com portão aberto (ação).
+
+**Regras:**
+- A flag é conferida antes do item, para não gastar a chave à toa.
+- Uma ação iniciada pelo jogador (atravessar a porta) pertence ao evento de ação, nunca ao de estado, que também dispara sozinho ao carregar a cena.
+
+**Falta:**
+- Atravessar uma porta aberta levar a outra sala (#13).
+- Os campos de flag escolherem de uma lista em vez de texto livre (#7).
+
+## Diálogo
+
+**Para o jogador:** uma caixa mostra quem fala e o que diz. Um clique avança. Em alguns pontos aparecem escolhas.
+
+**Existe (sistema próprio):**
+- Falas em sequência, até quatro escolhas, encadeamento de conversas.
+- Efeitos em uma fala ou em uma escolha: dar item, tirar item, ligar e desligar flag.
+- Narração (fala sem nome de personagem) esconde a placa de nome.
+- Dados inválidos nunca travam o jogo.
+
+**Vai mudar:** o diálogo migra para o Yarn Spinner (D-17), condicionado à prova de conceito (#3). Os roteiros passam a ser arquivos de texto, os efeitos viram comandos, e as escolhas e falas ganham condições.
+
+**Falta:**
+- A migração (#5).
+- Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
+
+**Regras que continuam valendo depois da migração:**
+- Iniciar um diálogo é um comando direto ao dono.
+- O jogo sabe que um diálogo começou e acabou por `DialogueStartedMessage` e `DialogueEndedMessage`; uma conversa, por mais longa que seja, publica cada uma só uma vez.
+- Durante o diálogo, o mundo não aceita cliques.
+- Não se salva durante um diálogo (D-20).
+
+**Fora do escopo:** avanço automático, pular texto já lido, histórico de falas, voz.
+
+## Estado da história e afinidade
+
+**Para o jogador:** o jogo lembra o que ele fez e escolheu, e reage a isso.
+
+**Existe:**
+- Flags booleanas (`StoryFlags`), ligadas e desligadas por efeitos de diálogo e por portões, salvas e restauradas.
+
+**Falta:**
+- Valores numéricos e de texto, em um estado único (`StoryState`) lido pelo roteiro, pelas portas e pelo save (#4, D-18).
+- Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
+- Um registro central das variáveis, com descrição, para que ninguém dependa de digitar o nome certo (#7).
+
+**Regras:**
+- Um nome de variável vazio ou em branco é sempre inválido: nunca é gravado e sempre lê como falso.
+- Os nomes são em português (D-22).
+
+**Fora do escopo:** mostrar a afinidade ao jogador.
+
+## Personagens
+
+**Para o jogador:** o retrato de quem fala aparece ao lado da caixa de diálogo e muda de expressão.
+
+**Planejada (#10, D-21):**
+- Cada personagem é um asset: identificador, nome exibido, cor do nome, retratos por expressão.
+- O roteiro cita o personagem pelo nome; um nome desconhecido é avisado e não trava o jogo.
+
+**Fora do escopo:** sprites de corpo inteiro sobre o cenário, vários personagens na tela, animação de entrada e saída.
+
+## Navegação entre salas
+
+**Para o jogador:** clicar em uma saída escurece a tela e o leva a outra sala. O que ele mudou em uma sala continua mudado quando volta.
+
+**Planejada (D-19):**
+- Uma cena por sala, que contém só o mundo. A interface de jogo é persistente (#9).
+- Troca com fade; nenhum clique passa durante a troca (#12).
+- Saídas clicáveis e pontos de entrada (#13). Não há mapa.
+- Itens coletados e portões abertos persistem entre salas (#14).
+
+## Salvar e carregar
+
+**Para o jogador:** o jogo salva sozinho ao entrar em cada sala, e ele pode salvar pela pausa. Continuar o devolve aonde estava.
+
+**Existe:**
+- Salvar e carregar em JSON, com itens, objetos consumidos, flags e o nome da cena.
+- Acionado só pelo painel de debug da cena de teste.
+
+**Falta (D-20):**
+- Save automático ao entrar na sala; carregar leva à sala salva e recarrega a cena (#16).
+- Salvar manual pela pausa (#18).
+
+**Limitação conhecida, resolvida pela #16:** carregar no meio da cena restaura o estado, mas a aparência de portões e coletáveis só se acerta ao recarregar a cena.
+
+**Fora do escopo:** vários slots, salvar durante um diálogo.
+
+## Menu e pausa
+
+**Para o jogador:** o jogo abre em um menu com Novo Jogo, Continuar e Sair. Esc pausa.
+
+**Existe:**
+- A cena `Menu.unity`, com janelas de título e de opções, navegação por mouse e teclado. Só os botões Opções e Voltar estão ligados a algo, e a cena está fora do Build Settings.
+
+**Falta:**
+- Novo Jogo, Continuar e Sair funcionando; menu como primeira cena (#17).
+- Pausa com Continuar, Salvar e Voltar ao menu (#18).
+
+**Fora do escopo:** tela de configurações (volume, velocidade do texto).
+
+## Áudio
+
+**Para o jogador:** cada sala tem música; interface e interações têm som.
+
+**Planejada:**
+- Música por sala, com troca suave (#19).
+- Sons de interface e de interação; comandos de roteiro para tocar música e efeito (#20).
+
+**Fora do escopo:** voz, controle de volume pelo jogador.
