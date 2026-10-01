@@ -1,0 +1,188 @@
+# Unity CLI: receitas e armadilhas
+
+O Unity CLI (`unity`) controla o Editor aberto pelo pacote `com.unity.pipeline`, já instalado no projeto. Antes de usar, carregue a skill `unity:unity-cli`. Esta página guarda só o que é específico deste projeto: as receitas do dia a dia e as armadilhas que já custaram tempo.
+
+Regra geral: **com o Editor aberto, altere cenas, prefabs e assets pelo CLI**, e não editando o YAML à mão. As exceções estão em [Armadilhas de serialização](#armadilhas-de-serialização).
+
+## Receitas
+
+Todos os comandos rodam a partir da raiz do repositório. Em scripts, acrescente `--no-banner`; para ler a saída por programa, `--format json`.
+
+### O Editor está conectado?
+
+```bash
+unity status
+```
+
+O estado esperado é `ready`. Se nenhum Editor aparecer, verifique se há erro de compilação: com erro, o Editor entra em Safe Mode e o CLI não conecta.
+
+### Listar os comandos que o Editor expõe
+
+```bash
+unity command --query scene
+```
+
+Sem `--query`, lista todos. Cada linha mostra os parâmetros do comando.
+
+### Recompilar depois de alterar scripts
+
+```bash
+unity command recompile
+```
+
+```bash
+unity command recompile_status
+```
+
+Repita o segundo até o resultado ser `completed` ou `up_to_date`. Erros de compilação aparecem no console:
+
+```bash
+unity command console --level error --tail 20
+```
+
+### Rodar os testes
+
+```bash
+unity command run_tests --mode EditMode --timeout 180
+```
+
+O resultado esperado tem a forma `48/48 aprovados (EditMode, 3.87s)`. O número cresce a cada issue; o que importa é não haver falha. Para um subconjunto:
+
+```bash
+unity command run_tests --mode EditMode --filter StoryFlagsTests
+```
+
+Alguns testes provocam um erro de propósito (o do `MessageBroker` com assinante que lança exceção). A entrada `InvalidOperationException: falha proposital` no console é esperada.
+
+### Executar C# no Editor
+
+```bash
+unity command eval 'return UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;'
+```
+
+O código é um corpo de método: instruções terminadas em `;` e um `return` para devolver valor. Use nomes de tipo completos, com namespace.
+
+### Atualizar o banco de assets depois de criar arquivos por fora
+
+```bash
+unity command eval 'UnityEditor.AssetDatabase.Refresh(); return "ok";'
+```
+
+É isso que faz o Editor gerar o `.meta` de um arquivo criado direto no disco, como um README novo dentro de `Assets/`.
+
+### Abrir e salvar cena
+
+```bash
+unity command open_scene --path "Assets/Scenes/[Teste] Mecanicas.unity"
+```
+
+```bash
+unity command save_scene
+```
+
+### Entrar e sair do Play Mode
+
+```bash
+unity command editor_play
+```
+
+```bash
+unity command editor_stop
+```
+
+### Capturar a tela do jogo
+
+```bash
+unity command capture_game_view --source screen --save_path Temp/captura.png
+```
+
+`--source screen` só funciona em Play Mode e é o único que inclui a interface (o canvas é Overlay). Sem ele, a captura mostra só o que a câmera renderiza.
+
+### Mover, renomear e apagar assets
+
+```bash
+unity command move_asset --asset "Assets/Scripts/A/Coisa.cs" --destination "Assets/Scripts/B/Coisa.cs"
+```
+
+```bash
+unity command delete_asset --asset "Assets/Scenes/Antiga.unity" --confirm true
+```
+
+Sempre pelo CLI ou por `AssetDatabase`, nunca por `mv` ou `rm`: é o que leva o `.meta` junto e preserva o GUID.
+
+## Verificação em Play Mode
+
+O que os testes EditMode não cobrem (MonoBehaviours, cenas, `UnityEvent`) é verificado rodando o jogo e conferindo o estado por `eval`. Cada issue traz o seu roteiro de verificação no comentário de levantamento.
+
+### A armadilha do Editor sem foco
+
+**Um Editor dirigido pelo CLI está sem foco, e o projeto tem `runInBackground` desligado. Nessa situação o Play Mode congela:** nenhum frame avança, então `Start()`, `Update()` e corrotinas não rodam. O sintoma engana, porque `SceneManager.LoadScene` ainda conclui e os objetos são recriados, e parece que o código de restauração é que está quebrado.
+
+Toda verificação que dependa de frames começa com:
+
+```bash
+unity command eval 'UnityEngine.Application.runInBackground = true; return UnityEngine.Time.frameCount;'
+```
+
+Rode de novo alguns segundos depois. Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()` é falsa. A atribuição é só de runtime e não altera `ProjectSettings`.
+
+Asserções feitas só por chamada direta de método (`porta.Interact()`, `GameSaveManager.Instance.Save()`) não dependem de frames e valem mesmo com o jogo parado.
+
+### O que não dá para simular
+
+O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o Matheus.
+
+### Contar o que está visível
+
+O painel de inventário reaproveita slots: um slot devolvido é desativado, não destruído. `transform.childCount` não diz quantos itens estão visíveis. Conte os filhos ativos.
+
+## Armadilhas de serialização
+
+Lições que custaram horas. Todas valem para cenas, prefabs e assets.
+
+### Um `UnityEvent` guarda o tipo por nome
+
+Uma ligação feita no Inspector grava o alvo como `"Namespace.Tipo, Assembly"`. **Renomear a classe, mudar o namespace ou mover a classe de asmdef quebra a ligação sem erro de compilação.** Depois de qualquer uma dessas mudanças:
+
+1. Procure o nome antigo em todos os `.unity` e `.prefab` (`m_TargetAssemblyTypeName` e `m_ObjectArgumentAssemblyTypeName`).
+2. Corrija as ocorrências.
+3. Nunca substitua em bloco uma string de assembly: tipos diferentes compartilham a mesma string.
+
+### `m_EditorClassIdentifier` nunca é atualizado pelo Editor
+
+Essa linha do YAML é só uma dica de leitura. Salvar a cena, reserializar o componente e `ForceReserializeAssets` deixam o valor antigo. A ligação real é o GUID em `m_Script`, então nada quebra, mas a string errada engana quem lê o arquivo. Para corrigir, feche a cena no Editor e edite o YAML. O formato é `<Assembly>::<Namespace>.<Tipo>`.
+
+### Trocar ou renomear um campo não reescreve os assets
+
+O Unity descarta a chave desconhecida ao carregar, mas só regrava o arquivo quando algo o modifica. Depois de renomear ou trocar o tipo de um campo de um tipo autorado, force a regravação:
+
+```bash
+unity command eval 'UnityEditor.AssetDatabase.ForceReserializeAssets(new[] { "Assets/caminho/do/arquivo.asset" }); return "ok";'
+```
+
+### Apagar um script
+
+Antes de apagar um `.cs` de MonoBehaviour ou ScriptableObject:
+
+1. Pegue o GUID no `.meta` do script.
+2. Procure esse GUID em `Assets/` (cenas, prefabs, assets).
+3. Remova os componentes e assets que o usam, **pelo Editor**, antes de apagar o script. A ordem inversa deixa "Missing Script".
+
+### Mover um script
+
+Mova com `move_asset` para que o `.meta` vá junto. Se o `.meta` se perder, o GUID muda e todo componente daquele tipo vira "Missing Script", com as ligações de `UnityEvent` destruídas.
+
+### Um arquivo novo dentro de `Assets/` precisa do `.meta`
+
+Vale também para `.md`, `.yarn` e pastas. Atualize o banco de assets e commite o `.meta` junto.
+
+### Managers não entram em cena
+
+`DialogueManager`, `InventoryManager`, `GameStateController`, `DialogueInputHandler` e `GameSaveManager` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
+
+## Outras armadilhas do projeto
+
+- **Arte da interface em SVG.** Os SVGs são importados como Textured Sprite e desenhados com `Image` comum. Cada textura tem exatamente o tamanho do elemento em 1080p, porque o importador não gera mipmaps e uma textura maior volta a serrilhar. Detalhes no [README do Dialogue](../../Assets/Scripts/Dialogue/README.md).
+- **Nitidez se julga em Full HD.** No Game view, use 1920×1080, não "16:9 Aspect".
+- **Ids de save.** `ItemDataSO.Id` e o `persistentId` dos coletáveis são chaves do save. Um prefab duplicado copia o `persistentId`; use o menu de contexto **Regenerate Persistent Id** no componente.
+- **Rastreamento.** Para ver o fluxo de mensagens e as trocas de estado, acrescente `VN_TRACE_MESSAGES` em Project Settings → Player → Scripting Define Symbols. Isso altera `ProjectSettings`, então não vai para o commit.

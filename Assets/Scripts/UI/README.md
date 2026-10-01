@@ -2,7 +2,7 @@
 
 O módulo **UI** agrupa os elementos visuais de tela (HUDs, menus, janelas e painéis) do jogo.
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
@@ -48,3 +48,15 @@ A UI compila no seu próprio assembly, **`ProjetoVN.UI`**, e declara explicitame
 Se uma tela nova precisar de outro módulo, adicione a referência no `ProjetoVN.UI.asmdef` conscientemente — é esse o ponto de ter o arquivo.
 
 A UI de diálogo é a exceção proposital: ela vive dentro do módulo `Dialogue` (`Dialogue/UI/`), junto da lógica que a alimenta.
+
+---
+
+## Mudanças planejadas
+
+| Issue | O que muda neste módulo |
+|---|---|
+| #9 | O painel de inventário sai das cenas e passa a morar no prefab persistente da interface de jogo |
+| #17 | `Menu.unity` vira a primeira cena; Novo Jogo, Continuar e Sair passam a funcionar |
+| #18 | Menu de pausa; o `UIWindowManager` ganha uma pilha simples de janelas (decisão D-13) |
+
+A interface do jogo é **uGUI**. Para criar ou alterar telas, use a skill `unity:ui-ugui`.

@@ -1,0 +1,79 @@
+# Guia de autoria: salas e objetos
+
+**Para quem:** quem monta cenas no Unity Editor. Você não precisa ler código para seguir este guia.
+
+> **Este guia cobre o que existe hoje.** As seções marcadas com *a preencher* são escritas pela issue indicada, quando a mecânica existir. A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`.
+
+## Regras que valem sempre
+
+- **Não coloque managers na cena.** `DialogueManager`, `InventoryManager`, `GameStateController`, `DialogueInputHandler` e `GameSaveManager` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
+- **Não altere um asset durante o Play.** Itens e diálogos são dados somente leitura.
+- **Leia os avisos do console ao salvar.** Os componentes avisam quando um campo obrigatório ficou vazio.
+- **Todo id é único.** O id de um item e o id persistente de um coletável são gravados no save.
+
+## Objeto interativo
+
+Qualquer objeto do cenário em que o jogador pode clicar.
+
+1. Use o prefab `Assets/Prefabs/Gameplay/Interactable.prefab`, ou acrescente a um objeto um `Collider2D` e o componente **Interactable Item**.
+2. Em **On Interact**, ligue o que deve acontecer no clique (veja as seções abaixo).
+3. **Outline Object** é opcional: um objeto filho que aparece quando o mouse passa por cima.
+
+O objeto cresce um pouco no hover (**Highlight Scale Multiplier**).
+
+## Coletável
+
+Um objeto que vira item do inventário ao ser clicado.
+
+1. Crie o item: botão direito no Project → **Create → Items → Item**. Preencha **Id** (único, sem espaços), **Item Name**, **Description** e **Icon**.
+2. Acrescente o item à lista do asset `Assets/Scripts/ScriptableObjects/Items/ItemRegistry.asset`. Sem isso, o item não é restaurado ao carregar um save. O registro avisa se dois itens têm o mesmo id.
+3. No objeto interativo, acrescente o componente **Collectable Item Behaviour** e aponte **Item Data** para o item.
+4. Em **On Interact**, ligue `CollectableItemBehaviour.Collect`.
+
+O campo **Persistent Id** é gerado sozinho. **Se você duplicar um coletável, o id vem copiado:** clique com o botão direito no componente e escolha **Regenerate Persistent Id** na cópia.
+
+## Diálogo ao clicar
+
+1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e aponte **Dialogue Data** para o diálogo.
+2. Em **On Interact**, ligue `InteractableDialogueTrigger.TriggerDialogue`.
+
+> Isto muda na issue #5: o componente passa a apontar para um nó do roteiro, e não mais para um asset de diálogo. A criação de diálogos pelo Inspector deixa de existir; ver [roteiro.md](roteiro.md).
+
+## Portão (porta trancada)
+
+Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lembra que foi aberto.
+
+1. No objeto interativo, acrescente o componente **Locked Action Behaviour**.
+2. Preencha pelo menos um requisito:
+   - **Required Item:** o item exigido. Ele é **consumido** ao abrir.
+   - **Required Flag Id:** uma flag que precisa estar ligada. Ela **não** é consumida.
+3. Preencha **Unlocked Flag Id** com um id **único para este portão** (por exemplo `porta-biblioteca-destrancada`). É o que mantém o portão aberto depois. Dois portões com o mesmo id abrem juntos.
+4. Em **On Interact**, ligue `LockedActionBehaviour.Interact`.
+5. Ligue os eventos:
+
+| Evento | Quando dispara | Use para |
+|---|---|---|
+| **On Locked** | O jogador clicou e faltou o requisito | A fala de "está trancada" |
+| **On Unlocked** | O instante em que destrancou, uma vez só | A fala de "a chave serviu" |
+| **On Opened** | Ao destrancar **e** toda vez que a cena carrega com o portão já aberto | Aparência: trocar o sprite, desligar um collider |
+| **On Already Unlocked** | O jogador clicou em um portão já aberto | Ação: atravessar, ir para outra sala |
+
+**Cuidado:** nunca ligue em **On Opened** algo que o jogador deveria iniciar. Ele dispara sozinho quando a cena carrega; uma troca de sala ali levaria o jogador embora sem ele clicar. Isso pertence a **On Already Unlocked**.
+
+O componente `PlaceholderTint`, que pinta a porta de verde, é provisório: troque pela arte de porta aberta.
+
+## Pan do cenário
+
+O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda. **Min X** e **Max X** são os limites; ajuste conforme a largura do fundo.
+
+## Criar uma sala nova
+
+*A preencher pelas issues #9, #12 e #13:* o que uma cena de sala precisa conter, como registrar a sala no jogo, como definir pontos de entrada e saídas.
+
+## Personagens
+
+*A preencher pela issue #10:* como criar um personagem, cadastrar retratos e expressões.
+
+## Música e sons
+
+*A preencher pelas issues #19 e #20.*

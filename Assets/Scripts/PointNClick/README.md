@@ -2,7 +2,7 @@
 
 O módulo **PointNClick** é responsável pela mecânica central de interação física do jogador com o mundo (cenário) através do mouse. Ele detecta onde o jogador está clicando e como a câmera se movimenta.
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
@@ -49,3 +49,11 @@ A partir daí, componentes instalados no mesmo GameObject (pertencentes a outros
 - Se o objeto tiver um **`InteractableDialogueTrigger`** (do módulo `GameFlow`), o clique iniciará o diálogo configurado.
 
 Isso garante que o `PointNClick` nunca conheça a existência de diálogos ou inventários, ele apenas lida com raycasts.
+
+---
+
+## Limitações conhecidas e mudanças planejadas
+
+- O destaque (hover) ainda aparece em um objeto que esteja atrás de um painel de interface; só o clique é barrado. Só vale corrigir se ficar visivelmente errado no jogo.
+- `PointNClickSelector` guarda `Camera.main` no `Awake`. Cada sala tem a sua câmera, então isso continua valendo com uma cena por sala.
+- **Issue #13:** o ponto de entrada de uma sala define a posição inicial do pan (`ScreenPanController`).

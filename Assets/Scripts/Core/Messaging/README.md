@@ -2,28 +2,15 @@
 
 Este sistema provê comunicação entre componentes do projeto usando o padrão **Publisher/Subscriber (Pub/Sub)**, para que partes do código possam **avisar** que algo aconteceu sem conhecer quem está ouvindo.
 
-> **Leia primeiro as [Regras de comunicação](#regras-de-comunicação) abaixo.** Elas valem para o projeto inteiro e definem o que *deve* e o que *não deve* passar por este barramento. O plano arquitetural que as originou está em [`ARCHITECTURE_ROADMAP.md`](../../../../ARCHITECTURE_ROADMAP.md), na raiz do repositório.
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
-## Regras de comunicação
+## O que passa por este barramento
 
-Estas regras são a referência única do projeto. **Todo README de módulo aponta para cá.** O erro que elas existem para evitar é usar um barramento de notificações para comandos, consultas e estado: uma consulta em pub/sub falha em silêncio com 0 ouvintes e responde duas vezes com 2, e um estado enviado como evento nunca chega a quem ainda não existia.
+**Só notificações:** "X aconteceu", com zero ou mais ouvintes, cruzando módulos. Comando, consulta e estado **não** passam por aqui (decisão D-05). A tabela completa, que vale para o projeto inteiro, está nas [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação).
 
-| Interação | Use | Exemplo neste projeto |
-|---|---|---|
-| **Comando:** exatamente um dono precisa executar | Chamada direta de método no dono (singleton ou referência serializada) | `DialogueManager.Instance.StartDialogue(data)`, `InventoryManager.Instance.TryUse(item)` |
-| **Consulta:** você precisa de uma resposta | Chamada direta / propriedade. **Nunca** requisição-resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
-| **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
-| **Notificação:** "X aconteceu", 0..N ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`) | `DialogueStartedMessage`, `DialogueEndedMessage`, `ItemCollectedMessage`, `ItemUsedMessage`, `InventoryReplacedMessage` |
-| **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect` / `Interact` / `TriggerDialogue` |
-| **Um módulo precisa consultar outro que não pode referenciar** | Uma interface pequena, de posse do módulo que consulta (só quando for realmente necessário) | Condições de diálogo (ARCH-17, ainda não implementado) |
-
-Regras adicionais:
-
-- A UI pode **ler** estado dos managers; ela **modifica** apenas chamando os métodos do dono.
-- Um handler de mensagem não pode assumir que outro handler rodou antes ou depois dele.
-- Estado estático deve ser resetado em `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]`.
+O erro que essa regra existe para evitar: uma consulta em pub/sub falha em silêncio com 0 ouvintes e responde duas vezes com 2, e um estado enviado como evento nunca chega a quem ainda não existia.
 
 ---
 
@@ -53,7 +40,7 @@ algo que **já aconteceu**.
 
 > **Uma mensagem sem assinante é um bug esperando acontecer.** A `DialogueTriggerMessage` foi publicada
 > por meses com zero ouvintes: o roteiro "disparava" gatilhos que não faziam nada, sem erro nenhum.
-> Ela foi removida em `ARCH-20` e substituída por chamada direta (`DialogueEffectSO.Execute()`), porque
+> Ela foi removida e substituída por chamada direta (`DialogueEffectSO.Execute()`), porque
 > aquilo era um **comando com dono**, não uma notificação. Antes de criar uma mensagem nova, confirme
 > que existe quem a escute — e que mais de um sistema pode legitimamente querer escutá-la.
 
@@ -119,4 +106,4 @@ Avisos e erros continuam sendo logados normalmente e, quando quem loga é um com
 - **Escalabilidade**: Você pode adicionar novos ouvintes sem alterar o código de quem envia a mensagem.
 - **Organização**: Facilita a comunicação entre sistemas complexos como UI, Áudio e Lógica de Jogo.
 
-Esses benefícios valem **para notificações**. Para comandos e consultas, o barramento só troca uma chamada legível por um salto indireto, sem ganho de desacoplamento quando as duas pontas já compilam no mesmo assembly. Veja as [Regras de comunicação](#regras-de-comunicação).
+Esses benefícios valem **para notificações**. Para comandos e consultas, o barramento só troca uma chamada legível por um salto indireto, sem ganho de desacoplamento quando as duas pontas já compilam no mesmo assembly. Veja as [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação).

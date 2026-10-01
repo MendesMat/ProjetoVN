@@ -2,9 +2,13 @@
 
 Este módulo é reservado para os testes automatizados do projeto (Unity Test Framework).
 
-> Antes de escrever testes, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de escrever testes:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisão D-24, sobre testes](../../../docs/arquitetura/decisoes.md#d-24--testes) · [como a TDD se aplica aqui](../../../docs/agentes/skills.md#como-a-tdd-se-aplica-aqui)
 
-Os testes vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*.
+Os testes vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*, ou pelo Unity CLI:
+
+```bash
+unity command run_tests --mode EditMode --timeout 180
+```
 
 - **`MessageBrokerTests`**: entrega, cancelamento de assinatura, assinatura duplicada, isolamento de exceções, `Clear`, e o comportamento de snapshot quando alguém assina durante um despacho.
 - **`DialogueControllerTests`**: avanço sequencial, escolhas (com e sem diálogo-alvo), encadeamento publicando Started e Ended uma única vez, dados inválidos sendo rejeitados sem travar o jogo, e os **efeitos** (ordem de execução, efeito nulo, efeito que estoura, efeito reentrante).
@@ -16,8 +20,7 @@ Os testes vivem em `EditMode/` e rodam pela janela **Window → General → Test
 > não têm teste de EditMode. Todos exigiriam um `InventoryManager` num `GameObject`, o que quebraria
 > a regra "C# puro, sem GameObjects" desta suíte; o `LockedActionBehaviour` ainda por cima é um
 > `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando, e a `Tests.asmdef`
-> nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`,
-> como ARCH-04/08/09 também foram.
+> nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`.
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
 > guardas: a flag é checada antes do item porque `IsSet` não consome nada e `TryUse` consome.
@@ -40,8 +43,8 @@ Os testes vivem em `EditMode/` e rodam pela janela **Window → General → Test
 
 ## Verificação em Play Mode (armadilha que já custou tempo)
 
-O que não dá para cobrir em EditMode é verificado rodando o jogo pelo Editor conectado. Uma pegadinha
-importante, descoberta na ARCH-22:
+O que não dá para cobrir em EditMode é verificado rodando o jogo pelo Editor conectado; as receitas
+estão em [docs/agentes/unity-cli.md](../../../docs/agentes/unity-cli.md). Uma pegadinha importante:
 
 > **Se o Editor estiver sem foco — o caso normal quando ele é dirigido pela CLI — o Play Mode
 > congela**, porque o Player Settings tem `runInBackground: 0`. Nenhum frame avança, então a Unity

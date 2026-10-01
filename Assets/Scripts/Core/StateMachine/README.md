@@ -2,7 +2,7 @@
 
 Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo e, no futuro, inventário ou pausa). Fica em `Assets/Scripts/Core/StateMachine`.
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
