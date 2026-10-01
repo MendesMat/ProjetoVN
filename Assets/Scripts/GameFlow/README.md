@@ -4,7 +4,7 @@ O módulo **GameFlow** é o orquestrador do jogo. Ele gerencia em qual **modo** 
 
 A responsabilidade deste módulo não é implementar como um diálogo funciona ou como um item é coletado, mas ditar as **regras de modo** (Ex: "enquanto o jogo estiver em diálogo, o input do jogador no mundo fica desativado").
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
@@ -78,3 +78,17 @@ Se você estiver criando um novo módulo (ex: `MiniGame`), você deverá:
 3. Fazer o próprio módulo ser dono do seu ciclo de vida e publicar notificações de início e fim (ex: `MiniGameStartedMessage` / `MiniGameEndedMessage`), que o `GameStateController` assina para chamar `ChangeState`.
 
 Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use `Push`/`Pop` em vez de `ChangeState`: o modo de baixo recebe `Exit` ao ser coberto e `Enter` ao voltar, então os efeitos colaterais se desfazem sozinhos.
+
+---
+
+## Mudanças planejadas
+
+| Issue | O que muda neste módulo |
+|---|---|
+| #4 | `LockedActionBehaviour`, `GameState` e o painel de debug passam a usar `StoryState` no lugar de `StoryFlags` |
+| #5, #6 | `DialogueEffects/` sai; entram os comandos de roteiro (`dar_item`, `remover_item`, `tem_item`) |
+| #9 | O bootstrap passa a criar também o prefab da interface de jogo |
+| #12, #13 | Troca de sala com estado de transição; saídas e pontos de entrada |
+| #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |
+| #16 | Save automático ao entrar na sala; carregar recarrega a cena |
+| #18 | Estado de pausa, sobreposto com `Push`/`Pop` |

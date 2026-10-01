@@ -2,7 +2,7 @@
 
 O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógica de dados separada da interface visual (UI) e da interação na cena.
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
 
 ---
 
@@ -14,7 +14,7 @@ O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógic
 - **`InventoryManager` (MonoBehaviour)**: A API do inventário para o resto do jogo.
 - **`CollectableItemBehaviour`**: Utilitário de cena, ligado ao objeto pelo `UnityEvent` `OnInteract` do `InteractableItem`.
 
-> `LockedActionBehaviour` **saiu deste módulo** (ARCH-22). Ele passou a combinar item (Inventory) com flag de história (`StoryFlags`, em Core) e a lembrar que já foi aberto, o que é progressão de história e não regra de inventário. Agora mora em [`GameFlow`](../GameFlow/README.md).
+> `LockedActionBehaviour` **não mora neste módulo**. Ele combina item (Inventory) com flag de história (`StoryFlags`, em Core) e lembra que já foi aberto, o que é progressão de história e não regra de inventário. Mora em [`GameFlow`](../GameFlow/README.md).
 
 ---
 
@@ -50,9 +50,12 @@ Todos recebem `ItemDataSO`, nunca uma string de id. Quem chama deve tratar o `nu
 
 Consultar antes com `HasItem` seria um segundo lookup sem nada a ganhar: `TryUse` falha exatamente quando o jogador não tem o item, então ele já decide os dois caminhos.
 
-O caso concreto — a porta trancada — vive em [`GameFlow/LockedActionBehaviour`](../GameFlow/README.md). Atenção a uma diferença que veio com a ARCH-22: uma porta que **já foi aberta** dispara `OnUnlocked` sem chamar `TryUse`, porque ela lembra pela flag. Ou seja, `OnUnlocked` não implica mais que um consumo acabou de acontecer.
+O caso concreto — a porta trancada — vive em [`GameFlow/LockedActionBehaviour`](../GameFlow/README.md). Dois detalhes de lá que afetam este módulo: uma porta que **já foi aberta** dispara `OnAlreadyUnlocked` e não chama `TryUse` de novo, porque ela lembra pela flag; e um portão que exige só uma flag abre sem consumir item nenhum. Ou seja, `OnUnlocked` não implica que um consumo acabou de acontecer.
 
-### 3. Consultas de Estado
+### 3. Objetos de mundo já consumidos
+O `InventoryManager` também guarda os ids dos coletáveis já recolhidos (`IsWorldObjectConsumed`, `MarkWorldObjectConsumed`), para que um objeto coletado não reapareça ao recarregar a cena. Isso mora aqui só porque o `CollectableItemBehaviour` não pode referenciar o `GameFlow`. A issue #14 decide o lugar definitivo desse registro.
+
+### 4. Consultas de Estado
 Sistemas da cena que precisem bifurcar conforme os itens do jogador chamam `InventoryManager.Instance.HasItem(item)` **diretamente**. Nunca faça pergunta pelo `MessageBroker`: com 0 ouvintes ela falha em silêncio, e com 2 ela responde duas vezes.
 
-O módulo `Dialogue` é o único caso que não pode fazer essa chamada, porque o seu assembly não referencia `Inventory` (e não deve passar a referenciar). A solução planejada para isso é uma interface pequena de posse do próprio `Dialogue` — ver ARCH-17 no roadmap, ainda não implementado.
+O módulo `Dialogue` é o único caso que não pode fazer essa chamada, porque o seu assembly não referencia `Inventory` (e não deve passar a referenciar). Tudo o que liga diálogo a inventário mora no `GameFlow`, que enxerga os dois: hoje são os efeitos `GiveItemEffect` e `RemoveItemEffect`; a partir da issue #6, os comandos de roteiro `dar_item` e `remover_item` e a função `tem_item`.

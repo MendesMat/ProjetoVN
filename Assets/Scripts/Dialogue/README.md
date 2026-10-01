@@ -2,7 +2,9 @@
 
 O sistema foi desenhado visando ser de fácil uso por Game Designers diretamente via Unity Editor (usando ScriptableObjects), possuir total desacoplamento da interface de usuário (UI) e integrar-se de forma nativa com o `MessageBroker` do projeto para disparos de eventos.
 
-> Antes de mudar qualquer coisa aqui, leia as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
+
+> **Este módulo vai ser reescrito.** O diálogo migra para o Yarn Spinner (decisão D-17), condicionado à prova de conceito da issue #3; a migração é a issue #5. Este README descreve o sistema próprio, que é o que está em produção até lá. **Não acrescente funcionalidade ao sistema próprio** (condições, novos efeitos, saltos): isso pertence às issues da milestone M1. O que sobrevive à migração: iniciar diálogo é um comando direto ao dono, `DialogueStartedMessage` e `DialogueEndedMessage` continuam sendo publicadas, e dados inválidos nunca travam o jogo.
 
 ---
 
@@ -28,7 +30,7 @@ Localizada em `Assets/Scripts/Dialogue/Messaging`, utiliza a interface genérica
 > Efeitos de roteiro **não** passam por mensagem. Dar um item ou ligar uma flag é um **comando com um
 > dono definido**, então o `DialogueController` chama `DialogueEffectSO.Execute()` diretamente. A
 > `DialogueTriggerMessage` existia para isso e foi removida: nunca teve um assinante, e uma notificação
-> com 0 ouvintes falha em silêncio (ver `ARCH-20` no roadmap).
+> com 0 ouvintes falha em silêncio (ver a decisão D-05).
 
 ### 3. Camada de Lógica (Logic)
 Localizada em `Assets/Scripts/Dialogue/Logic`, responsável pela máquina que processa e avança na história.
@@ -129,9 +131,9 @@ public sealed class PlayMusicEffect : DialogueEffectSO
 
 Regras que valem para todo efeito:
 - **Sem estado de runtime.** O asset é compartilhado entre nós; escrever num `[SerializeField]`
-  durante o Play suja o `.asset` e vaza entre sessões (ver `D-02` no roadmap).
+  durante o Play suja o `.asset` e vaza entre sessões (ver a decisão D-02).
 - **`Execute()` não recebe contexto.** Quem protege a direção da dependência é o assembly onde a
-  subclasse vive, não um objeto de contexto (que seria um service locator — ver `D-04`).
+  subclasse vive, não um objeto de contexto (que seria um service locator — ver a decisão D-04).
 - **Uma exceção não derruba o diálogo.** O `DialogueController` isola cada efeito em try/catch, igual
   ao que o `MessageBroker` faz com handlers.
 - **Ordem:** os efeitos de um nó rodam *depois* da fala e das escolhas serem publicadas; os de uma

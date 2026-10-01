@@ -4,7 +4,9 @@ Este diretório funciona como o banco de dados principal do jogo, mas com uma pe
 
 As definições das classes e a lógica desses objetos (como `ItemDataSO` ou `DialogueData`) residem dentro de seus respectivos módulos lógicos (`Inventory`, `Dialogue`, etc). Esta pasta centraliza as instâncias criadas pelos Game Designers para facilitar a organização.
 
-> Ver também as [Regras de comunicação](../Core/Messaging/README.md#regras-de-comunicação) e o [`ARCHITECTURE_ROADMAP.md`](../../../ARCHITECTURE_ROADMAP.md).
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [guia de autoria](../../../docs/autoria/salas.md)
+
+> A pasta `Dialogues/` e a pasta `DialogueEffects/` deixam de existir com a migração para o Yarn Spinner (issue #5): os roteiros passam a ser arquivos `.yarn` em `Assets/Roteiro/`. Não crie conteúdo definitivo nelas.
 
 ---
 
