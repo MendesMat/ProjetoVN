@@ -8,9 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/[Teste] Mecanicas.unity
     guid: 47956c4527e7e8d4a8137d39e62780af
-  - enabled: 1
-    path: Assets/Scenes/[Teste] CameraPan.unity
-    guid: d2fd6ca589ed95a46bed99416dab0574
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
