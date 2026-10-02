@@ -16,6 +16,14 @@ unity status
 
 O estado esperado é `ready`. Se nenhum Editor aparecer, verifique se há erro de compilação: com erro, o Editor entra em Safe Mode e o CLI não conecta.
 
+Se o Editor estiver fechado (não existe `Temp/UnityLockfile` e `unity editors running` devolve zero instâncias), abra o projeto e repita o `unity status` até ele ficar `ready`:
+
+```bash
+unity open .
+```
+
+Não encadeie esse comando em um pipe (`unity open . | tail`): o Editor herda a saída e o pipe só fecha quando o Editor fecha.
+
 ### Listar os comandos que o Editor expõe
 
 ```bash
@@ -127,6 +135,16 @@ unity command eval 'UnityEngine.Application.runInBackground = true; return Unity
 Rode de novo alguns segundos depois. Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()` é falsa. A atribuição é só de runtime e não altera `ProjectSettings`.
 
 Asserções feitas só por chamada direta de método (`porta.Interact()`, `GameSaveManager.Instance.Save()`) não dependem de frames e valem mesmo com o jogo parado.
+
+### O erro de console que é do CLI, não do jogo
+
+Um `eval` enviado enquanto o Editor ainda está entrando em Play Mode pode estourar o tempo de resposta. O comando falha e o pacote Pipeline deixa um erro no console:
+
+```
+Failed to handle /api/exec request: Main thread operation timed out after 5000ms
+```
+
+Esse erro não vem do jogo. Espere uns dez segundos depois do `editor_play` antes do primeiro `eval`. Se o erro aparecer mesmo assim, ele não conta como falha de "console sem erro"; para uma leitura limpa, saia do Play Mode, rode `clear_console` e repita.
 
 ### O que não dá para simular
 

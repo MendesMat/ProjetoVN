@@ -23,9 +23,9 @@ Consequência para o código: o **Inspector e o arquivo de roteiro são as inter
 O planejamento atual termina quando este percurso funciona de ponta a ponta, em um build de desktop:
 
 1. O jogo abre no **menu principal**.
-2. **Novo Jogo** leva à primeira sala.
+2. **Novo Jogo** pede o **nome do protagonista** e leva à primeira sala.
 3. O jogador explora **duas salas**, ligadas por uma porta.
-4. Conversa com um personagem com **retrato** e texto revelado aos poucos; uma **escolha altera a afinidade** e um trecho do diálogo só aparece com afinidade suficiente.
+4. Conversa com um personagem com **retrato** e texto revelado aos poucos; uma **escolha altera a afinidade** e um trecho do diálogo só aparece com afinidade suficiente. Durante a conversa, o jogador abre o **histórico** e relê o que foi dito.
 5. Resolve um **puzzle de item**: algo obtido numa sala abre algo na outra.
 6. O jogo **salva** ao trocar de sala; o jogador fecha o jogo.
 7. **Continuar** devolve o jogador à sala em que estava, com tudo como deixou.
@@ -34,7 +34,7 @@ O conteúdo da fatia é provisório. O que ela prova é que os sistemas funciona
 
 ## Fora do escopo atual
 
-Localização, voz, mapa ou viagem rápida, vários slots de save, salvar no meio de um diálogo, histórico de falas, sprites de corpo inteiro, tela de configurações, build para navegador e integração contínua.
+Localização, voz, mapa ou viagem rápida, vários slots de save, salvar no meio de um diálogo, sprites de corpo inteiro, tela de configurações, build para navegador e integração contínua.
 
 Fora do escopo não quer dizer proibido para sempre: quer dizer que nenhuma issue atual pede isso, e que um agente não deve construir nem preparar terreno para isso (decisão D-27).
 
@@ -57,6 +57,8 @@ Fora do escopo não quer dizer proibido para sempre: quer dizer que nenhuma issu
 | **Nó** | Um trecho nomeado do roteiro; é por ele que uma cena inicia um diálogo |
 | **Fala** | Uma linha de diálogo, dita por um personagem ou pela narração |
 | **Opção / escolha** | Alternativa oferecida ao jogador em um diálogo |
+| **Histórico** | A lista, só de leitura, do que já foi dito na conversa em curso (decisão D-30) |
+| **Protagonista** | O personagem do jogador. O nome dele é escolhido pelo jogador ao começar um jogo novo |
 | **Comando** | Instrução do roteiro que age sobre o jogo (`<<dar_item chave>>`) |
 | **Efeito** | No sistema atual, o equivalente a um comando: um asset `DialogueEffectSO` |
 | **Modo** | Em que situação o jogo está: exploração, diálogo, pausa. Um estado da máquina de estados |
