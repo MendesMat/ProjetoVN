@@ -15,7 +15,7 @@ namespace ProjetoVN.Tests.EditMode
                 ownedItemIds = new List<string> { "chave", "moeda" },
                 consumedWorldObjectIds = new List<string> { "obj-1", "obj-2" },
                 storyFlagIds = new List<string> { "falou-com-gotica", "porta-destrancada" },
-                currentScene = "TesteCameraPan"
+                currentScene = "SalaDeTeste"
             };
 
             string json = JsonUtility.ToJson(original);

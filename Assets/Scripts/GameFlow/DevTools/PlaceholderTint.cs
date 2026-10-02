@@ -5,8 +5,8 @@ namespace ProjetoVN.GameFlow.DevTools
     /// <summary>
     /// Marcador visual para um evento que ainda não tem implementação de verdade.
     /// Ligue <see cref="Apply"/> a um <c>UnityEvent</c> para enxergar que ele disparou —
-    /// por exemplo o <c>OnAlreadyUnlocked</c> de uma porta já aberta, enquanto a troca de cena
-    /// (ou o que for) não existe.
+    /// por exemplo o <c>OnOpened</c> de uma porta, que fica tingida enquanto a arte de
+    /// porta aberta não existe.
     /// <para>
     /// Existe porque um <c>UnityEvent</c> do Inspector não aceita um argumento do tipo
     /// <c>Color</c>, então não dá para ligar <c>SpriteRenderer.color</c> direto.

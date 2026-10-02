@@ -1,13 +1,9 @@
 {
     "dotnet.defaultSolution": "ProjetoVN.sln",
     "dotnet.dotnetPath": "C:/Program Files/dotnet/dotnet.exe",
-    "dotrush.roslyn.dotnetSdkDirectory": "C:/Program Files/dotnet/sdk/10.0.400-preview.0.26322.102",
     "dotrush.msbuildProperties": {
         "DefineConstants": "UNITY_EDITOR"
     },
-    "dotrush.roslyn.projectOrSolutionFiles": [
-        "C:/Projetos/Unity/ProjetoVN/ProjetoVN/ProjetoVN.sln"
-    ],
     "dotrush.roslyn.restoreProjectsBeforeLoading": false,
     "files.exclude": {
         "**/.DS_Store": true,
