@@ -200,8 +200,10 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
   - salvar fica **bloqueado durante um diálogo**, então a posição da conversa não é salva;
   - **carregar sempre recarrega a cena**, para que os objetos apareçam no estado certo;
   - todo acesso a arquivo fica **apenas** no `GameSaveManager`;
-  - o formato é JSON via `JsonUtility` (listas, não dicionários), sem framework genérico de save.
-- **Por quê:** bloquear o save no diálogo elimina a parte mais cara de um save. Concentrar o acesso a arquivo permite trocar a gravação num lugar só (D-23).
+  - o formato é JSON via `JsonUtility` (listas, não dicionários), sem framework genérico de save;
+  - há **um único formato de save**: quando uma issue muda o formato, o código passa a conhecer só o novo. Não se mantém campo legado em `GameState`, conversão de arquivo anterior nem teste de formato anterior.
+- **Por quê:** bloquear o save no diálogo elimina a parte mais cara de um save. Concentrar o acesso a arquivo permite trocar a gravação num lugar só (D-23). O jogo nunca foi distribuído, então não existe save de jogador a preservar, e o formato ainda vai mudar; código e testes para um formato datado só acrescentariam o que manter.
+- **Rever o formato único só se:** o jogo tiver sido entregue a alguém de fora cujo save precise continuar abrindo.
 - **Estado atual:** só existe salvar e carregar pelo painel de debug. A política acima chega nas issues #16 e #18.
 
 ### D-15 — Mono, desktop
@@ -240,6 +242,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-01 | Página criada a partir do `ARCHITECTURE_ROADMAP.md`, que foi removido. D-01 a D-15 vieram de lá. **Revistas:** D-06 (assíncrono permitido na apresentação e no carregamento), D-13 (pilha simples de janelas permitida), D-15 (itch.io por download). **Novas:** D-16 a D-29, da entrevista de planejamento com o Matheus. D-11 e D-12 ficam marcadas para revisão na issue #5. |
 | 2026-10-02 | **Nova:** D-30 (histórico de falas), decidida com o Matheus durante o levantamento da #2. O histórico de falas sai do "fora do escopo" e vira a issue #25; o nome do protagonista definido pelo jogador vira a issue #26. As duas entram na fatia vertical. |
 | 2026-10-02 | **Confirmada:** D-17. A prova de conceito da #3 terminou com o veredito "adotar", confirmado pelo Matheus. O plano B não foi acionado. As notas sobre D-06, D-11 e D-12 que o relatório da #3 propõe ficam para a issue #5, que é quem decide essas três. |
+| 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo Matheus no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 
