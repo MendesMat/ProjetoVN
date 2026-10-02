@@ -12,9 +12,11 @@ unity command run_tests --mode EditMode --timeout 180
 
 - **`MessageBrokerTests`**: entrega, cancelamento de assinatura, assinatura duplicada, isolamento de exceções, `Clear`, e o comportamento de snapshot quando alguém assina durante um despacho.
 - **`DialogueControllerTests`**: avanço sequencial, escolhas (com e sem diálogo-alvo), encadeamento publicando Started e Ended uma única vez, dados inválidos sendo rejeitados sem travar o jogo, e os **efeitos** (ordem de execução, efeito nulo, efeito que estoura, efeito reentrante).
-- **`StoryFlagsTests`**: leitura/escrita, entradas inválidas e restauração a partir de um save.
+- **`StoryVariableNameTests`**: as duas regras de nome: o que o armazenamento aceita (inclusive os nomes internos do Yarn) e o que quem monta cena pode digitar.
+- **`StoryStateTests`**: booleano, número e texto: leitura e escrita, falso gravado × nunca gravado, nomes inválidos (vazio em silêncio, sem `$` com aviso), um nome em um só tipo, substituição total e limpeza.
+- **`StoryStatePersistenceTests`**: a cópia entre `StoryState` e `GameState` (`Capture` e `Restore`), incluindo a ida e volta pelo JSON com afinidade, falso gravado e acentos.
 - **`StoryFlagEffectsTests`**: `SetFlagEffect` e `ClearFlagEffect`.
-- **`GameStateTests`**: round-trip do JSON, incluindo um save gravado antes do campo `storyFlagIds` existir.
+- **`GameStateTests`**: ida e volta do JSON, com os três tipos de estado da história.
 
 > **Lacuna conhecida e deliberada:** `GiveItemEffect`, `RemoveItemEffect` e `LockedActionBehaviour`
 > não têm teste de EditMode. Todos exigiriam um `InventoryManager` num `GameObject`, o que quebraria
@@ -23,7 +25,7 @@ unity command run_tests --mode EditMode --timeout 180
 > nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`.
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
-> guardas: a flag é checada antes do item porque `IsSet` não consome nada e `TryUse` consome.
+> guardas: a flag é checada antes do item porque `IsTrue` não consome nada e `TryUse` consome.
 > Extrair isso para uma classe pura só para testar criaria mais superfície do que as quatro linhas
 > que ela embrulharia, então a proteção é o comentário no código mais a asserção em Play Mode
 > ("portão de flag não come a chave").
@@ -35,7 +37,9 @@ unity command run_tests --mode EditMode --timeout 180
 - **Teste a lógica em C# puro, direto.** `DialogueController`, `InventoryModel` e `InventoryService` não são `MonoBehaviour`: instancie com `new` e chame os métodos. É por isso que o projeto mantém essa separação, e é por isso que ele **não** precisa de interfaces nem de um container de injeção de dependência para ser testável.
 - **Comandos e consultas se testam chamando o método**, não publicando mensagens. Publicar uma mensagem para provocar um comando testa o barramento, não o sistema.
 - **Use o `MessageBroker` para verificar as notificações**: assine a mensagem que o sistema deveria publicar, execute a ação e confira o que chegou. Chame `MessageBroker.Clear()` no `SetUp` para que um teste não herde assinaturas de outro.
-- **Todo estado estático precisa ser limpo no `SetUp` *e* no `TearDown`.** Vale para `MessageBroker.Clear()` e para `StoryFlags.ClearAll()`: sem isso, a ordem dos testes passa a importar e a suíte fica intermitente.
+- **Todo estado estático precisa ser limpo no `SetUp` *e* no `TearDown`.** Vale para `MessageBroker.Clear()` e para `StoryState.ClearAll()`: sem isso, a ordem dos testes passa a importar e a suíte fica intermitente.
+- **Um teste que espera um aviso usa `LogAssert.Expect`; um que prova silêncio termina com `LogAssert.NoUnexpectedReceived()`.** Um aviso inesperado (`LogType.Warning`) não reprova um teste sozinho.
+- **Fase vermelha no Unity:** um teste que cita uma API que ainda não existe é erro de compilação, e a suíte inteira deixa de rodar. Crie a assinatura vazia primeiro, para o teste falhar por asserção.
 - **Para testar efeitos, faça um dublê herdando de `DialogueEffectSO`** (ver `SpyEffect` em `DialogueControllerTests`) em vez de montar o efeito real. Campos `[SerializeField] private` de um efeito real podem ser preenchidos com `SerializedObject`, já que este assembly é Editor-only.
 - O `.asmdef` deste módulo é restrito ao ambiente de testes, então ele não entra na build final do jogo.
 

@@ -15,8 +15,11 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
 - **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
-- **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e **flags de história** (`StoryFlags`, do módulo `Core`). Ainda não há menu de save; na cena de teste, use o painel de debug.
-- **`LockedActionBehaviour`**: Portão de cena. Libera uma ação quando os requisitos são atendidos (um `ItemDataSO`, que é consumido, e/ou uma flag de história, que não é) e **lembra** que liberou, gravando `unlockedFlagId` em `StoryFlags` — que já entra no save, então a porta continua aberta depois de recarregar a cena ou carregar um save. Mora aqui, e não no `Inventory`, porque combina item (Inventory) com flag (Core): é progressão de história, não regra de inventário. Ligado ao objeto pelo `OnInteract` do `InteractableItem`, igual ao `InteractableDialogueTrigger`.
+- **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e o **estado da história** (`StoryState`, do módulo `Core`: booleanos, números e textos). Ainda não há menu de save; na cena de teste, use o painel de debug.
+  - O save tem **um formato único**: `GameState` guarda o estado da história em três listas de pares nome e valor (`storyBools`, `storyNumbers`, `storyTexts`, tipos em `StoryEntries.cs`), porque o `JsonUtility` não serializa dicionários. Não há campo nem conversão de formato anterior (D-20).
+  - `StoryStatePersistence` (C# puro, estático) faz a cópia entre o `StoryState` e o `GameState`: `Capture` no `Save()` e `Restore` no `Load()`. Fica fora do `GameSaveManager`, que é `MonoBehaviour` e lê arquivo, para a cópia ser testável em EditMode. Acesso a arquivo continua só no `GameSaveManager`.
+  - O `JsonUtility` ignora em silêncio uma chave que não tem campo: um campo de `GameState` renomeado por engano deixa de ser lido sem aviso. Os testes de ida e volta (`GameStateTests`, `StoryStatePersistenceTests`) são a proteção.
+- **`LockedActionBehaviour`**: Portão de cena. Libera uma ação quando os requisitos são atendidos (um `ItemDataSO`, que é consumido, e/ou uma variável de história booleana, que não é) e **lembra** que liberou, gravando `unlockedFlagId` no `StoryState` — que já entra no save, então a porta continua aberta depois de recarregar a cena ou carregar um save. Os campos de variável (`requiredFlagId`, `unlockedFlagId`) levam o nome com o `$`, no formato `$` + minúsculas sem acento, dígitos e `_` (ex.: `$porta_mecanicas_destrancada`); fora do formato, o `OnValidate` avisa. Mora aqui, e não no `Inventory`, porque combina item (Inventory) com flag (Core): é progressão de história, não regra de inventário. Ligado ao objeto pelo `OnInteract` do `InteractableItem`, igual ao `InteractableDialogueTrigger`.
   - Quatro eventos, e a distinção que importa é **estado × ação**:
 
     | Evento | Quando dispara | Para quê |
@@ -31,6 +34,8 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - *Limitação conhecida:* um `Load()` no meio da cena restaura a flag, mas o `Start()` já rodou, então a aparência do portão só se acerta ao recarregar a cena — o mesmo comportamento do `CollectableItemBehaviour`. É para isso que o painel de debug tem o botão **Reload Scene** ao lado do Load.
 - **`DevTools/PlaceholderTint`**: Marcador visual provisório. Hoje está ligado ao **`OnOpened`** da porta de `[Teste] Mecanicas`, pintando-a de verde — ou seja, verde quer dizer "esta porta está aberta", e não "você clicou nela". Existe como componente porque um `UnityEvent` do Inspector não aceita argumento do tipo `Color`, então não dá para ligar `SpriteRenderer.color` direto. Troque pela arte de porta aberta quando existir.
 - **`DialogueEffects/`**: As implementações concretas de `DialogueEffectSO` (`GiveItemEffect`, `RemoveItemEffect`, `SetFlagEffect`, `ClearFlagEffect`). Elas moram **aqui**, e não no módulo `Dialogue`, porque precisam enxergar `Inventory` e `Core` — e `Dialogue` não referencia nenhum dos dois. O campo em `DialogueNode`/`DialogueChoice` é da classe base abstrata, então a referência de asset resolve entre assemblies sem inverter a dependência. Ver o [README do Dialogue](../Dialogue/README.md#5-efeitos-effects).
+  `SetFlagEffect` grava `true` e `ClearFlagEffect` grava `false` (o falso fica gravado, como um `<<set $x to false>>` do roteiro faria).
+- **`StoryVariableNameCheck`**: o aviso de autoria que o `OnValidate` do portão e dos efeitos de flag mostra quando um campo de variável está fora do formato (`StoryVariableName.FollowsConvention`, no `Core`).
 - **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
 
 ---
@@ -85,7 +90,6 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #4 | `LockedActionBehaviour`, `GameState` e o painel de debug passam a usar `StoryState` no lugar de `StoryFlags` |
 | #5, #6 | `DialogueEffects/` sai; entram os comandos de roteiro (`dar_item`, `remover_item`, `tem_item`) |
 | #9 | O bootstrap passa a criar também o prefab da interface de jogo |
 | #12, #13 | Troca de sala com estado de transição; saídas e pontos de entrada |

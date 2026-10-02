@@ -14,7 +14,7 @@ O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógic
 - **`InventoryManager` (MonoBehaviour)**: A API do inventário para o resto do jogo.
 - **`CollectableItemBehaviour`**: Utilitário de cena, ligado ao objeto pelo `UnityEvent` `OnInteract` do `InteractableItem`.
 
-> `LockedActionBehaviour` **não mora neste módulo**. Ele combina item (Inventory) com flag de história (`StoryFlags`, em Core) e lembra que já foi aberto, o que é progressão de história e não regra de inventário. Mora em [`GameFlow`](../GameFlow/README.md).
+> `LockedActionBehaviour` **não mora neste módulo**. Ele combina item (Inventory) com variável de história (`StoryState`, em Core) e lembra que já foi aberto, o que é progressão de história e não regra de inventário. Mora em [`GameFlow`](../GameFlow/README.md).
 
 ---
 

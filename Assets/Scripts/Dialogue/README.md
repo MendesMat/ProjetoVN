@@ -112,8 +112,8 @@ concretas moram em `GameFlow`, que é quem enxerga `Inventory` e `Core`:
 |---|---|
 | `GiveItemEffect` | Coloca um `ItemDataSO` no inventário |
 | `RemoveItemEffect` | Tira um `ItemDataSO` do inventário |
-| `SetFlagEffect` | Liga uma flag em `StoryFlags` (`Core/State`) |
-| `ClearFlagEffect` | Desliga uma flag |
+| `SetFlagEffect` | Grava `true` em uma variável booleana do `StoryState` (`Core/State`), como `$falou_com_gotica` |
+| `ClearFlagEffect` | Grava `false` na variável |
 
 Para criar um efeito novo, herde de `DialogueEffectSO` **dentro de `GameFlow`** e adicione um
 `[CreateAssetMenu]`. O campo em `DialogueNode`/`DialogueChoice` é da classe base, então a referência

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bb200754cf464e498595ae641f42b62, type: 3}
   m_Name: FalouComGotica
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.DialogueEffects.SetFlagEffect
-  flagId: falou-com-gotica
+  flagId: $falou_com_gotica

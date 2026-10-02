@@ -7,8 +7,8 @@ namespace ProjetoVN.GameFlow
 {
     /// <summary>
     /// Portão de cena: libera uma ação quando os requisitos são atendidos e <b>lembra</b> que já
-    /// liberou. A memória é uma flag de história (<see cref="StoryFlags"/>), então ela já entra no
-    /// save por <c>GameState.storyFlagIds</c> e sobrevive a recarregar a cena.
+    /// liberou. A memória é uma variável booleana de história (<see cref="StoryState"/>), então ela já
+    /// entra no save por <c>GameState.storyBools</c> e sobrevive a recarregar a cena.
     /// <para>
     /// Os quatro eventos separam <b>estado</b> de <b>ação</b>, e essa é a distinção que importa:
     /// <c>OnOpened</c> é "este portão está aberto" (dispara ao destrancar e de novo a cada carga de
@@ -17,8 +17,8 @@ namespace ProjetoVN.GameFlow
     /// teleportaria o jogador sozinho no <c>Start()</c>; ela pertence ao segundo.
     /// </para>
     /// <para>
-    /// Mora no <c>GameFlow</c>, e não no <c>Inventory</c>, porque combina item (Inventory) com flag
-    /// (Core): é progressão de história, não regra de inventário. É ligado ao objeto pelo
+    /// Mora no <c>GameFlow</c>, e não no <c>Inventory</c>, porque combina item (Inventory) com variável
+    /// de história (Core): é progressão de história, não regra de inventário. É ligado ao objeto pelo
     /// <c>UnityEvent</c> <c>OnInteract</c> do <c>InteractableItem</c>, igual ao
     /// <see cref="InteractableDialogueTrigger"/>.
     /// </para>
@@ -29,11 +29,13 @@ namespace ProjetoVN.GameFlow
         [Tooltip("Item exigido. É consumido ao destrancar. Vazio = portão só de flag.")]
         [SerializeField] private ItemDataSO requiredItem;
 
-        [Tooltip("Flag exigida. NÃO é consumida. Vazio = portão só de item.")]
+        [Tooltip("Variável de história exigida, no formato '$' + minúsculas sem acento, dígitos e '_' " +
+                 "(ex.: $falou_com_gotica). NÃO é consumida. Vazio = portão só de item.")]
         [SerializeField] private string requiredFlagId;
 
         [Header("Memória")]
-        [Tooltip("Flag ligada ao destrancar. É o que mantém o portão aberto depois. " +
+        [Tooltip("Variável de história ligada ao destrancar, no formato '$' + minúsculas sem acento, dígitos e '_' " +
+                 "(ex.: $porta_biblioteca_destrancada). É o que mantém o portão aberto depois. " +
                  "Vazio = sem memória: o portão consome o item e volta a trancar.")]
         [SerializeField] private string unlockedFlagId;
 
@@ -61,9 +63,9 @@ namespace ProjetoVN.GameFlow
                 return;
             }
 
-            // StoryFlags.IsSet("") é sempre false, então um 'unlockedFlagId' vazio nunca entra aqui:
+            // StoryState.IsTrue("") é sempre false, então um 'unlockedFlagId' vazio nunca entra aqui:
             // o portão simplesmente fica sem memória, exatamente como era antes.
-            if (StoryFlags.IsSet(unlockedFlagId))
+            if (StoryState.IsTrue(unlockedFlagId))
             {
                 OnAlreadyUnlocked?.Invoke();
                 return;
@@ -72,7 +74,7 @@ namespace ProjetoVN.GameFlow
             // A flag é checada ANTES do item de propósito: ela não consome nada. Na ordem inversa,
             // um portão que exige os dois gastaria a chave do jogador só para descobrir que a flag
             // ainda não estava ligada. Não inverta.
-            if (!string.IsNullOrWhiteSpace(requiredFlagId) && !StoryFlags.IsSet(requiredFlagId))
+            if (!string.IsNullOrWhiteSpace(requiredFlagId) && !StoryState.IsTrue(requiredFlagId))
             {
                 OnLocked?.Invoke();
                 return;
@@ -104,18 +106,18 @@ namespace ProjetoVN.GameFlow
 
         /// <summary>
         /// Restaura o estado aberto ao carregar a cena. <c>ManagersBootstrap</c> roda em
-        /// <c>AfterSceneLoad</c>, ou seja, antes de qualquer <c>Start()</c>, e <c>StoryFlags</c> é
-        /// estático — então aqui a flag já reflete a sessão (ou o save) atual.
+        /// <c>AfterSceneLoad</c>, ou seja, antes de qualquer <c>Start()</c>, e <c>StoryState</c> é
+        /// estático — então aqui a variável já reflete a sessão (ou o save) atual.
         /// </summary>
         private void Start()
         {
-            if (StoryFlags.IsSet(unlockedFlagId)) OnOpened?.Invoke();
+            if (StoryState.IsTrue(unlockedFlagId)) OnOpened?.Invoke();
         }
 
-        /// <summary>Grava a memória e dispara os eventos. <c>Set</c> ignora sozinho um id vazio.</summary>
+        /// <summary>Grava a memória e dispara os eventos. <c>SetBool</c> ignora sozinho um nome vazio.</summary>
         private void Unlock()
         {
-            StoryFlags.Set(unlockedFlagId);
+            StoryState.SetBool(unlockedFlagId, true);
 
             // Estado antes da narrativa: o portão já está visualmente aberto quando a fala aparece.
             OnOpened?.Invoke();
@@ -129,10 +131,13 @@ namespace ProjetoVN.GameFlow
                 Debug.LogWarning("[LockedActionBehaviour] Nem 'requiredItem' nem 'requiredFlagId' foram preenchidos: este portão abriria sempre. Preencha pelo menos um.", this);
 
             if (string.IsNullOrWhiteSpace(unlockedFlagId))
-                Debug.LogWarning("[LockedActionBehaviour] O campo 'unlockedFlagId' está vazio: este portão não lembra que foi aberto e vai trancar de novo depois de consumir o item. Preencha um id único (ex.: \"porta-mecanicas-destrancada\").", this);
+                Debug.LogWarning("[LockedActionBehaviour] O campo 'unlockedFlagId' está vazio: este portão não lembra que foi aberto e vai trancar de novo depois de consumir o item. Preencha um nome único (ex.: \"$porta_mecanicas_destrancada\").", this);
 
             if (!string.IsNullOrWhiteSpace(unlockedFlagId) && unlockedFlagId == requiredFlagId)
-                Debug.LogWarning("[LockedActionBehaviour] 'requiredFlagId' e 'unlockedFlagId' são a mesma flag: o portão se considera aberto antes de abrir, e OnUnlocked nunca dispara. Use ids diferentes.", this);
+                Debug.LogWarning("[LockedActionBehaviour] 'requiredFlagId' e 'unlockedFlagId' são a mesma variável: o portão se considera aberto antes de abrir, e OnUnlocked nunca dispara. Use nomes diferentes.", this);
+
+            StoryVariableNameCheck.WarnIfOffConvention(nameof(LockedActionBehaviour), nameof(requiredFlagId), requiredFlagId, this);
+            StoryVariableNameCheck.WarnIfOffConvention(nameof(LockedActionBehaviour), nameof(unlockedFlagId), unlockedFlagId, this);
         }
 #endif
     }

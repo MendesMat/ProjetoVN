@@ -8,19 +8,18 @@ using UnityEngine.TestTools;
 namespace ProjetoVN.Tests.EditMode
 {
     /// <summary>
-    /// Cobre os efeitos que só dependem de StoryFlags. GiveItemEffect e RemoveItemEffect ficam de
+    /// Cobre os efeitos que só dependem de StoryState. GiveItemEffect e RemoveItemEffect ficam de
     /// fora de propósito: exigiriam um InventoryManager num GameObject, quebrando a regra
     /// "C# puro, sem GameObjects" da suíte por um null-check e uma linha que delega.
     /// Esses dois são verificados em Play Mode.
     /// </summary>
     public sealed class StoryFlagEffectsTests
     {
-        #region Setup
         [SetUp]
-        public void SetUp() => StoryFlags.ClearAll();
+        public void SetUp() => StoryState.ClearAll();
 
         [TearDown]
-        public void TearDown() => StoryFlags.ClearAll();
+        public void TearDown() => StoryState.ClearAll();
 
         // flagId é [SerializeField] private, então preenchemos pelo SerializedObject —
         // legal aqui porque a Tests.asmdef é Editor-only.
@@ -34,28 +33,26 @@ namespace ProjetoVN.Tests.EditMode
 
             return effect;
         }
-        #endregion
 
-        #region SetFlagEffect
         [Test]
         public void SetFlagEffect_Execute_SetsTheFlag()
         {
-            var effect = EffectWithFlag<SetFlagEffect>("falou-com-gotica");
+            var effect = EffectWithFlag<SetFlagEffect>("$falou_com_gotica");
 
             effect.Execute();
 
-            Assert.IsTrue(StoryFlags.IsSet("falou-com-gotica"));
+            Assert.IsTrue(StoryState.IsTrue("$falou_com_gotica"));
         }
 
         [Test]
         public void SetFlagEffect_Executed_Twice_LeavesTheFlagSet()
         {
-            var effect = EffectWithFlag<SetFlagEffect>("falou-com-gotica");
+            var effect = EffectWithFlag<SetFlagEffect>("$falou_com_gotica");
 
             effect.Execute();
             effect.Execute();
 
-            Assert.IsTrue(StoryFlags.IsSet("falou-com-gotica"),
+            Assert.IsTrue(StoryState.IsTrue("$falou_com_gotica"),
                 "rejogar um diálogo não pode desligar o que ele tinha ligado");
         }
 
@@ -68,20 +65,21 @@ namespace ProjetoVN.Tests.EditMode
 
             effect.Execute();
 
-            Assert.IsEmpty(StoryFlags.All, "um efeito mal configurado precisa reclamar, não criar uma flag vazia");
+            Assert.IsEmpty(StoryState.Bools, "um efeito mal configurado precisa reclamar, não criar uma variável vazia");
         }
-        #endregion
 
-        #region ClearFlagEffect
         [Test]
-        public void ClearFlagEffect_Execute_RemovesTheFlag()
+        public void ClearFlagEffect_Execute_WritesFalse()
         {
-            StoryFlags.Set("porta-destrancada");
-            var effect = EffectWithFlag<ClearFlagEffect>("porta-destrancada");
+            StoryState.SetBool("$porta_destrancada", true);
+            var effect = EffectWithFlag<ClearFlagEffect>("$porta_destrancada");
 
             effect.Execute();
 
-            Assert.IsFalse(StoryFlags.IsSet("porta-destrancada"));
+            Assert.IsFalse(StoryState.IsTrue("$porta_destrancada"));
+            Assert.IsTrue(StoryState.TryGetBool("$porta_destrancada", out bool value),
+                "desligar grava falso, como um <<set $x to false>> do roteiro faria");
+            Assert.IsFalse(value);
         }
 
         [Test]
@@ -93,8 +91,7 @@ namespace ProjetoVN.Tests.EditMode
 
             effect.Execute();
 
-            Assert.IsEmpty(StoryFlags.All);
+            Assert.IsEmpty(StoryState.Bools);
         }
-        #endregion
     }
 }

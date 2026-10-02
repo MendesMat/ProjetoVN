@@ -46,8 +46,10 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 1. No objeto interativo, acrescente o componente **Locked Action Behaviour**.
 2. Preencha pelo menos um requisito:
    - **Required Item:** o item exigido. Ele é **consumido** ao abrir.
-   - **Required Flag Id:** uma flag que precisa estar ligada. Ela **não** é consumida.
-3. Preencha **Unlocked Flag Id** com um id **único para este portão** (por exemplo `porta-biblioteca-destrancada`). É o que mantém o portão aberto depois. Dois portões com o mesmo id abrem juntos.
+   - **Required Flag Id:** uma variável de história que precisa estar ligada. Ela **não** é consumida.
+3. Preencha **Unlocked Flag Id** com um nome **único para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com o mesmo nome abrem juntos.
+
+**Formato do nome de uma variável** (vale para os dois campos e para os efeitos de flag): começa com `$`, seguido de letras minúsculas sem acento, dígitos e `_`. Exemplos: `$falou_com_gotica`, `$porta_mecanicas_destrancada`. O componente avisa no console se o nome estiver fora desse formato.
 4. Em **On Interact**, ligue `LockedActionBehaviour.Interact`.
 5. Ligue os eventos:
 

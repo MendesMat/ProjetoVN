@@ -57,7 +57,7 @@ unity command run_tests --mode EditMode --timeout 180
 O resultado esperado tem a forma `48/48 aprovados (EditMode, 3.87s)`. O número cresce a cada issue; o que importa é não haver falha. Para um subconjunto:
 
 ```bash
-unity command run_tests --mode EditMode --filter StoryFlagsTests
+unity command run_tests --mode EditMode --filter StoryStateTests
 ```
 
 Alguns testes provocam um erro de propósito (o do `MessageBroker` com assinante que lança exceção). A entrada `InvalidOperationException: falha proposital` no console é esperada.
@@ -137,6 +137,14 @@ unity command eval 'UnityEngine.Application.runInBackground = true; return Unity
 Rode de novo alguns segundos depois. Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()` é falsa. A atribuição é só de runtime e não altera `ProjectSettings`.
 
 Asserções feitas só por chamada direta de método (`porta.Interact()`, `GameSaveManager.Instance.Save()`) não dependem de frames e valem mesmo com o jogo parado.
+
+### Comandos que falham com "Network error" logo depois de criar ou apagar scripts
+
+Depois de mexer em `.cs`, o Editor recarrega o domínio, e um `eval` ou `recompile` enviado nesse intervalo falha com `Network error: An error occurred while sending the request`. Não é erro do código: espere e rode `unity command recompile_status` até `completed`, depois repita o comando.
+
+### O `$` e o shell
+
+Os nomes de variável de história começam com `$`. Dentro de aspas duplas o shell o expande para vazio e o `eval` roda com o nome errado, sem erro. Todo `eval` com um nome como `$falou_com_gotica` vai entre aspas simples.
 
 ### O erro de console que é do CLI, não do jogo
 

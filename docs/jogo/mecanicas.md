@@ -8,10 +8,10 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 |---|---|---|---|
 | [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | #6 |
-| [Portões](#portões) | existe | `GameFlow` | #4, #7 |
+| [Portões](#portões) | existe | `GameFlow` | #7 |
 | [Diálogo](#diálogo) | parcial | `Dialogue` | #3, #5, #11 |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
-| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #4, #7 |
+| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #5, #7 |
 | [Personagens](#personagens) | planejada | — | #10, #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
@@ -116,16 +116,17 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo lembra o que ele fez e escolheu, e reage a isso.
 
 **Existe:**
-- Flags booleanas (`StoryFlags`), ligadas e desligadas por efeitos de diálogo e por portões, salvas e restauradas.
+- Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado. Hoje é escrito por efeitos de diálogo (booleanos) e por portões.
 
 **Falta:**
-- Valores numéricos e de texto, em um estado único (`StoryState`) lido pelo roteiro, pelas portas e pelo save (#4, D-18).
+- O roteiro ler e gravar nesse estado (#5).
 - Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
 - Um registro central das variáveis, com descrição, para que ninguém dependa de digitar o nome certo (#7).
 
 **Regras:**
 - Um nome de variável vazio ou em branco é sempre inválido: nunca é gravado e sempre lê como falso.
-- Os nomes são em português (D-22).
+- O nome começa com `$` e quem monta cena usa minúsculas sem acento, dígitos e `_` (`$falou_com_gotica`). Os nomes são em português (D-22).
+- Um nome guarda um tipo só: gravar de outro tipo troca o valor, e ler como outro tipo não converte.
 
 **Fora do escopo:** mostrar a afinidade ao jogador.
 
@@ -158,7 +159,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo salva sozinho ao entrar em cada sala, e ele pode salvar pela pausa. Continuar o devolve aonde estava.
 
 **Existe:**
-- Salvar e carregar em JSON, com itens, objetos consumidos, flags e o nome da cena.
+- Salvar e carregar em JSON, com itens, objetos consumidos, o estado da história (booleanos, números e textos) e o nome da cena. O save tem um formato único (D-20).
 - Acionado só pelo painel de debug da cena de teste.
 
 **Falta (D-20):**

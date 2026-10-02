@@ -33,9 +33,9 @@ namespace ProjetoVN.GameFlow.DevTools
 
         public void ResetSession()
         {
-            // Flags são estáticas e não dependem do InventoryManager, então limpe-as primeiro:
+            // O estado da história é estático e não depende do InventoryManager, então limpe-o primeiro:
             // assim um reset continua valendo mesmo se o inventário não estiver disponível.
-            StoryFlags.ClearAll();
+            StoryState.ClearAll();
 
             if (InventoryManager.Instance == null)
             {
