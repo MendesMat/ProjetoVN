@@ -10,11 +10,12 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | #6 |
 | [Portões](#portões) | existe | `GameFlow` | #4, #7 |
 | [Diálogo](#diálogo) | parcial | `Dialogue` | #3, #5, #11 |
+| [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #4, #7 |
-| [Personagens](#personagens) | planejada | — | #10 |
+| [Personagens](#personagens) | planejada | — | #10, #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
-| [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18 |
+| [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
@@ -83,6 +84,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Falta:**
 - A migração (#5).
 - Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
+- O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
 
 **Regras que continuam valendo depois da migração:**
 - Iniciar um diálogo é um comando direto ao dono.
@@ -90,7 +92,24 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Durante o diálogo, o mundo não aceita cliques.
 - Não se salva durante um diálogo (D-20).
 
-**Fora do escopo:** avanço automático, pular texto já lido, histórico de falas, voz.
+**Fora do escopo:** avanço automático, pular texto já lido, voz.
+
+## Histórico de falas
+
+**Para o jogador:** durante uma conversa, um botão na caixa de diálogo abre a lista do que já foi dito nela. Ele relê, fecha e a conversa continua de onde estava.
+
+**Planejada (#25, D-30):**
+- Registra as falas, a opção escolhida e os itens dados ou retirados pelo roteiro durante a conversa.
+- Cada fala aparece como `Nome: texto`, com o nome na cor do personagem. A narração aparece sem nome, e a opção escolhida aparece como fala do protagonista.
+- O botão fica desabilitado enquanto o texto da fala está sendo revelado; funciona com a fala completa e com as opções na tela.
+- Abre na entrada mais recente; a roda do mouse e a barra de rolagem levam às anteriores.
+
+**Regras:**
+- É só leitura: nada no histórico altera o estado do jogo.
+- Guarda só a conversa em curso. Começa vazio a cada conversa e não entra no save.
+- Com o histórico aberto, um clique não avança a fala e não escolhe opção.
+
+**Fora do escopo:** voltar a uma fala anterior, histórico da sessão inteira, abrir na exploração ou pela pausa, coleta feita no cenário, eventos de som e de efeito visual, retrato por entrada, busca, atalho de teclado.
 
 ## Estado da história e afinidade
 
@@ -118,7 +137,11 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Cada personagem é um asset: identificador, nome exibido, cor do nome, retratos por expressão.
 - O roteiro cita o personagem pelo nome; um nome desconhecido é avisado e não trava o jogo.
 
-**Fora do escopo:** sprites de corpo inteiro sobre o cenário, vários personagens na tela, animação de entrada e saída.
+**Planejada (#26):**
+- O nome do protagonista é escolhido pelo jogador ao começar um jogo novo, com um nome padrão.
+- O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico.
+
+**Fora do escopo:** sprites de corpo inteiro sobre o cenário, vários personagens na tela, animação de entrada e saída, trocar o nome do protagonista depois de o jogo começar.
 
 ## Navegação entre salas
 
@@ -155,6 +178,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Falta:**
 - Novo Jogo, Continuar e Sair funcionando; menu como primeira cena (#17).
+- Novo Jogo pedir o nome do protagonista (#26).
 - Pausa com Continuar, Salvar e Voltar ao menu (#18).
 
 **Fora do escopo:** tela de configurações (volume, velocidade do texto).

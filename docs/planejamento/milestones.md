@@ -55,7 +55,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #7 | Condições e afinidade no roteiro | #4, #5 |
 | #8 | Guia de autoria de roteiro e ambiente dos roteiristas | #6, #7 |
 
-**Portão:** a #3 termina com um veredito. Se for "não adotar", as issues #5 a #8, #10, #11 e #20 (com a label `depende-da-prova-yarn`) são reescritas para o plano B da decisão D-17 antes de qualquer execução. A #4 vale nos dois casos.
+**Portão:** a #3 termina com um veredito. Se for "não adotar", as issues #5 a #8, #10, #11, #20, #25 e #26 (com a label `depende-da-prova-yarn`) são reescritas para o plano B da decisão D-17 antes de qualquer execução. A #4 vale nos dois casos.
 
 ## M2 — Apresentação do diálogo
 
@@ -64,6 +64,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #9 | Interface de jogo em prefab persistente | #5 |
 | #10 | Personagem como dado e retrato no diálogo | #5, #9 |
 | #11 | Typewriter com completar e avançar | #5, #9 |
+| #25 | Histórico de falas da conversa em curso | #5, #6, #9, #10, #11 |
 
 ## M3 — Navegação entre salas
 
@@ -81,6 +82,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #16 | Save automático por sala e carregamento que recarrega a cena | #12, #14 |
 | #17 | Menu principal ligado ao jogo | #16 |
 | #18 | Pausa com salvar manual e voltar ao menu | #16, #17 |
+| #26 | Nome do protagonista definido pelo jogador | #4, #10, #16, #17, #25 |
 
 ## M5 — Áudio
 
@@ -93,7 +95,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 
 | Issue | Título | Depende de |
 |---|---|---|
-| #21 | Conteúdo provisório da fatia vertical | #8, #11, #13, #14, #18, #20 |
+| #21 | Conteúdo provisório da fatia vertical | #8, #11, #13, #14, #18, #20, #25, #26 |
 | #22 | Verificação de ponta a ponta e build de desktop | #21 |
 
 ## Riscos conhecidos

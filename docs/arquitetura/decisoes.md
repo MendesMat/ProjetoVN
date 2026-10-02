@@ -41,6 +41,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | D-27 | Nada especulativo | Padrão |
 | D-28 | Só o `GameFlow` escreve no `PlayerInputGate` | Padrão |
 | D-29 | Todo estado estático é zerado no início do Play | **Absoluta** |
+| D-30 | Histórico de falas: só leitura, só da conversa em curso, fora do save | Padrão |
 
 ---
 
@@ -142,6 +143,17 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Decisão:** cada personagem é um asset (`CharacterSO`: identificador, nome exibido, cor do nome, retratos por expressão). O diálogo mostra o retrato de quem fala ao lado da caixa.
 - **Fora do escopo atual:** sprites de corpo inteiro sobre o cenário e vários personagens na tela.
 
+### D-30 — Histórico de falas
+- **Decisão:** o jogador pode reler a conversa em curso em um histórico, aberto por um botão na caixa de diálogo. O histórico:
+  - é **só leitura**: não permite voltar a uma fala nem refazer uma escolha;
+  - guarda **só a conversa em curso** e começa vazio a cada conversa;
+  - **não entra no save**;
+  - só abre **durante uma conversa**, nunca na exploração nem pela pausa;
+  - registra falas, a opção escolhida e os itens dados ou retirados pelo roteiro. Sons e efeitos visuais não entram.
+- **Por quê:** é uma mecânica esperada do gênero, e o alcance segue o modelo de Persona 5. Guardar a sessão inteira e perdê-la ao reabrir o jogo não faz sentido; gravá-la mudaria o formato do save (D-20); voltar no tempo exigiria desfazer afinidade, itens e variáveis.
+- **Chega na issue #25.** Até lá, nada no código prepara terreno para ele (D-27).
+- **Rever só se:** os roteiristas pedirem releitura fora da conversa.
+
 ### D-12 — Fala e escolhas por mensagem (a rever na #5)
 - **Decisão atual:** o `DialogueController` publica `DialogueLineMessage` e `DialogueChoicesMessage`, e o `DialogueUIController` as assina, mesmo estando no mesmo módulo.
 - **Situação:** com o Yarn Spinner, a interface passa a ser um apresentador dele. A issue #5 decide se essas duas mensagens continuam existindo. `DialogueStartedMessage` e `DialogueEndedMessage` **continuam**: o `GameFlow` depende delas.
@@ -225,6 +237,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | Data | Mudança |
 |---|---|
 | 2026-10-01 | Página criada a partir do `ARCHITECTURE_ROADMAP.md`, que foi removido. D-01 a D-15 vieram de lá. **Revistas:** D-06 (assíncrono permitido na apresentação e no carregamento), D-13 (pilha simples de janelas permitida), D-15 (itch.io por download). **Novas:** D-16 a D-29, da entrevista de planejamento com o Matheus. D-11 e D-12 ficam marcadas para revisão na issue #5. |
+| 2026-10-02 | **Nova:** D-30 (histórico de falas), decidida com o Matheus durante o levantamento da #2. O histórico de falas sai do "fora do escopo" e vira a issue #25; o nome do protagonista definido pelo jogador vira a issue #26. As duas entram na fatia vertical. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 
