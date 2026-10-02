@@ -3887,7 +3887,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.LockedActionBehaviour
   requiredItem: {fileID: 11400000, guid: 66320ee0ac9cdda4bb59f1ee560d781c, type: 2}
   requiredFlagId: 
-  unlockedFlagId: porta-mecanicas-destrancada
+  unlockedFlagId: $porta_mecanicas_destrancada
   OnUnlocked:
     m_PersistentCalls:
       m_Calls:
