@@ -1,0 +1,19 @@
+title: Poc_Gotica
+---
+<<declare $afinidade_gotica = 0>>
+<<declare $conheceu_gotica = false>>
+Gótica: Acho que cheguei muito cedo...
+-> Sim
+    <<set $afinidade_gotica to $afinidade_gotica + 1>>
+    <<set $conheceu_gotica to true>>
+    <<dar_item item-teste-01>>
+    Gótica: Ele falou sim.
+-> Não
+    Gótica: Ele falou não.
+-> Talvez
+    Gótica: Ele falou talvez.
+<<if tem_item("item-teste-01")>>
+    Peguei uma chave... O que será que ela abre?
+<<endif>>
+Gótica: A escola está mais quieta do que eu imaginava.
+===

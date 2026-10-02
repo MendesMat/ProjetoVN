@@ -1,15 +1,17 @@
 {
-    "name": "ProjetoVN.PocYarn",
-    "rootNamespace": "ProjetoVN.PocYarn",
+    "name": "ProjetoVN.PocYarn.Editor",
+    "rootNamespace": "ProjetoVN.PocYarn.Editor",
     "references": [
-        "ProjetoVN.Core",
-        "ProjetoVN.Dialogue",
+        "ProjetoVN.PocYarn",
         "ProjetoVN.Inventory",
         "YarnSpinner.Unity",
+        "YarnSpinner.Unity.Editor",
         "Unity.TextMeshPro",
         "UnityEngine.UI"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
