@@ -79,7 +79,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Narração (fala sem nome de personagem) esconde a placa de nome.
 - Dados inválidos nunca travam o jogo.
 
-**Vai mudar:** o diálogo migra para o Yarn Spinner (D-17), condicionado à prova de conceito (#3). Os roteiros passam a ser arquivos de texto, os efeitos viram comandos, e as escolhas e falas ganham condições.
+**Vai mudar:** o diálogo migra para o Yarn Spinner (D-17), adoção confirmada pela prova de conceito (#3). Os roteiros passam a ser arquivos de texto, os efeitos viram comandos, e as escolhas e falas ganham condições.
 
 **Falta:**
 - A migração (#5).

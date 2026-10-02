@@ -4,7 +4,7 @@ O sistema foi desenhado visando ser de fácil uso por Game Designers diretamente
 
 > **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md)
 
-> **Este módulo vai ser reescrito.** O diálogo migra para o Yarn Spinner (decisão D-17), condicionado à prova de conceito da issue #3; a migração é a issue #5. Este README descreve o sistema próprio, que é o que está em produção até lá. **Não acrescente funcionalidade ao sistema próprio** (condições, novos efeitos, saltos): isso pertence às issues da milestone M1. O que sobrevive à migração: iniciar diálogo é um comando direto ao dono, `DialogueStartedMessage` e `DialogueEndedMessage` continuam sendo publicadas, e dados inválidos nunca travam o jogo.
+> **Este módulo vai ser reescrito.** O diálogo migra para o Yarn Spinner (decisão D-17, confirmada pela prova de conceito da issue #3); a migração é a issue #5. Este README descreve o sistema próprio, que é o que está em produção até lá. **Não acrescente funcionalidade ao sistema próprio** (condições, novos efeitos, saltos): isso pertence às issues da milestone M1. O que sobrevive à migração: iniciar diálogo é um comando direto ao dono, `DialogueStartedMessage` e `DialogueEndedMessage` continuam sendo publicadas, e dados inválidos nunca travam o jogo.
 
 ---
 
