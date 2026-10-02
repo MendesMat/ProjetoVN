@@ -133,8 +133,9 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Até a #5 ser mesclada, o sistema próprio é o que está em produção.**
 
 ### D-18 — Estado da história único
-- **Decisão:** um único `StoryState`, estático, no `Core`, guarda valores booleanos, numéricos e de texto. O roteiro (pelo adaptador do Yarn Spinner), as portas e o save leem e gravam nele. Ele substitui `StoryFlags` na issue #4.
-- **Por quê:** uma fonte de verdade. Com dois armazenamentos, a porta e o roteiro podem discordar. A afinidade com personagens é numérica.
+- **Decisão:** um único `StoryState`, estático, no `Core`, guarda valores booleanos, numéricos e de texto. O roteiro (pelo adaptador do Yarn Spinner), as portas e o save leem e gravam nele. Ele substituiu o antigo `StoryFlags` (issue #4).
+- **Formato do nome:** o nome de uma variável é guardado **com o `$`** em todo lugar (roteiro, Inspector, save). Quem monta cena digita `$` seguido de minúsculas sem acento, dígitos e `_` (por exemplo `$porta_biblioteca_destrancada`). O `StoryState` só exige o `$`, porque o Yarn Spinner grava nomes internos fora dessa convenção (`$Yarn.Internal.Visiting.<nó>`); a convenção é cobrada no `OnValidate` do portão e dos efeitos, e depois pelo seletor da #7.
+- **Por quê:** uma fonte de verdade. Com dois armazenamentos, a porta e o roteiro podem discordar. A afinidade com personagens é numérica. O `$` no Inspector evita que a mesma variável tenha duas grafias (uma no roteiro, outra na cena e no save).
 
 ### D-22 — Vocabulário do roteiro em português
 - **Decisão:** tudo o que o roteirista digita é em português: comandos (`<<dar_item chave>>`), variáveis (`$afinidade_gotica`) e nomes de nó. Identificadores de C# são em inglês. Mensagens de log, comentários e documentação são em português.
@@ -243,6 +244,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-02 | **Nova:** D-30 (histórico de falas), decidida com o Matheus durante o levantamento da #2. O histórico de falas sai do "fora do escopo" e vira a issue #25; o nome do protagonista definido pelo jogador vira a issue #26. As duas entram na fatia vertical. |
 | 2026-10-02 | **Confirmada:** D-17. A prova de conceito da #3 terminou com o veredito "adotar", confirmado pelo Matheus. O plano B não foi acionado. As notas sobre D-06, D-11 e D-12 que o relatório da #3 propõe ficam para a issue #5, que é quem decide essas três. |
 | 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo Matheus no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
+| 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo Matheus no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

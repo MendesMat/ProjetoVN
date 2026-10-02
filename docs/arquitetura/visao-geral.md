@@ -82,7 +82,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 |---|---|---|
 | Itens do jogador | `InventoryManager` (via `InventoryModel`) | Sim, por id |
 | Objetos de mundo já consumidos | `InventoryManager` (provisório; a issue #14 decide o lugar definitivo) | Sim |
-| Flags de história | `StoryFlags`, estático em `Core` (vira `StoryState` na #4) | Sim |
+| Estado da história (booleanos, números, textos) | `StoryState`, estático em `Core` | Sim, em três listas de pares nome e valor |
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
 | Posição do diálogo em curso | `DialogueController` | Não (salvar em diálogo será bloqueado, D-20) |
@@ -113,7 +113,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 **Portão**
 1. `LockedActionBehaviour.Interact()` confere, nesta ordem: já aberto → flag exigida → item exigido.
 2. A flag é conferida **antes** do item porque conferir a flag não consome nada e usar o item consome.
-3. Ao abrir, grava a flag de memória e dispara `OnOpened` (estado) e `OnUnlocked` (o momento).
+3. Ao abrir, grava a variável de memória no `StoryState` e dispara `OnOpened` (estado) e `OnUnlocked` (o momento).
 
 ## Como estender
 
@@ -131,7 +131,6 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| `StoryFlags` vira `StoryState` (booleano, número, texto) | #4 |
 | O módulo `Dialogue` vira adaptador do Yarn Spinner | #5 |
 | A interface de jogo sai das cenas e vira prefab persistente | #9 |
 | Troca de sala e estado de transição | #12 |
