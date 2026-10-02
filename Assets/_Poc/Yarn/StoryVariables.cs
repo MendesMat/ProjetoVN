@@ -63,7 +63,13 @@ namespace ProjetoVN.PocYarn
             foreach (KeyValuePair<string, bool> entry in bools) SetValue(entry.Key, entry.Value);
         }
 
-        public VariableKind GetVariableKind(string name) => VariableKind.Unknown;
+        public VariableKind GetVariableKind(string name)
+        {
+            if (Contains(name)) return VariableKind.Stored;
+            if (Program == null) return VariableKind.Unknown;
+
+            return Program.GetVariableKind(name);
+        }
 
         private void Store(string variableName, object value)
         {

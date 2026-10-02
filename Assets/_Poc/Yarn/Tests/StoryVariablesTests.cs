@@ -125,5 +125,32 @@ namespace ProjetoVN.PocYarn.Tests
 
             Assert.AreEqual(0, variables.GetAllVariables().Floats.Count);
         }
+
+        [Test]
+        public void GetVariableKind_AfterSetValue_ReturnsStored()
+        {
+            var variables = new StoryVariables();
+
+            variables.SetValue("$afinidade_gotica", 1f);
+
+            Assert.AreEqual(Yarn.VariableKind.Stored, variables.GetVariableKind("$afinidade_gotica"));
+        }
+
+        [Test]
+        public void GetVariableKind_ForANameNobodyKnows_ReturnsUnknown()
+        {
+            var variables = new StoryVariables();
+
+            Assert.AreEqual(Yarn.VariableKind.Unknown, variables.GetVariableKind("$nunca_vista"));
+        }
+
+        [Test]
+        public void GetVariableKind_ForAVariableOnlyDeclaredInTheScript_ReturnsStored()
+        {
+            var run = new ScriptRun("title: Teste\n---\n<<declare $afinidade_gotica = 0>>\nOi.\n===\n");
+
+            Assert.AreEqual(Yarn.VariableKind.Stored, run.Variables.GetVariableKind("$afinidade_gotica"),
+                "o Yarn consulta o Program para saber de variáveis declaradas e ainda não gravadas");
+        }
     }
 }
