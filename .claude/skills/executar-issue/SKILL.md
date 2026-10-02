@@ -14,7 +14,7 @@ Se `$ARGUMENTS` estiver vazio, pergunte o número da issue e pare.
 ## 1. Conferir o estado
 
 ```bash
-gh issue view $ARGUMENTS --comments --json number,title,body,labels,milestone,comments,state
+gh issue view $ARGUMENTS --json number,title,body,labels,milestone,comments,state
 ```
 
 - A issue precisa estar aberta e com a label `estado:pronta` (primeira execução) ou `estado:mudancas-pedidas` (reexecução depois da revisão).
