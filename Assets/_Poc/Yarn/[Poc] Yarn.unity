@@ -553,6 +553,7 @@ GameObject:
   - component: {fileID: 287646447}
   - component: {fileID: 287646446}
   - component: {fileID: 287646445}
+  - component: {fileID: 287646449}
   m_Layer: 0
   m_Name: PocYarn
   m_TagString: Untagged
@@ -638,6 +639,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &287646449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 287646444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afd1336bae317f74cbf7a9f217b60402, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.PocYarn::ProjetoVN.PocYarn.PocVariableProbe
+  project: {fileID: 7545569452688597077, guid: 561231a89c7c0e0498512ba26c337bf9, type: 3}
+  variableName: $afinidade_gotica
 --- !u!1 &315637482
 GameObject:
   m_ObjectHideFlags: 0

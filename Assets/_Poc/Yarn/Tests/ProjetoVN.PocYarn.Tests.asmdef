@@ -3,6 +3,7 @@
     "rootNamespace": "ProjetoVN.PocYarn.Tests",
     "references": [
         "ProjetoVN.PocYarn",
+        "ProjetoVN.PocYarn.Editor",
         "ProjetoVN.Core",
         "ProjetoVN.Inventory",
         "YarnSpinner.Unity",
