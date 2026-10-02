@@ -127,5 +127,33 @@ namespace ProjetoVN.PocYarn.Tests
             Assert.AreEqual(1, withoutItem.Lines.Count);
             Assert.AreEqual(2, withItem.Lines.Count);
         }
+
+        [Test]
+        public void Start_WithAStringVariableInsideALine_DeliversItsValueAsASubstitution()
+        {
+            const string script =
+                "title: Teste\n---\n<<declare $nome_jogador = \"Heroi\">>\nOi, {$nome_jogador}!\n===\n";
+            var run = new ScriptRun(script);
+            run.Variables.SetValue("$nome_jogador", "Ana");
+
+            run.Start("Teste");
+
+            CollectionAssert.AreEqual(new[] { "Ana" }, run.LineSubstitutions[0],
+                "o nome escolhido pelo jogador chega à fala pela variável de texto");
+        }
+
+        [Test]
+        public void Start_WithAConditionalOption_MarksItUnavailableInsteadOfDroppingIt()
+        {
+            const string script =
+                "title: Teste\n---\n<<declare $afinidade_gotica = 0>>\n"
+                + "-> Aberta\n    Oi.\n-> Só com afinidade <<if $afinidade_gotica >= 1>>\n    Oi.\n===\n";
+            var run = new ScriptRun(script);
+
+            run.Start("Teste");
+
+            CollectionAssert.AreEqual(new[] { true, false }, run.OptionAvailability,
+                "o Yarn entrega a opção com IsAvailable=false; ocultar ou desabilitar é decisão do apresentador");
+        }
     }
 }

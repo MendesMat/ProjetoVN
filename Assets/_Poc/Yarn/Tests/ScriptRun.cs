@@ -19,6 +19,8 @@ namespace ProjetoVN.PocYarn.Tests
         public List<string> Lines { get; } = new();
         public List<string> Commands { get; } = new();
         public List<string> OptionTexts { get; } = new();
+        public List<bool> OptionAvailability { get; } = new();
+        public List<string[]> LineSubstitutions { get; } = new();
         public bool Completed { get; private set; }
 
         public Program Program => _compilation.Program;
@@ -53,12 +55,14 @@ namespace ProjetoVN.PocYarn.Tests
             _dialogue.SetSelectedOption(_pendingOptions.Value.Options[index].ID);
             _pendingOptions = null;
             OptionTexts.Clear();
+            OptionAvailability.Clear();
             RunUntilWaiting();
         }
 
         private void Deliver(List<string> destination, Line line)
         {
             destination.Add(_compilation.GetStringForKey(line.ID));
+            LineSubstitutions.Add(line.Substitutions);
             _shouldContinue = true;
         }
 
@@ -66,6 +70,7 @@ namespace ProjetoVN.PocYarn.Tests
         {
             _pendingOptions = options;
             OptionTexts.AddRange(options.Options.Select(option => _compilation.GetStringForKey(option.Line.ID)));
+            OptionAvailability.AddRange(options.Options.Select(option => option.IsAvailable));
         }
 
         private void RunUntilWaiting()
