@@ -1,0 +1,22 @@
+{
+    "name": "ProjetoVN.PocYarn",
+    "rootNamespace": "ProjetoVN.PocYarn",
+    "references": [
+        "ProjetoVN.Core",
+        "ProjetoVN.Inventory",
+        "YarnSpinner.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "YarnSpinner.dll",
+        "YarnSpinner.Compiler.dll",
+        "Yarn.Google.Protobuf.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

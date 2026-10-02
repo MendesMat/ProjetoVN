@@ -1,0 +1,30 @@
+{
+    "name": "ProjetoVN.PocYarn.Tests",
+    "rootNamespace": "ProjetoVN.PocYarn.Tests",
+    "references": [
+        "ProjetoVN.PocYarn",
+        "ProjetoVN.Core",
+        "ProjetoVN.Inventory",
+        "YarnSpinner.Unity",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "YarnSpinner.dll",
+        "YarnSpinner.Compiler.dll",
+        "Yarn.Google.Protobuf.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
