@@ -3340,9 +3340,9 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: dialogueData
-      value: 
-      objectReference: {fileID: 11400000, guid: f5b223aed2040e74ba386502b04d05e6, type: 2}
+      propertyPath: nodeName
+      value: peguei_chave
+      objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2
@@ -3787,9 +3787,9 @@ PrefabInstance:
       value: 0.3018868
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: dialogueData
-      value: 
-      objectReference: {fileID: 11400000, guid: 0a1a4c21a7dd9ea4586d3227409fdc2b, type: 2}
+      propertyPath: nodeName
+      value: porta_trancada
+      objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4
@@ -3950,7 +3950,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9255399149389f34bb6db5147e42bcd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.InteractableDialogueTrigger
-  dialogueData: {fileID: 11400000, guid: 2c5a47f0ce4199649afc255a0d3e8677, type: 2}
+  nodeName: porta_destrancada
 --- !u!114 &1549455984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4265,9 +4265,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.UI.DialogueUIController
   dialogueBox: {fileID: 1989313757}
-  dialogueChoices: {fileID: 954174371}
-  speakerNameText: {fileID: 28100558}
   dialogueText: {fileID: 835991442}
+  speakerNameText: {fileID: 28100558}
+  dialogueChoices: {fileID: 954174371}
   choiceButtonObjects:
   - {fileID: 1673162312}
   - {fileID: 1091503613}
@@ -4702,6 +4702,10 @@ PrefabInstance:
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: nodeName
+      value: gotica_cheguei_cedo
       objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x

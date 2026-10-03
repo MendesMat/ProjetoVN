@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 8729558593117236761}
   - component: {fileID: 6815418778352200814}
   - component: {fileID: 3163852298196397563}
+  - component: {fileID: 7320409207393300824}
+  - component: {fileID: 1119890017147649609}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -98,3 +100,64 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Persistence.GameSaveManager
   itemRegistry: {fileID: 11400000, guid: e70a9b732ab633f429ff272e35a516e2, type: 2}
+--- !u!114 &7320409207393300824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 892e2f9a431b90049b7c729f5e0bc98a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Logic.StoryStateVariableStorage
+--- !u!114 &1119890017147649609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bec29c0a230741bdac901dba8da47ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.DialogueRunner
+  yarnProject: {fileID: 7545569452688597077, guid: 093c4ede51cce6447a99cfeb17717ee4, type: 3}
+  variableStorage: {fileID: 7320409207393300824}
+  lineProvider: {fileID: 0}
+  saliencyStrategy: 0
+  dialoguePresenters: []
+  verboseLogging: 0
+  autoStart: 0
+  startNode: Start
+  runSelectedOptionAsLine: 0
+  allowOptionFallthrough: 1
+  onNodeStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onNodeComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  onDialogueStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onDialogueComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnhandledCommand:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1610200894811289061}
+        m_TargetAssemblyTypeName: ProjetoVN.Dialogue.Logic.DialogueManager, ProjetoVN.Dialogue
+        m_MethodName: SkipUnknownCommand
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
