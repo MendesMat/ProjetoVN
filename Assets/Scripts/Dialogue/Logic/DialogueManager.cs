@@ -84,6 +84,9 @@ namespace ProjetoVN.Dialogue.Logic
 
         public bool IsDialogueActive() => _conversation.IsOpen;
 
+        /// <summary>O nó em que o roteiro está; <c>null</c> fora de uma conversa.</summary>
+        public string CurrentNodeName => _runner != null && _conversation.IsOpen ? _runner.Dialogue.CurrentNode : null;
+
         // Ligado ao onUnhandledCommand do runner por ligação persistente no Managers.prefab. Sem isto o runner
         // loga o erro e para sem chamar Continue(): o jogo prenderia na conversa.
         public void SkipUnknownCommand(string commandText)
