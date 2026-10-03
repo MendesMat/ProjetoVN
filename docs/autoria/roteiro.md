@@ -16,7 +16,7 @@ Se é a sua primeira vez, comece instalando os programas: [Na primeira vez: prep
 
 - **O roteiro é texto puro.** Cada conversa é escrita em um arquivo que termina em `.yarn`, dentro da pasta `Assets/Roteiro/` do projeto.
 - **Você escreve no VS Code**, um editor de texto gratuito, com a extensão **Yarn Spinner**. Ela colore o texto e aponta erros enquanto você digita.
-- **Você envia pelo GitHub Desktop**, um programa que manda os seus arquivos para o projeto. O Matheus confere e junta ao jogo.
+- **Você envia pelo GitHub Desktop**, um programa que manda os seus arquivos para o projeto. O programador confere e junta ao jogo.
 - **Nomes técnicos são em minúsculas, sem acento, com `_` no lugar do espaço.** Isso vale para nome de arquivo, de pasta, de conversa e de variável: `gotica_chave_perdida`, nunca `Gótica Chave Perdida`. **O texto que o jogador lê é português normal**, com acento, maiúscula e pontuação.
 - **Uma conversa não é salva pela metade.** Se o jogador fechar o jogo no meio de um diálogo, ele volta ao começo da sala.
 - **O editor não é o jogo.** Um texto sem erro no editor ainda pode ser recusado pela verificação do jogo. A seção [O que o editor não confere](#o-que-o-editor-não-confere) lista esses casos.
@@ -112,7 +112,7 @@ Gótica: Então senta, que a aula já vai começar.
 
 Duas regras de digitação que valem para o arquivo inteiro:
 
-- **Comentário:** tudo o que vem depois de `//` em uma linha é comentário. Use para deixar recados para você e para o Matheus.
+- **Comentário:** tudo o que vem depois de `//` em uma linha é comentário. Use para deixar recados para você e para o programador.
 - **Recuo:** algumas linhas ficam "para dentro" (você vai ver em [Opções](#opções) e em [Condicionar uma fala](#condicionar-uma-fala)). O recuo é sempre de **quatro espaços**. O editor já está configurado: a tecla Tab insere os quatro espaços.
 
 ### O nome do nó
@@ -130,7 +130,7 @@ Quem monta a cena no jogo digita o nome do nó em um campo de texto, letra por l
 
 O nome do nó **não** leva ato, capítulo nem episódio: isso já está na pasta e na linha de título.
 
-**Nunca apague nem renomeie um nó que já foi entregue** sem avisar o Matheus. A cena guarda o nome como texto; se o nó mudar de nome, o objeto para de responder ao clique, sem aviso.
+**Nunca apague nem renomeie um nó que já foi entregue** sem avisar o programador. A cena guarda o nome como texto; se o nó mudar de nome, o objeto para de responder ao clique, sem aviso.
 
 ### Vários nós na mesma conversa
 
@@ -217,7 +217,7 @@ Os nomes que existem hoje:
 | `Gótica` | A Gótica |
 | `Protagonista` | O protagonista (nome reservado, veja abaixo) |
 
-Quando uma personagem nova entrar no jogo, o Matheus acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
+Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
 ### O protagonista
 
@@ -384,7 +384,7 @@ Para criar uma variável, acrescente duas linhas **no fim, antes do `===`**:
 - A linha com `///` (três barras) é a descrição. Ela é **obrigatória** e aparece para quem monta as cenas.
 - O valor depois do `=` é o valor inicial e define o tipo: `false` para sim/não, `0` para número.
 - Não declare uma variável em outro arquivo, e não use uma que não foi declarada: a verificação reprova os dois.
-- Este é o único arquivo em que duas pessoas mexem ao mesmo tempo. Acrescentar sempre no fim evita que as mudanças se choquem. Se mesmo assim aparecer um aviso de **conflito**, pare e chame o Matheus.
+- Este é o único arquivo em que duas pessoas mexem ao mesmo tempo. Acrescentar sempre no fim evita que as mudanças se choquem. Se mesmo assim aparecer um aviso de **conflito**, pare e chame o programador.
 
 ### Mudar o valor
 
@@ -546,7 +546,7 @@ Os casos da coluna "Errado" passam sem erro no editor. A verificação do jogo r
 |---|---|---|
 | `chave_teste` | Chave Teste | Uma chave que abre alguma porta |
 
-Quando um item novo entrar no jogo, o Matheus acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
+Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
 
 ## Convenções de nome
 
@@ -580,7 +580,7 @@ Gótica: Você não devia ter visto isso.
 // PEDIDO: tocar uma música tensa a partir daqui.
 ```
 
-Repita os pedidos no texto do envio (veja [A cada entrega](#a-cada-entrega)). O Matheus cria o que falta, acrescenta à tabela do guia e troca o comentário pelo comando.
+Repita os pedidos no texto do envio (veja [A cada entrega](#a-cada-entrega)). O programador cria o que falta, acrescenta à tabela do guia e troca o comentário pelo comando.
 
 ## Como conferir
 
@@ -624,7 +624,7 @@ Procure a mensagem nesta tabela.
 | `[Compilation Error] Index and length must refer to a location within the string`, em **todos** os arquivos | Um `[` sem fechar em alguma fala derrubou o projeto inteiro. | Procure `[` nas suas falas e escreva `\[`. |
 | `YS0010 Variable '$x' is declared but never used` (azul) | A variável existe e nenhuma conversa a usa ainda. | Pode ignorar. |
 
-Se a mensagem não está aqui, copie o texto dela e mande ao Matheus.
+Se a mensagem não está aqui, copie o texto dela e mande ao programador.
 
 ### O que o editor não confere
 
@@ -642,7 +642,7 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |
 | Há dois-pontos em alguma narração? | `Eram 10:30 da manhã.` | Vira nome de personagem ([Dois-pontos na narração](#dois-pontos-na-narração)). |
 
-O Matheus roda a verificação do jogo em todo envio e devolve o que ela acusar.
+O programador roda a verificação do jogo em todo envio e devolve o que ela acusar.
 
 ## Como enviar
 
@@ -661,13 +661,13 @@ Você nunca envia direto para a `main`: ela é protegida. Se o GitHub Desktop re
 
 Faça uma vez só.
 
-1. **Conta no GitHub.** Crie em [github.com](https://github.com) e mande o seu nome de usuário ao Matheus. Ele te convida para o repositório `MendesMat/ProjetoVN`. Aceite o convite pelo e-mail que o GitHub enviar.
+1. **Conta no GitHub.** Crie em [github.com](https://github.com) e mande o seu nome de usuário ao programador. Ele te convida para o repositório `MendesMat/ProjetoVN`. Aceite o convite pelo e-mail que o GitHub enviar.
 2. **GitHub Desktop.** Baixe e instale em [desktop.github.com](https://desktop.github.com) e entre com a sua conta (*Sign in to GitHub.com*).
 3. **VS Code.** Baixe e instale em [code.visualstudio.com](https://code.visualstudio.com).
 4. **Copie o projeto para o seu computador.** No GitHub Desktop: *File → Clone repository*, aba *GitHub.com*, escolha `MendesMat/ProjetoVN`, escolha uma pasta e clique em *Clone*. Demora um pouco: é o projeto inteiro do jogo.
 5. **Abra o projeto no VS Code.** *File → Open Folder* e escolha a pasta **raiz** do projeto: a que se chama `ProjetoVN` e tem a pasta `Assets` dentro. Abra sempre a raiz, não só `Assets/Roteiro`: é isso que faz o editor conhecer os comandos do jogo.
 6. **Instale a extensão.** Ao abrir a pasta, o VS Code oferece instalar as extensões recomendadas: clique em *Install*. Se não oferecer, abra *Extensions* (Ctrl+Shift+X; Cmd+Shift+X no Mac), procure **Yarn Spinner** e instale. Na primeira vez, a extensão pode baixar uma ferramenta chamada .NET: espere terminar. Precisa de internet.
-7. **Confira que funcionou.** Abra `Assets/Roteiro/exemplo_comentado.yarn`. O texto deve aparecer colorido, e o painel *Problems* (*View → Problems*) deve estar sem vermelho e sem amarelo. Se aparecer `Unknown command 'dar_item'`, confira que você abriu a raiz (passo 5) e que o download do passo 6 terminou; se continuar, avise o Matheus.
+7. **Confira que funcionou.** Abra `Assets/Roteiro/exemplo_comentado.yarn`. O texto deve aparecer colorido, e o painel *Problems* (*View → Problems*) deve estar sem vermelho e sem amarelo. Se aparecer `Unknown command 'dar_item'`, confira que você abriu a raiz (passo 5) e que o download do passo 6 terminou; se continuar, avise o programador.
 
 Na lista de arquivos à esquerda do VS Code você vai ver várias pastas do jogo (`Assets`, `Packages` e outras). A única que importa para você é `Assets/Roteiro`.
 
@@ -710,8 +710,8 @@ O exemplo acompanha a Ana, que vai escrever a conversa da chave perdida.
    ```
 
    Clique em *Create pull request*.
-8. **Espere a resposta.** O Matheus roda a verificação do jogo e responde no PR. Se ele pedir uma mudança: edite o arquivo, faça um novo commit (passo 5) e clique em *Push origin*. O PR se atualiza sozinho.
-9. **Depois que o Matheus juntar ao jogo.** Volte para a `main` no GitHub Desktop, clique em *Pull origin* e apague a sua branch (*Branch → Delete*).
+8. **Espere a resposta.** O programador roda a verificação do jogo e responde no PR. Se ele pedir uma mudança: edite o arquivo, faça um novo commit (passo 5) e clique em *Push origin*. O PR se atualiza sozinho.
+9. **Depois que o programador juntar ao jogo.** Volte para a `main` no GitHub Desktop, clique em *Pull origin* e apague a sua branch (*Branch → Delete*).
 
 Outro exemplo de texto de PR, para uma entrega com dois arquivos e uma variável nova:
 
@@ -730,14 +730,14 @@ Pedidos: o item "chave_da_biblioteca"
 
 - **Mexa só em `Assets/Roteiro/`.** Nunca edite `Roteiro.yarnproject` nem a pasta `Testes/`.
 - **Não use estes comandos da extensão**, que alteram vários arquivos de uma vez: `Add Line Tags`, `Create New Yarn Project`, `Create New Yarn File`, `Set as Start Node`, `Open in Project Editor`. O jogo não precisa de nenhum deles.
-- **Conflito você não resolve.** Se o GitHub Desktop ou o PR avisarem de *conflict*, pare e chame o Matheus.
+- **Conflito você não resolve.** Se o GitHub Desktop ou o PR avisarem de *conflict*, pare e chame o programador.
 - **Se o GitHub Desktop disser que não pode publicar na `main`,** você está na branch errada: crie a sua (passo 2).
 
 ### O que acontece com o seu envio
 
 Para você saber o que esperar:
 
-1. O Matheus baixa a sua branch e abre o projeto no Unity. O Unity cria arquivos `.meta` para cada `.yarn` novo; o Matheus os acrescenta ao seu PR.
+1. O programador baixa a sua branch e abre o projeto no Unity. O Unity cria arquivos `.meta` para cada `.yarn` novo; o programador os acrescenta ao seu PR.
 2. Ele roda a verificação do jogo. Se algo falhar, ele explica no PR o que corrigir.
 3. Ele abre a conversa no jogo e confere as falas, as opções e o tamanho do texto.
 4. Com tudo certo, ele junta a sua branch à `main` e liga a conversa à cena.
