@@ -6,6 +6,9 @@
   "excludeFiles": [
     "**/*~/*"
   ],
+  "definitions": [
+    "../../ProjectSettings/Packages/dev.yarnspinner/ProjetoVN.GameFlow-generated.ysls.json"
+  ],
   "localisation": {},
   "baseLanguage": "pt-BR",
   "compilerOptions": {
