@@ -119,7 +119,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado.
 - O roteiro lê e grava nesse estado: uma variável do roteiro é uma entrada do `StoryState`, e o contador de visitas dos nós (`visited()`) também. Portões e save enxergam o mesmo valor.
 
-**Falta:**- Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
+**Falta:**
+- Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
 - Um registro central das variáveis, com descrição, para que ninguém dependa de digitar o nome certo (#7).
 
 **Regras:**

@@ -108,7 +108,7 @@ unity command capture_game_view --source screen --save_path Temp/captura.png
 
 `--source screen` só funciona em Play Mode e é o único que inclui a interface (o canvas é Overlay). Sem ele, a captura mostra só o que a câmera renderiza.
 
-**O `--save_path` relativo é resolvido dentro de `Assets/`** (o exemplo acima grava em `Assets/Temp/captura.png`, com `.meta`). Para uma captura que não entra no projeto, passe um caminho absoluto fora do repositório.
+**A captura sempre cai dentro de `Assets/`.** O exemplo acima grava em `Assets/Temp/captura.png`, com `.meta`; um caminho absoluto dentro do projeto dá no mesmo, e um caminho fora do projeto é recusado (`400 Bad Request: Path … is outside the project root`). Para a captura não entrar no commit, copie o arquivo para fora do repositório e apague a pasta antes de commitar: `unity command delete_asset --asset "Assets/Temp" --confirm true`.
 
 ### Mover, renomear e apagar assets
 
