@@ -30,6 +30,9 @@
 *.shadergraph           unity-json
 *.shadersubgraph        unity-json
 
+# Roteiro (Yarn Spinner): fim de linha igual em Windows e Mac, para o diff não mostrar a linha toda
+*.yarn                  text eol=lf
+
 # Unity UI Toolkit files
 *.tss                   text diff=css linguist-language=css
 *.uss                   text diff=css linguist-language=css
