@@ -22,8 +22,8 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | D-08 | Input: ação para avançar diálogo, leitura direta do mouse para o mundo, EventSystem para UI | Padrão |
 | D-09 | Sem Addressables até haver medição | Padrão |
 | D-10 | Inventário em modelo, serviço e manager; sem camadas a mais | Padrão |
-| D-11 | Pool de slots no inventário; botões de escolha em vetor fixo | A rever na #5 |
-| D-12 | Fala e escolhas chegam à interface por mensagem | A rever na #5 |
+| D-11 | Pool de slots no inventário; botões de escolha em vetor fixo | Padrão |
+| D-12 | Fala e escolhas chegam à interface direto do Yarn Spinner | Padrão |
 | D-13 | Sem framework de UI; pilha simples de janelas permitida | Padrão |
 | D-14 | Sem Clean Architecture, DDD ou camadas hexagonais | Padrão |
 | D-15 | Backend Mono; alvo desktop, distribuído por download | Padrão |
@@ -128,9 +128,8 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Decisão:** o diálogo será executado pelo Yarn Spinner 3, com roteiros em arquivos `.yarn` dentro de `Assets/Roteiro/`. O módulo `Dialogue` vira um adaptador fino. A instalação é pelo caminho gratuito (URL de git ou OpenUPM).
 - **Por quê:** os roteiristas não usam o Unity. O Yarn Spinner é gratuito (licença MIT), cobre falas, escolhas, saltos, variáveis e condições, e tem extensão de VS Code com verificação de erros, grafo e pré-visualização.
 - **Portão cumprido:** a prova de conceito da issue #3 cumpriu os critérios obrigatórios e o Matheus confirmou o veredito **adotar** em 2026-10-02. A versão provada é a `v3.2.8`, instalada pela URL de git com a tag fixa. O relatório, com as medições e os ajustes das issues seguintes, está nos comentários da #3.
-- **O pacote ainda não está em `main`:** o código da prova foi descartado (PR #28, fechado sem merge). Quem instala o pacote e refaz a integração no padrão do projeto é a issue #5.
-- **Plano B (não acionado):** manter o sistema próprio (`DialogueController` e `DialogueData`) e permitir saltos entre falas dentro do mesmo asset.
-- **Até a #5 ser mesclada, o sistema próprio é o que está em produção.**
+- **Instalado pela issue #5:** o pacote `dev.yarnspinner.unity` v3.2.8 entra pela URL de git com a tag fixa (hash `bfc5b6a` no `packages-lock.json`), e o código da prova (PR #28, fechado sem merge) foi refeito no padrão do projeto. O `DialogueManager` é o adaptador, o `DialogueUIController` é o apresentador e o `DialogueRunner` vive no `Managers.prefab`.
+- **Plano B (não acionado):** manter o sistema próprio (`DialogueController` e `DialogueData`) e permitir saltos entre falas dentro do mesmo asset. O sistema próprio foi removido na #5, então o plano B deixou de existir.
 
 ### D-18 — Estado da história único
 - **Decisão:** um único `StoryState`, estático, no `Core`, guarda valores booleanos, numéricos e de texto. O roteiro (pelo adaptador do Yarn Spinner), as portas e o save leem e gravam nele. Ele substituiu o antigo `StoryFlags` (issue #4).
@@ -156,9 +155,10 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Chega na issue #25.** Até lá, nada no código prepara terreno para ele (D-27).
 - **Rever só se:** os roteiristas pedirem releitura fora da conversa.
 
-### D-12 — Fala e escolhas por mensagem (a rever na #5)
-- **Decisão atual:** o `DialogueController` publica `DialogueLineMessage` e `DialogueChoicesMessage`, e o `DialogueUIController` as assina, mesmo estando no mesmo módulo.
-- **Situação:** com o Yarn Spinner, a interface passa a ser um apresentador dele. A issue #5 decide se essas duas mensagens continuam existindo. `DialogueStartedMessage` e `DialogueEndedMessage` **continuam**: o `GameFlow` depende delas.
+### D-12 — Fala e escolhas chegam à interface direto do Yarn Spinner
+- **Decisão:** o `DialogueRunner` entrega cada fala e cada grupo de opções ao apresentador (`DialogueUIController`) por chamada direta. `DialogueLineMessage` e `DialogueChoicesMessage` deixaram de existir: só a interface as escutava, e fala e opção têm um destinatário, não são notificação (D-05). `DialogueStartedMessage` e `DialogueEndedMessage` continuam, publicadas pelo `DialogueManager`, uma vez por conversa (o `GameFlow` depende delas).
+- **Por quê:** uma notificação com um único ouvinte, dentro do mesmo módulo, só acrescenta indireção, e o apresentador do Yarn Spinner já recebe fala e opções por chamada.
+- **Quem precisar das falas** (o histórico da #25) as recebe do apresentador, dentro do módulo.
 
 ---
 
@@ -172,23 +172,15 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
   - pular ou completar um efeito passa pelo dono do diálogo, nunca direto na view;
   - **nunca** threads, `Task.Run`, Jobs ou Burst (ver também D-23).
 - **Por quê:** não há trabalho pesado de CPU num jogo deste gênero; o risco real é uma continuação rodar depois que o objeto foi destruído.
+- **Nota (issue #5):** o diálogo é entregue pelo Yarn Spinner por tarefas assíncronas (`YarnTask`, que no Unity 6 é `Awaitable`, na thread principal). O apresentador segue as regras acima, e a API do `DialogueManager` continua síncrona (`StartDialogue` devolve `bool` na hora).
 
 ### D-13 — Sem framework de UI
 - **Decisão:** não adotar MVVM nem sistema genérico de janelas. `UIWindow` e `UIWindowManager` bastam. Uma **pilha simples** de janelas no `UIWindowManager` é permitida a partir da issue #18 (pausa).
 - **Interface em uGUI.** O projeto não usa UI Toolkit em runtime.
 
-### D-11 — Pool de slots e botões fixos (a rever na #5)
-- **Decisão atual:** o `InventoryPresenter` reaproveita slots; o `DialogueUIController` tem um vetor fixo de quatro botões de escolha.
-- **Situação:** a issue #5 decide como o apresentador do Yarn Spinner trata as opções.
-
-### D-19 — Uma cena por sala, interface persistente
-- **Decisão:** cada sala é uma cena Unity que contém só o mundo (fundo, objetos interativos, câmera, pontos de entrada). A interface de jogo (diálogo, inventário, pausa, fade) é um prefab criado uma vez pelo bootstrap, como os managers. A navegação entre salas é por saídas clicáveis no cenário; não há mapa.
-- **Por quê:** quem monta a sala não toca em interface e não consegue esquecê-la.
-- **Até a #9 ser mesclada, a interface de jogo ainda mora na cena `[Teste] Mecanicas`.**
-
-### D-08 — Input
-- **Decisão:** `InputActionReference` para avançar o diálogo; leitura direta de `Mouse.current` para o mundo; EventSystem para a interface. O `PlayerInputGate` é a única arbitragem.
-- **Rever só se:** entrar navegação do mundo por teclado ou controle.
+### D-11 — Pool de slots e botões fixos
+- **Decisão:** o `InventoryPresenter` reaproveita slots; o diálogo mostra as opções em um vetor fixo de quatro botões (`DialogueUIController`). Mais de quatro opções disponíveis ao mesmo tempo é erro de conteúdo: aparecem as quatro primeiras e sai um erro no console. O `OptionsPresenter` do Yarn Spinner não é usado, porque instancia um prefab por opção e obrigaria a refazer a arte dos botões.
+- **Rever só se:** o roteiro precisar de mais de quatro opções.
 
 ---
 
@@ -245,6 +237,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-02 | **Confirmada:** D-17. A prova de conceito da #3 terminou com o veredito "adotar", confirmado pelo Matheus. O plano B não foi acionado. As notas sobre D-06, D-11 e D-12 que o relatório da #3 propõe ficam para a issue #5, que é quem decide essas três. |
 | 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo Matheus no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
 | 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo Matheus no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
+| 2026-10-02 | **Revistas:** D-11 e D-12 saem de "a rever", com os textos aprovados pelo Matheus no levantamento da #5. D-12: fala e escolhas passam do `MessageBroker` para chamada direta do Yarn Spinner ao apresentador, e `DialogueLineMessage` e `DialogueChoicesMessage` deixam de existir. D-11: o vetor fixo de quatro botões vale para o apresentador do Yarn. **Nota nova na D-06** sobre o diálogo assíncrono (`YarnTask`). **D-17:** o pacote entra em `main` e o plano B deixa de existir. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

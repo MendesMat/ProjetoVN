@@ -7,12 +7,12 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | Módulo | Pasta | Responsabilidade | Enxerga |
 |---|---|---|---|
 | `Core` | [Core/](../../Assets/Scripts/Core/README.md) | Barramento de notificações, máquina de estados, estado da história | nada |
-| `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Dados, lógica, input e interface do diálogo | `Core` |
+| `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Adaptador do Yarn Spinner: iniciar, avançar e escolher; input e interface do diálogo | `Core` e o pacote Yarn Spinner |
 | `Inventory` | [Inventory/](../../Assets/Scripts/Inventory/README.md) | Itens do jogador, objeto coletável, registro de itens | `Core` |
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
-| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, efeitos de diálogo | `Core`, `Dialogue`, `Inventory`, `PointNClick` |
+| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo | `Core`, `Dialogue`, `Inventory`, `PointNClick` |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
-| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow` |
+| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow` e o pacote Yarn Spinner |
 
 ```
 Core ◄── Dialogue ◄──┐
@@ -31,15 +31,15 @@ Regras da estrutura:
 
 O padrão se repete em todos os módulos (decisão D-03):
 
-1. **Dados autorados:** ScriptableObjects, somente leitura em runtime (`ItemDataSO`, `DialogueData`).
-2. **Lógica:** classe C# comum, criada com `new`, testável sem cena (`InventoryService`, `DialogueController`, `StateMachine`).
+1. **Dados autorados:** ScriptableObjects somente leitura em runtime (`ItemDataSO`) ou arquivos de texto (os roteiros `.yarn` do diálogo).
+2. **Lógica:** classe C# comum, criada com `new`, testável sem cena (`InventoryService`, `StoryStateVariables`, `StateMachine`).
 3. **Ponte com o Unity:** um MonoBehaviour fino que expõe a API (`InventoryManager`, `DialogueManager`).
 4. **Objetos de cena:** componentes pequenos ligados por `UnityEvent` (`CollectableItemBehaviour`, `LockedActionBehaviour`).
 5. **Interface:** lê o estado do manager e reage a notificações.
 
 ## Ciclo de vida
 
-- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager` e `GameSaveManager`.
+- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager` e `GameSaveManager`.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes.**
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
 - Dar Play a partir de qualquer cena funciona, porque o bootstrap não depende de uma cena inicial.
@@ -50,11 +50,11 @@ Esta tabela é a referência única do projeto (decisão D-05).
 
 | Interação | Use | Exemplo |
 |---|---|---|
-| **Comando:** exatamente um dono executa | Chamada direta de método no dono | `DialogueManager.Instance.StartDialogue(data)`, `InventoryManager.Instance.TryUse(item)` |
+| **Comando:** exatamente um dono executa | Chamada direta de método no dono | `DialogueManager.Instance.StartDialogue("porta_trancada")`, `InventoryManager.Instance.TryUse(item)` |
 | **Consulta:** você precisa de uma resposta | Chamada direta ou propriedade. **Nunca** pergunta e resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
 | **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
 | **Notificação:** "X aconteceu", zero ou mais ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`, nome no passado) | `DialogueStartedMessage`, `ItemCollectedMessage` |
-| **Efeito de história:** um diálogo muda o estado do jogo | Chamada direta, executada pelo dono do diálogo | `DialogueEffectSO.Execute()` hoje; comandos de roteiro depois da #5 |
+| **Efeito de história:** um diálogo muda o estado do jogo | Variável do roteiro (`<<set $x to true>>`), que grava direto no `StoryState`; comandos de roteiro para o resto (#6) | `$falou_com_gotica` |
 | **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect`, `Interact`, `TriggerDialogue` |
 | **Um módulo precisa consultar outro que não pode referenciar** | Interface pequena, de posse do módulo que consulta | Nenhum caso hoje |
 
@@ -85,7 +85,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Estado da história (booleanos, números, textos) | `StoryState`, estático em `Core` | Sim, em três listas de pares nome e valor |
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
-| Posição do diálogo em curso | `DialogueController` | Não (salvar em diálogo será bloqueado, D-20) |
+| Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo será bloqueado, D-20) |
 | Cena atual | `SceneManager` | Gravada; ainda não é consumida ao carregar |
 
 `GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`. Itens são resolvidos por id pelo `ItemRegistry`.
@@ -99,11 +99,11 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 4. O que acontece depende do que quem montou a cena ligou ali.
 
 **Diálogo**
-1. `InteractableDialogueTrigger.TriggerDialogue()` chama `DialogueManager.Instance.StartDialogue(data)`.
-2. Dados inválidos: aviso no console, retorna `false`, nada muda.
-3. Dados válidos: `DialogueStartedMessage` é publicada **antes** da primeira fala; o `GameFlow` entra em `DialogueState`.
-4. O clique esquerdo avança (`DialogueInputHandler`); os botões escolhem (`DialogueChoiceButton`).
-5. Ao acabar, `DialogueEndedMessage`; o `GameFlow` volta a `GameplayState`. O clique que encerrou o diálogo não atinge o mundo, porque o gate ignora o frame em que foi liberado.
+1. `InteractableDialogueTrigger.TriggerDialogue()` chama `DialogueManager.Instance.StartDialogue(nodeName)`, com o nome de um nó de um roteiro `.yarn`.
+2. Nome vazio, nó inexistente, roteiro com erro de compilação, conversa já em curso ou nenhuma interface registrada: aviso ou erro no console, retorna `false`, nada muda.
+3. Caso contrário o `DialogueRunner` começa a conversa: `DialogueStartedMessage` é publicada **antes** da primeira fala; o `GameFlow` entra em `DialogueState`.
+4. O runner entrega cada fala e cada grupo de opções ao `DialogueUIController` (D-12). O clique esquerdo avança (`DialogueInputHandler` → `AdvanceDialogue`); os botões escolhem (`DialogueChoiceButton` → `MakeChoice`). As variáveis do roteiro leem e gravam no `StoryState`.
+5. Ao acabar, `DialogueEndedMessage`; o `GameFlow` volta a `GameplayState`. O clique que encerrou o diálogo não atinge o mundo, porque o gate ignora o frame em que foi liberado. Se o roteiro parar sem terminar (por exemplo um `<<jump>>` para um nó que não existe), o `DialogueManager` registra o erro e encerra a conversa do mesmo jeito.
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
@@ -121,6 +121,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 |---|---|
 | Um modo de jogo | Uma classe que herda de `BaseState`, criada com `new` no `GameStateController`. O módulo dono publica notificações de início e fim |
 | Uma notificação | Um `readonly struct` que implementa `IMessage`, no módulo que publica, com nome no passado |
+| Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o chama pelo nome no `InteractableDialogueTrigger` |
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
@@ -131,7 +132,7 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| O módulo `Dialogue` vira adaptador do Yarn Spinner | #5 |
+| Comandos de roteiro para o inventário; condições e afinidade | #6, #7 |
 | A interface de jogo sai das cenas e vira prefab persistente | #9 |
 | Troca de sala e estado de transição | #12 |
 | Save automático e carregamento que recarrega a cena | #16 |

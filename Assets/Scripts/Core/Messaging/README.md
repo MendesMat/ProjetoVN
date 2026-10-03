@@ -33,14 +33,14 @@ O sistema é composto por três pilares principais localizados nesta pasta:
 
 ### 3. Mensagens concretas
 As mensagens vivem no módulo que as **publica**, não aqui. Exemplos em uso:
-`Dialogue/Messaging/DialogueStartedMessage.cs`, `DialogueEndedMessage`, `DialogueLineMessage`,
-`DialogueChoicesMessage`, e `Inventory/Messages/ItemCollectedMessage.cs`, `ItemUsedMessage`,
+`Dialogue/Messaging/DialogueStartedMessage.cs`, `DialogueEndedMessage`, e
+`Inventory/Messages/ItemCollectedMessage.cs`, `ItemUsedMessage`,
 `InventoryReplacedMessage`. Todas são `readonly struct` implementando `IMessage`, e todas descrevem
 algo que **já aconteceu**.
 
 > **Uma mensagem sem assinante é um bug esperando acontecer.** A `DialogueTriggerMessage` foi publicada
 > por meses com zero ouvintes: o roteiro "disparava" gatilhos que não faziam nada, sem erro nenhum.
-> Ela foi removida e substituída por chamada direta (`DialogueEffectSO.Execute()`), porque
+> Ela foi removida e substituída por chamada direta, porque
 > aquilo era um **comando com dono**, não uma notificação. Antes de criar uma mensagem nova, confirme
 > que existe quem a escute — e que mais de um sistema pode legitimamente querer escutá-la.
 

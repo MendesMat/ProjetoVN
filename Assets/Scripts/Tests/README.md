@@ -11,18 +11,23 @@ unity command run_tests --mode EditMode --timeout 180
 ```
 
 - **`MessageBrokerTests`**: entrega, cancelamento de assinatura, assinatura duplicada, isolamento de exceções, `Clear`, e o comportamento de snapshot quando alguém assina durante um despacho.
-- **`DialogueControllerTests`**: avanço sequencial, escolhas (com e sem diálogo-alvo), encadeamento publicando Started e Ended uma única vez, dados inválidos sendo rejeitados sem travar o jogo, e os **efeitos** (ordem de execução, efeito nulo, efeito que estoura, efeito reentrante).
+- **`StoryStateVariablesTests`**: o armazenamento de variáveis do Yarn sobre o `StoryState`: gravar e ler cada tipo, ler o que foi gravado por fora, sem conversão silenciosa de tipo, nome sem `$` com aviso, `Clear`.
+- **`ScriptVariablesTests`**: roteiros curtos de verdade sobre o `StoryState`: `<<set>>`, `<<if>>`, valor inicial declarado, incremento, `visited()` (com o contador no `StoryState`), texto interpolado e a etiqueta `lastline` que o apresentador usa.
+- **`ScriptContentTests`**: os arquivos reais de `Assets/Roteiro/` compilam sem erro **nem aviso** (pega `<<jump>>` para nó inexistente, variável não declarada e código inalcançável antes do Play), têm os nós esperados e dizem o que o jogo mostra.
+- **`ConversationNotifierTests`**: um `DialogueStartedMessage` e um `DialogueEndedMessage` por conversa, e nunca um Ended sem Started.
+- **`ScriptNodeNameTests`**: o formato dos nomes de nó.
 - **`StoryVariableNameTests`**: as duas regras de nome: o que o armazenamento aceita (inclusive os nomes internos do Yarn) e o que quem monta cena pode digitar.
 - **`StoryStateTests`**: booleano, número e texto: leitura e escrita, falso gravado × nunca gravado, nomes inválidos (vazio em silêncio, sem `$` com aviso), um nome em um só tipo, substituição total e limpeza.
 - **`StoryStatePersistenceTests`**: a cópia entre `StoryState` e `GameState` (`Capture` e `Restore`), incluindo a ida e volta pelo JSON com afinidade, falso gravado e acentos.
-- **`StoryFlagEffectsTests`**: `SetFlagEffect` e `ClearFlagEffect`.
 - **`GameStateTests`**: ida e volta do JSON, com os três tipos de estado da história.
 
-> **Lacuna conhecida e deliberada:** `GiveItemEffect`, `RemoveItemEffect` e `LockedActionBehaviour`
-> não têm teste de EditMode. Todos exigiriam um `InventoryManager` num `GameObject`, o que quebraria
+> **Lacuna conhecida e deliberada:** `LockedActionBehaviour`, o `DialogueManager`, o apresentador
+> `DialogueUIController` e o `InteractableDialogueTrigger` não têm teste de EditMode. Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
 > a regra "C# puro, sem GameObjects" desta suíte; o `LockedActionBehaviour` ainda por cima é um
 > `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando, e a `Tests.asmdef`
-> nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`.
+> nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`
+> (o roteiro de verificação de cada issue). O que o `DialogueManager` decide sem Unity mora em classes
+> puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`.
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
 > guardas: a flag é checada antes do item porque `IsTrue` não consome nada e `TryUse` consome.
@@ -34,13 +39,15 @@ unity command run_tests --mode EditMode --timeout 180
 
 ## Estrutura e Práticas
 
-- **Teste a lógica em C# puro, direto.** `DialogueController`, `InventoryModel` e `InventoryService` não são `MonoBehaviour`: instancie com `new` e chame os métodos. É por isso que o projeto mantém essa separação, e é por isso que ele **não** precisa de interfaces nem de um container de injeção de dependência para ser testável.
+- **Teste a lógica em C# puro, direto.** `StoryStateVariables`, `ConversationNotifier`, `InventoryModel` e `InventoryService` não são `MonoBehaviour`: instancie com `new` e chame os métodos. É por isso que o projeto mantém essa separação, e é por isso que ele **não** precisa de interfaces nem de um container de injeção de dependência para ser testável.
 - **Comandos e consultas se testam chamando o método**, não publicando mensagens. Publicar uma mensagem para provocar um comando testa o barramento, não o sistema.
 - **Use o `MessageBroker` para verificar as notificações**: assine a mensagem que o sistema deveria publicar, execute a ação e confira o que chegou. Chame `MessageBroker.Clear()` no `SetUp` para que um teste não herde assinaturas de outro.
 - **Todo estado estático precisa ser limpo no `SetUp` *e* no `TearDown`.** Vale para `MessageBroker.Clear()` e para `StoryState.ClearAll()`: sem isso, a ordem dos testes passa a importar e a suíte fica intermitente.
 - **Um teste que espera um aviso usa `LogAssert.Expect`; um que prova silêncio termina com `LogAssert.NoUnexpectedReceived()`.** Um aviso inesperado (`LogType.Warning`) não reprova um teste sozinho.
 - **Fase vermelha no Unity:** um teste que cita uma API que ainda não existe é erro de compilação, e a suíte inteira deixa de rodar. Crie a assinatura vazia primeiro, para o teste falhar por asserção.
-- **Para testar efeitos, faça um dublê herdando de `DialogueEffectSO`** (ver `SpyEffect` em `DialogueControllerTests`) em vez de montar o efeito real. Campos `[SerializeField] private` de um efeito real podem ser preenchidos com `SerializedObject`, já que este assembly é Editor-only.
+- **Para testar um roteiro, use o `ScriptRun`** (`EditMode/ScriptRun.cs`): `ScriptRun.FromText("title: no
+---
+...")` compila um texto, `ScriptRun.FromProjectFiles()` compila os `.yarn` de `Assets/Roteiro/`, e `Start`, `Choose`, `Lines`, `OptionTexts`, `Completed` e `ErrorsAndWarnings` dizem o que o jogador veria. Ele roda sobre o `StoryState` de verdade, então o `SetUp` e o `TearDown` chamam `StoryState.ClearAll()`. Escreva `Yarn.Dialogue` por extenso: dentro de `ProjetoVN.*`, `Dialogue` é o namespace.
 - O `.asmdef` deste módulo é restrito ao ambiente de testes, então ele não entra na build final do jogo.
 
 ---

@@ -58,7 +58,7 @@ A skill é um conjunto de heurísticas, e ela mesma diz que a convenção do pro
 | Separar comando de consulta | O padrão `Try…` do C#, que executa e devolve `bool`, é aceito e é o padrão dos managers |
 | Não retornar `null` | `Instance` de um manager pode ser `null`. Quem chama confere e loga um erro com contexto (`Debug.LogError(msg, this)`) |
 | Sem prefixos em membros | Campos privados usam `_camelCase` |
-| Evitar palavras de ruído como `Data` | Nomes existentes ficam (`ItemDataSO`, `DialogueData`). Nomes novos evitam o ruído |
+| Evitar palavras de ruído como `Data` | Nomes existentes ficam (`ItemDataSO`). Nomes novos evitam o ruído |
 | Combinar com `clean-architecture` e `domain-driven-design` | Não combinar (D-14) |
 
 ### Onde a skill e o projeto concordam, com detalhe local
