@@ -8,10 +8,10 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 |---|---|---|---|
 | [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | — |
-| [Portões](#portões) | existe | `GameFlow` | #7 |
-| [Diálogo](#diálogo) | parcial | `Dialogue` | #7, #11 |
+| [Portões](#portões) | existe | `GameFlow`, `Editor` | — |
+| [Diálogo](#diálogo) | parcial | `Dialogue` | #11 |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
-| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #7 |
+| [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | planejada | — | #10, #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
@@ -58,6 +58,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Requisito por item (consumido), por flag (não consumida) ou pelos dois.
 - O portão lembra que foi aberto, inclusive depois de recarregar a cena ou carregar um save.
 - Quatro eventos para quem monta a cena: trancado, destrancou agora, está aberto (estado), jogador interagiu com portão aberto (ação).
+- Os dois campos de variável (a exigida e a que guarda a memória) escolhem de uma lista das variáveis booleanas declaradas em `Assets/Roteiro/variaveis.yarn`, mostram a descrição da escolhida e avisam de um valor que não está declarado.
 
 **Regras:**
 - A flag é conferida antes do item, para não gastar a chave à toa.
@@ -65,7 +66,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Falta:**
 - Atravessar uma porta aberta levar a outra sala (#13).
-- Os campos de flag escolherem de uma lista em vez de texto livre (#7).
+
+**Limitação conhecida:** renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado no Inspector.
 
 ## Diálogo
 
@@ -73,14 +75,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Existe (Yarn Spinner, D-17):**
 - Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó.
-- Falas em sequência, escolhas (até quatro opções disponíveis por vez), saltos e desvios entre nós.
+- Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
+- Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
 - As variáveis do roteiro (`$falou_com_gotica`) leem e gravam no estado da história.
 - Narração (fala sem nome de personagem) esconde a placa de nome.
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 - Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
 
 **Falta:**
-- Condições nas escolhas e afinidade (#7).
 - Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
 - O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
 
@@ -118,10 +120,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Existe:**
 - Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado.
 - O roteiro lê e grava nesse estado: uma variável do roteiro é uma entrada do `StoryState`, e o contador de visitas dos nós (`visited()`) também. Portões e save enxergam o mesmo valor.
-
-**Falta:**
-- Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
-- Um registro central das variáveis, com descrição, para que ninguém dependa de digitar o nome certo (#7).
+- Afinidade: uma variável numérica por personagem (`$afinidade_gotica`), alterada por uma escolha e lida por condições de fala e de opção. Salvar, zerar a sessão e carregar preserva o valor.
+- Um registro central, `Assets/Roteiro/variaveis.yarn`, onde toda variável é declarada uma única vez, com descrição. Um teste automático reprova declaração fora dele, declaração sem descrição e nome fora do formato.
 
 **Regras:**
 - Um nome de variável vazio ou em branco é sempre inválido: nunca é gravado e sempre lê como falso.

@@ -30,7 +30,52 @@
 
 ## Variáveis e afinidade
 
-*A preencher pela issue #7:* onde as variáveis são declaradas, como alterar a afinidade em uma escolha, como condicionar uma fala ou uma opção.
+Uma variável guarda o que o jogador fez: se falou com alguém, o quanto uma personagem gosta dele. O nome começa com `$` e usa minúsculas sem acento, dígitos e `_` (`$afinidade_gotica`).
+
+### Onde se declara
+
+**Toda variável é declarada uma única vez, em `Assets/Roteiro/variaveis.yarn`**, com uma linha `///` de descrição logo acima:
+
+```
+/// Afinidade com a Gótica. Sobe 1 quando o protagonista concorda com ela.
+<<declare $afinidade_gotica = 0>>
+```
+
+- O valor depois do `=` é o valor inicial, e o tipo vem dele: `false` ou `true` é sim/não, um número (`0`) é afinidade ou contador, um texto entre aspas é texto.
+- Declarar a mesma variável em outro arquivo é erro, e usar uma variável que não está declarada é aviso: a verificação automática reprova os dois. Uma declaração sem descrição também é reprovada.
+- O arquivo `variaveis.yarn` tem um nó chamado `variaveis`, só com declarações. Não aponte nenhuma cena para ele.
+- Quem monta a cena escolhe a variável de um portão em uma lista feita a partir deste arquivo: o que você declara aqui aparece lá, com a descrição.
+
+### Alterar a afinidade em uma escolha
+
+```
+-> Sim
+    <<set $afinidade_gotica to $afinidade_gotica + 1>>
+    <<detour gotica_resposta_sim>>
+```
+
+Ponha o `<<set>>` **dentro da opção**, nunca entre a fala e o bloco de opções: isso tira a fala da mesma tela das opções e o jogador precisa de um clique a mais.
+
+### Condicionar uma fala
+
+```
+<<if $afinidade_gotica >= 1>>
+    Gótica: Gostei de você.
+<<endif>>
+```
+
+Compare a afinidade com `>=` ou `<=`, não com `==`: o valor é um número com vírgula.
+
+### Condicionar uma opção
+
+```
+-> Posso sentar perto de você? <<if $afinidade_gotica >= 1>>
+    <<detour gotica_resposta_sentar>>
+```
+
+- **O jogador vê a opção bloqueada**, esmaecida e sem clique. Isso é de propósito: ele entende que as escolhas têm peso. Por isso o **texto de uma opção bloqueada não pode entregar o que ela esconde**.
+- Uma opção bloqueada **conta** para o limite de **quatro opções** por bloco. Um bloco com quatro opções fixas e uma quinta condicional é erro de conteúdo, mesmo quando a quinta está bloqueada.
+- Se **todas** as opções do bloco estiverem bloqueadas, o bloco não aparece e a conversa continua pela fala depois dele. Escreva essa fala pensando nisso.
 
 ## Comandos disponíveis
 

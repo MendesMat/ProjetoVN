@@ -87,7 +87,7 @@ O `DialogueUIController` herda de `DialoguePresenterBase`. Ele se **registra** n
 
 - **Fala:** o nome é o do personagem da fala (`Gótica: ...`); sem personagem (**narração**), a placa de nome fica escondida. O texto é a fala sem o nome.
 - **A fala antes de opções** (regra do `lastline`): o compilador etiqueta com `lastline` a fala que é o comando imediatamente anterior a um bloco de opções. O apresentador não espera clique nela: mostra fala e opções juntas, sem o indicador de continuar. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
-- **Escolhas:** mostra, em ordem, só as opções **disponíveis**. Há quatro botões (D-11); mais opções do que botões é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. Nenhuma opção disponível: a conversa segue depois do bloco, sem mostrar nada.
+- **Escolhas:** mostra, em ordem, **todas** as opções do bloco. Uma opção indisponível (a condição `<<if>>` dela é falsa) aparece com o `Button` desabilitado (`interactable = false`, esmaecido pelo `disabledColor` do botão) e ocupa um botão, para o jogador ver que existe um caminho fechado (D-11). `Choose` ignora o índice de uma opção indisponível, também numa chamada direta a `MakeChoice`. O `Button` de cada `choiceButtonObjects[i]` é lido uma vez no `Start`; sem `Button`, o `OnValidate` avisa e a opção indisponível não fica desabilitada. Há quatro botões; mais opções do que botões (disponíveis ou não) é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. **Nenhuma opção disponível:** `RunOptionsAsync` devolve `null` sem mostrar nada e a conversa segue pela fala depois do bloco; isso depende de `allowOptionFallthrough` ligado no `DialogueRunner` do `Managers.prefab` (sem ele o runner loga erro e a conversa fica presa).
 - **Indicador de continuar** (`>>`): aparece a cada fala que espera clique e some quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança em qualquer lugar, e um `>>` clicável avançaria duas falas por clique.
 - **Fim da conversa:** `DialogueEndedMessage` esconde a caixa e as escolhas, também no fim anormal.
 - **Assíncrono (D-06):** o runner e o apresentador usam `YarnTask`, que no Unity 6 é `Awaitable` na thread principal. Depois de cada `await` o apresentador reconfere se ainda existe.
@@ -122,7 +122,6 @@ O módulo não conhece o `GameFlow` nem o `PointNClick`: a direção das depend�
 
 ## O que ainda não existe
 
-- Condições nas escolhas (opção indisponível desabilitada, em vez de escondida) e afinidade: issue #7.
 - Retrato do personagem: issue #10. Texto revelado aos poucos: issue #11.
 - Seletor de nó no Inspector: issue #32.
 - Interface de diálogo em prefab persistente, criada pelo bootstrap: issue #9. Hoje ela mora na cena `[Teste] Mecanicas`.

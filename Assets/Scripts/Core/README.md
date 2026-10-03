@@ -12,7 +12,7 @@ O módulo **Core** guarda o que todos os outros módulos podem usar e que não p
 |---|---|---|
 | `Messaging/` | `MessageBroker` e `IMessage`: o barramento de **notificações** | [Messaging/README.md](Messaging/README.md) |
 | `StateMachine/` | `StateMachine` e `BaseState`: a máquina de modos de jogo, em C# puro | [StateMachine/README.md](StateMachine/README.md) |
-| `State/` | `StoryState` e `StoryVariableName`: o estado global da história e a regra dos nomes | abaixo |
+| `State/` | `StoryState`, `StoryVariableName` e `StoryFlagAttribute`: o estado global da história, a regra dos nomes e o marcador de campo de variável booleana | abaixo |
 
 ## O critério para algo morar no Core
 
@@ -62,6 +62,16 @@ Duas regras de nome, de propósito diferentes:
 
 O nome é guardado **com o `$`** em todo lugar: roteiro, Inspector e save.
 
-## Mudanças planejadas
+## `StoryFlagAttribute`
 
-- **Issue #7:** um registro central das variáveis, com descrição, e um seletor no Inspector no lugar do texto livre.
+Um `PropertyAttribute` sem parâmetros que marca um campo `string` com o nome de uma **variável booleana de história**:
+
+```csharp
+[SerializeField, StoryFlag] private string unlockedFlagId;
+```
+
+O Core só guarda o marcador. Quem o desenha é o módulo [Editor](../Editor/README.md): o campo vira uma lista das variáveis `Bool` declaradas em `Assets/Roteiro/variaveis.yarn`, com a descrição da escolhida e um aviso para um valor que não está declarado. O atributo não muda nome nem tipo do campo, então cenas e prefabs já gravados continuam valendo. Hoje é usado pelo `LockedActionBehaviour`.
+
+## O registro de variáveis
+
+O registro das variáveis de história é o arquivo `Assets/Roteiro/variaveis.yarn`: cada variável é declarada ali, uma só vez, com `<<declare>>` e uma linha `///` de descrição. Ele não é código do Core; o Core só guarda os valores. A regra é cobrada por testes (`ScriptContentTests`): toda declaração está nesse arquivo, tem descrição e segue `StoryVariableName.FollowsConvention`. Como declarar: [docs/autoria/roteiro.md](../../../docs/autoria/roteiro.md#variáveis-e-afinidade).
