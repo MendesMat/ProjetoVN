@@ -78,6 +78,16 @@ O agente lê a issue, os comentários, a documentação citada e o diff do PR, e
 
 O parecer vai como comentário no PR, com veredito **aprovado** ou **mudanças pedidas**, e os achados em ordem de gravidade, cada um com arquivo e linha. A label da issue é trocada conforme o veredito. O merge é do Matheus.
 
+## PR de roteiro
+
+Quem escreve roteiro entrega por um fluxo à parte, descrito para o roteirista em [roteiro.md](../autoria/roteiro.md). Um agente que encontrar um PR assim deve saber que:
+
+- Ele vem de um roteirista (colaborador do repositório), em uma branch `roteiro/<nome>-<assunto>`, **sem issue e sem as três sessões**. O texto do PR são três linhas: o arquivo, a conversa (com o nó de entrada) e onde ela entra na história.
+- A regra "uma issue por vez" **não conta** PR de roteiro: ele não disputa lugar com a issue em andamento.
+- Quem integra é o Matheus: gera os `.meta`, reimporta o `Roteiro.yarnproject`, roda os testes e abre a conversa no jogo (receita em [unity-cli.md](unity-cli.md#receber-um-roteiro-pr-de-roteirista)), e faz o merge por *squash* com a branch apagada. O agente só faz o que o Matheus pedir.
+- O PR de roteiro mexe só em `Assets/Roteiro/` (e nos `.meta`). Se tocar em qualquer outra coisa, não é PR de roteiro: devolva ao roteirista.
+- Um pedido de comando, item, personagem ou som que o roteirista deixou em `// PEDIDO` vira issue (com a label `triagem`), não é feito no PR de roteiro.
+
 ## Regras de foco
 
 O projeto tem histórico de frentes abertas e não terminadas. Estas regras existem para isso, e o agente as aplica também quando o pedido vem do Matheus:
