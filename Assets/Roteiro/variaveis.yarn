@@ -1,0 +1,9 @@
+title: variaveis
+---
+/// A Gótica já conversou com o protagonista e ele respondeu "Sim".
+<<declare $falou_com_gotica = false>>
+/// Afinidade com a Gótica. Sobe 1 quando o protagonista concorda com ela.
+<<declare $afinidade_gotica = 0>>
+/// A porta da cena de teste já foi destrancada.
+<<declare $porta_mecanicas_destrancada = false>>
+===
