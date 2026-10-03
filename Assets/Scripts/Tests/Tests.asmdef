@@ -6,7 +6,8 @@
         "GUID:eaa15409731623142a1e86b06222eeda",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:9ce98ac309bf1ea49b3581202329cd57"
+        "GUID:9ce98ac309bf1ea49b3581202329cd57",
+        "GUID:34aa492b82754644eac2f903cd496268"
     ],
     "includePlatforms": [
         "Editor"
@@ -15,7 +16,10 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll"
+        "nunit.framework.dll",
+        "YarnSpinner.dll",
+        "YarnSpinner.Compiler.dll",
+        "Yarn.Google.Protobuf.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
