@@ -4,6 +4,7 @@ using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.Messaging;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Yarn.Unity;
 
 namespace ProjetoVN.Dialogue.UI
@@ -31,7 +32,8 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Objeto que contém os botões de escolha, ligado só enquanto há opções. Vazio: a interface de diálogo não funciona e o console avisa.")]
         [SerializeField] private GameObject dialogueChoices;
 
-        [Tooltip("Um objeto por botão de escolha, na ordem. Opções além do tamanho da lista são descartadas, com erro no console (D-11).")]
+        [Tooltip("Um objeto por botão de escolha, na ordem, cada um com um componente Button. Uma opção indisponível ocupa um botão, desabilitado. " +
+                 "Opções além do tamanho da lista são descartadas, com erro no console (D-11).")]
         [SerializeField] private GameObject[] choiceButtonObjects;
 
         [Tooltip("O texto de cada botão, na mesma ordem e do mesmo tamanho de Choice Button Objects.")]
@@ -45,10 +47,12 @@ namespace ProjetoVN.Dialogue.UI
         [SerializeField] private GameObject continueIndicator;
 
         private readonly List<DialogueOption> _shownOptions = new();
+        private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
 
         private void Start()
         {
+            CacheChoiceButtons();
             HideAll();
             RegisterOnDialogueManager();
         }
@@ -82,8 +86,8 @@ namespace ProjetoVN.Dialogue.UI
 
         public override async YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken token)
         {
-            CollectAvailable(dialogueOptions);
-            if (_shownOptions.Count == 0) return null;
+            CollectOptions(dialogueOptions);
+            if (!HasAvailableOption()) return null;
 
             ShowOptions();
             var selection = new YarnTaskCompletionSource<DialogueOption>();
@@ -106,6 +110,7 @@ namespace ProjetoVN.Dialogue.UI
         {
             if (_selection == null) return;
             if (buttonIndex < 0 || buttonIndex >= _shownOptions.Count) return;
+            if (!_shownOptions[buttonIndex].IsAvailable) return;
 
             _selection.TrySetResult(_shownOptions[buttonIndex]);
         }
@@ -122,13 +127,19 @@ namespace ProjetoVN.Dialogue.UI
             dialogueChoices.SetActive(false);
         }
 
-        private void CollectAvailable(DialogueOption[] dialogueOptions)
+        private void CacheChoiceButtons()
+        {
+            _choiceButtons = new Button[choiceButtonObjects.Length];
+            for (int i = 0; i < choiceButtonObjects.Length; i++)
+                _choiceButtons[i] = choiceButtonObjects[i].GetComponent<Button>();
+        }
+
+        private bool HasAvailableOption() => _shownOptions.Exists(option => option.IsAvailable);
+
+        private void CollectOptions(DialogueOption[] dialogueOptions)
         {
             _shownOptions.Clear();
-            foreach (DialogueOption option in dialogueOptions)
-            {
-                if (option.IsAvailable) _shownOptions.Add(option);
-            }
+            _shownOptions.AddRange(dialogueOptions);
 
             if (_shownOptions.Count <= choiceButtonObjects.Length) return;
 
@@ -144,7 +155,10 @@ namespace ProjetoVN.Dialogue.UI
                 bool isVisible = i < _shownOptions.Count;
                 choiceButtonObjects[i].SetActive(isVisible);
 
-                if (isVisible) choiceTexts[i].text = _shownOptions[i].Line.TextWithoutCharacterName.Text;
+                if (!isVisible) continue;
+
+                choiceTexts[i].text = _shownOptions[i].Line.TextWithoutCharacterName.Text;
+                if (_choiceButtons[i] != null) _choiceButtons[i].interactable = _shownOptions[i].IsAvailable;
             }
 
             SetActiveIfAssigned(continueIndicator, false);
@@ -177,6 +191,15 @@ namespace ProjetoVN.Dialogue.UI
         }
 
 #if UNITY_EDITOR
+        private void WarnAboutChoiceObjectsWithoutButton()
+        {
+            foreach (GameObject choiceObject in choiceButtonObjects)
+            {
+                if (choiceObject != null && choiceObject.GetComponent<Button>() == null)
+                    Debug.LogWarning($"[DialogueUIController] '{choiceObject.name}' não tem um componente Button: a opção indisponível não aparece desabilitada.", this);
+            }
+        }
+
         private void OnValidate()
         {
             if (dialogueBox == null || dialogueText == null || speakerNameText == null || dialogueChoices == null)
@@ -186,6 +209,8 @@ namespace ProjetoVN.Dialogue.UI
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);
             else if (choiceTexts == null || choiceTexts.Length != choiceButtonObjects.Length)
                 Debug.LogWarning("[DialogueUIController] Choice Texts precisa ter o mesmo tamanho de Choice Button Objects.", this);
+            else
+                WarnAboutChoiceObjectsWithoutButton();
         }
 #endif
     }

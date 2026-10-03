@@ -29,15 +29,16 @@ namespace ProjetoVN.GameFlow
         [Tooltip("Item exigido. É consumido ao destrancar. Vazio = portão só de flag.")]
         [SerializeField] private ItemDataSO requiredItem;
 
-        [Tooltip("Variável de história exigida, no formato '$' + minúsculas sem acento, dígitos e '_' " +
-                 "(ex.: $falou_com_gotica). NÃO é consumida. Vazio = portão só de item.")]
-        [SerializeField] private string requiredFlagId;
+        [Tooltip("Variável de história exigida, escolhida entre as booleanas declaradas em Assets/Roteiro/variaveis.yarn " +
+                 "(ex.: $falou_com_gotica). NÃO é consumida. '(nenhuma)' = portão só de item. " +
+                 "Uma variável nova entra em variaveis.yarn; um valor que não está lá aparece com aviso.")]
+        [SerializeField, StoryFlag] private string requiredFlagId;
 
         [Header("Memória")]
-        [Tooltip("Variável de história ligada ao destrancar, no formato '$' + minúsculas sem acento, dígitos e '_' " +
+        [Tooltip("Variável de história ligada ao destrancar, escolhida entre as booleanas declaradas em Assets/Roteiro/variaveis.yarn " +
                  "(ex.: $porta_biblioteca_destrancada). É o que mantém o portão aberto depois. " +
-                 "Vazio = sem memória: o portão consome o item e volta a trancar.")]
-        [SerializeField] private string unlockedFlagId;
+                 "'(nenhuma)' = sem memória: o portão consome o item e volta a trancar.")]
+        [SerializeField, StoryFlag] private string unlockedFlagId;
 
         [Header("Events")]
         [Tooltip("O momento em que destrancou: a narrativa do 'a chave serviu'. Dispara uma vez só.")]
