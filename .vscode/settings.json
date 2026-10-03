@@ -5,6 +5,13 @@
         "DefineConstants": "UNITY_EDITOR"
     },
     "dotrush.roslyn.restoreProjectsBeforeLoading": false,
+    "[yarnspinner]": {
+        "editor.wordWrap": "on",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": false,
+        "files.eol": "\n"
+    },
     "files.exclude": {
         "**/.DS_Store": true,
         "**/.git": true,
