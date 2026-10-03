@@ -12,7 +12,7 @@ Um híbrido de **visual novel** e **point-and-click** em 2D, de tema escolar. O 
 
 | Papel | Pessoa | Ferramenta | Entrega |
 |---|---|---|---|
-| Programação | Matheus, com agentes de IA | Unity, Claude Code | Sistemas e ferramentas de autoria |
+| Programação | Programador, com agentes de IA | Unity, Claude Code | Sistemas e ferramentas de autoria |
 | Roteiro | Roteiristas (não usam o Unity) | VS Code com a extensão do Yarn Spinner, GitHub Desktop | Arquivos `.yarn` em `Assets/Roteiro/` |
 | Design de jogo e montagem de salas | Game designer | Unity Editor (Inspector) | Cenas, itens, personagens |
 

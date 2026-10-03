@@ -13,7 +13,7 @@ gh issue list --state open --milestone "M1 - Diálogo em Yarn Spinner"
 - Uma issue em andamento por vez; uma milestone só abre quando a anterior fecha.
 - Dentro de uma milestone, as issues são feitas **na ordem numérica**, que já respeita as dependências.
 - Toda issue passa pelas três sessões descritas em [../agentes/fluxo-de-trabalho.md](../agentes/fluxo-de-trabalho.md).
-- Uma issue nova entra com a label `triagem` e só ganha milestone quando o Matheus a prioriza.
+- Uma issue nova entra com a label `triagem` e só ganha milestone quando o programador a prioriza.
 
 ## Sequência
 
@@ -100,7 +100,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 
 ## Riscos conhecidos
 
-Riscos aceitos pelo Matheus em 2026-10-01, a tratar conforme aparecerem:
+Riscos aceitos pelo programador em 2026-10-01, a tratar conforme aparecerem:
 
 - A prova de conceito do Yarn Spinner pode falhar em algum critério (instalação no Unity 6000.3, testes em EditMode).
 - Ids de item, personagem e áudio citados em texto no roteiro só falham ao rodar; a proteção é um teste de validação por tipo de id.

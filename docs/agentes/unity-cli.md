@@ -177,7 +177,7 @@ Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pac
 
 ### O que não dá para simular
 
-O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o Matheus.
+O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o programador.
 
 ### Contar o que está visível
 
@@ -237,10 +237,10 @@ Descobertas na issue #5. A prova de conceito (#3) e o código do pacote estão e
 - **Comando e função novos: C# primeiro, `.yarn` depois.** O gerador de código do pacote acha métodos **estáticos** com `[YarnCommand]` e `[YarnFunction]` sem registro nosso; o asmdef do módulo precisa referenciar `YarnSpinner.Unity`. Para executar um roteiro fora do runner (o `ScriptRun` dos testes), a função precisa estar registrada na `Library` do `Yarn.Dialogue`, senão a VM lança `Function tem_item is not present in the library`. Em um roteiro em memória no Play Mode, passe `runner.Dialogue.Library` ao `CompilationJob`.
 - **`<<jump>>` para nó inexistente compila com aviso.** O compilador dá só o aviso `YS0012`, e em runtime o Yarn lança e para sem chamar o fim da conversa. A rede de segurança no `Update` do `DialogueManager` encerra a conversa com um erro. O `ScriptContentTests` reprova qualquer aviso nos roteiros, o que pega o erro antes do Play.
 - **Um `.yarn` só vira conteúdo dentro de um `.yarnproject`.** Os roteiros ficam em `Assets/Roteiro/`, cobertos por `Assets/Roteiro/Roteiro.yarnproject` (`**/*.yarn`). Um `.yarn` fora dessa pasta não é importado.
-- **Arquivos criados pelo pacote em `ProjectSettings/Packages/dev.yarnspinner/`.** O `YarnSpinnerProjectSettings.json` é commitado (a #5 foi autorizada a isso); `*.ysls.json` ficam fora do commit até a #8 decidir (com o primeiro `[YarnCommand]` do `GameFlow`, na #6, apareceu `ProjetoVN.GameFlow-generated.ysls.json`, sem cobertura do `.gitignore`). O pacote também abre a janela "About Yarn Spinner" na primeira carga.
+- **Arquivos criados pelo pacote em `ProjectSettings/Packages/dev.yarnspinner/`.** O `YarnSpinnerProjectSettings.json` é commitado (a #5 foi autorizada a isso). O `ProjetoVN.GameFlow-generated.ysls.json` também é commitado desde a #8: o Unity o **regenera a cada compilação** (lista os comandos e funções de C#: `dar_item`, `remover_item`, `tem_item`, com parâmetros, arquivo e linha) e é ele que faz a extensão do VS Code conhecer os comandos do jogo. **Quem criar ou alterar um `[YarnCommand]` ou `[YarnFunction]` (#10, #20) commita o arquivo regenerado no mesmo PR** (qualquer mudança em `ItemScriptActions.cs` já o altera, por causa da linha). A extensão só usa um `.ysls.json` listado no campo `definitions` do `Roteiro.yarnproject`; um arquivo solto na pasta é "não rastreado" e `dar_item` aparece como `Unknown command`. O campo aponta para o arquivo gerado (`../../ProjectSettings/Packages/dev.yarnspinner/ProjetoVN.GameFlow-generated.ysls.json`) e o Unity reimporta o projeto sem reclamar dele. Se um novo asmdef do projeto ganhar comandos, o Unity gera um `<Assembly>-generated.ysls.json` novo: acrescente-o ao `definitions`. O pacote também abre a janela "About Yarn Spinner" na primeira carga.
 - **O choque de nome `Dialogue`.** Dentro de `ProjetoVN.*`, `Dialogue` resolve para o namespace `ProjetoVN.Dialogue`, não para a classe do Yarn. Escreva `Yarn.Dialogue` por extenso.
 - **`lastline`.** O compilador etiqueta com `lastline` a fala que é o comando **imediatamente anterior** a um bloco de opções, e o apresentador usa isso para mostrar fala e opções juntas. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
-- **Narração com dois-pontos vira personagem.** `Atenção: a porta fechou.` é lida como a personagem "Atenção". Evite dois-pontos no começo de uma fala de narração.
+- **Narração com dois-pontos vira personagem.** `Atenção: a porta fechou.` é lida como a personagem "Atenção", e `Eram 10:30 da manhã.` como a personagem "Eram 10": **qualquer** dois-pontos numa linha de narração faz o que vem antes virar o nome. Evite-os ou escape com `\:` (`Eram 10\:30 da manhã.`).
 - **`variableStorage` nulo no runner** faz o Yarn criar um `InMemoryVariableStorage` em silêncio, e o roteiro passa a ter um estado paralelo (contra a D-18). Na verificação, conte os `InMemoryVariableStorage` em Play Mode: deve ser zero.
 - **Não toque em `DialogueRunner.Dialogue` nem em `YarnProject.Program` antes de conferir `compiledYarnProgram`:** com erro de compilação eles lançam.
 - **`#nullable`.** O pacote declara `YarnTask<DialogueOption?>`; no nosso código, sem contexto anulável, escreva `YarnTask<DialogueOption>`.
@@ -254,6 +254,35 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 - Crie `ScriptableObject.CreateInstance<Yarn.Unity.YarnProject>()`, grave `compiledYarnProgram = Google.Protobuf.MessageExtensions.ToByteArray(resultado.Program)` e uma `Yarn.Unity.Localization` com `AddLocalizedStrings` sobre a tabela de textos em `baseLocalization`.
 - Troque com `SerializedObject(runner).FindProperty("yarnProject").objectReferenceValue = projeto`. Para o caso do roteiro com erro de compilação, deixe `compiledYarnProgram = null`.
 - Volte ao projeto real com `AssetDatabase.LoadAssetAtPath<Yarn.Unity.YarnProject>("Assets/Roteiro/Roteiro.yarnproject")`.
+- Grave também `project.lineMetadata = new Yarn.Unity.LineMetadata()` e, para cada entrada da tabela de textos com etiquetas, `AddMetadata(id, etiquetas)`; sem isso a etiqueta `lastline` some e a fala não aparece junto das opções.
+- **Pare a conversa em curso antes de trocar o projeto** (`FindFirstObjectByType<Yarn.Unity.DialogueRunner>().Stop()`). Com uma conversa aberta, `StartDialogue` devolve `false` e a interface continua mostrando a fala antiga.
+- Para medir como o texto fica na interface (medições da #8), leia os componentes TMP do `DialogueUIController` por `SerializedObject` (`dialogueText`, `speakerNameText`, `choiceTexts`): `preferredHeight` e `preferredWidth` valem, mas **`textInfo.lineCount` devolve 1** em texto que quebra, então não use.
+
+### Receber um roteiro (PR de roteirista)
+
+Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
+
+1. Faça checkout da branch `roteiro/<nome>-<assunto>`. Se o `Packages/manifest.json` da branch for igual ao da `main` (o normal num PR de roteiro), trocar de branch com o Editor aberto é seguro; se diferir, veja a armadilha dos pacotes acima.
+2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
+
+   ```bash
+   unity command eval 'UnityEditor.AssetDatabase.Refresh(); return "ok";'
+   ```
+
+3. Reimporte o projeto de roteiro (um `.yarn` novo pode não entrar sem isso, #34):
+
+   ```bash
+   unity command eval 'UnityEditor.AssetDatabase.ImportAsset("Assets/Roteiro/Roteiro.yarnproject", UnityEditor.ImportAssetOptions.ForceUpdate); return "ok";'
+   ```
+
+4. Rode a suíte. O `ScriptContentTests` reprova aviso de compilação, id de item inexistente, nó fora da convenção e variável fora do `variaveis.yarn`:
+
+   ```bash
+   unity command run_tests --mode EditMode --timeout 180
+   ```
+
+5. Abra a conversa em Play Mode (receita acima, com `Application.runInBackground = true`) e confira falas, opções e tamanho do texto.
+6. Confira o `git status`: só `Assets/Roteiro/` e os `.meta`. O merge, por *squash*, é do programador.
 
 ## Outras armadilhas do projeto
 

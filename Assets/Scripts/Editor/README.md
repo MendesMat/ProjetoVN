@@ -32,4 +32,4 @@ Como funciona:
 
 - Só cobre variáveis **booleanas**. Um seletor para número ou texto fica para quando uma issue pedir (D-27).
 - Renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado.
-- É código de Editor: não tem teste automatizado (D-24). Foi verificado lendo o Inspector por `eval`; o clique no dropdown e a aparência ficam para o Matheus.
+- É código de Editor: não tem teste automatizado (D-24). Foi verificado lendo o Inspector por `eval`; o clique no dropdown e a aparência ficam para o programador.

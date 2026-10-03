@@ -1,0 +1,145 @@
+// ============================================================================
+// EXEMPLO COMENTADO: copie trechos deste arquivo para a sua conversa.
+//
+// Tudo o que começa com // é comentário: o jogador nunca vê, o jogo ignora.
+// Use à vontade para deixar recados para o programador e para você mesmo.
+//
+// Este arquivo mostra um recurso por vez. Para o guia completo, leia
+// docs/autoria/roteiro.md.
+//
+// ESTE ARQUIVO É UMA EXCEÇÃO às regras de organização do guia: fica na raiz de
+// Assets/Roteiro/ (o seu fica na pasta do episódio), tem o nome
+// "exemplo_comentado" (o seu tem o nome do nó de entrada) e a linha de título
+// só aparece depois destes comentários (no seu arquivo, ela é a primeira
+// linha). Para um arquivo novo, siga o guia.
+//
+// Para o jogo, este exemplo é uma conversa de verdade: se alguém apontar uma
+// cena para o nó "exemplo_apresentacao", ela roda. Ele não é ligado a nenhuma
+// cena, então o jogador nunca o encontra.
+// ============================================================================
+
+// Todo arquivo de roteiro começa com uma linha de título como a de baixo:
+// ato, capítulo, episódio e o nome do episódio. O arquivo fica na pasta do
+// episódio, por exemplo
+// Assets/Roteiro/ato_1/capitulo_1/episodio_1/gotica_primeiro_oi.yarn.
+
+// ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
+
+
+// Um arquivo é uma lista de NÓS. Cada nó é uma conversa (ou um pedaço dela) e
+// tem três partes: "title:" com o nome, uma linha "---" que abre o texto e uma
+// linha "===" que fecha o nó.
+//
+// O nome do nó usa só letras minúsculas sem acento, números e sublinhado. O
+// primeiro nó, o que a cena chama pelo nome, é o nó de entrada: o nome dele é
+// <quem_ou_onde>_<assunto>. Os nós que ele chama começam com o mesmo nome.
+title: exemplo_apresentacao
+---
+// NARRAÇÃO: uma linha sem "Nome:" no começo é narração. O jogo mostra o texto
+// sem placa de nome.
+// Cuidado: qualquer dois-pontos numa narração, em qualquer lugar da linha,
+// faz o que vem antes virar o nome de uma personagem. "Atenção: a porta
+// fechou." vira fala de "Atenção"; "Eram 10:30 da manhã." vira fala de
+// "Eram 10". Nem o editor nem os testes avisam. Reescreva a frase sem os
+// dois-pontos ou, se não houver jeito, escape com barra: "Eram 10\:30 da manhã."
+Uma sala de aula vazia. Dá para ouvir o relógio.
+
+// FALA: o nome de quem fala, dois-pontos, espaço e o texto. Escreva o nome
+// sempre igual (a tabela "Quem fala" do guia lista os nomes): "Gótica" e
+// "Gotica" são duas personagens diferentes para o jogo.
+// Uma linha do arquivo é uma caixa de diálogo e um clique. Fala longa se
+// divide em várias linhas.
+Gótica: Você é novo aqui?
+
+// FALA DO PROTAGONISTA, quando ele não tem o que escolher: uma linha com o
+// nome reservado "Protagonista", como a de qualquer personagem.
+// (Provisório: hoje a placa mostra a palavra "Protagonista". A issue #26 troca
+// pelo nome que o jogador escolher, e o roteiro não precisa mudar.)
+Protagonista: Sou. Cheguei hoje.
+
+// PENSAMENTO do protagonista: narração em primeira pessoa, sem nome.
+Respiro fundo. Ela parece me estudar.
+
+// CONDIÇÃO: <<if>> / <<elseif>> / <<else>> / <<endif>> escolhem quais falas
+// aparecem. A afinidade é um número, então compare com >= ou <=, nunca com ==.
+// O recuo de quatro espaços dentro da condição é obrigatório (a tecla Tab do
+// editor já insere os quatro espaços).
+<<if $afinidade_gotica >= 2>>
+    Gótica: Ah, é você de novo. Que bom.
+<<elseif $afinidade_gotica >= 1>>
+    Gótica: Já nos vimos, não é?
+<<else>>
+    Gótica: Pode sentar onde quiser. Só não faça barulho.
+<<endif>>
+
+// VARIÁVEL NO TEXTO: {$nome} troca pelo valor atual. Serve para teste; num
+// roteiro de verdade, não mostre número para o jogador.
+Sua afinidade com a Gótica agora é {$afinidade_gotica}.
+
+// OPÇÕES: cada "->" é uma opção. O texto da opção é a fala do protagonista.
+// Regras:
+//   - Um bloco tem de duas a quatro opções. Nunca uma só: se o protagonista só
+//     tem uma resposta, ela é uma linha "Protagonista:".
+//   - O que acontece depois de escolher vai logo abaixo da opção, recuado com
+//     quatro espaços.
+//   - A fala que vem logo antes do bloco aparece junto com as opções. Por isso
+//     não ponha <<set>> entre a fala e o bloco: ponha dentro da opção.
+Gótica: O que você achou da escola?
+-> Gostei bastante.
+    // <<set>> muda uma variável. Declare a variável nova no variaveis.yarn
+    // (guia, seção "Variáveis e afinidade"); esta já existe.
+    <<set $afinidade_gotica to $afinidade_gotica + 1>>
+    // <<detour>> vai para outro nó e VOLTA para cá quando o nó termina.
+    <<detour exemplo_apresentacao_gostei>>
+-> Achei estranha.
+    <<detour exemplo_apresentacao_estranha>>
+-> Preciso ir.
+    Gótica: Então vai. A gente se vê.
+    // <<stop>> encerra a conversa aqui. Nada abaixo roda por este caminho.
+    <<stop>>
+// OPÇÃO CONDICIONAL: o "<<if ...>>" no fim da linha da opção a bloqueia. O
+// jogador VÊ a opção bloqueada, esmaecida, e entende que existe um caminho
+// fechado. Por isso o texto de uma opção bloqueada não pode entregar o que
+// ela esconde. Bloqueada também conta para o limite de quatro opções.
+-> Posso te perguntar uma coisa? <<if $afinidade_gotica >= 1>>
+    <<detour exemplo_apresentacao_pergunta>>
+
+// Aqui voltam todos os caminhos que não usaram <<stop>>.
+
+// VISITED: visited("nó") diz se o jogador já passou por aquele nó nesta
+// partida (a lembrança vai junto quando ele salva e carrega). O nome do nó
+// vai entre aspas.
+<<if visited("exemplo_apresentacao_pergunta")>>
+    Gótica: E então? Respondi o que você queria?
+<<endif>>
+
+// ITEM: <<dar_item id>> entrega um item (id sem aspas), tem_item("id") confere
+// (id com aspas). Os itens são únicos: dar de novo não faz nada. Proteja a fala
+// com tem_item para ela não se repetir quando o jogador já tem o item.
+<<if not tem_item("chave_teste")>>
+    Gótica: Toma, achei esta chave no corredor.
+    <<dar_item chave_teste>>
+<<endif>>
+
+// <<jump>> vai para outro nó e NÃO volta: a conversa continua lá e termina lá.
+// Tudo o que estiver abaixo de um <<jump>>, no mesmo nível, nunca roda.
+<<jump exemplo_apresentacao_despedida>>
+===
+title: exemplo_apresentacao_gostei
+---
+Gótica: Que bom. A maioria reclama.
+===
+title: exemplo_apresentacao_estranha
+---
+Gótica: Estranha é pouco. Você se acostuma.
+===
+title: exemplo_apresentacao_pergunta
+---
+Protagonista: Você sempre vem tão cedo?
+Gótica: Só quando não quero encontrar ninguém.
+===
+title: exemplo_apresentacao_despedida
+---
+Gótica: Vou pegar uma cadeira no fundo.
+// Quando as linhas acabam, a conversa acaba sozinha: não precisa de <<stop>>.
+===

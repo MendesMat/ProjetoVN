@@ -10,7 +10,7 @@ Quais skills o agente usa neste projeto, quando, e o que fazer quando uma skill 
 2. As convenções já presentes no código vizinho.
 3. A skill.
 
-Se o agente achar que uma decisão está errada, ele diz isso ao Matheus. Ele não a contorna com o argumento de que a skill manda.
+Se o agente achar que uma decisão está errada, ele diz isso ao programador. Ele não a contorna com o argumento de que a skill manda.
 
 ## Skills obrigatórias
 
@@ -33,7 +33,7 @@ Se o agente achar que uma decisão está errada, ele diz isso ao Matheus. Ele n�
 | Atlas de sprites | `unity:manage-sprite-atlas` |
 | Achar assets ou objetos de cena no Editor | `unity:generate-editor-search-query` |
 | Revisar um PR (sessão de revisão) | `code-review`, como apoio ao roteiro de `/revisar-issue` |
-| O Matheus pede para testar uma ideia ou um plano | `anthropic-skills:grill-me` |
+| O programador pede para testar uma ideia ou um plano | `anthropic-skills:grill-me` |
 
 ## Skills que este projeto não usa
 

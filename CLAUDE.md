@@ -1,6 +1,6 @@
 # ProjetoVN
 
-Híbrido de visual novel e point-and-click 2D em Unity 6 (6000.3.9f1, URP 2D, uGUI, Input System, Mono). Você trabalha aqui como par de programação do Matheus, que é o único programador; roteiristas e game designer produzem o conteúdo.
+Híbrido de visual novel e point-and-click 2D em Unity 6 (6000.3.9f1, URP 2D, uGUI, Input System, Mono). Você trabalha aqui em par com o programador, o único do projeto; roteiristas e game designer produzem o conteúdo.
 
 Toda a documentação é em português brasileiro. Identificadores de C# são em inglês.
 
@@ -10,7 +10,7 @@ Toda a documentação é em português brasileiro. Identificadores de C# são em
 2. Leia [docs/arquitetura/decisoes.md](docs/arquitetura/decisoes.md). Ela prevalece sobre qualquer skill.
 3. Leia o README do módulo que você vai tocar.
 
-Se o Matheus pedir algo sem citar uma issue, pergunte a qual issue o pedido pertence ou ofereça criar uma. Perguntas e explicações não precisam de issue.
+Se o programador pedir algo sem citar uma issue, pergunte a qual issue o pedido pertence ou ofereça criar uma. Perguntas e explicações não precisam de issue.
 
 ## Comandos de trabalho
 
@@ -33,7 +33,7 @@ Cada fase é uma conversa nova, com contexto zerado.
 7. **Estado estático é zerado** em `RuntimeInitializeOnLoadMethod(SubsystemRegistration)`.
 8. **Conteúdo novo não exige código.** Todo campo exposto no Inspector tem tooltip e validação.
 9. **Sem threads, sem `Task.Run`, sem reflexão para construir objetos; acesso a arquivo só no `GameSaveManager`.**
-10. **Você não faz merge por iniciativa própria;** só com ordem explícita do Matheus, e sempre por squash. Pergunte antes de instalar pacote, alterar `ProjectSettings/`, mudar um asmdef ou apagar conteúdo.
+10. **Você não faz merge por iniciativa própria;** só com ordem explícita do programador, e sempre por squash. Pergunte antes de instalar pacote, alterar `ProjectSettings/`, mudar um asmdef ou apagar conteúdo.
 11. **Documentação é parte da entrega,** no mesmo PR.
 
 ## Verificar o trabalho

@@ -34,7 +34,7 @@ O campo **Persistent Id** é gerado sozinho. **Se você duplicar um coletável, 
 
 ## Diálogo ao clicar
 
-1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e digite em **Node Name** o nome do nó do roteiro que ele inicia (por exemplo `porta_trancada`). O nome é de um nó dos arquivos `.yarn` em `Assets/Roteiro/`; peça o nome ao roteirista ou procure a linha `title:` no arquivo.
+1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e digite em **Node Name** o nome do nó do roteiro que ele inicia (por exemplo `porta_trancada`). O nome é de um nó dos arquivos `.yarn` em `Assets/Roteiro/`; o nome do nó de entrada vem no PR do roteirista (formato `<quem_ou_onde>_<assunto>`, ver [as convenções do guia](roteiro.md#convenções-de-nome)); na dúvida, procure a linha `title:` no arquivo.
 2. Em **On Interact**, ligue `InteractableDialogueTrigger.TriggerDialogue`.
 
 O nome é minúsculas sem acento, dígitos e `_`; o componente avisa no console se ele fugir desse formato. **O nome não é conferido ao montar a cena:** um nome errado só aparece ao clicar no objeto, com um aviso no console ("o nó 'x' não existe no roteiro") e sem iniciar conversa. **Node Name** vazio também não inicia conversa e avisa ao clicar.

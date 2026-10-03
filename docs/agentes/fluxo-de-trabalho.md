@@ -1,6 +1,6 @@
 # Fluxo de trabalho do agente
 
-Como um agente de IA trabalha neste repositório como par de programação do Matheus. Vale para qualquer sessão, de qualquer fase.
+Como um agente de IA trabalha neste repositório, em par com o programador. Vale para qualquer sessão, de qualquer fase.
 
 ## O princípio
 
@@ -17,13 +17,13 @@ Cada issue passa por três sessões separadas, cada uma em uma conversa nova.
 | 3. Revisão | `/revisar-issue N` | `estado:em-revisao` | `estado:aprovada` ou `estado:mudancas-pedidas` | Um parecer no PR |
 
 ```
-levantamento ──► pronta ──► em-execucao ──► em-revisao ──► aprovada ──► (Matheus faz o merge)
+levantamento ──► pronta ──► em-execucao ──► em-revisao ──► aprovada ──► (programador faz o merge)
      │              ▲                            │
      ▼              │                            ▼
 aguardando-resposta ┘                    mudancas-pedidas ──► (nova execução)
 ```
 
-**Uma sessão recusa começar se a issue não estiver na label de entrada dela.** Ela diz em que estado a issue está e qual é o comando certo. A única pessoa que pode mandar pular uma fase é o Matheus, e a sessão registra isso em um comentário na issue.
+**Uma sessão recusa começar se a issue não estiver na label de entrada dela.** Ela diz em que estado a issue está e qual é o comando certo. A única pessoa que pode mandar pular uma fase é o programador, e a sessão registra isso em um comentário na issue.
 
 ### 1. Levantamento
 
@@ -38,12 +38,12 @@ O agente lê a issue, a documentação que ela cita e o código envolvido, e pub
 - **Roteiro de verificação em Play Mode:** passos concretos e o resultado esperado de cada um.
 - **Skills a usar:** conforme [skills.md](skills.md).
 - **Documentação a atualizar:** quais arquivos mudam com esta issue.
-- **Perguntas em aberto:** só decisões que são do Matheus. Fatos, o agente levanta sozinho.
+- **Perguntas em aberto:** só decisões que são do programador. Fatos, o agente levanta sozinho.
 
 Regras:
 - O levantamento **não altera código**. Se a documentação estiver errada ou incompleta, ele a corrige em uma branch `docs/issue-N-levantamento` e abre um PR só de documentação.
-- Se houver perguntas em aberto, a issue vai para `estado:aguardando-resposta`. O Matheus responde na issue e troca a label para `estado:pronta`.
-- Se os critérios de aceite da issue estiverem errados ou incompletos, o levantamento propõe a correção no comentário; quem edita o corpo da issue é o Matheus, ou o agente com o aval dele.
+- Se houver perguntas em aberto, a issue vai para `estado:aguardando-resposta`. O programador responde na issue e troca a label para `estado:pronta`.
+- Se os critérios de aceite da issue estiverem errados ou incompletos, o levantamento propõe a correção no comentário; quem edita o corpo da issue é o programador, ou o agente com o aval dele.
 
 ### 2. Execução
 
@@ -76,18 +76,28 @@ O agente lê a issue, os comentários, a documentação citada e o diff do PR, e
 6. A documentação foi atualizada?
 7. Há algo no diff que a issue não pediu?
 
-O parecer vai como comentário no PR, com veredito **aprovado** ou **mudanças pedidas**, e os achados em ordem de gravidade, cada um com arquivo e linha. A label da issue é trocada conforme o veredito. O merge é do Matheus.
+O parecer vai como comentário no PR, com veredito **aprovado** ou **mudanças pedidas**, e os achados em ordem de gravidade, cada um com arquivo e linha. A label da issue é trocada conforme o veredito. O merge é do programador.
+
+## PR de roteiro
+
+Quem escreve roteiro entrega por um fluxo à parte, descrito para o roteirista em [roteiro.md](../autoria/roteiro.md). Um agente que encontrar um PR assim deve saber que:
+
+- Ele vem de um roteirista (colaborador do repositório), em uma branch `roteiro/<nome>-<assunto>`, **sem issue e sem as três sessões**. O título do PR traz ato, capítulo, episódio e o título do episódio (`Ato 1, Cap. 1, Ep. 2: A chave perdida`); o texto lista os arquivos, os nós de entrada, onde a conversa entra na história, as variáveis novas e os pedidos.
+- A regra "uma issue por vez" **não conta** PR de roteiro: ele não disputa lugar com a issue em andamento.
+- Quem integra é o programador: gera os `.meta`, reimporta o `Roteiro.yarnproject`, roda os testes e abre a conversa no jogo (receita em [unity-cli.md](unity-cli.md#receber-um-roteiro-pr-de-roteirista)), e faz o merge por *squash* com a branch apagada. O agente só faz o que o programador pedir.
+- O PR de roteiro mexe só em `Assets/Roteiro/` (e nos `.meta`), em pastas `ato_N/capitulo_N/episodio_N/`, um arquivo por conversa, cada um começando pela linha de título descrita no guia (`// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida`). Se tocar em qualquer outra coisa, não é PR de roteiro: devolva ao roteirista.
+- Um pedido de comando, item, personagem ou som que o roteirista deixou em `// PEDIDO` vira issue (com a label `triagem`), não é feito no PR de roteiro.
 
 ## Regras de foco
 
-O projeto tem histórico de frentes abertas e não terminadas. Estas regras existem para isso, e o agente as aplica também quando o pedido vem do Matheus:
+O projeto tem histórico de frentes abertas e não terminadas. Estas regras existem para isso, e o agente as aplica também quando o pedido vem do programador:
 
 1. **Uma issue em andamento por vez.** A próxima só começa com o PR da anterior mesclado.
 2. **Uma milestone só abre quando a anterior fecha.** A ordem está em [../planejamento/milestones.md](../planejamento/milestones.md).
 3. **Ideia nova vira issue no backlog,** com a label `triagem`, e não trabalho imediato.
 4. **Pronto significa:** testes passando, verificação em Play Mode feita, README do módulo atualizado e PR mesclado.
 
-Quando o Matheus pedir algo fora da issue atual, o agente lembra a regra, oferece registrar o pedido como issue e segue o que ele decidir.
+Quando o programador pedir algo fora da issue atual, o agente lembra a regra, oferece registrar o pedido como issue e segue o que ele decidir.
 
 ## Autonomia
 
@@ -105,7 +115,7 @@ O critério é: livre o que é reversível e fica dentro da branch; perguntar o 
 | Acrescentar referência a um asmdef | Perguntar antes |
 | Mudar uma decisão `D-xx` | Perguntar antes, e registrar em `decisoes.md` |
 | Apagar assets de conteúdo (roteiro, itens, salas, arte) | Perguntar antes |
-| Fazer merge de PR | **Nunca por iniciativa própria.** A decisão é do Matheus; o agente só mescla com ordem explícita dele na conversa, para aquele PR |
+| Fazer merge de PR | **Nunca por iniciativa própria.** A decisão é do programador; o agente só mescla com ordem explícita dele na conversa, para aquele PR |
 | `git push --force`, reescrever histórico de `main` | **Nunca** |
 
 Uma issue pode conceder uma autorização específica no próprio texto (a #3 autoriza instalar o Yarn Spinner). Essa autorização vale só para aquela issue.

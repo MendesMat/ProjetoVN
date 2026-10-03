@@ -1,6 +1,6 @@
 ---
 name: executar-issue
-description: Fase 2 do fluxo do ProjetoVN. Implementa uma issue do GitHub já levantada, em uma branch própria, guiada pela issue, pelos comentários e pela documentação, e abre o PR. Use quando o Matheus disser "/executar-issue N", "executar a issue N" ou pedir a implementação de uma issue.
+description: Fase 2 do fluxo do ProjetoVN. Implementa uma issue do GitHub já levantada, em uma branch própria, guiada pela issue, pelos comentários e pela documentação, e abre o PR. Use quando o programador disser "/executar-issue N", "executar a issue N" ou pedir a implementação de uma issue.
 argument-hint: <número da issue>
 disable-model-invocation: true
 ---
@@ -18,9 +18,9 @@ gh issue view $ARGUMENTS --json number,title,body,labels,milestone,comments,stat
 ```
 
 - A issue precisa estar aberta e com a label `estado:pronta` (primeira execução) ou `estado:mudancas-pedidas` (reexecução depois da revisão).
-- Se estiver em outro estado, **não comece**. Diga em que estado ela está e qual é o comando certo. Só siga se o Matheus mandar explicitamente, e registre isso no PR.
+- Se estiver em outro estado, **não comece**. Diga em que estado ela está e qual é o comando certo. Só siga se o programador mandar explicitamente, e registre isso no PR.
 - Precisa existir um comentário de **Levantamento**. Sem ele, pare e indique `/levantar-issue $ARGUMENTS`.
-- Se o levantamento tem perguntas em aberto, as respostas do Matheus precisam estar nos comentários. Sem resposta, pare.
+- Se o levantamento tem perguntas em aberto, as respostas do programador precisam estar nos comentários. Sem resposta, pare.
 - Confira se há outra issue com a label `estado:em-execucao` ou `estado:em-revisao`. Se houver, lembre a regra de uma issue por vez e pergunte se ele quer seguir.
 
 ## 2. Ler o contexto
@@ -74,7 +74,7 @@ unity status
 unity command run_tests --mode EditMode --timeout 180
 ```
 
-Se a linha de base já falha, pare e avise o Matheus.
+Se a linha de base já falha, pare e avise o programador.
 
 ## 4. Implementar
 
@@ -96,7 +96,7 @@ Regras:
   ```
 
 - **Editor aberto:** altere cenas, prefabs e assets pelo Unity CLI. As exceções e as armadilhas estão em `docs/agentes/unity-cli.md`.
-- **Precisa de autorização** (pacote, `ProjectSettings/`, asmdef, apagar conteúdo) que a issue não deu: pergunte ao Matheus e espere.
+- **Precisa de autorização** (pacote, `ProjectSettings/`, asmdef, apagar conteúdo) que a issue não deu: pergunte ao programador e espere.
 - **Commits pequenos**, em português, no formato `#$ARGUMENTS: <o que mudou>`.
 
 ## 5. Verificar
@@ -147,4 +147,4 @@ Quando o plano não funciona, um critério não faz sentido ou a solução exige
 
 ## 8. Encerrar
 
-Diga ao Matheus, em poucas linhas: o que foi feito, o resultado dos testes e da verificação, o que ficou sem verificar, o link do PR e o próximo comando (`/revisar-issue $ARGUMENTS`, em uma conversa nova). **Você não faz o merge.**
+Diga ao programador, em poucas linhas: o que foi feito, o resultado dos testes e da verificação, o que ficou sem verificar, o link do PR e o próximo comando (`/revisar-issue $ARGUMENTS`, em uma conversa nova). **Você não faz o merge.**
