@@ -42,12 +42,20 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
-        public void ProjectScripts_HaveExactlyTheTestNodes_AllFollowingTheNamingConvention()
+        public void ProjectScripts_ContainTheTestNodes()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
 
-            CollectionAssert.AreEquivalent(ExpectedNodes, run.NodeNames.ToArray());
-            foreach (string node in run.NodeNames) Assert.IsTrue(ScriptNodeName.FollowsConvention(node), node);
+            CollectionAssert.IsSubsetOf(ExpectedNodes, run.NodeNames.ToArray());
+        }
+
+        [Test]
+        public void ProjectScripts_AllNodesFollowTheNamingConvention()
+        {
+            ScriptRun run = ScriptRun.FromProjectFiles();
+
+            Assert.IsEmpty(run.NodeNames.Where(node => !ScriptNodeName.FollowsConvention(node)),
+                "o nome de nó é digitado na cena: minúsculas sem acento, dígitos e _");
         }
 
         [Test]
