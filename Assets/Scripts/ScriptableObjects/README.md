@@ -15,6 +15,7 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO`) resid
 - **`Items/`**: Contém os metadados de cada item coletável no jogo (Ícone, nome, ID, propriedades de uso).
   - O **id** de um item é em minúsculas sem acento, com dígitos e `_` (`chave_teste`), igual aos nomes de nó e de variável do roteiro (D-22). Ele é chave do save e é o que o roteiro cita em `<<dar_item id>>`, `<<remover_item id>>` e `tem_item("id")`.
   - Um item que o roteiro cita precisa estar no `ItemRegistry.asset`. Um teste EditMode acusa o id que não está lá.
+  - **Quem cria um item acrescenta a linha dele na tabela "Itens que existem" de [roteiro.md](../../../docs/autoria/roteiro.md#comandos-disponíveis)** (id, nome no jogo e uma frase). É dali que o roteirista copia o id.
 
 ---
 
