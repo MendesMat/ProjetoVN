@@ -1,6 +1,6 @@
 # Fluxo de trabalho do agente
 
-Como um agente de IA trabalha neste repositório como par de programação do programador. Vale para qualquer sessão, de qualquer fase.
+Como um agente de IA trabalha neste repositório, em par com o programador. Vale para qualquer sessão, de qualquer fase.
 
 ## O princípio
 
