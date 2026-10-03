@@ -2,7 +2,7 @@
 
 **Para quem:** roteiristas. Você não precisa do Unity, nem de saber programar, nem de ter usado Git antes.
 
-**Como usar este guia:** na primeira vez, leia só [Sua primeira entrega](#sua-primeira-entrega) e faça um passo de cada vez. O resto é consulta: volte aqui quando precisar de uma regra. A última seção é uma [cola de uma página](#cola-de-uma-página).
+**Como usar este guia:** na primeira vez, leia só [Sua primeira entrega](#sua-primeira-entrega) e faça um passo de cada vez. O resto é consulta: volte aqui quando precisar de uma regra. A última seção é um [exemplo de roteiro](#exemplo-de-roteiro) completo.
 
 ## O que já está decidido
 
@@ -401,37 +401,78 @@ Isto é o que o Matheus faz com o seu PR, para você saber o que esperar:
 4. Abre a conversa no jogo e confere as falas, as opções e o tamanho do texto.
 5. Se tudo estiver certo, junta ao `main` (*squash and merge*) e liga a conversa à cena.
 
-## Cola de uma página
+## Exemplo de roteiro
+
+Três conversas curtas que contam uma história só: o protagonista acha uma chave no corredor, a Gótica aparece procurando por ela, e o que ele faz com a chave muda o que ela aceita mais tarde. O exemplo mostra **coleta de item**, **entrega de item**, **ganho e perda de afinidade** e **uso da afinidade** em uma fala e em uma opção. Ele foi rodado no jogo como está escrito.
 
 ```
-title: nome_do_no                 // nome único no projeto; minúsculas, sem acento
+// CONVERSA 1: o protagonista clica no bebedouro do corredor e acha uma chave.
+title: corredor_bebedouro
 ---
-Narração, sem nome.
-Gótica: Fala com nome.            // uma linha = uma caixa e um clique
-Protagonista: Fala do protagonista.
-// comentário: o jogador não vê
+<<if tem_item("chave_teste")>>
+    Só poeira e um chiclete seco. A chave já está comigo.
+    <<stop>>
+<<endif>>
+Alguma coisa brilha embaixo do bebedouro.
+Uma chave pequena, presa a um chaveiro de morcego.
+// COLETA: o item entra no inventário do jogador.
+<<dar_item chave_teste>>
+Guardei no bolso. Alguém deve estar procurando por ela.
+===
 
-<<if $afinidade_gotica >= 1>>     // condição (termina em <<endif>>)
-    Gótica: Só aparece se gostar de você.
-<<else>>
-    Gótica: Senão, aparece esta.
+// CONVERSA 2: a Gótica procura a chave do armário dela.
+title: gotica_chave_perdida
+---
+Gótica: Você viu uma chave por aí? Tem um morcego no chaveiro.
+
+// Sem a chave, a conversa é curta e termina aqui.
+<<if not tem_item("chave_teste")>>
+    Protagonista: Não vi. Se eu achar, te aviso.
+    Gótica: Tá. Ela não pode ter ido longe.
+    <<stop>>
 <<endif>>
 
-Gótica: Pergunta?                 // 2 a 4 opções
--> Primeira opção.
-    <<set $afinidade_gotica to $afinidade_gotica + 1>>   // dentro da opção
-    <<detour outro_no>>           // vai e volta
--> Segunda opção.
-    <<jump outro_no>>             // vai e não volta
--> Terceira opção. <<if $afinidade_gotica >= 1>>        // opção bloqueada
-    <<stop>>                      // termina a conversa
+Sinto o peso da chave no bolso.
+Gótica: E aí? Viu ou não viu?
+-> Vi. Estava embaixo do bebedouro.
+    // ENTREGA: o item sai do inventário. GANHO de afinidade.
+    <<remover_item chave_teste>>
+    <<set $afinidade_gotica to $afinidade_gotica + 1>>
+    Gótica: Sério? Já estava me vendo arrombar o meu próprio armário.
+-> Depende. O que eu ganho com isso?
+    // Entrega também, mas sem ganhar nada.
+    <<remover_item chave_teste>>
+    Gótica: Ganha eu não contar pra ninguém que você tentou.
+-> Não vi nada.
+    // PERDA de afinidade. O protagonista fica com a chave.
+    <<set $afinidade_gotica to $afinidade_gotica - 1>>
+    Gótica: Engraçado. O seu bolso está tilintando.
+    Gótica: Quando lembrar onde não viu, me procura.
+    <<stop>>
 
-<<dar_item chave_teste>>          // id sem aspas
-<<if tem_item("chave_teste")>>    // id com aspas
-    Gótica: Você já tem a chave.
+// Aqui chegam os dois caminhos em que a chave foi devolvida.
+// USO da afinidade em uma fala.
+<<if $afinidade_gotica >= 1>>
+    Gótica: Fico te devendo uma. E eu pago o que devo.
+<<else>>
+    Gótica: Da próxima vez, devolve sem fazer graça.
 <<endif>>
 ===
+
+// CONVERSA 3: mais tarde, no fim da aula.
+title: gotica_fim_da_aula
+---
+Gótica: Vou ensaiar no auditório. A banda toca na sexta.
+-> Boa sorte no ensaio.
+    Gótica: Sorte é pra quem não ensaia.
+// USO da afinidade em uma opção: só quem ganhou a confiança dela pode pedir.
+// Sem afinidade, o jogador vê a opção bloqueada.
+-> Posso assistir? <<if $afinidade_gotica >= 1>>
+    Gótica: Pode. Senta no fundo e não bate palma fora de hora.
+===
 ```
+
+Para escrever no texto um caractere que o Yarn usa:
 
 | Para escrever | Digite |
 |---|---|
