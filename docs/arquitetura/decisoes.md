@@ -22,7 +22,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | D-08 | Input: ação para avançar diálogo, leitura direta do mouse para o mundo, EventSystem para UI | Padrão |
 | D-09 | Sem Addressables até haver medição | Padrão |
 | D-10 | Inventário em modelo, serviço e manager; sem camadas a mais | Padrão |
-| D-11 | Pool de slots no inventário; botões de escolha em vetor fixo | Padrão |
+| D-11 | Pool de slots no inventário; botões de escolha em vetor fixo, opção indisponível desabilitada | Padrão |
 | D-12 | Fala e escolhas chegam à interface direto do Yarn Spinner | Padrão |
 | D-13 | Sem framework de UI; pilha simples de janelas permitida | Padrão |
 | D-14 | Sem Clean Architecture, DDD ou camadas hexagonais | Padrão |
@@ -48,7 +48,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 ## Estrutura do código
 
 ### D-01 — Módulos por feature com asmdef
-- **Decisão:** cada feature é uma pasta em `Assets/Scripts/` com o seu asmdef. O grafo de dependências não tem ciclos: `Core` ← `Dialogue`, `Inventory`, `PointNClick` ← `GameFlow`; `UI` enxerga só `Core` e `Inventory`. Todo script do projeto pertence a um asmdef de módulo.
+- **Decisão:** cada feature é uma pasta em `Assets/Scripts/` com o seu asmdef. O grafo de dependências não tem ciclos: `Core` ← `Dialogue`, `Inventory`, `PointNClick` ← `GameFlow`; `UI` enxerga só `Core` e `Inventory`. Todo script do projeto pertence a um asmdef de módulo. O módulo `Editor` (`ProjetoVN.Editor`) é só de Editor: enxerga `Core` e o Yarn Spinner, e nenhum módulo de runtime o referencia.
 - **Por quê:** o compilador garante as fronteiras a custo baixo.
 - **Rever só se:** um módulo virar depósito de coisas sem relação. **Não** dividir um módulo em sub-asmdefs de dados, lógica e interface.
 
@@ -133,7 +133,8 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 
 ### D-18 — Estado da história único
 - **Decisão:** um único `StoryState`, estático, no `Core`, guarda valores booleanos, numéricos e de texto. O roteiro (pelo adaptador do Yarn Spinner), as portas e o save leem e gravam nele. Ele substituiu o antigo `StoryFlags` (issue #4).
-- **Formato do nome:** o nome de uma variável é guardado **com o `$`** em todo lugar (roteiro, Inspector, save). Quem monta cena digita `$` seguido de minúsculas sem acento, dígitos e `_` (por exemplo `$porta_biblioteca_destrancada`). O `StoryState` só exige o `$`, porque o Yarn Spinner grava nomes internos fora dessa convenção (`$Yarn.Internal.Visiting.<nó>`); a convenção é cobrada no `OnValidate` do portão e dos efeitos, e depois pelo seletor da #7.
+- **Formato do nome:** o nome de uma variável é guardado **com o `$`** em todo lugar (roteiro, Inspector, save). Quem monta cena digita `$` seguido de minúsculas sem acento, dígitos e `_` (por exemplo `$porta_biblioteca_destrancada`). O `StoryState` só exige o `$`, porque o Yarn Spinner grava nomes internos fora dessa convenção (`$Yarn.Internal.Visiting.<nó>`); a convenção é cobrada no `OnValidate` do portão e dos efeitos, pelo teste do registro e pelo seletor do Inspector (#7).
+- **Registro central (#7):** toda variável é declarada **uma só vez**, em `Assets/Roteiro/variaveis.yarn`, com `<<declare>>` e uma linha `///` de descrição. Um teste EditMode reprova declaração fora desse arquivo, sem descrição ou fora da convenção. Os campos de variável booleana do Inspector (`[StoryFlag]`) escolhem de uma lista feita a partir dele, e um valor não declarado aparece com aviso. A afinidade com um personagem é uma variável numérica (`$afinidade_gotica`) nesse mesmo registro.
 - **Por quê:** uma fonte de verdade. Com dois armazenamentos, a porta e o roteiro podem discordar. A afinidade com personagens é numérica. O `$` no Inspector evita que a mesma variável tenha duas grafias (uma no roteiro, outra na cena e no save).
 
 ### D-22 — Vocabulário do roteiro em português
@@ -180,7 +181,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Interface em uGUI.** O projeto não usa UI Toolkit em runtime.
 
 ### D-11 — Pool de slots e botões fixos
-- **Decisão:** o `InventoryPresenter` reaproveita slots; o diálogo mostra as opções em um vetor fixo de quatro botões (`DialogueUIController`). Mais de quatro opções disponíveis ao mesmo tempo é erro de conteúdo: aparecem as quatro primeiras e sai um erro no console. O `OptionsPresenter` do Yarn Spinner não é usado, porque instancia um prefab por opção e obrigaria a refazer a arte dos botões.
+- **Decisão:** o `InventoryPresenter` reaproveita slots; o diálogo mostra as opções em um vetor fixo de quatro botões (`DialogueUIController`). Uma opção cuja condição é falsa aparece **desabilitada** e ocupa um botão, para o jogador ver que existe um caminho fechado. Mais de quatro opções no mesmo bloco, disponíveis ou não, é erro de conteúdo: aparecem as quatro primeiras e sai um erro no console. Se nenhuma opção do bloco estiver disponível, o bloco não é mostrado e a conversa segue. O `OptionsPresenter` do Yarn Spinner não é usado, porque instancia um prefab por opção e obrigaria a refazer a arte dos botões.
 - **Rever só se:** o roteiro precisar de mais de quatro opções.
 
 ---
@@ -240,6 +241,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo Matheus no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
 | 2026-10-02 | **Revistas:** D-11 e D-12 saem de "a rever", com os textos aprovados pelo Matheus no levantamento da #5. D-12: fala e escolhas passam do `MessageBroker` para chamada direta do Yarn Spinner ao apresentador, e `DialogueLineMessage` e `DialogueChoicesMessage` deixam de existir. D-11: o vetor fixo de quatro botões vale para o apresentador do Yarn. **Nota nova na D-06** sobre o diálogo assíncrono (`YarnTask`). **D-17:** o pacote entra em `main` e o plano B deixa de existir. |
 | 2026-10-03 | **Revista:** D-22 ganha o formato do id de item (minúsculas sem acento, dígitos e `_`; sempre literal no roteiro), decidido pelo Matheus no levantamento da #6. O único item do projeto passou de `item-teste-01` para `chave_teste`. **D-01:** duas referências de asmdef autorizadas pelo Matheus na #6, sem inverter seta nem criar ciclo: `GameFlow` → pacote Yarn Spinner (para `[YarnCommand]` e `[YarnFunction]`) e `Tests` → `Inventory` (para o teste de ids usar o `ItemRegistry`). |
+| 2026-10-03 | **Revistas (#7):** **D-11** deixa de esconder a opção indisponível: ela aparece desabilitada e conta para o limite de quatro botões; um bloco sem opção disponível não é mostrado (decisão do Matheus no levantamento da #7: mostrar que existem caminhos bloqueados faz o jogador entender que as escolhas têm peso). **D-18** ganha o registro central `variaveis.yarn`. **D-01:** o asmdef `ProjetoVN.Editor` (só Editor; referencia `Core`, `YarnSpinner.Unity` e `YarnSpinner.Unity.Editor`), autorizado pelo Matheus na #7. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

@@ -13,6 +13,14 @@ namespace ProjetoVN.Tests.EditMode
         [TearDown]
         public void TearDown() => StoryState.ClearAll();
 
+        private const string FreeAndConditionalOptions =
+            "title: no\n---\n<<declare $afinidade = 0>>\nfala antes\n" +
+            "-> Livre\n    livre\n-> Segredo <<if $afinidade >= 1>>\n    segredo\n===\n";
+
+        private const string OnlyConditionalOptions =
+            "title: no\n---\n<<declare $afinidade = 0>>\nfala antes\n" +
+            "-> Segredo <<if $afinidade >= 1>>\n    segredo\ndepois\n===\n";
+
         private static ScriptRun Compile(string source)
         {
             ScriptRun run = ScriptRun.FromText(source);
@@ -105,6 +113,52 @@ namespace ProjetoVN.Tests.EditMode
 
             Assert.Contains("lastline", run.TagsOfLine("fala antes das opcoes"));
             Assert.IsFalse(run.TagsOfLine("fala comum").Contains("lastline"));
+        }
+
+        [Test]
+        public void ConditionalOption_IsUnavailable_WhileTheConditionIsFalse()
+        {
+            ScriptRun run = Compile(FreeAndConditionalOptions);
+
+            run.Start("no");
+
+            CollectionAssert.AreEqual(new[] { "Livre", "Segredo" }, run.OptionTexts);
+            CollectionAssert.AreEqual(new[] { "Segredo" }, run.UnavailableOptionTexts);
+        }
+
+        [Test]
+        public void ConditionalOption_BecomesAvailable_WhenTheStoryStateSatisfiesTheCondition()
+        {
+            ScriptRun run = Compile(FreeAndConditionalOptions);
+            StoryState.SetNumber("$afinidade", 1);
+
+            run.Start("no");
+
+            CollectionAssert.AreEqual(new[] { "Livre", "Segredo" }, run.OptionTexts);
+            Assert.IsEmpty(run.UnavailableOptionTexts);
+        }
+
+        [Test]
+        public void AllOptionsUnavailable_TheLineBeforeThemStillCarriesLastLine()
+        {
+            ScriptRun run = Compile(OnlyConditionalOptions);
+
+            run.Start("no");
+
+            CollectionAssert.AreEqual(new[] { "Segredo" }, run.UnavailableOptionTexts);
+            Assert.Contains("lastline", run.TagsOfLine("fala antes"));
+        }
+
+        [Test]
+        public void Declaration_CarriesTheTripleSlashCommentAsItsDescription()
+        {
+            ScriptRun run = Compile(
+                "title: no\n---\n/// Afinidade com a Gótica.\n<<declare $afinidade = 0>>\n" +
+                "<<set $afinidade to $afinidade + 1>>\nfim\n===\n");
+
+            string[] descriptions = run.Declarations.Where(d => d.Name == "$afinidade").Select(d => d.Description).ToArray();
+
+            CollectionAssert.AreEqual(new[] { "Afinidade com a Gótica." }, descriptions);
         }
     }
 }

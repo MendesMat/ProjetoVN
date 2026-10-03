@@ -49,9 +49,14 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 2. Preencha pelo menos um requisito:
    - **Required Item:** o item exigido. Ele é **consumido** ao abrir.
    - **Required Flag Id:** uma variável de história que precisa estar ligada. Ela **não** é consumida.
-3. Preencha **Unlocked Flag Id** com um nome **único para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com o mesmo nome abrem juntos.
+3. Preencha **Unlocked Flag Id** com uma variável **única para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com a mesma variável abrem juntos.
 
-**Formato do nome de uma variável** (vale para os dois campos): começa com `$`, seguido de letras minúsculas sem acento, dígitos e `_`. Exemplos: `$falou_com_gotica`, `$porta_mecanicas_destrancada`. O componente avisa no console se o nome estiver fora desse formato.
+**Os dois campos de variável são listas.** Eles mostram as variáveis **booleanas** declaradas em `Assets/Roteiro/variaveis.yarn`, em ordem alfabética, mais **(nenhuma)** para deixar o campo vazio. Abaixo do campo aparece a descrição da variável escolhida. As variáveis numéricas (afinidade) e de texto não aparecem.
+
+- **Uma variável nova** (a do seu portão) entra primeiro em `variaveis.yarn`, com uma linha `///` de descrição e `<<declare $nome = false>>`; veja [roteiro.md](roteiro.md#variáveis-e-afinidade). Depois do Unity importar o arquivo, ela aparece na lista.
+- **Um valor que não está declarado** (a variável foi renomeada ou nunca existiu) continua no campo e aparece com um aviso amarelo logo abaixo. Escolha outra na lista ou declare a variável.
+- Se o roteiro não compila, ou o projeto não tem exatamente um `YarnProject`, a lista dá lugar a um aviso e a um campo de texto comum.
+- O formato do nome é `$` seguido de minúsculas sem acento, dígitos e `_`. O componente ainda avisa no console se um valor digitado por fora da lista fugir desse formato.
 4. Em **On Interact**, ligue `LockedActionBehaviour.Interact`.
 5. Ligue os eventos:
 

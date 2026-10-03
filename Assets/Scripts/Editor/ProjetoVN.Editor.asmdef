@@ -1,0 +1,20 @@
+{
+    "name": "ProjetoVN.Editor",
+    "rootNamespace": "ProjetoVN.Editor",
+    "references": [
+        "GUID:f224320d92960dd4aaf6aeee46ddf5dc",
+        "GUID:34aa492b82754644eac2f903cd496268",
+        "GUID:3a299c53e4c683b4eb4a04c9ad9e648f"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -70,6 +70,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 [PointNClick](Assets/Scripts/PointNClick/README.md) ·
 [GameFlow](Assets/Scripts/GameFlow/README.md) ·
 [UI](Assets/Scripts/UI/README.md) ·
+[Editor](Assets/Scripts/Editor/README.md) ·
 [Tests](Assets/Scripts/Tests/README.md) ·
 [ScriptableObjects](Assets/Scripts/ScriptableObjects/README.md)
 

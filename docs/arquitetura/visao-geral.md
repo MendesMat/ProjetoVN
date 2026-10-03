@@ -12,6 +12,7 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
 | `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick` e o pacote Yarn Spinner |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
+| `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: o seletor de variável de história do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
 | `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow`, `Inventory` e o pacote Yarn Spinner |
 
 ```
@@ -19,6 +20,7 @@ Core ◄── Dialogue ◄──┐
   ▲◄──── Inventory ◄──┼── GameFlow
   ▲◄──── PointNClick ◄┘
   ▲◄──── UI (enxerga também Inventory)
+  ▲◄──── Editor (só Editor; enxerga também o Yarn Spinner)
 ```
 
 Regras da estrutura:
@@ -124,6 +126,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o chama pelo nome no `InteractableDialogueTrigger` |
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
+| Uma variável de história | Uma linha `<<declare $nome = valor>>` com `/// descrição` em `Assets/Roteiro/variaveis.yarn`, sem código. Se for booleana, ela aparece sozinha nos campos de portão do Inspector |
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
 
@@ -133,7 +136,6 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| Condições e afinidade | #7 |
 | A interface de jogo sai das cenas e vira prefab persistente | #9 |
 | Troca de sala e estado de transição | #12 |
 | Save automático e carregamento que recarrega a cena | #16 |

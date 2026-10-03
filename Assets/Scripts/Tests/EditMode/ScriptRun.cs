@@ -27,6 +27,9 @@ namespace ProjetoVN.Tests.EditMode
         public List<string> Commands { get; } = new();
         public List<string> OptionTexts { get; } = new();
 
+        /// <summary>As opções do bloco em espera cuja condição é falsa. Elas também estão em <see cref="OptionTexts"/>.</summary>
+        public List<string> UnavailableOptionTexts { get; } = new();
+
         /// <summary>Os ids que <c>tem_item</c> considera no inventário do jogador.</summary>
         public HashSet<string> OwnedItems { get; } = new();
         public bool Completed { get; private set; }
@@ -40,6 +43,9 @@ namespace ProjetoVN.Tests.EditMode
         public IEnumerable<string> NodeNames => _compilation.Program == null
             ? Enumerable.Empty<string>()
             : _compilation.Program.Nodes.Keys;
+
+        /// <summary>As variáveis que o roteiro declara com <c>&lt;&lt;declare&gt;&gt;</c>.</summary>
+        public IEnumerable<Declaration> Declarations => _compilation.Declarations.Where(IsExplicitVariable);
 
         private ScriptRun(Func<Library, CompilationJob> createJob)
         {
@@ -74,6 +80,7 @@ namespace ProjetoVN.Tests.EditMode
 
         public void Start(string nodeName)
         {
+            Completed = false;
             _dialogue.SetNode(nodeName);
             RunUntilWaiting();
         }
@@ -83,8 +90,14 @@ namespace ProjetoVN.Tests.EditMode
             _dialogue.SetSelectedOption(_pendingOptions.Value.Options[index].ID);
             _pendingOptions = null;
             OptionTexts.Clear();
+            UnavailableOptionTexts.Clear();
             RunUntilWaiting();
         }
+
+        private static bool IsExplicitVariable(Declaration declaration) =>
+            !declaration.IsImplicit
+            && declaration.Type is not FunctionType
+            && !declaration.Name.StartsWith("$Yarn.Internal.");
 
         private void DeliverLine(Line line)
         {
@@ -103,8 +116,11 @@ namespace ProjetoVN.Tests.EditMode
         private void ShowOptions(OptionSet options)
         {
             _pendingOptions = options;
-            OptionTexts.AddRange(options.Options.Select(option => _compilation.GetStringForKey(option.Line.ID)));
+            OptionTexts.AddRange(options.Options.Select(TextOf));
+            UnavailableOptionTexts.AddRange(options.Options.Where(option => !option.IsAvailable).Select(TextOf));
         }
+
+        private string TextOf(OptionSet.Option option) => _compilation.GetStringForKey(option.Line.ID);
 
         private void RunUntilWaiting()
         {

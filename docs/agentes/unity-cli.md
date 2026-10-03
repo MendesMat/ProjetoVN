@@ -148,6 +148,14 @@ Depois de mexer em `.cs`, o Editor recarrega o domínio, e um `eval` ou `recompi
 
 Os nomes de variável de história começam com `$`. Dentro de aspas duplas o shell o expande para vazio e o `eval` roda com o nome errado, sem erro. Todo `eval` com um nome como `$falou_com_gotica` vai entre aspas simples.
 
+### O `eval` roda tudo em um frame só
+
+Um `eval` com um laço que chama `AdvanceDialogue()` várias vezes não avança nada além da primeira fala: a apresentação do Yarn é assíncrona e só troca a fala no frame seguinte. Para percorrer uma conversa, faça uma chamada de `eval` por passo, com um `sleep` de um ou dois segundos entre elas, e leia o `DialogueText` a cada passo. O mesmo vale para ler a interface logo depois de `StartDialogue` ou `MakeChoice`: espere um instante.
+
+### O `eval` é o corpo de um método
+
+Não aceita `using` no topo nem método de extensão por sintaxe de ponto de um namespace que você não importou. Para consultar UI Toolkit, chame a extensão como método estático: `UnityEngine.UIElements.UQueryExtensions.Query<UnityEngine.UIElements.DropdownField>(raiz).ToList()`. Código com mais de uma ou duas linhas vai em um arquivo `.cs` e roda com `unity command eval_file --file <caminho>`, o que também escapa do problema do `$` no shell.
+
 ### O erro de console que é do CLI, não do jogo
 
 Um `eval` enviado enquanto o Editor ainda está entrando em Play Mode pode estourar o tempo de resposta. O comando falha e o pacote Pipeline deixa um erro no console:
