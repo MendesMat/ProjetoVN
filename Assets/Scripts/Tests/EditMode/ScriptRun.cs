@@ -26,10 +26,16 @@ namespace ProjetoVN.Tests.EditMode
         public List<string> Lines { get; } = new();
         public List<string> Commands { get; } = new();
         public List<string> OptionTexts { get; } = new();
+
+        /// <summary>Os ids que <c>tem_item</c> considera no inventário do jogador.</summary>
+        public HashSet<string> OwnedItems { get; } = new();
         public bool Completed { get; private set; }
 
         public IEnumerable<Diagnostic> ErrorsAndWarnings => _compilation.Diagnostics.Where(d =>
             d.Severity == Diagnostic.DiagnosticSeverity.Error || d.Severity == Diagnostic.DiagnosticSeverity.Warning);
+
+        /// <summary><c>null</c> quando o roteiro tem erro de compilação.</summary>
+        public Program Program => _compilation.Program;
 
         public IEnumerable<string> NodeNames => _compilation.Program == null
             ? Enumerable.Empty<string>()
@@ -38,6 +44,7 @@ namespace ProjetoVN.Tests.EditMode
         private ScriptRun(Func<Library, CompilationJob> createJob)
         {
             _dialogue = new Yarn.Dialogue(Variables);
+            _dialogue.Library.RegisterFunction("tem_item", (string itemId) => OwnedItems.Contains(itemId));
             _compilation = Compiler.Compile(createJob(_dialogue.Library));
             if (_compilation.Program == null) return;
 
