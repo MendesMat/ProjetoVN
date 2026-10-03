@@ -478,18 +478,60 @@ Gótica: Vou ensaiar no auditório. A banda toca na sexta.
 
 Um **comando** é uma ordem para o jogo, escrita entre `<<` e `>>`, em uma linha só dele. A lista cresce conforme as mecânicas entram: cada issue que cria um comando o acrescenta aqui.
 
-**Nunca escreva um comando que não esteja nesta tabela.** Se precisar de um, veja [Como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe).
+**Nunca escreva um comando que não esteja nestas tabelas.** Se precisar de um, veja [Como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe).
 
-| Comando | O que faz | Situação |
+As tabelas abaixo são a lista completa. Cada linha aponta para a seção que explica o comando com exemplo.
+
+**Andar entre nós**
+
+| Comando | O que faz | Explicado em |
 |---|---|---|
-| `<<dar_item id>>` | Coloca um item no inventário do jogador | existe |
-| `<<remover_item id>>` | Tira um item do inventário | existe |
-| `tem_item("id")` | Em uma condição: o jogador tem o item? | existe |
-| Expressão do personagem | *a definir* | issue #10 |
-| `<<tocar_musica id>>` | Troca a música | issue #20 |
-| `<<tocar_efeito id>>` | Toca um efeito sonoro | issue #20 |
+| `<<detour nome_do_no>>` | Vai para o outro nó e volta para a linha seguinte quando ele termina | [Vários nós na mesma conversa](#vários-nós-na-mesma-conversa) |
+| `<<jump nome_do_no>>` | Vai para o outro nó e não volta | [Vários nós na mesma conversa](#vários-nós-na-mesma-conversa) |
+| `<<stop>>` | Termina a conversa na hora | [Vários nós na mesma conversa](#vários-nós-na-mesma-conversa) |
 
-Os comandos da própria linguagem (`<<set>>`, `<<declare>>`, `<<if>>`, `<<detour>>`, `<<jump>>`, `<<stop>>`) estão nas seções acima.
+**Variáveis**
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<declare $nome = valor>>` | Cria uma variável, com o valor inicial. Só em `variaveis.yarn` | [Onde se declara](#onde-se-declara) |
+| `<<set $nome to valor>>` | Muda o valor de uma variável | [Mudar o valor](#mudar-o-valor) |
+
+**Condições**
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<if condição>>` | Abre um trecho que só aparece se a condição for verdadeira | [Condicionar uma fala](#condicionar-uma-fala) |
+| `<<elseif condição>>` | Dentro de um `<<if>>`: outro trecho, testado só se os anteriores falharam | [Condicionar uma fala](#condicionar-uma-fala) |
+| `<<else>>` | Dentro de um `<<if>>`: o trecho que aparece se nenhuma condição valeu | [Condicionar uma fala](#condicionar-uma-fala) |
+| `<<endif>>` | Fecha o `<<if>>` | [Condicionar uma fala](#condicionar-uma-fala) |
+| `-> texto <<if condição>>` | No fim de uma opção: ela aparece bloqueada se a condição for falsa | [Condicionar uma opção](#condicionar-uma-opção) |
+
+**Itens**
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<dar_item id>>` | Coloca um item no inventário do jogador | [Itens](#itens) |
+| `<<remover_item id>>` | Tira um item do inventário | [Itens](#itens) |
+
+**Perguntas para usar em uma condição**
+
+Estas não são comandos: não levam `<<` `>>` e só valem dentro de um `<<if>>` ou `<<elseif>>`.
+
+| Pergunta | O que responde | Explicado em |
+|---|---|---|
+| `tem_item("id")` | O jogador tem o item? | [Itens](#itens) |
+| `visited("nome_do_no")` | O jogador já passou por aquele nó? | [Condicionar uma fala](#condicionar-uma-fala) |
+
+**Ainda não existem**
+
+Não escreva estes; enquanto a issue não entrar, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
+
+| Comando | O que vai fazer | Entra com |
+|---|---|---|
+| Expressão do personagem | *a definir* | issue #10 |
+| `<<tocar_musica id>>` | Trocar a música | issue #20 |
+| `<<tocar_efeito id>>` | Tocar um efeito sonoro | issue #20 |
 
 ### Itens
 
