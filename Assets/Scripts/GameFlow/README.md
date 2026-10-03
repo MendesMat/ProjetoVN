@@ -14,7 +14,7 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 - **`States/`**: Os estados concretos:
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
-- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
+- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
 - **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e o **estado da história** (`StoryState`, do módulo `Core`: booleanos, números e textos). Ainda não há menu de save; na cena de teste, use o painel de debug.
   - O save tem **um formato único**: `GameState` guarda o estado da história em três listas de pares nome e valor (`storyBools`, `storyNumbers`, `storyTexts`, tipos em `StoryEntries.cs`), porque o `JsonUtility` não serializa dicionários. Não há campo nem conversão de formato anterior (D-20).
   - `StoryStatePersistence` (C# puro, estático) faz a cópia entre o `StoryState` e o `GameState`: `Capture` no `Save()` e `Restore` no `Load()`. Fica fora do `GameSaveManager`, que é `MonoBehaviour` e lê arquivo, para a cópia ser testável em EditMode. Acesso a arquivo continua só no `GameSaveManager`.
@@ -32,6 +32,19 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - `OnOpened` é o que mantém o portão aberto: como ele também roda no `Start()`, recarregar a cena ou carregar um save traz o portão de volta já aberto. **Nunca ligue nele algo iniciado pelo jogador** — uma troca de cena ligada ali teleportaria o jogador sozinho ao carregar. Isso pertence ao `OnAlreadyUnlocked`, que só dispara por clique.
   - Ao autorar, a flag é checada **antes** do item, para que um portão que exige os dois não gaste a chave só para descobrir que a flag não estava ligada.
   - *Limitação conhecida:* um `Load()` no meio da cena restaura a flag, mas o `Start()` já rodou, então a aparência do portão só se acerta ao recarregar a cena — o mesmo comportamento do `CollectableItemBehaviour`. É para isso que o painel de debug tem o botão **Reload Scene** ao lado do Load.
+- **`ItemScriptActions`**: os comandos e a função de roteiro que ligam o diálogo ao inventário. Mora aqui porque o `Dialogue` não referencia o `Inventory` (D-01), e o `GameFlow` enxerga os dois. É por ele que o asmdef do `GameFlow` referencia o pacote Yarn Spinner (`YarnSpinner.Unity`).
+
+    | No roteiro | Método | O que faz |
+    |---|---|---|
+    | `<<dar_item id>>` | `GiveItem` | `InventoryManager.Collect`. Já ter o item não é erro, e não entra uma segunda cópia |
+    | `<<remover_item id>>` | `RemoveItem` | `InventoryManager.TryUse`. Não ter o item não é erro |
+    | `tem_item("id")` | `HasItem` | `InventoryManager.HasItem`; `false` se o id não existe |
+
+  - Os métodos são **estáticos** porque é assim que o gerador de código do Yarn Spinner os acha sem registro nosso e sem exigir o nome de um GameObject no roteiro. O componente existe para guardar o `ItemRegistry` (campo `itemRegistry`, no `Managers.prefab`), que traduz o id em `ItemDataSO`; o `Instance` estático é zerado em `SubsystemRegistration` (D-29).
+  - São comando e consulta: chamada direta ao `InventoryManager` (D-05). Não há mensagem nova; o painel reage a `ItemCollectedMessage` e `ItemUsedMessage`, que o inventário já publica.
+  - Um id que não está no `ItemRegistry` loga `[ItemScriptActions] <<dar_item x>>: o item 'x' não existe no ItemRegistry (nó '...'). Ignorado.` e a conversa segue. O nome do nó vem de `DialogueManager.CurrentNodeName`.
+  - O teste `ProjectScripts_CiteOnlyItemIdsThatExistInTheItemRegistry` confere todo id citado nos roteiros contra o `ItemRegistry`, e reprova id não literal.
+  - *Limitação conhecida:* um comando com o número errado de parâmetros trava a conversa (comportamento do pacote, #37). O teste acima reprova esse roteiro antes do Play.
 - **`DevTools/PlaceholderTint`**: Marcador visual provisório. Hoje está ligado ao **`OnOpened`** da porta de `[Teste] Mecanicas`, pintando-a de verde — ou seja, verde quer dizer "esta porta está aberta", e não "você clicou nela". Existe como componente porque um `UnityEvent` do Inspector não aceita argumento do tipo `Color`, então não dá para ligar `SpriteRenderer.color` direto. Troque pela arte de porta aberta quando existir.
 - **`StoryVariableNameCheck`**: o aviso de autoria que o `OnValidate` do portão mostra quando um campo de variável está fora do formato (`StoryVariableName.FollowsConvention`, no `Core`).
 - **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
@@ -88,7 +101,6 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #6 | Entram os comandos de roteiro que ligam diálogo a inventário (`dar_item`, `remover_item`, `tem_item`). O `GameFlow` passará a referenciar o Yarn Spinner nessa issue |
 | #9 | O bootstrap passa a criar também o prefab da interface de jogo |
 | #12, #13 | Troca de sala com estado de transição; saídas e pontos de entrada |
 | #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |
