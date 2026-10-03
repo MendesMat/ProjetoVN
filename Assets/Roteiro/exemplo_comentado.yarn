@@ -24,9 +24,11 @@ title: exemplo_apresentacao
 ---
 // NARRAÇÃO: uma linha sem "Nome:" no começo é narração. O jogo mostra o texto
 // sem placa de nome.
-// Cuidado: narração que começa com uma palavra e dois-pontos
-// ("Atenção: a porta fechou.") vira fala de uma personagem chamada "Atenção".
-// Reescreva a frase sem os dois-pontos no começo.
+// Cuidado: qualquer dois-pontos numa narração, em qualquer lugar da linha,
+// faz o que vem antes virar o nome de uma personagem. "Atenção: a porta
+// fechou." vira fala de "Atenção"; "Eram 10:30 da manhã." vira fala de
+// "Eram 10". Nem o editor nem os testes avisam. Reescreva a frase sem os
+// dois-pontos ou, se não houver jeito, escape com barra: "Eram 10\:30 da manhã."
 Uma sala de aula vazia. Dá para ouvir o relógio.
 
 // FALA: o nome de quem fala, dois-pontos, espaço e o texto. Escreva o nome
@@ -91,7 +93,8 @@ Gótica: O que você achou da escola?
 // Aqui voltam todos os caminhos que não usaram <<stop>>.
 
 // VISITED: visited("nó") diz se o jogador já passou por aquele nó nesta
-// sessão de jogo. O nome do nó vai entre aspas.
+// partida (a lembrança vai junto quando ele salva e carrega). O nome do nó
+// vai entre aspas.
 <<if visited("exemplo_apresentacao_pergunta")>>
     Gótica: E então? Respondi o que você queria?
 <<endif>>
