@@ -12,15 +12,12 @@
 // cena, então o jogador nunca o encontra.
 // ============================================================================
 
-// Todo arquivo de roteiro começa com um cabeçalho como o de baixo: ato,
-// capítulo, episódio e o título do episódio; onde e com quem a conversa
-// acontece; e um resumo. O arquivo fica na pasta do episódio, por exemplo
+// Todo arquivo de roteiro começa com uma linha de título como a de baixo:
+// ato, capítulo, episódio e o nome do episódio. O arquivo fica na pasta do
+// episódio, por exemplo
 // Assets/Roteiro/ato_1/capitulo_1/episodio_1/gotica_primeiro_oi.yarn.
 
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
-// Onde: sala de aula, antes da primeira aula
-// Quem: Gótica
-// Resumo: a Gótica puxa conversa com o aluno novo.
 
 
 // Um arquivo é uma lista de NÓS. Cada nó é uma conversa (ou um pedaço dela) e

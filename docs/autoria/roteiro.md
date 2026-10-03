@@ -23,7 +23,7 @@ Se é a sua primeira vez, comece instalando os programas: [Na primeira vez: prep
 
 ## Como organizar a história
 
-A história é dividida em **atos**, cada ato em **capítulos**, cada capítulo em **episódios**. O episódio é a menor unidade: uma cena ou uma sequência curta de cenas. As pastas seguem essa divisão, e todo arquivo começa com um título que diz onde ele se encaixa.
+A história é dividida em **atos**, cada ato em **capítulos**, cada capítulo em **episódios**. O episódio é a menor unidade: uma cena ou uma sequência curta de cenas. As pastas seguem essa divisão, e todo arquivo começa com uma linha de título que diz onde ele se encaixa.
 
 Organizar assim serve para qualquer pessoa da equipe achar um texto sabendo só em que ponto da história ele acontece.
 
@@ -48,48 +48,38 @@ Assets/Roteiro/
 - As pastas se chamam `ato_1`, `capitulo_1`, `episodio_1`: a palavra, `_` e o número. Sem acento e sem título no nome da pasta.
 - **Um arquivo por conversa.** O nome do arquivo é o nome da conversa: `gotica_chave_perdida.yarn`.
 - Se a pasta do ato, do capítulo ou do episódio ainda não existe, crie.
-- Uma conversa que vale para vários episódios (a descrição de um objeto que fica sempre na sala, por exemplo) fica na pasta do **primeiro** episódio em que ela aparece. Diga isso no cabeçalho.
+- Uma conversa que vale para vários episódios (a descrição de um objeto que fica sempre na sala, por exemplo) fica na pasta do **primeiro** episódio em que ela aparece.
 
 Três coisas em `Assets/Roteiro/` não são suas, e você não mexe nelas: a pasta `Testes/`, o arquivo `Roteiro.yarnproject` e o arquivo `exemplo_comentado.yarn` (pode ler e copiar trechos dele, mas não alterar).
 
-### O cabeçalho de cada arquivo
+### A linha de título de cada arquivo
 
-Todo arquivo começa com um cabeçalho de quatro linhas. Cada linha começa com `//`, que marca um comentário: o jogador nunca vê e o jogo ignora.
+Todo arquivo começa com **uma linha de título**, que diz o ato, o capítulo, o episódio e o nome do episódio:
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida
-// Onde: corredor, no intervalo
-// Quem: Gótica
-// Resumo: a Gótica procura a chave do armário. O que o protagonista faz
-// com a chave muda a afinidade.
 ```
 
-| Linha | O que escrever | Exemplo |
-|---|---|---|
-| Título | Ato, capítulo, episódio e o **título do episódio**, em maiúsculas e minúsculas normais | `// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida` |
-| Onde | O lugar e o momento | `// Onde: corredor, no intervalo` |
-| Quem | As personagens que falam | `// Quem: Gótica` |
-| Resumo | Uma ou duas frases: o que acontece e o que muda | `// Resumo: a Gótica procura a chave…` |
+A linha começa com `//`, que marca um comentário: o jogador nunca vê e o jogo ignora. Ela existe para quem abre o arquivo saber, de cara, em que ponto da história ele está.
 
-**Dê título a todo episódio.** "Episódio 2" não diz nada a quem procura um texto; "A chave perdida" diz. Arquivos do mesmo episódio repetem o mesmo título:
+**Dê nome a todo episódio.** "Episódio 2" não diz nada a quem procura um texto; "A chave perdida" diz. Mais exemplos:
+
+```
+// ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
+// ATO 1 · CAPÍTULO 1 · EPISÓDIO 3 · O ensaio
+// ATO 1 · CAPÍTULO 2 · EPISÓDIO 1 · A biblioteca fechada
+```
+
+Arquivos do mesmo episódio repetem a mesma linha:
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida     ← em corredor_bebedouro.yarn
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida     ← em gotica_chave_perdida.yarn
 ```
 
-Outro exemplo, de uma conversa que serve a mais de um episódio:
-
-```
-// ATO 1 · CAPÍTULO 2 · EPISÓDIO 1 · A biblioteca fechada
-// Onde: porta da biblioteca
-// Quem: o protagonista, sozinho
-// Resumo: descrição da porta trancada. Vale do episódio 1 ao 3 deste capítulo.
-```
-
 ## Estrutura de um arquivo
 
-Depois do cabeçalho vem a conversa. No Yarn, uma conversa (ou um pedaço de conversa) se chama **nó**. Um nó tem sempre três partes:
+Depois da linha de título vem a conversa. No Yarn, uma conversa (ou um pedaço de conversa) se chama **nó**. Um nó tem sempre três partes:
 
 ```
 title: gotica_primeiro_oi
@@ -111,9 +101,6 @@ Um arquivo completo, então, fica assim:
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
-// Onde: sala de aula, antes da primeira aula
-// Quem: Gótica
-// Resumo: a Gótica puxa conversa com o aluno novo.
 
 title: gotica_primeiro_oi
 ---
@@ -141,7 +128,7 @@ Quem monta a cena no jogo digita o nome do nó em um campo de texto, letra por l
 | `corredor_bebedouro` | `corredor-bebedouro` | Hífen não vale; use `_`. |
 | `gotica_chave_perdida` | `conversa2` | Não diz quem fala nem sobre o quê. |
 
-O nome do nó **não** leva ato, capítulo nem episódio: isso já está na pasta e no cabeçalho.
+O nome do nó **não** leva ato, capítulo nem episódio: isso já está na pasta e na linha de título.
 
 **Nunca apague nem renomeie um nó que já foi entregue** sem avisar o Matheus. A cena guarda o nome como texto; se o nó mudar de nome, o objeto para de responder ao clique, sem aviso.
 
@@ -254,7 +241,7 @@ Gótica: Uma com um morcego no chaveiro. E aí?
 -> Vi. Estava embaixo do bebedouro.
     Gótica: Sério?
 -> Não vi nada.
-    Gótica: Engraçado. O seu bolso está tilintando.
+    Gótica: Droga. Se você achar, me avisa?
 ```
 
 Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros.
@@ -567,7 +554,7 @@ Quando um item novo entrar no jogo, o Matheus acrescenta uma linha a esta tabela
 |---|---|---|
 | Pasta | `ato_N/capitulo_N/episodio_N/` | `Assets/Roteiro/ato_1/capitulo_1/episodio_2/` |
 | Arquivo | o nome do nó de entrada + `.yarn` | `gotica_chave_perdida.yarn` |
-| Título do episódio (no cabeçalho) | português normal, com acento | `A chave perdida` |
+| Nome do episódio (na linha de título) | português normal, com acento | `A chave perdida` |
 | Nó de entrada | `<quem_ou_onde>_<assunto>` | `gotica_chave_perdida` |
 | Nó interno | o nome do nó de entrada + `_` + o assunto | `gotica_chave_perdida_devolveu` |
 | Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_gotica` |
@@ -702,7 +689,7 @@ O exemplo acompanha a Ana, que vai escrever a conversa da chave perdida.
    Assets/Roteiro/ato_1/capitulo_1/episodio_2/gotica_chave_perdida.yarn
    ```
 
-   Comece pelo [cabeçalho](#o-cabeçalho-de-cada-arquivo).
+   Comece pela [linha de título](#a-linha-de-título-de-cada-arquivo).
 4. **Confira.** Painel *Problems* sem vermelho e sem amarelo, e a lista de [O que o editor não confere](#o-que-o-editor-não-confere).
 5. **Faça o commit.** No GitHub Desktop, a lista à esquerda mostra os arquivos que mudaram. **Deixe marcados só os que estão em `Assets/Roteiro/`**; desmarque qualquer outro. No campo de resumo, escreva o ato, o capítulo, o episódio e o título:
 
@@ -763,9 +750,6 @@ Três conversas que contam uma história só: o protagonista acha uma chave no c
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida
-// Onde: corredor, no intervalo
-// Quem: o protagonista, sozinho
-// Resumo: ele acha uma chave embaixo do bebedouro.
 
 title: corredor_bebedouro
 ---
@@ -785,10 +769,6 @@ Guardei no bolso. Alguém deve estar procurando por ela.
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida
-// Onde: corredor, no intervalo
-// Quem: Gótica
-// Resumo: a Gótica procura a chave do armário. O que o protagonista faz
-// com a chave muda a afinidade.
 
 title: gotica_chave_perdida
 ---
@@ -812,11 +792,11 @@ Gótica: E aí? Viu ou não viu?
     // PERDA de afinidade. Ele entrega a chave mesmo assim.
     <<set $afinidade_gotica to $afinidade_gotica - 1>>
     <<remover_item chave_teste>>
-    Gótica: Ganha eu não contar pra ninguém que você tentou.
+    Gótica: Não ganha nada. Ser uma pessoa decente é o mínimo.
 -> Não vi nada.
     // Sem ganho nem perda de afinidade. O protagonista fica com a chave.
-    Gótica: Engraçado. O seu bolso está tilintando.
-    Gótica: Quando lembrar onde não viu, me procura.
+    Gótica: Droga. Deve ter caído em outro lugar.
+    Gótica: Se você achar, me avisa?
     <<stop>>
 
 // Aqui chegam os dois caminhos em que a chave foi devolvida.
@@ -833,10 +813,6 @@ Gótica: E aí? Viu ou não viu?
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 3 · O ensaio
-// Onde: sala de aula, no fim da aula
-// Quem: Gótica
-// Resumo: ela vai ensaiar com a banda. Só quem ganhou a confiança dela
-// pode pedir para assistir.
 
 title: gotica_fim_da_aula
 ---
@@ -856,4 +832,4 @@ O que cada escolha da conversa da chave causa:
 |---|---|---|---|---|
 | "Vi. Estava embaixo do bebedouro." | é devolvida | sobe 1 | "Fico te devendo uma. E eu pago o que devo." | liberada |
 | "Depende. O que eu ganho com isso?" | é devolvida | desce 1 | "Da próxima vez, devolve sem fazer graça." | bloqueada |
-| "Não vi nada." | fica com ele | não muda | "Quando lembrar onde não viu, me procura." | bloqueada |
+| "Não vi nada." | fica com ele | não muda | "Se você achar, me avisa?" | bloqueada |

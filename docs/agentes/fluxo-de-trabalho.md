@@ -85,7 +85,7 @@ Quem escreve roteiro entrega por um fluxo à parte, descrito para o roteirista e
 - Ele vem de um roteirista (colaborador do repositório), em uma branch `roteiro/<nome>-<assunto>`, **sem issue e sem as três sessões**. O título do PR traz ato, capítulo, episódio e o título do episódio (`Ato 1, Cap. 1, Ep. 2: A chave perdida`); o texto lista os arquivos, os nós de entrada, onde a conversa entra na história, as variáveis novas e os pedidos.
 - A regra "uma issue por vez" **não conta** PR de roteiro: ele não disputa lugar com a issue em andamento.
 - Quem integra é o Matheus: gera os `.meta`, reimporta o `Roteiro.yarnproject`, roda os testes e abre a conversa no jogo (receita em [unity-cli.md](unity-cli.md#receber-um-roteiro-pr-de-roteirista)), e faz o merge por *squash* com a branch apagada. O agente só faz o que o Matheus pedir.
-- O PR de roteiro mexe só em `Assets/Roteiro/` (e nos `.meta`), em pastas `ato_N/capitulo_N/episodio_N/`, um arquivo por conversa, cada um com o cabeçalho de título descrito no guia. Se tocar em qualquer outra coisa, não é PR de roteiro: devolva ao roteirista.
+- O PR de roteiro mexe só em `Assets/Roteiro/` (e nos `.meta`), em pastas `ato_N/capitulo_N/episodio_N/`, um arquivo por conversa, cada um começando pela linha de título descrita no guia (`// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida`). Se tocar em qualquer outra coisa, não é PR de roteiro: devolva ao roteirista.
 - Um pedido de comando, item, personagem ou som que o roteirista deixou em `// PEDIDO` vira issue (com a label `triagem`), não é feito no PR de roteiro.
 
 ## Regras de foco
