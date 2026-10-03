@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3163852298196397563}
   - component: {fileID: 7320409207393300824}
   - component: {fileID: 1119890017147649609}
+  - component: {fileID: 2701538978368167837}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -161,3 +162,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2701538978368167837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5786306404eee484cab23759f2936d8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.ItemScriptActions
+  itemRegistry: {fileID: 11400000, guid: e70a9b732ab633f429ff272e35a516e2, type: 2}

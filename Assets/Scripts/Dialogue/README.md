@@ -4,7 +4,7 @@ O módulo `Dialogue` é um **adaptador fino** entre o [Yarn Spinner](https://doc
 
 > **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) (D-05, D-06, D-11, D-12, D-17, D-18, D-22) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md) · [armadilhas do Yarn Spinner](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)
 
-O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmdef` referencia `YarnSpinner.Unity` e duas DLLs do pacote). Ele **não** referencia `Inventory`: os comandos de roteiro que mexem em itens (`<<dar_item>>`, issue #6) moram no `GameFlow`.
+O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmdef` referencia `YarnSpinner.Unity` e duas DLLs do pacote). Ele **não** referencia `Inventory`: os comandos de roteiro que mexem em itens (`<<dar_item>>`, `<<remover_item>>`, `tem_item()`) moram no `GameFlow` (`ItemScriptActions`).
 
 ---
 
@@ -50,6 +50,7 @@ Só então o `DialogueRunner` começa, e a conversa continua com:
 - `AdvanceDialogue()`: pede a próxima fala (`RequestNextLine`). Com escolhas na tela, não faz nada: o clique não pula a escolha.
 - `MakeChoice(int)`: repassa o botão clicado ao apresentador.
 - `IsDialogueActive()`: há uma conversa em curso.
+- `CurrentNodeName`: o nome do nó em que o roteiro está, ou `null` fora de uma conversa. É `string` de propósito, para quem está fora do módulo dizer o nó em uma mensagem de erro sem depender de tipo do Yarn.
 
 ---
 
@@ -121,7 +122,6 @@ O módulo não conhece o `GameFlow` nem o `PointNClick`: a direção das depend�
 
 ## O que ainda não existe
 
-- Comandos de roteiro para itens (`<<dar_item>>`, `<<remover_item>>`, `tem_item()`): issue #6. Até lá, a Gótica de teste não entrega a chave.
 - Condições nas escolhas (opção indisponível desabilitada, em vez de escondida) e afinidade: issue #7.
 - Retrato do personagem: issue #10. Texto revelado aos poucos: issue #11.
 - Seletor de nó no Inspector: issue #32.

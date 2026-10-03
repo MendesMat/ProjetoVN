@@ -138,6 +138,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 
 ### D-22 — Vocabulário do roteiro em português
 - **Decisão:** tudo o que o roteirista digita é em português: comandos (`<<dar_item chave>>`), variáveis (`$afinidade_gotica`) e nomes de nó. Identificadores de C# são em inglês. Mensagens de log, comentários e documentação são em português.
+- **Formato do id de item:** minúsculas sem acento, dígitos e `_` (`chave_teste`), igual aos nomes de nó e de variável. O roteiro cita o id sempre como literal (`<<dar_item chave_teste>>`, `tem_item("chave_teste")`), nunca por variável ou expressão; um teste EditMode confere cada id citado contra o `ItemRegistry`. Não há validação automática do formato no `ItemDataSO`.
 - **Por quê:** os roteiristas escrevem em português. Mudar isso depois que houver roteiro escrito é caro.
 
 ### D-21 — Personagem como dado
@@ -238,6 +239,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo Matheus no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
 | 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo Matheus no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
 | 2026-10-02 | **Revistas:** D-11 e D-12 saem de "a rever", com os textos aprovados pelo Matheus no levantamento da #5. D-12: fala e escolhas passam do `MessageBroker` para chamada direta do Yarn Spinner ao apresentador, e `DialogueLineMessage` e `DialogueChoicesMessage` deixam de existir. D-11: o vetor fixo de quatro botões vale para o apresentador do Yarn. **Nota nova na D-06** sobre o diálogo assíncrono (`YarnTask`). **D-17:** o pacote entra em `main` e o plano B deixa de existir. |
+| 2026-10-03 | **Revista:** D-22 ganha o formato do id de item (minúsculas sem acento, dígitos e `_`; sempre literal no roteiro), decidido pelo Matheus no levantamento da #6. O único item do projeto passou de `item-teste-01` para `chave_teste`. **D-01:** duas referências de asmdef autorizadas pelo Matheus na #6, sem inverter seta nem criar ciclo: `GameFlow` → pacote Yarn Spinner (para `[YarnCommand]` e `[YarnFunction]`) e `Tests` → `Inventory` (para o teste de ids usar o `ItemRegistry`). |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

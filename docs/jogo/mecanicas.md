@@ -7,9 +7,9 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | Mecânica | Estado | Módulo | Issues |
 |---|---|---|---|
 | [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
-| [Inventário](#inventário) | existe | `Inventory`, `UI` | #6 |
+| [Inventário](#inventário) | existe | `Inventory`, `UI` | — |
 | [Portões](#portões) | existe | `GameFlow` | #7 |
-| [Diálogo](#diálogo) | parcial | `Dialogue` | #6, #7, #11 |
+| [Diálogo](#diálogo) | parcial | `Dialogue` | #7, #11 |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #7 |
 | [Personagens](#personagens) | planejada | — | #10, #26 |
@@ -46,9 +46,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O mesmo item não entra duas vezes; não há quantidades.
 - O painel sempre reflete o inventário, mesmo se o item foi coletado com o painel fechado.
 - Um objeto coletado não reaparece ao recarregar a cena.
-
-**Falta:**
-- O roteiro dar, tirar e consultar itens por comando (#6). Até lá, nada liga diálogo a inventário: a Gótica de teste não entrega mais a chave, que se pega do chão.
+- O roteiro dá, tira e consulta itens: `<<dar_item id>>`, `<<remover_item id>>` e `tem_item("id")`. Dar um item que o jogador já tem e remover um que ele não tem não são erro, e `dar_item` repetido nunca deixa duas cópias. Na cena de teste, a Gótica entrega a chave pelo roteiro e a porta abre com ela.
 
 **Fora do escopo:** usar ou examinar um item pelo painel; combinar itens.
 
@@ -79,12 +77,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - As variáveis do roteiro (`$falou_com_gotica`) leem e gravam no estado da história.
 - Narração (fala sem nome de personagem) esconde a placa de nome.
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
+- Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
 
 **Falta:**
-- Comandos de roteiro para dar, tirar e consultar itens (#6).
 - Condições nas escolhas e afinidade (#7).
 - Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
 - O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
+
+**Limitação conhecida:** um comando com o número errado de parâmetros (`<<dar_item>>` sem id, ou com dois) trava a conversa (#37). Para os comandos de item, o teste automático dos roteiros reprova esse erro antes do Play.
 
 **Regras:**
 - Iniciar um diálogo é um comando direto ao dono.

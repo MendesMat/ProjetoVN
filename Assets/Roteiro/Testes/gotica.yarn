@@ -1,7 +1,6 @@
 title: gotica_cheguei_cedo
 ---
 <<declare $falou_com_gotica = false>>
-// A Gótica volta a entregar a chave na issue #6, com <<dar_item>>.
 Gótica: Acho que cheguei muito cedo...
 -> Sim
     <<set $falou_com_gotica to true>>
@@ -11,6 +10,10 @@ Gótica: Acho que cheguei muito cedo...
 -> Talvez
     <<detour gotica_resposta_talvez>>
 Gótica: A escola está mais quieta do que eu imaginava.
+<<if not tem_item("chave_teste")>>
+    Gótica: Toma, achei esta chave no corredor.
+    <<dar_item chave_teste>>
+<<endif>>
 <<jump gotica_cadeira_no_fundo>>
 ===
 title: gotica_resposta_sim

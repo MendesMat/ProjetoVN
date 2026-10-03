@@ -10,9 +10,9 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Adaptador do Yarn Spinner: iniciar, avançar e escolher; input e interface do diálogo | `Core` e o pacote Yarn Spinner |
 | `Inventory` | [Inventory/](../../Assets/Scripts/Inventory/README.md) | Itens do jogador, objeto coletável, registro de itens | `Core` |
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
-| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo | `Core`, `Dialogue`, `Inventory`, `PointNClick` |
+| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick` e o pacote Yarn Spinner |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
-| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow` e o pacote Yarn Spinner |
+| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow`, `Inventory` e o pacote Yarn Spinner |
 
 ```
 Core ◄── Dialogue ◄──┐
@@ -39,7 +39,7 @@ O padrão se repete em todos os módulos (decisão D-03):
 
 ## Ciclo de vida
 
-- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager` e `GameSaveManager`.
+- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes.**
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
 - Dar Play a partir de qualquer cena funciona, porque o bootstrap não depende de uma cena inicial.
@@ -54,7 +54,7 @@ Esta tabela é a referência única do projeto (decisão D-05).
 | **Consulta:** você precisa de uma resposta | Chamada direta ou propriedade. **Nunca** pergunta e resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
 | **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
 | **Notificação:** "X aconteceu", zero ou mais ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`, nome no passado) | `DialogueStartedMessage`, `ItemCollectedMessage` |
-| **Efeito de história:** um diálogo muda o estado do jogo | Variável do roteiro (`<<set $x to true>>`), que grava direto no `StoryState`; comandos de roteiro para o resto (#6) | `$falou_com_gotica` |
+| **Efeito de história:** um diálogo muda o estado do jogo | Variável do roteiro (`<<set $x to true>>`), que grava direto no `StoryState`; comando de roteiro para o resto, implementado no `GameFlow` como chamada direta ao dono | `$falou_com_gotica`, `<<dar_item chave_teste>>` |
 | **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect`, `Interact`, `TriggerDialogue` |
 | **Um módulo precisa consultar outro que não pode referenciar** | Interface pequena, de posse do módulo que consulta | Nenhum caso hoje |
 
@@ -124,6 +124,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o chama pelo nome no `InteractableDialogueTrigger` |
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
+| Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
 
 ## O que vai mudar
@@ -132,7 +133,7 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| Comandos de roteiro para o inventário; condições e afinidade | #6, #7 |
+| Condições e afinidade | #7 |
 | A interface de jogo sai das cenas e vira prefab persistente | #9 |
 | Troca de sala e estado de transição | #12 |
 | Save automático e carregamento que recarrega a cena | #16 |

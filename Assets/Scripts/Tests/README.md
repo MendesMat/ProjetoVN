@@ -13,7 +13,9 @@ unity command run_tests --mode EditMode --timeout 180
 - **`MessageBrokerTests`**: entrega, cancelamento de assinatura, assinatura duplicada, isolamento de exceções, `Clear`, e o comportamento de snapshot quando alguém assina durante um despacho.
 - **`StoryStateVariablesTests`**: o armazenamento de variáveis do Yarn sobre o `StoryState`: gravar e ler cada tipo, ler o que foi gravado por fora, sem conversão silenciosa de tipo, nome sem `$` com aviso, `Clear`.
 - **`ScriptVariablesTests`**: roteiros curtos de verdade sobre o `StoryState`: `<<set>>`, `<<if>>`, valor inicial declarado, incremento, `visited()` (com o contador no `StoryState`), texto interpolado e a etiqueta `lastline` que o apresentador usa.
-- **`ScriptContentTests`**: os arquivos reais de `Assets/Roteiro/` compilam sem erro **nem aviso** (pega `<<jump>>` para nó inexistente, variável não declarada e código inalcançável antes do Play), têm os nós esperados e dizem o que o jogo mostra.
+- **`ScriptContentTests`**: os arquivos reais de `Assets/Roteiro/` compilam sem erro **nem aviso** (pega `<<jump>>` para nó inexistente, variável não declarada e código inalcançável antes do Play), têm os nós esperados e dizem o que o jogo mostra. Todo id de item citado existe no único `ItemRegistry` do projeto e é literal (`ProjectScripts_CiteOnlyItemIdsThatExistInTheItemRegistry`).
+- **`ScriptItemReferencesTests`**: o `ScriptItemReferences`, que lê do roteiro compilado cada `dar_item`, `remover_item` e `tem_item` com o nó e o id, e separa as referências sem id literal (variável, expressão, id ausente, parâmetro a mais). Lê o programa, não o texto, então um comando em comentário não conta.
+- **`ScriptItemCommandsTests`**: `tem_item` em uma condição, com e sem o item, e o texto que `dar_item` e `remover_item` entregam ao jogo.
 - **`ConversationNotifierTests`**: um `DialogueStartedMessage` e um `DialogueEndedMessage` por conversa, e nunca um Ended sem Started.
 - **`ScriptNodeNameTests`**: o formato dos nomes de nó.
 - **`StoryVariableNameTests`**: as duas regras de nome: o que o armazenamento aceita (inclusive os nomes internos do Yarn) e o que quem monta cena pode digitar.
@@ -24,8 +26,9 @@ unity command run_tests --mode EditMode --timeout 180
 > **Lacuna conhecida e deliberada:** `LockedActionBehaviour`, o `DialogueManager`, o apresentador
 > `DialogueUIController` e o `InteractableDialogueTrigger` não têm teste de EditMode. Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
 > a regra "C# puro, sem GameObjects" desta suíte; o `LockedActionBehaviour` ainda por cima é um
-> `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando, e a `Tests.asmdef`
-> nem referencia `ProjetoVN.Inventory`. São verificados em Play Mode na cena `[Teste] Mecanicas`
+> `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando. O `ItemScriptActions`
+> é cola entre três singletons e fica na mesma lacuna. A `Tests.asmdef` referencia `ProjetoVN.Inventory`
+> só para o teste de ids usar o `ItemRegistry`. São verificados em Play Mode na cena `[Teste] Mecanicas`
 > (o roteiro de verificação de cada issue). O que o `DialogueManager` decide sem Unity mora em classes
 > puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`.
 >
@@ -47,7 +50,7 @@ unity command run_tests --mode EditMode --timeout 180
 - **Fase vermelha no Unity:** um teste que cita uma API que ainda não existe é erro de compilação, e a suíte inteira deixa de rodar. Crie a assinatura vazia primeiro, para o teste falhar por asserção.
 - **Para testar um roteiro, use o `ScriptRun`** (`EditMode/ScriptRun.cs`): `ScriptRun.FromText("title: no
 ---
-...")` compila um texto, `ScriptRun.FromProjectFiles()` compila os `.yarn` de `Assets/Roteiro/`, e `Start`, `Choose`, `Lines`, `OptionTexts`, `Completed` e `ErrorsAndWarnings` dizem o que o jogador veria. Ele roda sobre o `StoryState` de verdade, então o `SetUp` e o `TearDown` chamam `StoryState.ClearAll()`. Escreva `Yarn.Dialogue` por extenso: dentro de `ProjetoVN.*`, `Dialogue` é o namespace.
+...")` compila um texto, `ScriptRun.FromProjectFiles()` compila os `.yarn` de `Assets/Roteiro/`, e `Start`, `Choose`, `Lines`, `OptionTexts`, `Completed` e `ErrorsAndWarnings` dizem o que o jogador veria; `Commands` guarda o texto de cada comando, `OwnedItems` é o inventário que `tem_item` consulta e `Program` é o roteiro compilado. Ele roda sobre o `StoryState` de verdade, então o `SetUp` e o `TearDown` chamam `StoryState.ClearAll()`. Escreva `Yarn.Dialogue` por extenso: dentro de `ProjetoVN.*`, `Dialogue` é o namespace.
 - O `.asmdef` deste módulo é restrito ao ambiente de testes, então ele não entra na build final do jogo.
 
 ---
