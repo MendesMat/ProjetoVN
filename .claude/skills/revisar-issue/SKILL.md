@@ -1,6 +1,6 @@
 ---
 name: revisar-issue
-description: Fase 3 do fluxo do ProjetoVN. Revisa o PR de uma issue do GitHub contra a issue, os comentários e a documentação, e publica um parecer no PR. Não altera código. Use quando o Matheus disser "/revisar-issue N", "revisar a issue N" ou pedir a revisão de uma issue ou do PR dela.
+description: Fase 3 do fluxo do ProjetoVN. Revisa o PR de uma issue do GitHub contra a issue, os comentários e a documentação, e publica um parecer no PR. Não altera código. Use quando o programador disser "/revisar-issue N", "revisar a issue N" ou pedir a revisão de uma issue ou do PR dela.
 argument-hint: <número da issue>
 disable-model-invocation: true
 ---
@@ -31,7 +31,7 @@ Forme a sua expectativa antes de ver a solução:
 1. `CLAUDE.md`
 2. `docs/arquitetura/decisoes.md`
 3. `docs/agentes/skills.md` (a seção sobre a `clean-code` neste projeto)
-4. A issue inteira e todos os comentários: critérios de aceite, levantamento, respostas do Matheus
+4. A issue inteira e todos os comentários: critérios de aceite, levantamento, respostas do programador
 5. Os documentos citados na issue e no levantamento
 
 Só então leia o PR:
@@ -149,4 +149,4 @@ git checkout main
 
 ## 7. Encerrar
 
-Diga ao Matheus, em poucas linhas: o veredito, o que bloqueia (se algo), e o próximo passo: o merge é dele se aprovado, ou `/executar-issue $ARGUMENTS` em uma conversa nova se há mudanças pedidas.
+Diga ao programador, em poucas linhas: o veredito, o que bloqueia (se algo), e o próximo passo: o merge é dele se aprovado, ou `/executar-issue $ARGUMENTS` em uma conversa nova se há mudanças pedidas.

@@ -5,7 +5,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 **Como usar:**
 - Antes de "melhorar" qualquer coisa, procure aqui. Várias coisas que parecem melhoráveis foram mantidas de propósito.
 - Uma decisão daqui **prevalece sobre qualquer skill** (ver D-26).
-- Um agente **nunca muda uma decisão por conta própria**. Se uma issue parece exigir isso, ele para, pergunta ao Matheus e, com a resposta, atualiza esta página e o [registro de mudanças](#registro-de-mudanças).
+- Um agente **nunca muda uma decisão por conta própria**. Se uma issue parece exigir isso, ele para, pergunta ao programador e, com a resposta, atualiza esta página e o [registro de mudanças](#registro-de-mudanças).
 - As regras marcadas como **absoluta** não têm exceção. As demais são padrões com gatilho de revisão.
 
 ## Resumo
@@ -127,7 +127,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 ### D-17 — Yarn Spinner para o diálogo
 - **Decisão:** o diálogo será executado pelo Yarn Spinner 3, com roteiros em arquivos `.yarn` dentro de `Assets/Roteiro/`. O módulo `Dialogue` vira um adaptador fino. A instalação é pelo caminho gratuito (URL de git ou OpenUPM).
 - **Por quê:** os roteiristas não usam o Unity. O Yarn Spinner é gratuito (licença MIT), cobre falas, escolhas, saltos, variáveis e condições, e tem extensão de VS Code com verificação de erros, grafo e pré-visualização.
-- **Portão cumprido:** a prova de conceito da issue #3 cumpriu os critérios obrigatórios e o Matheus confirmou o veredito **adotar** em 2026-10-02. A versão provada é a `v3.2.8`, instalada pela URL de git com a tag fixa. O relatório, com as medições e os ajustes das issues seguintes, está nos comentários da #3.
+- **Portão cumprido:** a prova de conceito da issue #3 cumpriu os critérios obrigatórios e o programador confirmou o veredito **adotar** em 2026-10-02. A versão provada é a `v3.2.8`, instalada pela URL de git com a tag fixa. O relatório, com as medições e os ajustes das issues seguintes, está nos comentários da #3.
 - **Instalado pela issue #5:** o pacote `dev.yarnspinner.unity` v3.2.8 entra pela URL de git com a tag fixa (hash `bfc5b6a` no `packages-lock.json`), e o código da prova (PR #28, fechado sem merge) foi refeito no padrão do projeto. O `DialogueManager` é o adaptador, o `DialogueUIController` é o apresentador e o `DialogueRunner` vive no `Managers.prefab`.
 - **Plano B (não acionado):** manter o sistema próprio (`DialogueController` e `DialogueData`) e permitir saltos entre falas dentro do mesmo asset. O sistema próprio foi removido na #5, então o plano B deixou de existir.
 
@@ -225,7 +225,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Regras da suíte:** todo estado estático é limpo no `SetUp` e no `TearDown`; comando e consulta se testam chamando o método, não publicando mensagem.
 
 ### D-26 — Decisão do projeto prevalece sobre skill (absoluta)
-- **Decisão:** quando uma skill recomenda algo que uma decisão desta página proíbe, vale a decisão. O agente segue a decisão e, se achar que ela está errada, **diz isso ao Matheus** em vez de contorná-la.
+- **Decisão:** quando uma skill recomenda algo que uma decisão desta página proíbe, vale a decisão. O agente segue a decisão e, se achar que ela está errada, **diz isso ao programador** em vez de contorná-la.
 - **Detalhes e exemplos:** [../agentes/skills.md](../agentes/skills.md).
 
 ---
@@ -234,14 +234,14 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 
 | Data | Mudança |
 |---|---|
-| 2026-10-01 | Página criada a partir do `ARCHITECTURE_ROADMAP.md`, que foi removido. D-01 a D-15 vieram de lá. **Revistas:** D-06 (assíncrono permitido na apresentação e no carregamento), D-13 (pilha simples de janelas permitida), D-15 (itch.io por download). **Novas:** D-16 a D-29, da entrevista de planejamento com o Matheus. D-11 e D-12 ficam marcadas para revisão na issue #5. |
-| 2026-10-02 | **Nova:** D-30 (histórico de falas), decidida com o Matheus durante o levantamento da #2. O histórico de falas sai do "fora do escopo" e vira a issue #25; o nome do protagonista definido pelo jogador vira a issue #26. As duas entram na fatia vertical. |
-| 2026-10-02 | **Confirmada:** D-17. A prova de conceito da #3 terminou com o veredito "adotar", confirmado pelo Matheus. O plano B não foi acionado. As notas sobre D-06, D-11 e D-12 que o relatório da #3 propõe ficam para a issue #5, que é quem decide essas três. |
-| 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo Matheus no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
-| 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo Matheus no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
-| 2026-10-02 | **Revistas:** D-11 e D-12 saem de "a rever", com os textos aprovados pelo Matheus no levantamento da #5. D-12: fala e escolhas passam do `MessageBroker` para chamada direta do Yarn Spinner ao apresentador, e `DialogueLineMessage` e `DialogueChoicesMessage` deixam de existir. D-11: o vetor fixo de quatro botões vale para o apresentador do Yarn. **Nota nova na D-06** sobre o diálogo assíncrono (`YarnTask`). **D-17:** o pacote entra em `main` e o plano B deixa de existir. |
-| 2026-10-03 | **Revista:** D-22 ganha o formato do id de item (minúsculas sem acento, dígitos e `_`; sempre literal no roteiro), decidido pelo Matheus no levantamento da #6. O único item do projeto passou de `item-teste-01` para `chave_teste`. **D-01:** duas referências de asmdef autorizadas pelo Matheus na #6, sem inverter seta nem criar ciclo: `GameFlow` → pacote Yarn Spinner (para `[YarnCommand]` e `[YarnFunction]`) e `Tests` → `Inventory` (para o teste de ids usar o `ItemRegistry`). |
-| 2026-10-03 | **Revistas (#7):** **D-11** deixa de esconder a opção indisponível: ela aparece desabilitada e conta para o limite de quatro botões; um bloco sem opção disponível não é mostrado (decisão do Matheus no levantamento da #7: mostrar que existem caminhos bloqueados faz o jogador entender que as escolhas têm peso). **D-18** ganha o registro central `variaveis.yarn`. **D-01:** o asmdef `ProjetoVN.Editor` (só Editor; referencia `Core`, `YarnSpinner.Unity` e `YarnSpinner.Unity.Editor`), autorizado pelo Matheus na #7. |
+| 2026-10-01 | Página criada a partir do `ARCHITECTURE_ROADMAP.md`, que foi removido. D-01 a D-15 vieram de lá. **Revistas:** D-06 (assíncrono permitido na apresentação e no carregamento), D-13 (pilha simples de janelas permitida), D-15 (itch.io por download). **Novas:** D-16 a D-29, da entrevista de planejamento com o programador. D-11 e D-12 ficam marcadas para revisão na issue #5. |
+| 2026-10-02 | **Nova:** D-30 (histórico de falas), decidida com o programador durante o levantamento da #2. O histórico de falas sai do "fora do escopo" e vira a issue #25; o nome do protagonista definido pelo jogador vira a issue #26. As duas entram na fatia vertical. |
+| 2026-10-02 | **Confirmada:** D-17. A prova de conceito da #3 terminou com o veredito "adotar", confirmado pelo programador. O plano B não foi acionado. As notas sobre D-06, D-11 e D-12 que o relatório da #3 propõe ficam para a issue #5, que é quem decide essas três. |
+| 2026-10-02 | **Revista:** D-20 ganha a regra do formato único de save, decidida pelo programador no levantamento da #4: o código conhece só o formato atual, sem campo legado, conversão nem teste de formato anterior. |
+| 2026-10-02 | **Revista:** D-18 ganha o formato do nome das variáveis (`$` + minúsculas sem acento, dígitos e `_`, guardado com o `$` em todo lugar), aprovado pelo programador no levantamento da #4. `StoryFlags` foi substituído por `StoryState`. |
+| 2026-10-02 | **Revistas:** D-11 e D-12 saem de "a rever", com os textos aprovados pelo programador no levantamento da #5. D-12: fala e escolhas passam do `MessageBroker` para chamada direta do Yarn Spinner ao apresentador, e `DialogueLineMessage` e `DialogueChoicesMessage` deixam de existir. D-11: o vetor fixo de quatro botões vale para o apresentador do Yarn. **Nota nova na D-06** sobre o diálogo assíncrono (`YarnTask`). **D-17:** o pacote entra em `main` e o plano B deixa de existir. |
+| 2026-10-03 | **Revista:** D-22 ganha o formato do id de item (minúsculas sem acento, dígitos e `_`; sempre literal no roteiro), decidido pelo programador no levantamento da #6. O único item do projeto passou de `item-teste-01` para `chave_teste`. **D-01:** duas referências de asmdef autorizadas pelo programador na #6, sem inverter seta nem criar ciclo: `GameFlow` → pacote Yarn Spinner (para `[YarnCommand]` e `[YarnFunction]`) e `Tests` → `Inventory` (para o teste de ids usar o `ItemRegistry`). |
+| 2026-10-03 | **Revistas (#7):** **D-11** deixa de esconder a opção indisponível: ela aparece desabilitada e conta para o limite de quatro botões; um bloco sem opção disponível não é mostrado (decisão do programador no levantamento da #7: mostrar que existem caminhos bloqueados faz o jogador entender que as escolhas têm peso). **D-18** ganha o registro central `variaveis.yarn`. **D-01:** o asmdef `ProjetoVN.Editor` (só Editor; referencia `Core`, `YarnSpinner.Unity` e `YarnSpinner.Unity.Editor`), autorizado pelo programador na #7. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

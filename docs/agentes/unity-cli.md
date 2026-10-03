@@ -177,7 +177,7 @@ Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pac
 
 ### O que não dá para simular
 
-O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o Matheus.
+O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o programador.
 
 ### Contar o que está visível
 
@@ -260,7 +260,7 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 
 ### Receber um roteiro (PR de roteirista)
 
-Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o Matheus (ou o agente, a pedido dele) faz antes do merge:
+Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
 
 1. Faça checkout da branch `roteiro/<nome>-<assunto>`. Se o `Packages/manifest.json` da branch for igual ao da `main` (o normal num PR de roteiro), trocar de branch com o Editor aberto é seguro; se diferir, veja a armadilha dos pacotes acima.
 2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
@@ -282,7 +282,7 @@ Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho
    ```
 
 5. Abra a conversa em Play Mode (receita acima, com `Application.runInBackground = true`) e confira falas, opções e tamanho do texto.
-6. Confira o `git status`: só `Assets/Roteiro/` e os `.meta`. O merge, por *squash*, é do Matheus.
+6. Confira o `git status`: só `Assets/Roteiro/` e os `.meta`. O merge, por *squash*, é do programador.
 
 ## Outras armadilhas do projeto
 

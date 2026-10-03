@@ -1,6 +1,6 @@
 ---
 name: levantar-issue
-description: Fase 1 do fluxo do ProjetoVN. Levanta tudo o que a sessão de execução precisa para resolver uma issue do GitHub e registra em um comentário na issue. Use quando o Matheus disser "/levantar-issue N", "levantar a issue N" ou pedir o levantamento de uma issue.
+description: Fase 1 do fluxo do ProjetoVN. Levanta tudo o que a sessão de execução precisa para resolver uma issue do GitHub e registra em um comentário na issue. Use quando o programador disser "/levantar-issue N", "levantar a issue N" ou pedir o levantamento de uma issue.
 argument-hint: <número da issue>
 disable-model-invocation: true
 ---
@@ -18,8 +18,8 @@ gh issue view $ARGUMENTS --json number,title,body,labels,milestone,comments,stat
 ```
 
 - A issue precisa estar aberta e com a label `estado:levantamento`.
-- Se estiver em outro estado, **não comece**. Diga em que estado ela está e qual é o comando certo (`estado:pronta` → `/executar-issue`, `estado:em-revisao` → `/revisar-issue`). Só siga se o Matheus mandar explicitamente, e registre isso no comentário final.
-- Confira as dependências listadas em "Depende de": cada uma precisa estar fechada. Se alguma estiver aberta, avise o Matheus e pare.
+- Se estiver em outro estado, **não comece**. Diga em que estado ela está e qual é o comando certo (`estado:pronta` → `/executar-issue`, `estado:em-revisao` → `/revisar-issue`). Só siga se o programador mandar explicitamente, e registre isso no comentário final.
+- Confira as dependências listadas em "Depende de": cada uma precisa estar fechada. Se alguma estiver aberta, avise o programador e pare.
 - Confira se há outra issue com a label `estado:em-execucao` ou `estado:em-revisao`. Se houver, lembre a regra de uma issue por vez e pergunte se ele quer seguir.
 
 ## 2. Ler o contexto
@@ -39,7 +39,7 @@ Se a issue tocar no Editor, em cenas ou em prefabs, carregue a skill `unity:unit
 
 ## 3. Levantar
 
-Fatos são trabalho seu: leia, procure, execute. Só vira pergunta para o Matheus o que é **decisão dele**.
+Fatos são trabalho seu: leia, procure, execute. Só vira pergunta para o programador o que é **decisão dele**.
 
 Responda a cada ponto com evidência (caminho de arquivo, trecho, resultado de comando):
 
@@ -97,7 +97,7 @@ Use exatamente esta estrutura:
 <as de docs/agentes/unity-cli.md que se aplicam, e qualquer outra que você tenha encontrado>
 
 ### Perguntas em aberto
-<só decisões do Matheus, numeradas, cada uma com a sua recomendação; ou "Nenhuma.">
+<só decisões do programador, numeradas, cada uma com a sua recomendação; ou "Nenhuma.">
 ```
 
 ## 5. Passar o bastão
@@ -120,4 +120,4 @@ Se você encontrou documentação errada ou desatualizada, corrija em uma branch
 
 ## 7. Encerrar
 
-Diga ao Matheus, em poucas linhas: o que o levantamento concluiu, se há perguntas para ele e qual é o próximo comando (`/executar-issue $ARGUMENTS`, em uma conversa nova).
+Diga ao programador, em poucas linhas: o que o levantamento concluiu, se há perguntas para ele e qual é o próximo comando (`/executar-issue $ARGUMENTS`, em uma conversa nova).
