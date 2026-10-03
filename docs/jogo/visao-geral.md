@@ -60,7 +60,6 @@ Fora do escopo não quer dizer proibido para sempre: quer dizer que nenhuma issu
 | **Histórico** | A lista, só de leitura, do que já foi dito na conversa em curso (decisão D-30) |
 | **Protagonista** | O personagem do jogador. O nome dele é escolhido pelo jogador ao começar um jogo novo |
 | **Comando** | Instrução do roteiro que age sobre o jogo (`<<dar_item chave>>`) |
-| **Efeito** | No sistema atual, o equivalente a um comando: um asset `DialogueEffectSO` |
 | **Modo** | Em que situação o jogo está: exploração, diálogo, pausa. Um estado da máquina de estados |
 | **Manager** | Componente global e persistente, no prefab `Managers` |
 | **Fatia vertical** | O percurso mínimo jogável descrito acima |

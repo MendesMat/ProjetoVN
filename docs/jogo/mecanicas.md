@@ -9,9 +9,9 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | #6 |
 | [Portões](#portões) | existe | `GameFlow` | #7 |
-| [Diálogo](#diálogo) | parcial | `Dialogue` | #3, #5, #11 |
+| [Diálogo](#diálogo) | parcial | `Dialogue` | #6, #7, #11 |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
-| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #5, #7 |
+| [Estado da história e afinidade](#estado-da-história-e-afinidade) | parcial | `Core` | #7 |
 | [Personagens](#personagens) | planejada | — | #10, #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
@@ -48,7 +48,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Um objeto coletado não reaparece ao recarregar a cena.
 
 **Falta:**
-- O roteiro dar, tirar e consultar itens por comando (#6). Hoje isso é feito por assets de efeito.
+- O roteiro dar, tirar e consultar itens por comando (#6). Até lá, nada liga diálogo a inventário: a Gótica de teste não entrega mais a chave, que se pega do chão.
 
 **Fora do escopo:** usar ou examinar um item pelo painel; combinar itens.
 
@@ -73,20 +73,20 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Para o jogador:** uma caixa mostra quem fala e o que diz. Um clique avança. Em alguns pontos aparecem escolhas.
 
-**Existe (sistema próprio):**
-- Falas em sequência, até quatro escolhas, encadeamento de conversas.
-- Efeitos em uma fala ou em uma escolha: dar item, tirar item, ligar e desligar flag.
+**Existe (Yarn Spinner, D-17):**
+- Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó.
+- Falas em sequência, escolhas (até quatro opções disponíveis por vez), saltos e desvios entre nós.
+- As variáveis do roteiro (`$falou_com_gotica`) leem e gravam no estado da história.
 - Narração (fala sem nome de personagem) esconde a placa de nome.
-- Dados inválidos nunca travam o jogo.
-
-**Vai mudar:** o diálogo migra para o Yarn Spinner (D-17), adoção confirmada pela prova de conceito (#3). Os roteiros passam a ser arquivos de texto, os efeitos viram comandos, e as escolhas e falas ganham condições.
+- Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 
 **Falta:**
-- A migração (#5).
+- Comandos de roteiro para dar, tirar e consultar itens (#6).
+- Condições nas escolhas e afinidade (#7).
 - Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
 - O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
 
-**Regras que continuam valendo depois da migração:**
+**Regras:**
 - Iniciar um diálogo é um comando direto ao dono.
 - O jogo sabe que um diálogo começou e acabou por `DialogueStartedMessage` e `DialogueEndedMessage`; uma conversa, por mais longa que seja, publica cada uma só uma vez.
 - Durante o diálogo, o mundo não aceita cliques.
@@ -116,10 +116,10 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo lembra o que ele fez e escolheu, e reage a isso.
 
 **Existe:**
-- Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado. Hoje é escrito por efeitos de diálogo (booleanos) e por portões.
+- Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado.
+- O roteiro lê e grava nesse estado: uma variável do roteiro é uma entrada do `StoryState`, e o contador de visitas dos nós (`visited()`) também. Portões e save enxergam o mesmo valor.
 
 **Falta:**
-- O roteiro ler e gravar nesse estado (#5).
 - Afinidade: uma variável numérica por personagem, alterada por escolhas e usada em condições (#7).
 - Um registro central das variáveis, com descrição, para que ninguém dependa de digitar o nome certo (#7).
 

@@ -2,7 +2,7 @@
 
 **Para quem:** roteiristas. Você não precisa do Unity para seguir este guia.
 
-> **Este guia ainda é um esqueleto.** O diálogo do jogo está migrando para o Yarn Spinner (issues #3 e #5). As seções marcadas com *a preencher* são escritas pela issue indicada, quando a mecânica existir. Até lá, não escreva roteiro definitivo no formato antigo.
+> **Este guia ainda é um esqueleto.** O diálogo do jogo já roda no Yarn Spinner (issue #5): os roteiros de teste estão em `Assets/Roteiro/Testes/` e servem de exemplo de nó, escolha, `<<detour>>` e `<<jump>>`. As seções marcadas com *a preencher* são escritas pela issue indicada, quando a mecânica existir.
 
 ## O que já está decidido
 

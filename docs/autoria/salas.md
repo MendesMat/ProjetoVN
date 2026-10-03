@@ -6,8 +6,8 @@
 
 ## Regras que valem sempre
 
-- **Não coloque managers na cena.** `DialogueManager`, `InventoryManager`, `GameStateController`, `DialogueInputHandler` e `GameSaveManager` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
-- **Não altere um asset durante o Play.** Itens e diálogos são dados somente leitura.
+- **Não coloque managers na cena.** `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `DialogueInputHandler` e `GameSaveManager` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
+- **Não altere um asset durante o Play.** Itens são dados somente leitura.
 - **Leia os avisos do console ao salvar.** Os componentes avisam quando um campo obrigatório ficou vazio.
 - **Todo id é único.** O id de um item e o id persistente de um coletável são gravados no save.
 
@@ -34,10 +34,12 @@ O campo **Persistent Id** é gerado sozinho. **Se você duplicar um coletável, 
 
 ## Diálogo ao clicar
 
-1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e aponte **Dialogue Data** para o diálogo.
+1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e digite em **Node Name** o nome do nó do roteiro que ele inicia (por exemplo `porta_trancada`). O nome é de um nó dos arquivos `.yarn` em `Assets/Roteiro/`; peça o nome ao roteirista ou procure a linha `title:` no arquivo.
 2. Em **On Interact**, ligue `InteractableDialogueTrigger.TriggerDialogue`.
 
-> Isto muda na issue #5: o componente passa a apontar para um nó do roteiro, e não mais para um asset de diálogo. A criação de diálogos pelo Inspector deixa de existir; ver [roteiro.md](roteiro.md).
+O nome é minúsculas sem acento, dígitos e `_`; o componente avisa no console se ele fugir desse formato. **O nome não é conferido ao montar a cena:** um nome errado só aparece ao clicar no objeto, com um aviso no console ("o nó 'x' não existe no roteiro") e sem iniciar conversa. **Node Name** vazio também não inicia conversa e avisa ao clicar.
+
+Os diálogos não são mais assets do Inspector: quem escreve a conversa é o roteirista, em arquivos de texto; ver [roteiro.md](roteiro.md).
 
 ## Portão (porta trancada)
 
@@ -49,7 +51,7 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
    - **Required Flag Id:** uma variável de história que precisa estar ligada. Ela **não** é consumida.
 3. Preencha **Unlocked Flag Id** com um nome **único para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com o mesmo nome abrem juntos.
 
-**Formato do nome de uma variável** (vale para os dois campos e para os efeitos de flag): começa com `$`, seguido de letras minúsculas sem acento, dígitos e `_`. Exemplos: `$falou_com_gotica`, `$porta_mecanicas_destrancada`. O componente avisa no console se o nome estiver fora desse formato.
+**Formato do nome de uma variável** (vale para os dois campos): começa com `$`, seguido de letras minúsculas sem acento, dígitos e `_`. Exemplos: `$falou_com_gotica`, `$porta_mecanicas_destrancada`. O componente avisa no console se o nome estiver fora desse formato.
 4. Em **On Interact**, ligue `LockedActionBehaviour.Interact`.
 5. Ligue os eventos:
 

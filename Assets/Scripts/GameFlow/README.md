@@ -14,7 +14,7 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 - **`States/`**: Os estados concretos:
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
-- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
+- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
 - **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e o **estado da história** (`StoryState`, do módulo `Core`: booleanos, números e textos). Ainda não há menu de save; na cena de teste, use o painel de debug.
   - O save tem **um formato único**: `GameState` guarda o estado da história em três listas de pares nome e valor (`storyBools`, `storyNumbers`, `storyTexts`, tipos em `StoryEntries.cs`), porque o `JsonUtility` não serializa dicionários. Não há campo nem conversão de formato anterior (D-20).
   - `StoryStatePersistence` (C# puro, estático) faz a cópia entre o `StoryState` e o `GameState`: `Capture` no `Save()` e `Restore` no `Load()`. Fica fora do `GameSaveManager`, que é `MonoBehaviour` e lê arquivo, para a cópia ser testável em EditMode. Acesso a arquivo continua só no `GameSaveManager`.
@@ -33,9 +33,7 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - Ao autorar, a flag é checada **antes** do item, para que um portão que exige os dois não gaste a chave só para descobrir que a flag não estava ligada.
   - *Limitação conhecida:* um `Load()` no meio da cena restaura a flag, mas o `Start()` já rodou, então a aparência do portão só se acerta ao recarregar a cena — o mesmo comportamento do `CollectableItemBehaviour`. É para isso que o painel de debug tem o botão **Reload Scene** ao lado do Load.
 - **`DevTools/PlaceholderTint`**: Marcador visual provisório. Hoje está ligado ao **`OnOpened`** da porta de `[Teste] Mecanicas`, pintando-a de verde — ou seja, verde quer dizer "esta porta está aberta", e não "você clicou nela". Existe como componente porque um `UnityEvent` do Inspector não aceita argumento do tipo `Color`, então não dá para ligar `SpriteRenderer.color` direto. Troque pela arte de porta aberta quando existir.
-- **`DialogueEffects/`**: As implementações concretas de `DialogueEffectSO` (`GiveItemEffect`, `RemoveItemEffect`, `SetFlagEffect`, `ClearFlagEffect`). Elas moram **aqui**, e não no módulo `Dialogue`, porque precisam enxergar `Inventory` e `Core` — e `Dialogue` não referencia nenhum dos dois. O campo em `DialogueNode`/`DialogueChoice` é da classe base abstrata, então a referência de asset resolve entre assemblies sem inverter a dependência. Ver o [README do Dialogue](../Dialogue/README.md#5-efeitos-effects).
-  `SetFlagEffect` grava `true` e `ClearFlagEffect` grava `false` (o falso fica gravado, como um `<<set $x to false>>` do roteiro faria).
-- **`StoryVariableNameCheck`**: o aviso de autoria que o `OnValidate` do portão e dos efeitos de flag mostra quando um campo de variável está fora do formato (`StoryVariableName.FollowsConvention`, no `Core`).
+- **`StoryVariableNameCheck`**: o aviso de autoria que o `OnValidate` do portão mostra quando um campo de variável está fora do formato (`StoryVariableName.FollowsConvention`, no `Core`).
 - **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
 
 ---
@@ -45,21 +43,21 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 O `GameFlow` **reage** a notificações dos outros módulos (via `MessageBroker` do `Core`) e, a partir delas, decide o estado do jogo. Ele não é quem inicia diálogos: cada módulo é dono do seu próprio ciclo de vida e apenas **avisa** o que aconteceu.
 
 ### 1. Entrando em Diálogo
-O jogador clica em um objeto narrativo. O `InteractableDialogueTrigger` (via `UnityEvent` do `InteractableItem`) chama **diretamente** `DialogueManager.Instance.StartDialogue(dialogueData)` — iniciar um diálogo é um **comando** com um único dono, e comando não passa pelo barramento.
+O jogador clica em um objeto narrativo. O `InteractableDialogueTrigger` (via `UnityEvent` do `InteractableItem`) chama **diretamente** `DialogueManager.Instance.StartDialogue(nodeName)`, com o nome de um nó do roteiro `.yarn` — iniciar um diálogo é um **comando** com um único dono, e comando não passa pelo barramento. O campo `nodeName` é texto livre, com tooltip; o `OnValidate` avisa se o nome preenchido foge do formato (`ScriptNodeName`, do módulo `Dialogue`), e um nome vazio só avisa ao clicar.
 
 **Fluxo:**
-1. O `DialogueManager` valida os dados. Se forem inválidos (nulos ou sem nós), ele loga um aviso, retorna `false` e **nada mais acontece**: o jogo segue em `GameplayState` com o input liberado.
-2. Sendo válidos, o `DialogueController` publica **`DialogueStartedMessage`** *antes* de processar o primeiro nó.
+1. O `DialogueManager` valida o pedido. Se o nome for vazio, o nó não existir, o roteiro tiver erro de compilação, já houver conversa ou não houver interface registrada, ele loga um aviso (ou erro), retorna `false` e **nada mais acontece**: o jogo segue em `GameplayState` com o input liberado.
+2. Sendo válido, o `DialogueRunner` do Yarn Spinner começa a conversa e o `DialogueManager` publica **`DialogueStartedMessage`** *antes* da primeira fala.
 3. O `GameStateController` ouve a `DialogueStartedMessage`, altera a máquina de estados para **`DialogueState`** e chama `PlayerInputGate.SetEnabled(false)`.
    - *Consequência:* O módulo `PointNClick` lê esse gate no `Update` e bloqueia cliques e *panning* de tela, impedindo o jogador de interagir com o cenário enquanto a conversa acontece.
 
 Como a troca de estado acontece **antes** da primeira fala aparecer, nunca existe um frame em que o texto já está na tela mas o jogo ainda se considera em `GameplayState`.
 
 ### 2. Retornando ao Gameplay
-Ao término dos nós de um ScriptableObject de diálogo, a lógica de diálogos encerra sua execução.
+Ao término do nó (e dos nós para onde ele salta ou desvia), o `DialogueRunner` encerra a conversa.
 
 **Fluxo:**
-1. A camada lógica de diálogos publica a mensagem **`DialogueEndedMessage`**.
+1. O `DialogueManager` publica a mensagem **`DialogueEndedMessage`** (também no fim anormal, quando o roteiro para por um erro).
 2. O `GameStateController` ouve a `DialogueEndedMessage`.
 3. Altera a máquina de estados de volta para **`GameplayState`**.
 4. Chama `PlayerInputGate.SetEnabled(true)`.
@@ -90,7 +88,7 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #5, #6 | `DialogueEffects/` sai; entram os comandos de roteiro (`dar_item`, `remover_item`, `tem_item`) |
+| #6 | Entram os comandos de roteiro que ligam diálogo a inventário (`dar_item`, `remover_item`, `tem_item`). O `GameFlow` passará a referenciar o Yarn Spinner nessa issue |
 | #9 | O bootstrap passa a criar também o prefab da interface de jogo |
 | #12, #13 | Troca de sala com estado de transição; saídas e pontos de entrada |
 | #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |

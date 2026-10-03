@@ -49,7 +49,7 @@ Regras:
 - É persistido pelo `GameSaveManager` (módulo `GameFlow`), nos campos `storyBools`, `storyNumbers` e `storyTexts` do `GameState`.
 - **Não existe mensagem de "variável mudou".** Nada a escutaria hoje, e uma mensagem sem assinante falha em silêncio. Quem precisa do valor consulta.
 
-Quem escreve hoje: `SetFlagEffect` e `ClearFlagEffect` (efeitos de diálogo) e `LockedActionBehaviour` (ao destrancar), todos em `GameFlow`. O adaptador do Yarn Spinner (#5) passa a escrever também.
+Quem escreve hoje: o roteiro, pelo `StoryStateVariables` do módulo `Dialogue` (o armazenamento de variáveis do Yarn Spinner, que não guarda valor nenhum e vai direto ao `StoryState`, inclusive o contador de visitas `$Yarn.Internal.Visiting.<nó>`), e o `LockedActionBehaviour` (ao destrancar), do `GameFlow`.
 
 ## `StoryVariableName`
 
@@ -64,5 +64,4 @@ O nome é guardado **com o `$`** em todo lugar: roteiro, Inspector e save.
 
 ## Mudanças planejadas
 
-- **Issue #5:** o adaptador do Yarn Spinner lê e grava no `StoryState`, e acrescenta a ele o que precisar.
 - **Issue #7:** um registro central das variáveis, com descrição, e um seletor no Inspector no lugar do texto livre.
