@@ -1,11 +1,17 @@
 // ============================================================================
-// EXEMPLO COMENTADO: copie este arquivo para começar uma conversa nova.
+// EXEMPLO COMENTADO: copie trechos deste arquivo para a sua conversa.
 //
 // Tudo o que começa com // é comentário: o jogador nunca vê, o jogo ignora.
 // Use à vontade para deixar recados para o programador e para você mesmo.
 //
 // Este arquivo mostra um recurso por vez. Para o guia completo, leia
 // docs/autoria/roteiro.md.
+//
+// ESTE ARQUIVO É UMA EXCEÇÃO às regras de organização do guia: fica na raiz de
+// Assets/Roteiro/ (o seu fica na pasta do episódio), tem o nome
+// "exemplo_comentado" (o seu tem o nome do nó de entrada) e a linha de título
+// só aparece depois destes comentários (no seu arquivo, ela é a primeira
+// linha). Para um arquivo novo, siga o guia.
 //
 // Para o jogo, este exemplo é uma conversa de verdade: se alguém apontar uma
 // cena para o nó "exemplo_apresentacao", ela roda. Ele não é ligado a nenhuma
@@ -56,7 +62,8 @@ Respiro fundo. Ela parece me estudar.
 
 // CONDIÇÃO: <<if>> / <<elseif>> / <<else>> / <<endif>> escolhem quais falas
 // aparecem. A afinidade é um número, então compare com >= ou <=, nunca com ==.
-// O recuo de quatro espaços (nunca Tab) dentro da condição é obrigatório.
+// O recuo de quatro espaços dentro da condição é obrigatório (a tecla Tab do
+// editor já insere os quatro espaços).
 <<if $afinidade_gotica >= 2>>
     Gótica: Ah, é você de novo. Que bom.
 <<elseif $afinidade_gotica >= 1>>

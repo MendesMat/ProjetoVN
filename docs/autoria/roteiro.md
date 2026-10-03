@@ -521,14 +521,12 @@ Gótica: Sério? Obrigada.
 
 As regras:
 
-| Regra | Certo | Errado |
-|---|---|---|
-| No comando, o id vai **sem aspas** | `<<dar_item chave_teste>>` | `<<dar_item "chave_teste">>` |
-| Em `tem_item`, o id vai **com aspas** | `tem_item("chave_teste")` | `tem_item(chave_teste)` |
-| Cada comando leva **um** id | `<<dar_item chave_teste>>` | `<<dar_item>>` ou `<<dar_item chave_teste mapa>>` |
-| O id é escrito por extenso | `<<dar_item chave_teste>>` | `<<dar_item {$qual}>>` |
-
-Os casos da coluna "Errado" passam sem erro no editor. A verificação do jogo reprova, e os da terceira linha **travam a conversa** se chegarem ao jogo.
+| Regra | Certo | Errado | O que acontece com o errado |
+|---|---|---|---|
+| No comando, o id vai **sem aspas** | `<<dar_item chave_teste>>` | `<<dar_item "chave_teste">>` | Funciona, mas escreva sempre sem aspas, para o roteiro ficar igual do começo ao fim. |
+| Em `tem_item`, o id vai **com aspas** | `tem_item("chave_teste")` | `tem_item(chave_teste)` | O painel mostra um erro vermelho. |
+| Cada comando leva **um** id | `<<dar_item chave_teste>>` | `<<dar_item>>` ou `<<dar_item chave_teste mapa>>` | O editor não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
+| O id é escrito por extenso | `<<dar_item chave_teste>>` | `<<dar_item {$qual}>>` | A verificação do jogo reprova. |
 
 - **Os itens são únicos.** Dar um item que o jogador já tem não faz nada; tirar um que ele não tem também não. Nenhum dos dois é erro.
 - Por isso, **proteja a fala que acompanha a entrega**, para ela não se repetir quando o jogador já tem o item:
@@ -633,7 +631,7 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O que conferir | Exemplo do erro | O que acontece |
 |---|---|---|
 | O id do item existe na [tabela de itens](#itens)? | `<<dar_item chave_da_sala>>` | A verificação do jogo reprova. |
-| O comando de item tem um id, sem aspas? | `<<dar_item>>`, `<<dar_item "chave_teste">>` | A verificação reprova; no jogo, a conversa **trava**. |
+| O comando de item tem um id, e só um? | `<<dar_item>>`, `<<dar_item chave_teste mapa>>` | A verificação reprova; no jogo, a conversa **trava**. |
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
 | O nome do nó é minúsculo e sem acento? | `title: Gótica_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
