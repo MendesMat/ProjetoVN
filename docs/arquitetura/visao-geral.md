@@ -42,8 +42,10 @@ O padrão se repete em todos os módulos (decisão D-03):
 ## Ciclo de vida
 
 - Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
-- O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes.**
+- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
+- O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
+- A interface de jogo também só se liga aos managers no próprio `Start` (o `DialogueUIController` se registra no `DialogueManager`; o `InventoryPresenter` se reconstrói). Na primeira cena, os `Start` dos objetos de cena entram na fila **antes** dos `Start` do prefab, porque o prefab é instanciado depois. Consequência: **um componente de cena não inicia diálogo no próprio `Start`**; receberia "Nenhuma interface de diálogo registrada". Nada faz isso hoje.
 - Dar Play a partir de qualquer cena funciona, porque o bootstrap não depende de uma cena inicial.
 
 ## Regras de comunicação
@@ -129,6 +131,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Uma variável de história | Uma linha `<<declare $nome = valor>>` com `/// descrição` em `Assets/Roteiro/variaveis.yarn`, sem código. Se for booleana, ela aparece sozinha nos campos de portão do Inspector |
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
+| Um elemento de interface de jogo | Um objeto dentro do `Canvas_Game` de `Assets/Prefabs/UI/GameUI.prefab`. Nunca em uma cena |
 
 ## O que vai mudar
 
@@ -136,7 +139,6 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| A interface de jogo sai das cenas e vira prefab persistente | #9 |
 | Troca de sala e estado de transição | #12 |
 | Save automático e carregamento que recarrega a cena | #16 |
 

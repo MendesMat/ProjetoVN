@@ -33,6 +33,8 @@ O `InventoryPresenter` faz exatamente isso:
 
 O passo 2 é o que faz o painel estar certo quando o jogador coleta um item com o inventário fechado e só depois o abre.
 
+O painel (`InventoryPanel`, com o `InventoryPresenter`) mora em `Assets/Prefabs/UI/GameUI.prefab`, dentro do `Canvas_Game`. Esse prefab é a interface de jogo persistente (D-19): vem aninhado no `Managers.prefab`, é criado uma vez pelo bootstrap e nenhuma cena o contém. O `EventSystem` do jogo mora no mesmo prefab; `Menu.unity` também não tem o seu.
+
 ### O prefab do slot
 
 `Assets/Prefabs/UI/SlotUI.prefab`: raiz com `Image` de fundo, `LayoutElement` (140×140) e `ItemSlotUI`; filhos `Icon` (`Image`, escondido quando o item não tem ícone) e `Name` (TMP). As referências `iconImage` e `nameLabel` do `ItemSlotUI` precisam estar ligadas no prefab. Slots devolvidos ao pool são **desativados, não destruídos**, então `transform.childCount` do painel não diz quantos itens estão visíveis — conte os filhos ativos.
@@ -55,8 +57,7 @@ A UI de diálogo é a exceção proposital: ela vive dentro do módulo `Dialogue
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #9 | O painel de inventário sai das cenas e passa a morar no prefab persistente da interface de jogo |
-| #17 | `Menu.unity` vira a primeira cena; Novo Jogo, Continuar e Sair passam a funcionar |
+| #17 | `Menu.unity` vira a primeira cena; Novo Jogo, Continuar e Sair passam a funcionar. A interface de jogo precisa ficar escondida no menu (hoje, dar Play em `Menu.unity` mostra a barra do inventário por cima dele) |
 | #18 | Menu de pausa; o `UIWindowManager` ganha uma pilha simples de janelas (decisão D-13) |
 
 A interface do jogo é **uGUI**. Para criar ou alterar telas, use a skill `unity:ui-ugui`.

@@ -187,7 +187,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 ### D-19 — Uma cena por sala, interface persistente
 - **Decisão:** cada sala é uma cena Unity que contém só o mundo (fundo, objetos interativos, câmera, pontos de entrada). A interface de jogo (diálogo, inventário, pausa, fade) é um prefab criado uma vez pelo bootstrap, como os managers. A navegação entre salas é por saídas clicáveis no cenário; não há mapa.
 - **Por quê:** quem monta a sala não toca em interface e não consegue esquecê-la.
-- **Até a #9 ser mesclada, a interface de jogo ainda mora na cena `[Teste] Mecanicas`.**
+- **Onde mora (#9):** a interface de jogo é o prefab `Assets/Prefabs/UI/GameUI.prefab` (`Canvas_Game`, com o diálogo e o inventário, e o `EventSystem`), aninhado no `Managers.prefab`. O `ManagersBootstrap` cria os dois de uma vez e nenhuma cena contém `Canvas` de jogo nem `EventSystem`. Pausa (#18) e fade (#12) entram nesse prefab quando existirem.
 
 ### D-08 — Input
 - **Decisão:** `InputActionReference` para avançar o diálogo; leitura direta de `Mouse.current` para o mundo; EventSystem para a interface. O `PlayerInputGate` é a única arbitragem.
@@ -252,6 +252,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-03 | **Revista:** D-22 ganha o formato do id de item (minúsculas sem acento, dígitos e `_`; sempre literal no roteiro), decidido pelo programador no levantamento da #6. O único item do projeto passou de `item-teste-01` para `chave_teste`. **D-01:** duas referências de asmdef autorizadas pelo programador na #6, sem inverter seta nem criar ciclo: `GameFlow` → pacote Yarn Spinner (para `[YarnCommand]` e `[YarnFunction]`) e `Tests` → `Inventory` (para o teste de ids usar o `ItemRegistry`). |
 | 2026-10-03 | **Revistas (#7):** **D-11** deixa de esconder a opção indisponível: ela aparece desabilitada e conta para o limite de quatro botões; um bloco sem opção disponível não é mostrado (decisão do programador no levantamento da #7: mostrar que existem caminhos bloqueados faz o jogador entender que as escolhas têm peso). **D-18** ganha o registro central `variaveis.yarn`. **D-01:** o asmdef `ProjetoVN.Editor` (só Editor; referencia `Core`, `YarnSpinner.Unity` e `YarnSpinner.Unity.Editor`), autorizado pelo programador na #7. |
 | 2026-10-08 | **Restauradas:** as seções de detalhe da D-19 e da D-08, que saíram do arquivo no PR da #5 (#33) sem que este registro citasse a remoção, enquanto as duas continuavam no resumo e sendo citadas por issues e READMEs. O texto é o mesmo de antes; nenhuma decisão mudou. Encontrado no levantamento da #9. |
+| 2026-10-08 | **Cumprida em parte (#9):** D-19. A interface de jogo (diálogo e inventário) e o `EventSystem` saem das cenas e viram o `GameUI.prefab`, aninhado no `Managers.prefab` por decisão do programador no levantamento da #9 (a alternativa, um segundo prefab em `Resources`, exigiria rever a D-09). Nenhuma decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

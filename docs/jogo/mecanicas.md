@@ -148,8 +148,11 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Para o jogador:** clicar em uma saída escurece a tela e o leva a outra sala. O que ele mudou em uma sala continua mudado quando volta.
 
+**Existe (D-19):**
+- A interface de jogo (diálogo e inventário) é persistente: é criada uma vez, junto com os managers, e continua a mesma quando a cena é recarregada ou trocada. Uma cena só com câmera, fundo e objetos interativos já tem diálogo e inventário, sem montar interface.
+
 **Planejada (D-19):**
-- Uma cena por sala, que contém só o mundo. A interface de jogo é persistente (#9).
+- Uma cena por sala, que contém só o mundo.
 - Troca com fade; nenhum clique passa durante a troca (#12).
 - Saídas clicáveis e pontos de entrada (#13). Não há mapa.
 - Itens coletados e portões abertos persistem entre salas (#14).
