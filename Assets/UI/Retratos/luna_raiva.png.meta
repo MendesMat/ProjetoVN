@@ -4,7 +4,7 @@ TextureImporter:
   internalIDToNameTable:
   - first:
       213: 5725440016956529023
-    second: gotica_raiva_0
+    second: luna_raiva_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: gotica_raiva_0
+      name: luna_raiva_0
       rect:
         serializedVersion: 2
         x: 0
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      gotica_raiva_0: 5725440016956529023
+      luna_raiva_0: 5725440016956529023
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

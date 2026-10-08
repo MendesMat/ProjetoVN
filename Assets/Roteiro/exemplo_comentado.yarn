@@ -21,7 +21,7 @@
 // Todo arquivo de roteiro começa com uma linha de título como a de baixo:
 // ato, capítulo, episódio e o nome do episódio. O arquivo fica na pasta do
 // episódio, por exemplo
-// Assets/Roteiro/ato_1/capitulo_1/episodio_1/gotica_primeiro_oi.yarn.
+// Assets/Roteiro/ato_1/capitulo_1/episodio_1/luna_primeiro_oi.yarn.
 
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
 
@@ -45,11 +45,11 @@ title: exemplo_apresentacao
 Uma sala de aula vazia. Dá para ouvir o relógio.
 
 // FALA: o nome de quem fala, dois-pontos, espaço e o texto. Escreva o nome
-// sempre igual (a tabela "Quem fala" do guia lista os nomes): "Gótica" e
-// "Gotica" são duas personagens diferentes para o jogo.
+// sempre igual (a tabela "Quem fala" do guia lista os nomes): "Luna" e
+// "luna" são duas personagens diferentes para o jogo.
 // Uma linha do arquivo é uma caixa de diálogo e um clique. Fala longa se
 // divide em várias linhas.
-Gótica: Você é novo aqui?
+Luna: Você é novo aqui?
 
 // FALA DO PROTAGONISTA, quando ele não tem o que escolher: uma linha com o
 // nome reservado "Protagonista", como a de qualquer personagem.
@@ -67,24 +67,24 @@ Respiro fundo. Ela parece me estudar.
 // narração nem em opção. Nome de expressão que o personagem não tem não
 // trava o jogo: o console avisa e o retrato padrão aparece. O teste do
 // projeto reprova antes disso.
-Gótica: Não olha assim para mim. #raiva
-Gótica: Desculpa. Foi mal.
+Luna: Não olha assim para mim. #raiva
+Luna: Desculpa. Foi mal.
 
 // CONDIÇÃO: <<if>> / <<elseif>> / <<else>> / <<endif>> escolhem quais falas
 // aparecem. A afinidade é um número, então compare com >= ou <=, nunca com ==.
 // O recuo de quatro espaços dentro da condição é obrigatório (a tecla Tab do
 // editor já insere os quatro espaços).
-<<if $afinidade_gotica >= 2>>
-    Gótica: Ah, é você de novo. Que bom.
-<<elseif $afinidade_gotica >= 1>>
-    Gótica: Já nos vimos, não é?
+<<if $afinidade_luna >= 2>>
+    Luna: Ah, é você de novo. Que bom.
+<<elseif $afinidade_luna >= 1>>
+    Luna: Já nos vimos, não é?
 <<else>>
-    Gótica: Pode sentar onde quiser. Só não faça barulho.
+    Luna: Pode sentar onde quiser. Só não faça barulho.
 <<endif>>
 
 // VARIÁVEL NO TEXTO: {$nome} troca pelo valor atual. Serve para teste; num
 // roteiro de verdade, não mostre número para o jogador.
-Sua afinidade com a Gótica agora é {$afinidade_gotica}.
+Sua afinidade com a Luna agora é {$afinidade_luna}.
 
 // OPÇÕES: cada "->" é uma opção. O texto da opção é a fala do protagonista.
 // Regras:
@@ -94,24 +94,24 @@ Sua afinidade com a Gótica agora é {$afinidade_gotica}.
 //     quatro espaços.
 //   - A fala que vem logo antes do bloco aparece junto com as opções. Por isso
 //     não ponha <<set>> entre a fala e o bloco: ponha dentro da opção.
-Gótica: O que você achou da escola?
+Luna: O que você achou da escola?
 -> Gostei bastante.
     // <<set>> muda uma variável. Declare a variável nova no variaveis.yarn
     // (guia, seção "Variáveis e afinidade"); esta já existe.
-    <<set $afinidade_gotica to $afinidade_gotica + 1>>
+    <<set $afinidade_luna to $afinidade_luna + 1>>
     // <<detour>> vai para outro nó e VOLTA para cá quando o nó termina.
     <<detour exemplo_apresentacao_gostei>>
 -> Achei estranha.
     <<detour exemplo_apresentacao_estranha>>
 -> Preciso ir.
-    Gótica: Então vai. A gente se vê.
+    Luna: Então vai. A gente se vê.
     // <<stop>> encerra a conversa aqui. Nada abaixo roda por este caminho.
     <<stop>>
 // OPÇÃO CONDICIONAL: o "<<if ...>>" no fim da linha da opção a bloqueia. O
 // jogador VÊ a opção bloqueada, esmaecida, e entende que existe um caminho
 // fechado. Por isso o texto de uma opção bloqueada não pode entregar o que
 // ela esconde. Bloqueada também conta para o limite de quatro opções.
--> Posso te perguntar uma coisa? <<if $afinidade_gotica >= 1>>
+-> Posso te perguntar uma coisa? <<if $afinidade_luna >= 1>>
     <<detour exemplo_apresentacao_pergunta>>
 
 // Aqui voltam todos os caminhos que não usaram <<stop>>.
@@ -120,14 +120,14 @@ Gótica: O que você achou da escola?
 // partida (a lembrança vai junto quando ele salva e carrega). O nome do nó
 // vai entre aspas.
 <<if visited("exemplo_apresentacao_pergunta")>>
-    Gótica: E então? Respondi o que você queria?
+    Luna: E então? Respondi o que você queria?
 <<endif>>
 
 // ITEM: <<dar_item id>> entrega um item (id sem aspas), tem_item("id") confere
 // (id com aspas). Os itens são únicos: dar de novo não faz nada. Proteja a fala
 // com tem_item para ela não se repetir quando o jogador já tem o item.
 <<if not tem_item("chave_teste")>>
-    Gótica: Toma, achei esta chave no corredor.
+    Luna: Toma, achei esta chave no corredor.
     <<dar_item chave_teste>>
 <<endif>>
 
@@ -137,19 +137,19 @@ Gótica: O que você achou da escola?
 ===
 title: exemplo_apresentacao_gostei
 ---
-Gótica: Que bom. A maioria reclama.
+Luna: Que bom. A maioria reclama.
 ===
 title: exemplo_apresentacao_estranha
 ---
-Gótica: Estranha é pouco. Você se acostuma.
+Luna: Estranha é pouco. Você se acostuma.
 ===
 title: exemplo_apresentacao_pergunta
 ---
 Protagonista: Você sempre vem tão cedo?
-Gótica: Só quando não quero encontrar ninguém.
+Luna: Só quando não quero encontrar ninguém.
 ===
 title: exemplo_apresentacao_despedida
 ---
-Gótica: Vou pegar uma cadeira no fundo.
+Luna: Vou pegar uma cadeira no fundo.
 // Quando as linhas acabam, a conversa acaba sozinha: não precisa de <<stop>>.
 ===
