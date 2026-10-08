@@ -58,7 +58,7 @@ Esta tabela é a referência única do projeto (decisão D-05).
 | **Consulta:** você precisa de uma resposta | Chamada direta ou propriedade. **Nunca** pergunta e resposta pelo barramento | `InventoryManager.Instance.HasItem(item)` |
 | **Estado que quem chega depois precisa conhecer** | Propriedade consultável como fonte de verdade, opcionalmente com uma notificação de mudança | `PlayerInputGate.IsEnabled`, `InventoryManager.Items` |
 | **Notificação:** "X aconteceu", zero ou mais ouvintes, cruza módulos | Mensagem no `MessageBroker` (`readonly struct`, nome no passado) | `DialogueStartedMessage`, `ItemCollectedMessage` |
-| **Efeito de história:** um diálogo muda o estado do jogo | Variável do roteiro (`<<set $x to true>>`), que grava direto no `StoryState`; comando de roteiro para o resto, implementado no `GameFlow` como chamada direta ao dono | `$falou_com_gotica`, `<<dar_item chave_teste>>` |
+| **Efeito de história:** um diálogo muda o estado do jogo | Variável do roteiro (`<<set $x to true>>`), que grava direto no `StoryState`; comando de roteiro para o resto, implementado no `GameFlow` como chamada direta ao dono | `$falou_com_luna`, `<<dar_item chave_teste>>` |
 | **Composição de objetos de cena** | `UnityEvent` no Inspector | `InteractableItem.OnInteract` → `Collect`, `Interact`, `TriggerDialogue` |
 | **Um módulo precisa consultar outro que não pode referenciar** | Interface pequena, de posse do módulo que consulta | Nenhum caso hoje |
 

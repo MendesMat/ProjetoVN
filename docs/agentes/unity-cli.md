@@ -146,7 +146,7 @@ Depois de mexer em `.cs`, o Editor recarrega o domínio, e um `eval` ou `recompi
 
 ### O `$` e o shell
 
-Os nomes de variável de história começam com `$`. Dentro de aspas duplas o shell o expande para vazio e o `eval` roda com o nome errado, sem erro. Todo `eval` com um nome como `$falou_com_gotica` vai entre aspas simples.
+Os nomes de variável de história começam com `$`. Dentro de aspas duplas o shell o expande para vazio e o `eval` roda com o nome errado, sem erro. Todo `eval` com um nome como `$falou_com_luna` vai entre aspas simples.
 
 ### O `eval` roda tudo em um frame só
 

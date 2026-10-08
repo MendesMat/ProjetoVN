@@ -46,7 +46,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O mesmo item não entra duas vezes; não há quantidades.
 - O painel sempre reflete o inventário, mesmo se o item foi coletado com o painel fechado.
 - Um objeto coletado não reaparece ao recarregar a cena.
-- O roteiro dá, tira e consulta itens: `<<dar_item id>>`, `<<remover_item id>>` e `tem_item("id")`. Dar um item que o jogador já tem e remover um que ele não tem não são erro, e `dar_item` repetido nunca deixa duas cópias. Na cena de teste, a Gótica entrega a chave pelo roteiro e a porta abre com ela.
+- O roteiro dá, tira e consulta itens: `<<dar_item id>>`, `<<remover_item id>>` e `tem_item("id")`. Dar um item que o jogador já tem e remover um que ele não tem não são erro, e `dar_item` repetido nunca deixa duas cópias. Na cena de teste, a Luna entrega a chave pelo roteiro e a porta abre com ela.
 
 **Fora do escopo:** usar ou examinar um item pelo painel; combinar itens.
 
@@ -77,7 +77,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó.
 - Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
 - Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
-- As variáveis do roteiro (`$falou_com_gotica`) leem e gravam no estado da história.
+- As variáveis do roteiro (`$falou_com_luna`) leem e gravam no estado da história.
 - Narração (fala sem nome de personagem) esconde a placa de nome e o retrato.
 - O nome de quem fala aparece na cor do personagem, e o retrato dele aparece ao lado da caixa ([Personagens](#personagens)).
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
@@ -121,12 +121,12 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Existe:**
 - Um estado único (`StoryState`, D-18) com valores booleanos, numéricos e de texto por nome, salvo e restaurado.
 - O roteiro lê e grava nesse estado: uma variável do roteiro é uma entrada do `StoryState`, e o contador de visitas dos nós (`visited()`) também. Portões e save enxergam o mesmo valor.
-- Afinidade: uma variável numérica por personagem (`$afinidade_gotica`), alterada por uma escolha e lida por condições de fala e de opção. Salvar, zerar a sessão e carregar preserva o valor.
+- Afinidade: uma variável numérica por personagem (`$afinidade_luna`), alterada por uma escolha e lida por condições de fala e de opção. Salvar, zerar a sessão e carregar preserva o valor.
 - Um registro central, `Assets/Roteiro/variaveis.yarn`, onde toda variável é declarada uma única vez, com descrição. Um teste automático reprova declaração fora dele, declaração sem descrição e nome fora do formato.
 
 **Regras:**
 - Um nome de variável vazio ou em branco é sempre inválido: nunca é gravado e sempre lê como falso.
-- O nome começa com `$` e quem monta cena usa minúsculas sem acento, dígitos e `_` (`$falou_com_gotica`). Os nomes são em português (D-22).
+- O nome começa com `$` e quem monta cena usa minúsculas sem acento, dígitos e `_` (`$falou_com_luna`). Os nomes são em português (D-22).
 - Um nome guarda um tipo só: gravar de outro tipo troca o valor, e ler como outro tipo não converte.
 
 **Fora do escopo:** mostrar a afinidade ao jogador.
@@ -137,8 +137,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Existe (#10, D-21):**
 - Cada personagem é um asset (`CharacterSO`): identificador, nome exibido, cor do nome, retratos por expressão. Os personagens ficam reunidos em um registro (`CharacterRegistry`); personagem novo é um asset e uma linha no registro, sem código.
-- O roteiro cita o personagem pelo nome exibido (`Gótica: ...`). A placa de nome mostra o nome na cor do personagem, e o retrato aparece à esquerda da caixa de diálogo. Em narração, em personagem desconhecido e em personagem sem retrato, o retrato some; a caixa não muda de lugar.
-- O roteiro troca a expressão com uma etiqueta no fim da fala (`Gótica: Sai daqui. #raiva`). Ela vale só para aquela fala; sem etiqueta, aparece a primeira expressão do asset.
+- O roteiro cita o personagem pelo nome exibido (`Luna: ...`). A placa de nome mostra o nome na cor do personagem, e o retrato aparece à esquerda da caixa de diálogo. Em narração, em personagem desconhecido e em personagem sem retrato, o retrato some; a caixa não muda de lugar.
+- O roteiro troca a expressão com uma etiqueta no fim da fala (`Luna: Sai daqui. #raiva`). Ela vale só para aquela fala; sem etiqueta, aparece a primeira expressão do asset.
 - Um nome desconhecido no roteiro aparece em texto puro, sem cor e sem retrato, com aviso no console. Uma expressão que o personagem não tem mostra a expressão padrão, com aviso. Nenhum dos dois trava o jogo.
 - Um teste automático reprova nome de quem fala fora do registro e etiqueta de expressão que o personagem não tem, em narração, em opção ou repetida na fala.
 - O protagonista também é um personagem, com retrato.
