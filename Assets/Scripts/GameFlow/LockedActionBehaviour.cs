@@ -30,7 +30,7 @@ namespace ProjetoVN.GameFlow
         [SerializeField] private ItemDataSO requiredItem;
 
         [Tooltip("Variável de história exigida, escolhida entre as booleanas declaradas em Assets/Roteiro/variaveis.yarn " +
-                 "(ex.: $falou_com_gotica). NÃO é consumida. '(nenhuma)' = portão só de item. " +
+                 "(ex.: $falou_com_luna). NÃO é consumida. '(nenhuma)' = portão só de item. " +
                  "Uma variável nova entra em variaveis.yarn; um valor que não está lá aparece com aviso.")]
         [SerializeField, StoryFlag] private string requiredFlagId;
 

@@ -12,11 +12,11 @@ namespace ProjetoVN.Dialogue.Characters
     [CreateAssetMenu(fileName = "NewCharacterSO", menuName = "Characters/Character")]
     public sealed class CharacterSO : ScriptableObject
     {
-        [Tooltip("Identificador único do personagem para o código: minúsculas sem acento, dígitos e _ (ex.: gotica). " +
+        [Tooltip("Identificador único do personagem para o código: minúsculas sem acento, dígitos e _ (ex.: luna). " +
                  "Vazio ou fora do formato: o console avisa.")]
         [SerializeField] private string id = "";
 
-        [Tooltip("Nome como o roteiro o escreve antes dos dois-pontos e como aparece na placa de nome (ex.: Gótica). " +
+        [Tooltip("Nome como o roteiro o escreve antes dos dois-pontos e como aparece na placa de nome (ex.: Luna). " +
                  "Vazio: o roteiro não consegue citar o personagem e o console avisa.")]
         [SerializeField] private string displayName = "";
 
@@ -56,7 +56,7 @@ namespace ProjetoVN.Dialogue.Characters
         private void WarnAboutIdentity()
         {
             if (!ScriptNodeName.FollowsConvention(id))
-                Warn("O 'Id' está vazio ou fora do formato: use minúsculas sem acento, dígitos e _ (ex.: gotica).");
+                Warn("O 'Id' está vazio ou fora do formato: use minúsculas sem acento, dígitos e _ (ex.: luna).");
 
             if (string.IsNullOrEmpty(displayName) || displayName != displayName.Trim())
                 Warn("O 'Display Name' está vazio ou tem espaço no começo ou no fim: o roteiro não vai achar o personagem.");
