@@ -97,7 +97,18 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
 
 ### Criar um personagem
 
-1. **Retratos.** Cada expressão é uma imagem PNG de **300×300 pixels**, em `Assets/UI/Retratos/`, com o nome `<personagem>_<expressão>.png` (`luna_raiva.png`). No Inspector da imagem, **Texture Type** é `Sprite (2D and UI)` e **Sprite Mode** é `Single` (o padrão do projeto vem `Multiple`, e com ele o Unity não gera sprite nenhum). Os retratos atuais são provisórios: quadrados com o nome do arquivo.
+1. **A arte.** Cada expressão é uma imagem PNG de **corpo inteiro, de frente, com fundo transparente**, e **todos os personagens são desenhados na mesma escala** (a cabeça de um tem o mesmo tamanho da de outro; quem é mais alto ou mais largo ocupa mais imagem). **Os pés ficam na borda de baixo da imagem**, porque o jogo alinha todos pela base. A imagem fica em `Assets/Sprites/Personagens/<personagem>/`, uma pasta por personagem, com o nome `<personagem>_<expressão>.png`, tudo em minúsculas sem acento (`Assets/Sprites/Personagens/luna/luna_raiva.png`). Na tela só aparece do busto para cima: a caixa de diálogo cobre o resto.
+   No Inspector da imagem (**Import Settings**), confira antes de usá-la:
+
+   | Campo | Valor | Por quê |
+   |---|---|---|
+   | **Texture Type** | `Sprite (2D and UI)` | |
+   | **Sprite Mode** | `Single` | O padrão do projeto vem `Multiple`, e com ele o Unity fatia a imagem sozinho (ou não gera sprite nenhum). Uma imagem inteira é `Single` |
+   | **Pixels Per Unit** | `100` | O jogo desenha o sprite pelo tamanho em unidades, que **não muda** quando o Unity reduz a textura. Com outro valor, esse personagem aparece num tamanho diferente dos outros |
+   | **Generate Mipmaps** | desligado | |
+   | **Max Size** | `2048` | A arte original é maior que isso e é reduzida na importação; em Full HD o busto continua nítido |
+
+   Os dois personagens atuais (`luna` e `protagonista`) são o modelo. Não existe ajuste de tamanho ou de posição por personagem: a escala e a linha de chão são as mesmas para todos, definidas no `GameUI.prefab`. Se um personagem ficar estranho, peça um ajuste à arte ou abra uma issue.
 2. **O personagem.** Botão direito na pasta `Characters/` → **Create → Characters → Character**. Preencha:
 
    | Campo | O que escrever | Se errar |
@@ -105,16 +116,16 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
    | **Id** | Minúsculas sem acento, dígitos e `_` (`luna`). É o que o código usa; único no projeto | O console avisa |
    | **Display Name** | O nome **exatamente como o roteiro o escreve** antes dos dois-pontos, e como aparece na placa (`Luna`). Único no projeto | Vazio ou com espaço nas pontas: o roteiro não acha o personagem, e o console avisa |
    | **Name Color** | A cor do nome na placa | |
-   | **Portraits** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem retrato |
+   | **Expressions** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem aparecer na tela |
 
-3. **O registro.** Abra `CharacterRegistry.asset` (na mesma pasta) e acrescente o personagem à lista **Characters**. Um personagem fora do registro aparece no jogo só com o nome, sem cor e sem retrato, e o console avisa. O registro acusa id e nome exibido repetidos.
+3. **O registro.** Abra `CharacterRegistry.asset` (na mesma pasta) e acrescente o personagem à lista **Characters**. Um personagem fora do registro aparece no jogo só com o nome, sem cor e sem sprite, e o console avisa. O registro acusa id e nome exibido repetidos. O campo **Protagonist** do registro aponta o personagem que o jogo trata como protagonista: é ele quem entra na tela quando as opções de resposta abrem. Ele precisa estar na lista **Characters**; vazio ou fora da lista, o console avisa e as opções não trazem ninguém.
 4. **O guia de roteiro.** Acrescente uma linha para o personagem na tabela "Quem fala" e as expressões dele na tabela "Expressões" de [roteiro.md](roteiro.md). É dali que o roteirista copia os nomes.
 
-Uma **expressão nova** de um personagem existente é uma imagem nova, uma entrada em **Portraits** e uma linha na tabela "Expressões" do guia.
+Uma **expressão nova** de um personagem existente é uma imagem nova na pasta dele, uma entrada em **Expressions** e uma linha na tabela "Expressões" do guia.
 
-O jogo troca o retrato quando o roteiro escreve a expressão no fim da fala (`Luna: Sai daqui. #raiva`). O teste de conteúdo (`ScriptContentTests`) reprova nome de quem fala que não está no registro e expressão que o personagem não tem, com o nó e a linha.
+O jogo troca o sprite quando o roteiro escreve a expressão no fim da fala (`Luna: Sai daqui. #raiva`). O teste de conteúdo (`ScriptContentTests`) reprova nome de quem fala que não está no registro e expressão que o personagem não tem, com o nó e a linha.
 
-O retrato aparece à esquerda da caixa de diálogo e some em narração. Ele vive no `GameUI.prefab`, não na cena da sala.
+Os sprites aparecem atrás da caixa de diálogo, um de cada lado, e nada some nem entra em narração (quem já está na tela só escurece). Quem decide o lado é a ordem em que os personagens falam na conversa, não o asset. A tela de personagens vive no `GameUI.prefab` (`Canvas_Game/DialogueUI/CharacterStage`), não na cena da sala.
 
 ## Música e sons
 

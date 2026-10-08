@@ -78,8 +78,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
 - Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
 - As variáveis do roteiro (`$falou_com_luna`) leem e gravam no estado da história.
-- Narração (fala sem nome de personagem) esconde a placa de nome e o retrato.
-- O nome de quem fala aparece na cor do personagem, e o retrato dele aparece ao lado da caixa ([Personagens](#personagens)).
+- Narração (fala sem nome de personagem) esconde a placa de nome e não traz ninguém para a tela de personagens.
+- O nome de quem fala aparece na cor do personagem, e o sprite dele aparece atrás da caixa, em destaque ([Personagens](#personagens)).
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 - Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
 
@@ -133,23 +133,31 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 ## Personagens
 
-**Para o jogador:** o retrato de quem fala aparece ao lado da caixa de diálogo e muda de expressão.
+**Para o jogador:** durante a conversa, quem participa aparece como sprite grande atrás da caixa de diálogo, à esquerda e à direita. Quem fala fica em destaque, o outro fica um pouco escurecido, e a expressão muda conforme a fala.
 
 **Existe (#10, D-21):**
-- Cada personagem é um asset (`CharacterSO`): identificador, nome exibido, cor do nome, retratos por expressão. Os personagens ficam reunidos em um registro (`CharacterRegistry`); personagem novo é um asset e uma linha no registro, sem código.
-- O roteiro cita o personagem pelo nome exibido (`Luna: ...`). A placa de nome mostra o nome na cor do personagem, e o retrato aparece à esquerda da caixa de diálogo. Em narração, em personagem desconhecido e em personagem sem retrato, o retrato some; a caixa não muda de lugar.
+- Cada personagem é um asset (`CharacterSO`): identificador, nome exibido, cor do nome, sprites por expressão. Os personagens ficam reunidos em um registro (`CharacterRegistry`); personagem novo é um asset e uma linha no registro, sem código.
+- O roteiro cita o personagem pelo nome exibido (`Luna: ...`). A placa de nome mostra o nome na cor do personagem, no canto superior esquerdo da caixa, também quando fala quem está à direita.
+- **A tela de personagens (#48)** tem dois lugares, esquerda e direita, atrás da caixa e na frente do cenário; o centro fica livre para as opções. O primeiro personagem a falar na conversa fica à esquerda e o segundo à direita (o protagonista não tem lado fixo). Cada um entra na primeira fala e fica até a conversa acabar. Com os dois lugares ocupados, um terceiro toma o lugar de quem falou há mais tempo, e quem saiu volta pela mesma regra quando falar de novo.
+- **Destaque:** quem fala fica em destaque; quem mais está na tela fica um pouco escurecido (a cor do escurecido é um campo do Inspector) e mantém a última expressão até a própria fala seguinte. Narração, pensamento, personagem desconhecido e personagem sem sprite não trazem ninguém e escurecem quem está na tela. Ao abrir as opções de resposta, o protagonista entra, se não estiver na tela, e fica em destaque: é o aviso de que é a vez do jogador.
+- `<<jump>>` e `<<detour>>` não mudam quem está na tela; a tela só é limpa quando a conversa termina, e a conversa seguinte começa vazia. Todos os personagens usam a mesma escala e a mesma linha de chão, e entrar, escurecer e trocar de lugar são instantâneos.
 - O roteiro troca a expressão com uma etiqueta no fim da fala (`Luna: Sai daqui. #raiva`). Ela vale só para aquela fala; sem etiqueta, aparece a primeira expressão do asset.
-- Um nome desconhecido no roteiro aparece em texto puro, sem cor e sem retrato, com aviso no console. Uma expressão que o personagem não tem mostra a expressão padrão, com aviso. Nenhum dos dois trava o jogo.
+- Um nome desconhecido no roteiro aparece em texto puro, sem cor e sem sprite, com aviso no console, e não ocupa lugar na tela. Uma expressão que o personagem não tem mostra a expressão padrão, com aviso. Nenhum dos dois trava o jogo.
 - Um teste automático reprova nome de quem fala fora do registro e etiqueta de expressão que o personagem não tem, em narração, em opção ou repetida na fala.
-- O protagonista também é um personagem, com retrato.
+- O protagonista também é um personagem, com sprite; o jogo sabe quem ele é pelo campo **Protagonist** do `CharacterRegistry`.
 
-**Limitação conhecida:** os retratos são placeholders (um quadrado colorido com o nome do arquivo), em 300×300.
+**Limitações conhecidas:**
+- A expressão `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho ao lado da cabeça, até a arte definitiva chegar.
+- O PNG do protagonista tem riscos soltos à direita do braço; a arte vai limpá-los.
+- Os pés da Luna estão a cerca de 9 px da base da imagem e os do protagonista a cerca de 50 px. Sem ajuste por personagem, a Luna aparece uns 16 px mais baixa em relação a ele. O padrão para as próximas artes é "pés na base da imagem".
+- O sprite do lado esquerdo é desenhado por cima do painel de inventário, que fica no canto superior esquerdo. O painel só vai ficar visível em puzzle, e isso será tratado depois.
+- Se um roteiro emendar dois encontros com `<<jump>>` (a Luna se despede e o protagonista fala com um professor), a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Não há comando para tirar alguém de cena.
 
 **Planejada (#26):**
 - O nome do protagonista é escolhido pelo jogador ao começar um jogo novo, com um nome padrão.
 - O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico. O roteiro continua escrevendo `Protagonista:`; a troca pelo nome escolhido acontece na hora de mostrar a placa (ver D-21).
 
-**Fora do escopo:** sprites de corpo inteiro sobre o cenário, vários personagens na tela, animação de entrada e saída, trocar o nome do protagonista depois de o jogo começar.
+**Fora do escopo:** mais de dois lugares na tela, o roteiro escolher a posição de alguém ou tirar alguém de cena, transição suave (entrada, saída e escurecer, depois da #11), ajuste de enquadramento por personagem, sprite de personagem parado no cenário fora de uma conversa, trocar o nome do protagonista depois de o jogo começar.
 
 ## Navegação entre salas
 

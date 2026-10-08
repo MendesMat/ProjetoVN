@@ -163,6 +163,8 @@ No exemplo acima, o jogador lê: "Oi. Você é novo aqui?" → "Sou. Cheguei hoj
 
 Quando as linhas acabam, a conversa termina sozinha: o último nó não precisa de `<<stop>>`.
 
+**Mudar de nó não muda quem está na tela.** `<<detour>>` e `<<jump>>` andam dentro da mesma conversa, e o jogador não percebe a fronteira: quem já apareceu continua ali, escurecido ou em destaque, até a conversa terminar. A tela de personagens só é limpa no fim. Cuidado ao emendar dois encontros diferentes com um `<<jump>>` (a Luna se despede e o protagonista fala com um professor): a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Ainda não há comando para tirar alguém de cena; se isso fizer falta, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
+
 **Copie o nome do nó, não redigite.** Um `<<jump>>` ou `<<detour>>` para um nó que não existe aparece só como aviso amarelo no editor, mas a verificação do jogo reprova.
 
 ## Falas e narração
@@ -210,7 +212,7 @@ Linhas em branco entre as falas não fazem diferença para o jogo: use para orga
 | `LUNA: Oi.` | Uma personagem "LUNA", que não existe. |
 | `Luna : Oi.` | Uma personagem "Luna " (com um espaço no fim), que não existe. |
 
-O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, sem a cor e sem o retrato da personagem, e a conversa não travaria.
+O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, sem a cor, a personagem não apareceria na tela e a conversa não travaria.
 
 Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 
@@ -246,11 +248,13 @@ Luna: Uma com um morcego no chaveiro. E aí?
     Luna: Droga. Se você achar, me avisa?
 ```
 
+**O protagonista aparece na tela quando fala** (como qualquer personagem) **e quando as opções de resposta abrem**: é o sinal visual de que é a vez do jogador, e ele fica em destaque. Quando ele **pensa**, nada aparece: para o jogo, pensamento é narração sem nome, igual a `A porta está trancada.`
+
 Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros.
 
 ### Expressões
 
-Cada personagem tem um retrato por expressão, e o retrato de quem fala aparece ao lado da caixa de diálogo. Em narração não há retrato. **Sem etiqueta, o jogo mostra a expressão padrão** da personagem. Para mudar a cara dela em uma fala, escreva no **fim** da linha um espaço, `#` e o nome da expressão:
+Cada personagem tem um sprite por expressão, e o de quem fala aparece em destaque atrás da caixa de diálogo. **Sem etiqueta, o jogo mostra a expressão padrão** da personagem. Para mudar a cara dela em uma fala, escreva no **fim** da linha um espaço, `#` e o nome da expressão:
 
 ```
 Luna: Você não devia ter visto isso. #raiva
@@ -259,11 +263,13 @@ Luna: Desculpa. Perdi a cabeça.
 
 A primeira fala aparece com a Luna brava; a segunda volta à expressão padrão, porque **a etiqueta vale só para a fala em que está**. Para manter a mesma cara em duas falas seguidas, repita a etiqueta nas duas.
 
+Enquanto outra pessoa fala, a personagem continua na tela, um pouco escurecida, **com a última expressão que mostrou**. Se a Luna falou brava e o protagonista responde, ela fica brava (escurecida) até a próxima fala dela, que decide a cara de novo.
+
 | Regra | Por quê |
 |---|---|
 | A etiqueta vai no **fim** da linha, depois do texto, com um espaço antes do `#`. | No meio da fala, `#` é erro de sintaxe. |
 | **Uma etiqueta por fala.** | A verificação do jogo reprova duas. |
-| **Só em fala com nome.** Nunca em narração nem em opção. | Narração e opção não têm retrato; a verificação reprova a etiqueta ali. |
+| **Só em fala com nome.** Nunca em narração nem em opção. | Narração e opção não têm personagem falando; a verificação reprova a etiqueta ali. |
 | O nome da expressão é um da tabela abaixo, em minúsculas e sem acento. | A verificação reprova uma expressão que a personagem não tem; se ela chegasse ao jogo, apareceria a expressão padrão e o console avisaria. |
 
 A fala logo antes de um bloco de [opções](#opções) aceita expressão normalmente.
@@ -275,7 +281,7 @@ As expressões que existem hoje (a primeira de cada personagem é a padrão):
 | `Luna` | `neutra` (padrão), `raiva` |
 | `Protagonista` | `neutra` (padrão) |
 
-Os retratos atuais são provisórios: quadrados coloridos com o nome do arquivo. Quando uma expressão nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
+A `raiva` da Luna é provisória: hoje é uma cópia da expressão neutra com um quadrado vermelho ao lado da cabeça, até a arte definitiva chegar. Quando uma expressão nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
 ### Dois-pontos na narração
 
@@ -322,7 +328,7 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 | Caractere | O que acontece se você só digitar | Para aparecer no texto | Exemplo |
 |---|---|---|---|
 | `#` no meio da fala | Erro de sintaxe. | `\#` | `Luna: Sala \#12, no fim do corredor.` |
-| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o retrato. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Luna: Ela postou com \#saudade` |
+| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o sprite da personagem. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Luna: Ela postou com \#saudade` |
 | `//` | O resto da linha **some**, sem aviso. | `\/\/` | `Luna: O site é escola.com\/\/alunos` |
 | `{` e `}` | Abrem uma expressão. Um `{` sem fechar é erro e quebra o arquivo. | `\{` e `\}` | `Rabiscado na carteira, um \{ torto.` |
 | `[` e `]` | Abrem marcação. `[b]x[/b]` vira só `x`. Um **`[` sem fechar derruba o projeto inteiro.** | `\[` e `\]` | `Luna: Escreve \[urgente\] no bilhete.` |
@@ -560,7 +566,7 @@ Não são comandos: não levam `<<` `>>`, e vão no fim de uma fala.
 
 | Etiqueta | O que faz | Explicado em |
 |---|---|---|
-| `#expressao` | Mostra o retrato daquela expressão só nesta fala | [Expressões](#expressões) |
+| `#expressao` | Mostra a expressão daquela personagem nesta fala; na fala seguinte dela, sem etiqueta, volta à padrão | [Expressões](#expressões) |
 
 **Ainda não existem**
 

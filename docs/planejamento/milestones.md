@@ -63,6 +63,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 |---|---|---|
 | #9 | Interface de jogo em prefab persistente | #5 |
 | #10 | Personagem como dado e retrato no diálogo | #5, #9 |
+| #48 | Sprites da conversa: dois lugares na tela, com destaque para quem fala | #10, #47 |
 | #11 | Typewriter com completar e avançar | #5, #9 |
 | #25 | Histórico de falas da conversa em curso | #5, #6, #9, #10, #11 |
 
