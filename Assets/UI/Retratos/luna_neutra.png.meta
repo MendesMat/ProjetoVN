@@ -4,7 +4,7 @@ TextureImporter:
   internalIDToNameTable:
   - first:
       213: -7134658236159113394
-    second: gotica_neutra_0
+    second: luna_neutra_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: gotica_neutra_0
+      name: luna_neutra_0
       rect:
         serializedVersion: 2
         x: 0
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      gotica_neutra_0: -7134658236159113394
+      luna_neutra_0: -7134658236159113394
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

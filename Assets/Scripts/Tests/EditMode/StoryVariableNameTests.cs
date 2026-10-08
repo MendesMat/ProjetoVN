@@ -8,7 +8,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void IsValid_AcceptsADollarPrefixedName()
         {
-            Assert.IsTrue(StoryVariableName.IsValid("$afinidade_gotica"));
+            Assert.IsTrue(StoryVariableName.IsValid("$afinidade_luna"));
         }
 
         [Test]
@@ -17,7 +17,7 @@ namespace ProjetoVN.Tests.EditMode
             Assert.IsFalse(StoryVariableName.IsValid(null));
             Assert.IsFalse(StoryVariableName.IsValid(""));
             Assert.IsFalse(StoryVariableName.IsValid("   "));
-            Assert.IsFalse(StoryVariableName.IsValid("afinidade_gotica"));
+            Assert.IsFalse(StoryVariableName.IsValid("afinidade_luna"));
             Assert.IsFalse(StoryVariableName.IsValid("$"));
         }
 
@@ -31,17 +31,17 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void FollowsConvention_AcceptsLowercaseAsciiDigitsAndUnderscore()
         {
-            Assert.IsTrue(StoryVariableName.FollowsConvention("$falou_com_gotica"));
-            Assert.IsTrue(StoryVariableName.FollowsConvention("$afinidade_gotica2"));
+            Assert.IsTrue(StoryVariableName.FollowsConvention("$falou_com_luna"));
+            Assert.IsTrue(StoryVariableName.FollowsConvention("$afinidade_luna2"));
             Assert.IsTrue(StoryVariableName.FollowsConvention("$_x"));
         }
 
         [Test]
         public void FollowsConvention_RejectsWhatTheInspectorMustNotAccept()
         {
-            Assert.IsFalse(StoryVariableName.FollowsConvention("$falou-com-gotica"));
+            Assert.IsFalse(StoryVariableName.FollowsConvention("$falou-com-luna"));
             Assert.IsFalse(StoryVariableName.FollowsConvention("$Falou"));
-            Assert.IsFalse(StoryVariableName.FollowsConvention("$afinidade_gótica"));
+            Assert.IsFalse(StoryVariableName.FollowsConvention("$afinidade_ação"));
             Assert.IsFalse(StoryVariableName.FollowsConvention("$1x"));
             Assert.IsFalse(StoryVariableName.FollowsConvention("falou"));
             Assert.IsFalse(StoryVariableName.FollowsConvention("$Yarn.Internal.X"));

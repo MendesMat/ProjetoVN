@@ -1,0 +1,43 @@
+title: luna_cheguei_cedo
+---
+Luna: Acho que cheguei muito cedo...
+-> Sim
+    <<set $falou_com_luna to true>>
+    <<set $afinidade_luna to $afinidade_luna + 1>>
+    <<detour luna_resposta_sim>>
+-> Não
+    <<detour luna_resposta_nao>>
+-> Talvez
+    <<detour luna_resposta_talvez>>
+-> Posso sentar perto de você? <<if $afinidade_luna >= 1>>
+    <<detour luna_resposta_sentar>>
+<<if $afinidade_luna >= 1>>
+    Luna: Gostei de você.
+<<endif>>
+Luna: A escola está mais quieta do que eu imaginava.
+<<if not tem_item("chave_teste")>>
+    Luna: Toma, achei esta chave no corredor.
+    <<dar_item chave_teste>>
+<<endif>>
+<<jump luna_cadeira_no_fundo>>
+===
+title: luna_resposta_sim
+---
+Luna: Ele falou sim.
+===
+title: luna_resposta_nao
+---
+Luna: Ele falou não. #raiva
+===
+title: luna_resposta_talvez
+---
+Luna: Ele falou talvez.
+===
+title: luna_resposta_sentar
+---
+Luna: Pode. Só não puxa assunto.
+===
+title: luna_cadeira_no_fundo
+---
+Luna: Já vou aproveitar pra pegar uma cadeira no fundo.
+===

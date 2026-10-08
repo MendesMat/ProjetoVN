@@ -5,7 +5,7 @@ using System.Linq;
 namespace ProjetoVN.Dialogue.Logic
 {
     /// <summary>
-    /// A etiqueta de expressão de uma fala (<c>Gótica: Sai daqui. #raiva</c>). O Yarn Spinner entrega as etiquetas
+    /// A etiqueta de expressão de uma fala (<c>Luna: Sai daqui. #raiva</c>). O Yarn Spinner entrega as etiquetas
     /// da linha sem o <c>#</c>, misturadas com as que ele mesmo põe (<c>lastline</c> e <c>line:…</c>); esta classe
     /// separa as do roteirista.
     /// </summary>

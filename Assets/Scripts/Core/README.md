@@ -22,16 +22,16 @@ O Core não conhece diálogo, inventário nem cena. Se uma classe daqui precisar
 
 ## `StoryState`
 
-Estado global da história (decisão D-18): booleanos, números e textos por nome ("falou com a gótica", "afinidade com a gótica", "nome do protagonista"). É estático pelo mesmo motivo que o `MessageBroker`: o dono é o jogo inteiro, e quem lê não precisa de referência serializada. Ele é a fonte única que o roteiro, os portões e o save leem e gravam.
+Estado global da história (decisão D-18): booleanos, números e textos por nome ("falou com a Luna", "afinidade com a Luna", "nome do protagonista"). É estático pelo mesmo motivo que o `MessageBroker`: o dono é o jogo inteiro, e quem lê não precisa de referência serializada. Ele é a fonte única que o roteiro, os portões e o save leem e gravam.
 
 ```csharp
-StoryState.IsTrue("$falou_com_gotica");                 // booleano gravado e verdadeiro
-StoryState.TryGetBool("$falou_com_gotica", out bool b); // distingue "falso gravado" de "nunca gravado"
-StoryState.TryGetNumber("$afinidade_gotica", out float n);
+StoryState.IsTrue("$falou_com_luna");                 // booleano gravado e verdadeiro
+StoryState.TryGetBool("$falou_com_luna", out bool b); // distingue "falso gravado" de "nunca gravado"
+StoryState.TryGetNumber("$afinidade_luna", out float n);
 StoryState.TryGetText("$nome_jogador", out string t);
 
-StoryState.SetBool("$falou_com_gotica", true);          // true se gravou
-StoryState.SetNumber("$afinidade_gotica", 2.5f);
+StoryState.SetBool("$falou_com_luna", true);          // true se gravou
+StoryState.SetNumber("$afinidade_luna", 2.5f);
 StoryState.SetText("$nome_jogador", "Ana");             // null vira ""
 
 StoryState.Bools; StoryState.Numbers; StoryState.Texts; // IReadOnlyDictionary, usados pelo save

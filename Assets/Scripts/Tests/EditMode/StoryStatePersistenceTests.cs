@@ -16,15 +16,15 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void Capture_CopiesTheThreeTypesToTheGameState()
         {
-            StoryState.SetBool("$falou_com_gotica", true);
-            StoryState.SetNumber("$afinidade_gotica", 2.5f);
+            StoryState.SetBool("$falou_com_luna", true);
+            StoryState.SetNumber("$afinidade_luna", 2.5f);
             StoryState.SetText("$nome_jogador", "Ana");
             var state = new GameState();
 
             StoryStatePersistence.Capture(state);
 
-            Assert.That(state.storyBools, Is.EqualTo(new[] { new StoryBoolEntry { name = "$falou_com_gotica", value = true } }));
-            Assert.That(state.storyNumbers, Is.EqualTo(new[] { new StoryNumberEntry { name = "$afinidade_gotica", value = 2.5f } }));
+            Assert.That(state.storyBools, Is.EqualTo(new[] { new StoryBoolEntry { name = "$falou_com_luna", value = true } }));
+            Assert.That(state.storyNumbers, Is.EqualTo(new[] { new StoryNumberEntry { name = "$afinidade_luna", value = 2.5f } }));
             Assert.That(state.storyTexts, Is.EqualTo(new[] { new StoryTextEntry { name = "$nome_jogador", value = "Ana" } }));
         }
 
@@ -32,9 +32,9 @@ namespace ProjetoVN.Tests.EditMode
         public void CaptureThenJsonThenRestore_BringsEverythingBack()
         {
             StoryState.SetBool("$porta_destrancada", false);
-            StoryState.SetNumber("$afinidade_gotica", 0.1f);
+            StoryState.SetNumber("$afinidade_luna", 0.1f);
             StoryState.SetNumber("$humor", -3f);
-            StoryState.SetText("$apelido", "Gótica");
+            StoryState.SetText("$apelido", "Coração");
             var captured = new GameState();
             StoryStatePersistence.Capture(captured);
 
@@ -44,12 +44,12 @@ namespace ProjetoVN.Tests.EditMode
 
             Assert.IsTrue(StoryState.TryGetBool("$porta_destrancada", out bool door));
             Assert.IsFalse(door, "um falso gravado precisa voltar como falso gravado");
-            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_gotica", out float affinity));
+            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_luna", out float affinity));
             Assert.AreEqual(0.1f, affinity, "a afinidade não pode perder precisão no save");
             Assert.IsTrue(StoryState.TryGetNumber("$humor", out float mood));
             Assert.AreEqual(-3f, mood);
             Assert.IsTrue(StoryState.TryGetText("$apelido", out string nickname));
-            Assert.AreEqual("Gótica", nickname, "acentos precisam sobreviver ao save");
+            Assert.AreEqual("Coração", nickname, "acentos precisam sobreviver ao save");
         }
 
         [Test]

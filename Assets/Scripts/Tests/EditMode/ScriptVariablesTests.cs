@@ -42,9 +42,9 @@ namespace ProjetoVN.Tests.EditMode
         public void If_ChoosesTheBranchByAValueWrittenOutsideTheScript()
         {
             ScriptRun run = Compile(
-                "title: no\n---\n<<declare $falou_com_gotica = false>>\n" +
-                "<<if $falou_com_gotica>>\nsim\n<<else>>\nnao\n<<endif>>\n===\n");
-            StoryState.SetBool("$falou_com_gotica", true);
+                "title: no\n---\n<<declare $falou_com_luna = false>>\n" +
+                "<<if $falou_com_luna>>\nsim\n<<else>>\nnao\n<<endif>>\n===\n");
+            StoryState.SetBool("$falou_com_luna", true);
 
             run.Start("no");
 
@@ -153,12 +153,12 @@ namespace ProjetoVN.Tests.EditMode
         public void Declaration_CarriesTheTripleSlashCommentAsItsDescription()
         {
             ScriptRun run = Compile(
-                "title: no\n---\n/// Afinidade com a Gótica.\n<<declare $afinidade = 0>>\n" +
+                "title: no\n---\n/// Afinidade com a Luna.\n<<declare $afinidade = 0>>\n" +
                 "<<set $afinidade to $afinidade + 1>>\nfim\n===\n");
 
             string[] descriptions = run.Declarations.Where(d => d.Name == "$afinidade").Select(d => d.Description).ToArray();
 
-            CollectionAssert.AreEqual(new[] { "Afinidade com a Gótica." }, descriptions);
+            CollectionAssert.AreEqual(new[] { "Afinidade com a Luna." }, descriptions);
         }
     }
 }

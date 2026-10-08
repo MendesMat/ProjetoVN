@@ -16,10 +16,10 @@ namespace ProjetoVN.Tests.EditMode
                 consumedWorldObjectIds = new List<string> { "obj-1", "obj-2" },
                 storyBools = new List<StoryBoolEntry>
                 {
-                    new() { name = "$falou_com_gotica", value = true },
+                    new() { name = "$falou_com_luna", value = true },
                     new() { name = "$porta_destrancada", value = false }
                 },
-                storyNumbers = new List<StoryNumberEntry> { new() { name = "$afinidade_gotica", value = 2.5f } },
+                storyNumbers = new List<StoryNumberEntry> { new() { name = "$afinidade_luna", value = 2.5f } },
                 storyTexts = new List<StoryTextEntry> { new() { name = "$nome_jogador", value = "Ana" } },
                 currentScene = "SalaDeTeste"
             };

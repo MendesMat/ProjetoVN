@@ -21,8 +21,8 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SetBool_ThenIsTrue_ReturnsTrue()
         {
-            Assert.IsTrue(StoryState.SetBool("$falou_com_gotica", true));
-            Assert.IsTrue(StoryState.IsTrue("$falou_com_gotica"));
+            Assert.IsTrue(StoryState.SetBool("$falou_com_luna", true));
+            Assert.IsTrue(StoryState.IsTrue("$falou_com_luna"));
         }
 
         [Test]
@@ -154,10 +154,10 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SetNumber_ThenTryGetNumber_ReturnsTheValue_AndRewritingReplacesIt()
         {
-            StoryState.SetNumber("$afinidade_gotica", 2.5f);
-            StoryState.SetNumber("$afinidade_gotica", 4f);
+            StoryState.SetNumber("$afinidade_luna", 2.5f);
+            StoryState.SetNumber("$afinidade_luna", 4f);
 
-            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_gotica", out float value));
+            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_luna", out float value));
             Assert.AreEqual(4f, value);
         }
 
@@ -176,11 +176,11 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ReadingAsADifferentTypeThanWritten_ReturnsFalse()
         {
-            StoryState.SetNumber("$afinidade_gotica", 1f);
+            StoryState.SetNumber("$afinidade_luna", 1f);
 
-            Assert.IsFalse(StoryState.IsTrue("$afinidade_gotica"), "não há conversão silenciosa entre tipos");
-            Assert.IsFalse(StoryState.TryGetBool("$afinidade_gotica", out _));
-            Assert.IsFalse(StoryState.TryGetText("$afinidade_gotica", out _));
+            Assert.IsFalse(StoryState.IsTrue("$afinidade_luna"), "não há conversão silenciosa entre tipos");
+            Assert.IsFalse(StoryState.TryGetBool("$afinidade_luna", out _));
+            Assert.IsFalse(StoryState.TryGetText("$afinidade_luna", out _));
         }
 
         [Test]

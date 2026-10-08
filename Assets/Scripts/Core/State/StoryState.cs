@@ -4,8 +4,8 @@ using UnityEngine;
 namespace ProjetoVN.Core.State
 {
     /// <summary>
-    /// Estado global da história: booleanos, números e textos por nome ("falou com a gótica",
-    /// "afinidade com a gótica", "nome do protagonista"). Estático como <see cref="Messaging.MessageBroker"/>
+    /// Estado global da história: booleanos, números e textos por nome ("falou com a Luna",
+    /// "afinidade com a Luna", "nome do protagonista"). Estático como <see cref="Messaging.MessageBroker"/>
     /// e PlayerInputGate: o dono é o jogo inteiro, e quem lê (roteiro, portões, save) não precisa de
     /// referência serializada. Os nomes seguem <see cref="StoryVariableName"/>. Um nome mora em um só tipo.
     /// </summary>

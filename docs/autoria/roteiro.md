@@ -17,7 +17,7 @@ Se é a sua primeira vez, comece instalando os programas: [Na primeira vez: prep
 - **O roteiro é texto puro.** Cada conversa é escrita em um arquivo que termina em `.yarn`, dentro da pasta `Assets/Roteiro/` do projeto.
 - **Você escreve no VS Code**, um editor de texto gratuito, com a extensão **Yarn Spinner**. Ela colore o texto e aponta erros enquanto você digita.
 - **Você envia pelo GitHub Desktop**, um programa que manda os seus arquivos para o projeto. O programador confere e junta ao jogo.
-- **Nomes técnicos são em minúsculas, sem acento, com `_` no lugar do espaço.** Isso vale para nome de arquivo, de pasta, de conversa e de variável: `gotica_chave_perdida`, nunca `Gótica Chave Perdida`. **O texto que o jogador lê é português normal**, com acento, maiúscula e pontuação.
+- **Nomes técnicos são em minúsculas, sem acento, com `_` no lugar do espaço.** Isso vale para nome de arquivo, de pasta, de conversa e de variável: `luna_chave_perdida`, nunca `Luna Chave Perdida`. **O texto que o jogador lê é português normal**, com acento, maiúscula e pontuação.
 - **Uma conversa não é salva pela metade.** Se o jogador fechar o jogo no meio de um diálogo, ele volta ao começo da sala.
 - **O editor não é o jogo.** Um texto sem erro no editor ainda pode ser recusado pela verificação do jogo. A seção [O que o editor não confere](#o-que-o-editor-não-confere) lista esses casos.
 
@@ -34,19 +34,19 @@ Assets/Roteiro/
   ato_1/
     capitulo_1/
       episodio_1/
-        gotica_primeiro_oi.yarn
+        luna_primeiro_oi.yarn
       episodio_2/
         corredor_bebedouro.yarn
-        gotica_chave_perdida.yarn
+        luna_chave_perdida.yarn
       episodio_3/
-        gotica_fim_da_aula.yarn
+        luna_fim_da_aula.yarn
     capitulo_2/
       episodio_1/
         ...
 ```
 
 - As pastas se chamam `ato_1`, `capitulo_1`, `episodio_1`: a palavra, `_` e o número. Sem acento e sem título no nome da pasta.
-- **Um arquivo por conversa.** O nome do arquivo é o nome da conversa: `gotica_chave_perdida.yarn`.
+- **Um arquivo por conversa.** O nome do arquivo é o nome da conversa: `luna_chave_perdida.yarn`.
 - Se a pasta do ato, do capítulo ou do episódio ainda não existe, crie.
 - Uma conversa que vale para vários episódios (a descrição de um objeto que fica sempre na sala, por exemplo) fica na pasta do **primeiro** episódio em que ela aparece.
 
@@ -74,7 +74,7 @@ Arquivos do mesmo episódio repetem a mesma linha:
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida     ← em corredor_bebedouro.yarn
-// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida     ← em gotica_chave_perdida.yarn
+// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida     ← em luna_chave_perdida.yarn
 ```
 
 ## Estrutura de um arquivo
@@ -82,17 +82,17 @@ Arquivos do mesmo episódio repetem a mesma linha:
 Depois da linha de título vem a conversa. No Yarn, uma conversa (ou um pedaço de conversa) se chama **nó**. Um nó tem sempre três partes:
 
 ```
-title: gotica_primeiro_oi
+title: luna_primeiro_oi
 ---
-Gótica: Oi. Você é novo aqui?
+Luna: Oi. Você é novo aqui?
 Protagonista: Sou. Cheguei hoje.
-Gótica: Então senta, que a aula já vai começar.
+Luna: Então senta, que a aula já vai começar.
 ===
 ```
 
 | Parte | O que é |
 |---|---|
-| `title: gotica_primeiro_oi` | O **nome do nó**. É por esse nome que o jogo encontra a conversa. |
+| `title: luna_primeiro_oi` | O **nome do nó**. É por esse nome que o jogo encontra a conversa. |
 | `---` (três hífens) | Separa o nome do texto. |
 | as linhas do meio | A conversa. |
 | `===` (três sinais de igual) | Fecha o nó. Sem ele, o editor acusa `Missing node delimiter`. |
@@ -102,11 +102,11 @@ Um arquivo completo, então, fica assim:
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
 
-title: gotica_primeiro_oi
+title: luna_primeiro_oi
 ---
-Gótica: Oi. Você é novo aqui?
+Luna: Oi. Você é novo aqui?
 Protagonista: Sou. Cheguei hoje.
-Gótica: Então senta, que a aula já vai começar.
+Luna: Então senta, que a aula já vai começar.
 ===
 ```
 
@@ -124,9 +124,9 @@ Quem monta a cena no jogo digita o nome do nó em um campo de texto, letra por l
 
 | Certo | Errado | Por quê |
 |---|---|---|
-| `gotica_primeiro_oi` | `Gótica primeiro oi` | Tem maiúscula, acento e espaço. |
+| `luna_primeiro_oi` | `Luna primeiro oi` | Tem maiúscula e espaço. |
 | `corredor_bebedouro` | `corredor-bebedouro` | Hífen não vale; use `_`. |
-| `gotica_chave_perdida` | `conversa2` | Não diz quem fala nem sobre o quê. |
+| `luna_chave_perdida` | `conversa2` | Não diz quem fala nem sobre o quê. |
 
 O nome do nó **não** leva ato, capítulo nem episódio: isso já está na pasta e na linha de título.
 
@@ -137,17 +137,17 @@ O nome do nó **não** leva ato, capítulo nem episódio: isso já está na past
 Uma conversa longa pode ser dividida em vários nós, no mesmo arquivo, um depois do outro. O primeiro é o **nó de entrada** (o que a cena chama). Os outros começam com o nome dele:
 
 ```
-title: gotica_primeiro_oi
+title: luna_primeiro_oi
 ---
-Gótica: Oi. Você é novo aqui?
-<<detour gotica_primeiro_oi_apresentacao>>
-Gótica: Então senta, que a aula já vai começar.
+Luna: Oi. Você é novo aqui?
+<<detour luna_primeiro_oi_apresentacao>>
+Luna: Então senta, que a aula já vai começar.
 ===
 
-title: gotica_primeiro_oi_apresentacao
+title: luna_primeiro_oi_apresentacao
 ---
 Protagonista: Sou. Cheguei hoje.
-Gótica: Dá pra ver. Você ainda está sorrindo.
+Luna: Dá pra ver. Você ainda está sorrindo.
 ===
 ```
 
@@ -171,7 +171,7 @@ Cada linha do arquivo é **uma caixa de texto e um clique** do jogador.
 
 ```
 Uma sala de aula vazia. Dá para ouvir o relógio.
-Gótica: Você é novo aqui?
+Luna: Você é novo aqui?
 Protagonista: Sou. Cheguei hoje.
 Respiro fundo. Ela parece me estudar.
 ```
@@ -186,15 +186,15 @@ No exemplo, a primeira e a última linha são narração; as do meio são falas.
 **Fala longa se divide em várias linhas.** Em vez de:
 
 ```
-Gótica: Eu cheguei cedo porque o ônibus passa às seis e depois só às oito, e às oito já não dá tempo, então eu fico aqui esperando e desenhando no caderno até alguém aparecer.
+Luna: Eu cheguei cedo porque o ônibus passa às seis e depois só às oito, e às oito já não dá tempo, então eu fico aqui esperando e desenhando no caderno até alguém aparecer.
 ```
 
 escreva:
 
 ```
-Gótica: Eu cheguei cedo porque o ônibus passa às seis.
-Gótica: Depois, só às oito. E às oito já não dá tempo.
-Gótica: Então eu fico aqui, desenhando, até alguém aparecer.
+Luna: Eu cheguei cedo porque o ônibus passa às seis.
+Luna: Depois, só às oito. E às oito já não dá tempo.
+Luna: Então eu fico aqui, desenhando, até alguém aparecer.
 ```
 
 Linhas em branco entre as falas não fazem diferença para o jogo: use para organizar.
@@ -205,10 +205,10 @@ Linhas em branco entre as falas não fazem diferença para o jogo: use para orga
 
 | Você escreveu | O jogo entende |
 |---|---|
-| `Gótica: Oi.` | A Gótica. |
-| `Gotica: Oi.` | Uma personagem "Gotica", que não existe. |
-| `gótica: Oi.` | Uma personagem "gótica", que não existe. |
-| `Gótica : Oi.` | Uma personagem "Gótica " (com um espaço no fim), que não existe. |
+| `Luna: Oi.` | A Luna. |
+| `luna: Oi.` | Uma personagem "luna", que não existe. |
+| `LUNA: Oi.` | Uma personagem "LUNA", que não existe. |
+| `Luna : Oi.` | Uma personagem "Luna " (com um espaço no fim), que não existe. |
 
 O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, sem a cor e sem o retrato da personagem, e a conversa não travaria.
 
@@ -216,7 +216,7 @@ Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 
 | Nome | Quem é |
 |---|---|
-| `Gótica` | A Gótica |
+| `Luna` | A Luna |
 | `Protagonista` | O protagonista (nome reservado, veja abaixo) |
 
 Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
@@ -236,14 +236,14 @@ O protagonista aparece no texto de três jeitos:
 Os três juntos:
 
 ```
-Gótica: Você viu uma chave por aí?
+Luna: Você viu uma chave por aí?
 Sinto o peso da chave no bolso.
 Protagonista: Que chave?
-Gótica: Uma com um morcego no chaveiro. E aí?
+Luna: Uma com um morcego no chaveiro. E aí?
 -> Vi. Estava embaixo do bebedouro.
-    Gótica: Sério?
+    Luna: Sério?
 -> Não vi nada.
-    Gótica: Droga. Se você achar, me avisa?
+    Luna: Droga. Se você achar, me avisa?
 ```
 
 Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros.
@@ -253,11 +253,11 @@ Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é 
 Cada personagem tem um retrato por expressão, e o retrato de quem fala aparece ao lado da caixa de diálogo. Em narração não há retrato. **Sem etiqueta, o jogo mostra a expressão padrão** da personagem. Para mudar a cara dela em uma fala, escreva no **fim** da linha um espaço, `#` e o nome da expressão:
 
 ```
-Gótica: Você não devia ter visto isso. #raiva
-Gótica: Desculpa. Perdi a cabeça.
+Luna: Você não devia ter visto isso. #raiva
+Luna: Desculpa. Perdi a cabeça.
 ```
 
-A primeira fala aparece com a Gótica brava; a segunda volta à expressão padrão, porque **a etiqueta vale só para a fala em que está**. Para manter a mesma cara em duas falas seguidas, repita a etiqueta nas duas.
+A primeira fala aparece com a Luna brava; a segunda volta à expressão padrão, porque **a etiqueta vale só para a fala em que está**. Para manter a mesma cara em duas falas seguidas, repita a etiqueta nas duas.
 
 | Regra | Por quê |
 |---|---|
@@ -272,7 +272,7 @@ As expressões que existem hoje (a primeira de cada personagem é a padrão):
 
 | Personagem | Expressões |
 |---|---|
-| `Gótica` | `neutra` (padrão), `raiva` |
+| `Luna` | `neutra` (padrão), `raiva` |
 | `Protagonista` | `neutra` (padrão) |
 
 Os retratos atuais são provisórios: quadrados coloridos com o nome do arquivo. Quando uma expressão nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
@@ -296,7 +296,7 @@ Os retratos atuais são provisórios: quadrados coloridos com o nome do arquivo.
 
 Quando não houver jeito, ponha uma barra invertida antes dos dois-pontos: `Eram 10\:30 da manhã.` mostra "Eram 10:30 da manhã.", sem personagem.
 
-Dentro de uma fala o problema não existe: em `Gótica: São 10:30, anda logo.`, só o primeiro dois-pontos conta, e a Gótica diz a frase inteira.
+Dentro de uma fala o problema não existe: em `Luna: São 10:30, anda logo.`, só o primeiro dois-pontos conta, e a Luna diz a frase inteira.
 
 ### Quanto cabe
 
@@ -321,13 +321,13 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 
 | Caractere | O que acontece se você só digitar | Para aparecer no texto | Exemplo |
 |---|---|---|---|
-| `#` no meio da fala | Erro de sintaxe. | `\#` | `Gótica: Sala \#12, no fim do corredor.` |
-| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o retrato. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Gótica: Ela postou com \#saudade` |
-| `//` | O resto da linha **some**, sem aviso. | `\/\/` | `Gótica: O site é escola.com\/\/alunos` |
+| `#` no meio da fala | Erro de sintaxe. | `\#` | `Luna: Sala \#12, no fim do corredor.` |
+| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o retrato. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Luna: Ela postou com \#saudade` |
+| `//` | O resto da linha **some**, sem aviso. | `\/\/` | `Luna: O site é escola.com\/\/alunos` |
 | `{` e `}` | Abrem uma expressão. Um `{` sem fechar é erro e quebra o arquivo. | `\{` e `\}` | `Rabiscado na carteira, um \{ torto.` |
-| `[` e `]` | Abrem marcação. `[b]x[/b]` vira só `x`. Um **`[` sem fechar derruba o projeto inteiro.** | `\[` e `\]` | `Gótica: Escreve \[urgente\] no bilhete.` |
+| `[` e `]` | Abrem marcação. `[b]x[/b]` vira só `x`. Um **`[` sem fechar derruba o projeto inteiro.** | `\[` e `\]` | `Luna: Escreve \[urgente\] no bilhete.` |
 | `<<` | É o começo de um comando; no meio de uma fala é erro. | `\<\<` | `Na lousa, alguém rabiscou \<\< três vezes.` |
-| `\` | Uma barra sozinha é erro. | `\\` | `Gótica: É barra assim \\ ou assim /?` |
+| `\` | Uma barra sozinha é erro. | `\\` | `Luna: É barra assim \\ ou assim /?` |
 | `:` na narração | Vira nome de personagem ([veja acima](#dois-pontos-na-narração)). | `\:` | `Eram 10\:30 da manhã.` |
 | `->` no **começo** da linha | É uma opção. No meio da linha é texto comum. | | |
 
@@ -340,15 +340,15 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 Um bloco de opções é uma pergunta ao jogador. Cada opção começa com `->`, e o texto da opção é **a fala do protagonista**.
 
 ```
-Gótica: O que você achou da escola?
+Luna: O que você achou da escola?
 -> Gostei bastante.
-    Gótica: Que bom. A maioria reclama.
+    Luna: Que bom. A maioria reclama.
 -> Achei estranha.
-    Gótica: Estranha é pouco. Você se acostuma.
+    Luna: Estranha é pouco. Você se acostuma.
 -> Preciso ir.
-    Gótica: Então vai. A gente se vê.
+    Luna: Então vai. A gente se vê.
     <<stop>>
-Gótica: Bom, a aula já vai começar.
+Luna: Bom, a aula já vai começar.
 ```
 
 Como ler este exemplo:
@@ -369,15 +369,15 @@ As regras:
 Um bloco de opções pode ficar dentro de outro: basta recuar mais quatro espaços.
 
 ```
-Gótica: Quer saber um segredo?
+Luna: Quer saber um segredo?
 -> Quero.
-    Gótica: É sobre a professora ou sobre mim?
+    Luna: É sobre a professora ou sobre mim?
     -> Sobre a professora.
-        Gótica: Ela dorme na sala dos professores.
+        Luna: Ela dorme na sala dos professores.
     -> Sobre você.
-        Gótica: Aí já é pedir demais.
+        Luna: Aí já é pedir demais.
 -> Melhor não.
-    Gótica: Sábia decisão.
+    Luna: Sábia decisão.
 ```
 
 ## Variáveis e afinidade
@@ -386,8 +386,8 @@ Uma **variável** é uma anotação que o jogo guarda sobre o que o jogador fez.
 
 | Tipo | Guarda | Exemplo |
 |---|---|---|
-| Sim ou não | Se uma coisa já aconteceu | `$falou_com_gotica` |
-| Número | A **afinidade**: o quanto uma personagem gosta do protagonista | `$afinidade_gotica` |
+| Sim ou não | Se uma coisa já aconteceu | `$falou_com_luna` |
+| Número | A **afinidade**: o quanto uma personagem gosta do protagonista | `$afinidade_luna` |
 
 O nome de uma variável começa com `$` e segue a regra de sempre: minúsculas, sem acento, com `_`.
 
@@ -398,18 +398,18 @@ Antes de usar uma variável, ela precisa ser **declarada**, isto é, apresentada
 ```
 title: variaveis
 ---
-/// A Gótica já conversou com o protagonista e ele respondeu "Sim".
-<<declare $falou_com_gotica = false>>
-/// Afinidade com a Gótica. Sobe 1 quando o protagonista concorda com ela.
-<<declare $afinidade_gotica = 0>>
+/// A Luna já conversou com o protagonista e ele respondeu "Sim".
+<<declare $falou_com_luna = false>>
+/// Afinidade com a Luna. Sobe 1 quando o protagonista concorda com ela.
+<<declare $afinidade_luna = 0>>
 ===
 ```
 
 Para criar uma variável, acrescente duas linhas **no fim, antes do `===`**:
 
 ```
-/// O protagonista devolveu a chave do armário para a Gótica.
-<<declare $devolveu_chave_gotica = false>>
+/// O protagonista devolveu a chave do armário para a Luna.
+<<declare $devolveu_chave_luna = false>>
 ```
 
 - A linha com `///` (três barras) é a descrição. Ela é **obrigatória** e aparece para quem monta as cenas.
@@ -422,28 +422,28 @@ Para criar uma variável, acrescente duas linhas **no fim, antes do `===`**:
 O comando é `<<set>>`. Para sim/não:
 
 ```
-<<set $falou_com_gotica to true>>
+<<set $falou_com_luna to true>>
 ```
 
 Para a afinidade, some ou subtraia do valor atual:
 
 ```
-<<set $afinidade_gotica to $afinidade_gotica + 1>>
-<<set $afinidade_gotica to $afinidade_gotica - 1>>
+<<set $afinidade_luna to $afinidade_luna + 1>>
+<<set $afinidade_luna to $afinidade_luna - 1>>
 ```
 
 O `<<set>>` fica **dentro da opção** que causa a mudança:
 
 ```
-Gótica: Gostou do meu desenho?
+Luna: Gostou do meu desenho?
 -> Gostei. É a sua cara.
-    <<set $afinidade_gotica to $afinidade_gotica + 1>>
-    Gótica: Sombrio e mal acabado. Obrigada.
+    <<set $afinidade_luna to $afinidade_luna + 1>>
+    Luna: Sombrio e mal acabado. Obrigada.
 -> Parece um borrão.
-    <<set $afinidade_gotica to $afinidade_gotica - 1>>
-    Gótica: É um corvo. Mas tudo bem.
+    <<set $afinidade_luna to $afinidade_luna - 1>>
+    Luna: É um corvo. Mas tudo bem.
 -> Não entendo de arte.
-    Gótica: Ninguém entende. Por isso é bom.
+    Luna: Ninguém entende. Por isso é bom.
 ```
 
 Aqui a primeira resposta sobe a afinidade, a segunda desce e a terceira não muda nada.
@@ -453,20 +453,20 @@ Aqui a primeira resposta sobe a afinidade, a segunda desce e a terceira não mud
 Para uma fala só aparecer em certa situação, ponha-a entre `<<if>>` e `<<endif>>`, com recuo:
 
 ```
-<<if $falou_com_gotica>>
-    Gótica: Você de novo.
+<<if $falou_com_luna>>
+    Luna: Você de novo.
 <<endif>>
 ```
 
 Para escolher entre várias falas, use `<<elseif>>` e `<<else>>`:
 
 ```
-<<if $afinidade_gotica >= 2>>
-    Gótica: Ah, é você. Guardei um lugar.
-<<elseif $afinidade_gotica >= 1>>
-    Gótica: Já nos vimos, não é?
+<<if $afinidade_luna >= 2>>
+    Luna: Ah, é você. Guardei um lugar.
+<<elseif $afinidade_luna >= 1>>
+    Luna: Já nos vimos, não é?
 <<else>>
-    Gótica: Pode sentar onde quiser. Só não faça barulho.
+    Luna: Pode sentar onde quiser. Só não faça barulho.
 <<endif>>
 ```
 
@@ -474,11 +474,11 @@ O jogo lê de cima para baixo e mostra **só a primeira** que for verdadeira: co
 
 | Para dizer | Escreva |
 |---|---|
-| "se já falou com a Gótica" | `<<if $falou_com_gotica>>` |
-| "se ainda não falou com a Gótica" | `<<if not $falou_com_gotica>>` |
-| "se a afinidade é 1 ou mais" | `<<if $afinidade_gotica >= 1>>` |
-| "se a afinidade é 0 ou menos" | `<<if $afinidade_gotica <= 0>>` |
-| "se o jogador já passou por aquele nó" | `<<if visited("gotica_primeiro_oi")>>` |
+| "se já falou com a Luna" | `<<if $falou_com_luna>>` |
+| "se ainda não falou com a Luna" | `<<if not $falou_com_luna>>` |
+| "se a afinidade é 1 ou mais" | `<<if $afinidade_luna >= 1>>` |
+| "se a afinidade é 0 ou menos" | `<<if $afinidade_luna <= 0>>` |
+| "se o jogador já passou por aquele nó" | `<<if visited("luna_primeiro_oi")>>` |
 
 - Todo `<<if>>` precisa do seu `<<endif>>`.
 - Compare a afinidade com `>=` ou `<=`, nunca com `==`.
@@ -489,11 +489,11 @@ O jogo lê de cima para baixo e mostra **só a primeira** que for verdadeira: co
 Ponha o `<<if>>` no **fim da linha da opção**:
 
 ```
-Gótica: Vou ensaiar no auditório. A banda toca na sexta.
+Luna: Vou ensaiar no auditório. A banda toca na sexta.
 -> Boa sorte no ensaio.
-    Gótica: Sorte é pra quem não ensaia.
--> Posso assistir? <<if $afinidade_gotica >= 1>>
-    Gótica: Pode. Senta no fundo e não bate palma fora de hora.
+    Luna: Sorte é pra quem não ensaia.
+-> Posso assistir? <<if $afinidade_luna >= 1>>
+    Luna: Pode. Senta no fundo e não bate palma fora de hora.
 ```
 
 - **O jogador vê a opção bloqueada**, esmaecida e sem clique. É de propósito: ele entende que existe um caminho fechado e que as escolhas têm peso.
@@ -503,7 +503,7 @@ Gótica: Vou ensaiar no auditório. A banda toca na sexta.
 
 ### Mostrar um valor no texto
 
-`{$nome}` é trocado pelo valor atual: `Sua afinidade com a Gótica é {$afinidade_gotica}.` Serve para testar. Num roteiro de verdade, não mostre número para o jogador.
+`{$nome}` é trocado pelo valor atual: `Sua afinidade com a Luna é {$afinidade_luna}.` Serve para testar. Num roteiro de verdade, não mostre número para o jogador.
 
 ## Comandos disponíveis
 
@@ -586,16 +586,16 @@ Guardei no bolso.
 ```
 Protagonista: Toma. Estava embaixo do bebedouro.
 <<remover_item chave_teste>>
-Gótica: Sério? Obrigada.
+Luna: Sério? Obrigada.
 ```
 
 **A conversa muda conforme o jogador tem ou não o item:**
 
 ```
 <<if tem_item("chave_teste")>>
-    Gótica: Essa chave no seu bolso é minha.
+    Luna: Essa chave no seu bolso é minha.
 <<else>>
-    Gótica: Você viu uma chave por aí?
+    Luna: Você viu uma chave por aí?
 <<endif>>
 ```
 
@@ -613,7 +613,7 @@ As regras:
 
 ```
 <<if not tem_item("chave_teste")>>
-    Gótica: Toma, achei esta chave no corredor.
+    Luna: Toma, achei esta chave no corredor.
     <<dar_item chave_teste>>
 <<endif>>
 ```
@@ -631,13 +631,13 @@ Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta ta
 | O quê | Formato | Exemplo |
 |---|---|---|
 | Pasta | `ato_N/capitulo_N/episodio_N/` | `Assets/Roteiro/ato_1/capitulo_1/episodio_2/` |
-| Arquivo | o nome do nó de entrada + `.yarn` | `gotica_chave_perdida.yarn` |
+| Arquivo | o nome do nó de entrada + `.yarn` | `luna_chave_perdida.yarn` |
 | Nome do episódio (na linha de título) | português normal, com acento | `A chave perdida` |
-| Nó de entrada | `<quem_ou_onde>_<assunto>` | `gotica_chave_perdida` |
-| Nó interno | o nome do nó de entrada + `_` + o assunto | `gotica_chave_perdida_devolveu` |
-| Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_gotica` |
+| Nó de entrada | `<quem_ou_onde>_<assunto>` | `luna_chave_perdida` |
+| Nó interno | o nome do nó de entrada + `_` + o assunto | `luna_chave_perdida_devolveu` |
+| Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_luna` |
 | Id de item | minúsculas, sem acento, dígitos e `_` | `chave_teste` |
-| Quem fala | como na tabela [Quem fala](#quem-fala), com acento | `Gótica` |
+| Quem fala | como na tabela [Quem fala](#quem-fala), com a mesma letra maiúscula ou minúscula | `Luna` |
 | Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
 | Branch | `roteiro/<seu-nome>-<assunto>` | `roteiro/ana-chave-perdida` |
 
@@ -648,14 +648,14 @@ Um item novo, uma música, um som, uma expressão, uma personagem nova: enquanto
 Deixe um comentário `// PEDIDO:` no ponto exato do roteiro, dizendo o que deve acontecer ali:
 
 ```
-Gótica: Toma. É a chave da biblioteca.
+Luna: Toma. É a chave da biblioteca.
 // PEDIDO: dar o item "chave_da_biblioteca" aqui. É uma chave grande e antiga.
-Gótica: Não perde, que eu não tenho outra.
+Luna: Não perde, que eu não tenho outra.
 ```
 
 ```
-Gótica: Você não devia ter visto isso.
-// PEDIDO: a Gótica fica com uma expressão de medo nesta fala (ela só tem neutra e raiva).
+Luna: Você não devia ter visto isso.
+// PEDIDO: a Luna fica com uma expressão de medo nesta fala (ela só tem neutra e raiva).
 // PEDIDO: tocar uma música tensa a partir daqui.
 ```
 
@@ -714,10 +714,10 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O id do item existe na [tabela de itens](#itens)? | `<<dar_item chave_da_sala>>` | A verificação do jogo reprova. |
 | O comando de item tem um id, e só um? | `<<dar_item>>`, `<<dar_item chave_teste mapa>>` | A verificação reprova; no jogo, a conversa **trava**. |
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
-| O nome do nó é minúsculo e sem acento? | `title: Gótica_Oi` | A verificação reprova. |
+| O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
-| O nome de quem fala está igual ao da tabela? | `Gotica: Oi.` | A verificação do jogo reprova. |
-| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Gótica: Oi. #medo`, `Narração. #raiva` | A verificação do jogo reprova. |
+| O nome de quem fala está igual ao da tabela? | `luna: Oi.` | A verificação do jogo reprova. |
+| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Luna: Oi. #medo`, `Narração. #raiva` | A verificação do jogo reprova. |
 | As variáveis novas estão em `variaveis.yarn`, com `///`? | `<<declare>>` dentro da conversa | A verificação reprova. |
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |
 | Há dois-pontos em alguma narração? | `Eram 10:30 da manhã.` | Vira nome de personagem ([Dois-pontos na narração](#dois-pontos-na-narração)). |
@@ -766,7 +766,7 @@ O exemplo acompanha a Ana, que vai escrever a conversa da chave perdida.
 3. **Escreva.** No VS Code, crie o arquivo na pasta do episódio (botão direito na pasta → *New File*):
 
    ```
-   Assets/Roteiro/ato_1/capitulo_1/episodio_2/gotica_chave_perdida.yarn
+   Assets/Roteiro/ato_1/capitulo_1/episodio_2/luna_chave_perdida.yarn
    ```
 
    Comece pela [linha de título](#a-linha-de-título-de-cada-arquivo).
@@ -782,11 +782,11 @@ O exemplo acompanha a Ana, que vai escrever a conversa da chave perdida.
 7. **Abra o PR.** Clique em *Create Pull Request*; ele abre o navegador. O título é o mesmo do commit. O GitHub traz um texto pronto, escrito para programadores: **apague tudo** e escreva o seu, neste formato:
 
    ```
-   Arquivos: Assets/Roteiro/ato_1/capitulo_1/episodio_2/gotica_chave_perdida.yarn
-   Nó de entrada: gotica_chave_perdida
-   Onde entra: corredor, no intervalo. O jogador clica na Gótica.
+   Arquivos: Assets/Roteiro/ato_1/capitulo_1/episodio_2/luna_chave_perdida.yarn
+   Nó de entrada: luna_chave_perdida
+   Onde entra: corredor, no intervalo. O jogador clica na Luna.
    Variáveis novas: nenhuma
-   Pedidos: uma expressão de surpresa para a Gótica quando recebe a chave
+   Pedidos: uma expressão de surpresa para a Luna quando recebe a chave
    ```
 
    Clique em *Create pull request*.
@@ -798,11 +798,11 @@ Outro exemplo de texto de PR, para uma entrega com dois arquivos e uma variável
 ```
 Arquivos:
   Assets/Roteiro/ato_1/capitulo_2/episodio_1/biblioteca_porta.yarn
-  Assets/Roteiro/ato_1/capitulo_2/episodio_1/gotica_biblioteca.yarn
+  Assets/Roteiro/ato_1/capitulo_2/episodio_1/luna_biblioteca.yarn
   Assets/Roteiro/variaveis.yarn
-Nós de entrada: biblioteca_porta, gotica_biblioteca
-Onde entra: porta da biblioteca (clique na porta) e Gótica ao lado dela.
-Variáveis novas: $gotica_contou_da_biblioteca
+Nós de entrada: biblioteca_porta, luna_biblioteca
+Onde entra: porta da biblioteca (clique na porta) e Luna ao lado dela.
+Variáveis novas: $luna_contou_da_biblioteca
 Pedidos: o item "chave_da_biblioteca"
 ```
 
@@ -824,7 +824,7 @@ Para você saber o que esperar:
 
 ## Exemplo de roteiro
 
-Três conversas que contam uma história só: o protagonista acha uma chave no corredor, a Gótica aparece procurando por ela, e o que ele faz com a chave muda o que ela aceita mais tarde. O exemplo mostra **coleta de item**, **entrega de item**, **ganho e perda de afinidade** e **uso da afinidade** em uma fala e em uma opção. Os três arquivos foram rodados no jogo como estão.
+Três conversas que contam uma história só: o protagonista acha uma chave no corredor, a Luna aparece procurando por ela, e o que ele faz com a chave muda o que ela aceita mais tarde. O exemplo mostra **coleta de item**, **entrega de item**, **ganho e perda de afinidade** e **uso da afinidade** em uma fala e em uma opção. Os três arquivos foram rodados no jogo como estão.
 
 **`Assets/Roteiro/ato_1/capitulo_1/episodio_2/corredor_bebedouro.yarn`**
 
@@ -845,70 +845,70 @@ Guardei no bolso. Alguém deve estar procurando por ela.
 ===
 ```
 
-**`Assets/Roteiro/ato_1/capitulo_1/episodio_2/gotica_chave_perdida.yarn`**
+**`Assets/Roteiro/ato_1/capitulo_1/episodio_2/luna_chave_perdida.yarn`**
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida
 
-title: gotica_chave_perdida
+title: luna_chave_perdida
 ---
-Gótica: Você viu uma chave por aí? Tem um morcego no chaveiro.
+Luna: Você viu uma chave por aí? Tem um morcego no chaveiro.
 
 // Sem a chave, a conversa é curta e termina aqui.
 <<if not tem_item("chave_teste")>>
     Protagonista: Não vi. Se eu achar, te aviso.
-    Gótica: Tá. Ela não pode ter ido longe.
+    Luna: Tá. Ela não pode ter ido longe.
     <<stop>>
 <<endif>>
 
 Sinto o peso da chave no bolso.
-Gótica: E aí? Viu ou não viu?
+Luna: E aí? Viu ou não viu?
 -> Vi. Estava embaixo do bebedouro.
     // ENTREGA: o item sai do inventário. GANHO de afinidade.
     <<remover_item chave_teste>>
-    <<set $afinidade_gotica to $afinidade_gotica + 1>>
-    Gótica: Sério? Já estava me vendo arrombar o meu próprio armário.
+    <<set $afinidade_luna to $afinidade_luna + 1>>
+    Luna: Sério? Já estava me vendo arrombar o meu próprio armário.
 -> Depende. O que eu ganho com isso?
     // PERDA de afinidade. Ele entrega a chave mesmo assim.
-    <<set $afinidade_gotica to $afinidade_gotica - 1>>
+    <<set $afinidade_luna to $afinidade_luna - 1>>
     <<remover_item chave_teste>>
-    Gótica: Não ganha nada. Ser uma pessoa decente é o mínimo.
+    Luna: Não ganha nada. Ser uma pessoa decente é o mínimo.
 -> Não vi nada.
     // Sem ganho nem perda de afinidade. O protagonista fica com a chave.
-    Gótica: Droga. Deve ter caído em outro lugar.
-    Gótica: Se você achar, me avisa?
+    Luna: Droga. Deve ter caído em outro lugar.
+    Luna: Se você achar, me avisa?
     <<stop>>
 
 // Aqui chegam os dois caminhos em que a chave foi devolvida.
 // USO da afinidade em uma fala.
-<<if $afinidade_gotica >= 1>>
-    Gótica: Fico te devendo uma. E eu pago o que devo.
+<<if $afinidade_luna >= 1>>
+    Luna: Fico te devendo uma. E eu pago o que devo.
 <<else>>
-    Gótica: Da próxima vez, devolve sem fazer graça.
+    Luna: Da próxima vez, devolve sem fazer graça.
 <<endif>>
 ===
 ```
 
-**`Assets/Roteiro/ato_1/capitulo_1/episodio_3/gotica_fim_da_aula.yarn`**
+**`Assets/Roteiro/ato_1/capitulo_1/episodio_3/luna_fim_da_aula.yarn`**
 
 ```
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 3 · O ensaio
 
-title: gotica_fim_da_aula
+title: luna_fim_da_aula
 ---
-Gótica: Vou ensaiar no auditório. A banda toca na sexta.
+Luna: Vou ensaiar no auditório. A banda toca na sexta.
 -> Boa sorte no ensaio.
-    Gótica: Sorte é pra quem não ensaia.
+    Luna: Sorte é pra quem não ensaia.
 // USO da afinidade em uma opção. Sem afinidade, o jogador vê a opção
 // bloqueada.
--> Posso assistir? <<if $afinidade_gotica >= 1>>
-    Gótica: Pode. Senta no fundo e não bate palma fora de hora.
+-> Posso assistir? <<if $afinidade_luna >= 1>>
+    Luna: Pode. Senta no fundo e não bate palma fora de hora.
 ===
 ```
 
 O que cada escolha da conversa da chave causa:
 
-| O protagonista responde | A chave | A afinidade | A Gótica fecha com | No episódio 3, "Posso assistir?" |
+| O protagonista responde | A chave | A afinidade | A Luna fecha com | No episódio 3, "Posso assistir?" |
 |---|---|---|---|---|
 | "Vi. Estava embaixo do bebedouro." | é devolvida | sobe 1 | "Fico te devendo uma. E eu pago o que devo." | liberada |
 | "Depende. O que eu ganho com isso?" | é devolvida | desce 1 | "Da próxima vez, devolve sem fazer graça." | bloqueada |

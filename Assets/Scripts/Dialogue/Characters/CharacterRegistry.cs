@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ProjetoVN.Dialogue.Characters
 {
     /// <summary>
-    /// A lista de personagens do jogo. O roteiro cita o personagem pelo nome exibido (<c>Gótica: ...</c>);
+    /// A lista de personagens do jogo. O roteiro cita o personagem pelo nome exibido (<c>Luna: ...</c>);
     /// o <c>Id</c> é o que o código usa. Um asset, referenciado por quem precisa dele (D-04).
     /// </summary>
     [CreateAssetMenu(fileName = "CharacterRegistry", menuName = "Characters/Character Registry")]

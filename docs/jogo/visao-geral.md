@@ -49,7 +49,7 @@ Fora do escopo não quer dizer proibido para sempre: quer dizer que nenhuma issu
 | **Objeto interativo** | Objeto do cenário com `InteractableItem`: reage a hover e a clique |
 | **Coletável** | Objeto interativo que vira item do inventário ao ser clicado |
 | **Portão** | Objeto que só libera uma ação com um item, uma flag ou os dois (`LockedActionBehaviour`). Uma porta trancada é um portão |
-| **Flag** | Um fato booleano da história ("falou com a Gótica") |
+| **Flag** | Um fato booleano da história ("falou com a Luna") |
 | **Variável** | Um valor da história: booleano, número ou texto. Uma flag é uma variável booleana |
 | **Afinidade** | Variável numérica por personagem, alterada por escolhas e lida por condições |
 | **Estado da história** | O conjunto de todas as variáveis. Entra no save |
