@@ -60,6 +60,16 @@ Protagonista: Sou. Cheguei hoje.
 // PENSAMENTO do protagonista: narração em primeira pessoa, sem nome.
 Respiro fundo. Ela parece me estudar.
 
+// EXPRESSÃO: para a personagem mudar de cara numa fala, escreva no FIM da
+// linha um espaço, "#" e o nome da expressão. Vale só para esta fala: a
+// próxima volta à expressão padrão do personagem (a primeira da tabela
+// "Expressões" do guia). Só em fala com nome, uma etiqueta por fala, nunca em
+// narração nem em opção. Nome de expressão que o personagem não tem não
+// trava o jogo: o console avisa e o retrato padrão aparece. O teste do
+// projeto reprova antes disso.
+Gótica: Não olha assim para mim. #raiva
+Gótica: Desculpa. Foi mal.
+
 // CONDIÇÃO: <<if>> / <<elseif>> / <<else>> / <<endif>> escolhem quais falas
 // aparecem. A afinidade é um número, então compare com >= ou <=, nunca com ==.
 // O recuo de quatro espaços dentro da condição é obrigatório (a tecla Tab do

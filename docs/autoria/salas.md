@@ -93,7 +93,28 @@ O `Canvas_Debug` (botões Save, Load, Reset Session e Reload Scene) é ferrament
 
 ## Personagens
 
-*A preencher pela issue #10:* como criar um personagem, cadastrar retratos e expressões.
+Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro. Não precisa de código nem de cena: personagem novo é um asset, uma linha no registro e uma linha nas tabelas do guia de roteiro. Os assets ficam em `Assets/Scripts/ScriptableObjects/Characters/`.
+
+### Criar um personagem
+
+1. **Retratos.** Cada expressão é uma imagem PNG de **300×300 pixels**, em `Assets/UI/Retratos/`, com o nome `<personagem>_<expressão>.png` (`gotica_raiva.png`). No Inspector da imagem, **Texture Type** é `Sprite (2D and UI)` e **Sprite Mode** é `Single` (o padrão do projeto vem `Multiple`, e com ele o Unity não gera sprite nenhum). Os retratos atuais são provisórios: quadrados com o nome do arquivo.
+2. **O personagem.** Botão direito na pasta `Characters/` → **Create → Characters → Character**. Preencha:
+
+   | Campo | O que escrever | Se errar |
+   |---|---|---|
+   | **Id** | Minúsculas sem acento, dígitos e `_` (`gotica`). É o que o código usa; único no projeto | O console avisa |
+   | **Display Name** | O nome **exatamente como o roteiro o escreve** antes dos dois-pontos, e como aparece na placa (`Gótica`). Único no projeto | Vazio ou com espaço nas pontas: o roteiro não acha o personagem, e o console avisa |
+   | **Name Color** | A cor do nome na placa | |
+   | **Portraits** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem retrato |
+
+3. **O registro.** Abra `CharacterRegistry.asset` (na mesma pasta) e acrescente o personagem à lista **Characters**. Um personagem fora do registro aparece no jogo só com o nome, sem cor e sem retrato, e o console avisa. O registro acusa id e nome exibido repetidos.
+4. **O guia de roteiro.** Acrescente uma linha para o personagem na tabela "Quem fala" e as expressões dele na tabela "Expressões" de [roteiro.md](roteiro.md). É dali que o roteirista copia os nomes.
+
+Uma **expressão nova** de um personagem existente é uma imagem nova, uma entrada em **Portraits** e uma linha na tabela "Expressões" do guia.
+
+O jogo troca o retrato quando o roteiro escreve a expressão no fim da fala (`Gótica: Sai daqui. #raiva`). O teste de conteúdo (`ScriptContentTests`) reprova nome de quem fala que não está no registro e expressão que o personagem não tem, com o nó e a linha.
+
+O retrato aparece à esquerda da caixa de diálogo e some em narração. Ele vive no `GameUI.prefab`, não na cena da sala.
 
 ## Música e sons
 

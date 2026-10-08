@@ -40,6 +40,9 @@ namespace ProjetoVN.Tests.EditMode
         /// <summary><c>null</c> quando o roteiro tem erro de compilação.</summary>
         public Program Program => _compilation.Program;
 
+        /// <summary>O texto de cada linha do roteiro, com o nó, o número da linha e as etiquetas.</summary>
+        public IDictionary<string, StringInfo> StringTable => _compilation.StringTable;
+
         public IEnumerable<string> NodeNames => _compilation.Program == null
             ? Enumerable.Empty<string>()
             : _compilation.Program.Nodes.Keys;

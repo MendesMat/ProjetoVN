@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.Core.State;
+using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Inventory;
 using UnityEditor;
@@ -61,7 +63,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ProjectScripts_CiteOnlyItemIdsThatExistInTheItemRegistry()
         {
-            ItemRegistry registry = LoadTheOnlyItemRegistry();
+            ItemRegistry registry = LoadTheOnly<ItemRegistry>();
             ScriptItemReferences references = ScriptItemReferences.In(ScriptRun.FromProjectFiles().Program);
 
             Assert.IsEmpty(references.WithoutLiteralId,
@@ -110,13 +112,90 @@ namespace ProjetoVN.Tests.EditMode
             CollectionAssert.AreEqual(new[] { typeName }, declaredTypes);
         }
 
-        private static ItemRegistry LoadTheOnlyItemRegistry()
+        [Test]
+        public void ProjectScripts_NameOnlyCharactersInTheCharacterRegistry()
         {
-            string[] guids = AssetDatabase.FindAssets("t:ItemRegistry");
-            Assert.AreEqual(1, guids.Length, "o projeto tem um único ItemRegistry");
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+            ScriptSpeakers speakers = ProjectSpeakers();
 
-            return AssetDatabase.LoadAssetAtPath<ItemRegistry>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            Assert.IsEmpty(
+                speakers.Spoken.Where(line => !registry.TryGetByScriptName(line.Character, out _))
+                    .Select(line => $"{line}: '{line.Character}'"),
+                "todo nome antes dos dois-pontos precisa ser o Display Name de um personagem do CharacterRegistry; " +
+                "se for narração com dois-pontos, escape com \\:");
         }
+
+        [Test]
+        public void ProjectScripts_UseOnlyExpressionsTheSpeakerHas()
+        {
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+            ScriptSpeakers speakers = ProjectSpeakers();
+
+            Assert.IsEmpty(speakers.TaggedWithoutSpeaker.Select(line => $"{line}: #{string.Join(" #", line.Expressions)}"),
+                "etiqueta de expressão só vale em fala com nome, nunca em narração nem em opção");
+            Assert.IsEmpty(speakers.Spoken.Where(line => line.Expressions.Length > 1).Select(line => line.ToString()),
+                "uma fala tem no máximo uma etiqueta de expressão");
+            Assert.IsEmpty(speakers.Spoken.SelectMany(line => ExpressionsTheSpeakerLacks(registry, line)),
+                "a expressão precisa existir nos retratos de quem fala");
+        }
+
+        [Test]
+        public void CharacterRegistry_HasUniqueIdsAndNamesInTheConvention()
+        {
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+            Assert.IsEmpty(registry.Characters.Where(character => character == null).Select(_ => "(vazio)"),
+                "o registro não pode ter elemento vazio");
+
+            Assert.IsEmpty(registry.Characters.Select(character => character.Id).Where(id => !ScriptNodeName.FollowsConvention(id)),
+                "o id é minúsculas sem acento, dígitos e _");
+            Assert.IsEmpty(Repeated(registry.Characters.Select(character => character.Id)), "ids únicos");
+            Assert.IsEmpty(registry.Characters.Where(character => string.IsNullOrWhiteSpace(character.DisplayName)).Select(character => character.Id),
+                "todo personagem tem nome exibido");
+            Assert.IsEmpty(Repeated(registry.Characters.Select(character => character.DisplayName)), "nomes exibidos únicos");
+            Assert.IsEmpty(registry.Characters.SelectMany(PortraitProblems), "cada retrato tem uma expressão no formato, única, e um sprite");
+        }
+
+        [Test]
+        public void GoticaRespostaNao_AsksForTheAngryExpression()
+        {
+            ScriptSpeakers speakers = ProjectSpeakers();
+
+            ScriptSpeakerLine line = speakers.Spoken.Single(l => l.NodeName == "gotica_resposta_nao");
+
+            Assert.AreEqual("Gótica", line.Character);
+            CollectionAssert.AreEqual(new[] { "raiva" }, line.Expressions);
+        }
+
+        private static ScriptSpeakers ProjectSpeakers() => ScriptSpeakers.In(ScriptRun.FromProjectFiles().StringTable.Values);
+
+        private static T LoadTheOnly<T>() where T : UnityEngine.Object
+        {
+            string[] guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
+            Assert.AreEqual(1, guids.Length, $"o projeto tem um único {typeof(T).Name}");
+
+            return AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guids[0]));
+        }
+
+        private static IEnumerable<string> ExpressionsTheSpeakerLacks(CharacterRegistry registry, ScriptSpeakerLine line)
+        {
+            if (!registry.TryGetByScriptName(line.Character, out CharacterSO character)) return Enumerable.Empty<string>();
+
+            return line.Expressions.Where(expression => !character.HasExpression(expression))
+                .Select(expression => $"{line}: {character.DisplayName} não tem a expressão '{expression}'");
+        }
+
+        private static IEnumerable<string> PortraitProblems(CharacterSO character)
+        {
+            var problems = new List<string>();
+            problems.AddRange(character.Portraits.Where(p => !ScriptNodeName.FollowsConvention(p.Expression))
+                .Select(p => $"{character.Id}: expressão '{p.Expression}' fora do formato"));
+            problems.AddRange(Repeated(character.Portraits.Select(p => p.Expression)).Select(e => $"{character.Id}: expressão '{e}' repetida"));
+            problems.AddRange(character.Portraits.Where(p => p.Sprite == null).Select(p => $"{character.Id}: expressão '{p.Expression}' sem sprite"));
+            return problems;
+        }
+
+        private static IEnumerable<string> Repeated(IEnumerable<string> values) =>
+            values.GroupBy(value => value).Where(group => group.Count() > 1).Select(group => group.Key);
 
         [Test]
         public void GoticaChegueiCedo_AsksFourOptions()

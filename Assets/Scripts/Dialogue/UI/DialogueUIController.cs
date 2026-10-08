@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ProjetoVN.Core.Messaging;
+using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.Messaging;
 using TMPro;
@@ -28,6 +29,9 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Texto do nome de quem fala. Vazio: a interface de diálogo não funciona e o console avisa.")]
         [SerializeField] private TMP_Text speakerNameText;
 
+        [Tooltip("Lista dos personagens que o roteiro pode citar. Vazio: todo nome aparece em texto puro, sem cor e sem retrato, e o console avisa.")]
+        [SerializeField] private CharacterRegistry characterRegistry;
+
         [Header("Escolhas")]
         [Tooltip("Objeto que contém os botões de escolha, ligado só enquanto há opções. Vazio: a interface de diálogo não funciona e o console avisa.")]
         [SerializeField] private GameObject dialogueChoices;
@@ -43,17 +47,23 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Placa do nome, ligada só quando a fala tem personagem (narração a esconde). Vazio: a placa não é controlada.")]
         [SerializeField] private GameObject speakerNameplate;
 
+        [Tooltip("Imagem do retrato de quem fala, ligada só quando a fala tem um retrato (narração, personagem desconhecido e personagem sem retrato a desligam). Vazio: o retrato não é controlado.")]
+        [SerializeField] private Image portraitImage;
+
         [Tooltip("O '>>' de continuar, ligado enquanto a fala espera o jogador. Vazio: não é controlado.")]
         [SerializeField] private GameObject continueIndicator;
 
         private readonly List<DialogueOption> _shownOptions = new();
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
+        private Color _defaultNameColor;
 
         private void Start()
         {
+            _defaultNameColor = speakerNameText.color;
             CacheChoiceButtons();
             HideAll();
+            WarnAboutMissingCharacterRegistry();
             RegisterOnDialogueManager();
         }
 
@@ -119,12 +129,80 @@ namespace ProjetoVN.Dialogue.UI
 
         private void ShowLine(LocalizedLine line)
         {
-            string speaker = line.CharacterName;
-            speakerNameText.text = speaker ?? "";
+            ShowSpeaker(line);
             dialogueText.text = line.TextWithoutCharacterName.Text;
-            SetActiveIfAssigned(speakerNameplate, !string.IsNullOrWhiteSpace(speaker));
             dialogueBox.SetActive(true);
             dialogueChoices.SetActive(false);
+        }
+
+        private void ShowSpeaker(LocalizedLine line)
+        {
+            string speaker = line.CharacterName;
+            bool isNarration = string.IsNullOrWhiteSpace(speaker);
+            SetActiveIfAssigned(speakerNameplate, !isNarration);
+
+            if (isNarration)
+            {
+                speakerNameText.text = "";
+                ShowPortrait(null);
+                return;
+            }
+
+            if (!TryResolveCharacter(speaker, out CharacterSO character))
+            {
+                speakerNameText.text = speaker;
+                speakerNameText.color = _defaultNameColor;
+                ShowPortrait(null);
+                return;
+            }
+
+            speakerNameText.text = NameToDisplay(character);
+            speakerNameText.color = character.NameColor;
+            ShowPortrait(PortraitFor(character, line));
+        }
+
+        // A troca do nome do protagonista pelo que o jogador escolheu (#26) entra aqui, sem mexer em nenhum roteiro.
+        private static string NameToDisplay(CharacterSO character) => character.DisplayName;
+
+        private bool TryResolveCharacter(string scriptName, out CharacterSO character)
+        {
+            character = null;
+            if (characterRegistry == null) return false;
+            if (characterRegistry.TryGetByScriptName(scriptName, out character)) return true;
+
+            Debug.LogWarning($"[DialogueUIController] Personagem desconhecido no roteiro: '{scriptName}' (nó '{CurrentNodeName()}'). " +
+                             "O nome aparece em texto puro, sem cor e sem retrato.", this);
+            return false;
+        }
+
+        private Sprite PortraitFor(CharacterSO character, LocalizedLine line)
+        {
+            string expression = ExpressionTag.FirstIn(line.Metadata);
+            if (expression == null) return character.DefaultPortrait;
+            if (character.TryGetPortrait(expression, out Sprite portrait)) return portrait;
+
+            Debug.LogWarning($"[DialogueUIController] Expressão desconhecida: '{expression}' não existe em '{character.DisplayName}' (nó '{CurrentNodeName()}'). " +
+                             "Mostrando a expressão padrão.", this);
+            return character.DefaultPortrait;
+        }
+
+        // Um Image sem sprite desenha um quadrado branco, então o retrato some pelo objeto, não pelo sprite.
+        private void ShowPortrait(Sprite portrait)
+        {
+            if (portraitImage == null) return;
+
+            bool hasPortrait = portrait != null;
+            portraitImage.gameObject.SetActive(hasPortrait);
+            if (hasPortrait) portraitImage.sprite = portrait;
+        }
+
+        private static string CurrentNodeName() =>
+            DialogueManager.Instance != null ? DialogueManager.Instance.CurrentNodeName : null;
+
+        private void WarnAboutMissingCharacterRegistry()
+        {
+            if (characterRegistry == null)
+                Debug.LogError("[DialogueUIController] Character Registry não está atribuído: todo nome aparece em texto puro, sem cor e sem retrato.", this);
         }
 
         private void CacheChoiceButtons()
@@ -204,6 +282,9 @@ namespace ProjetoVN.Dialogue.UI
         {
             if (dialogueBox == null || dialogueText == null || speakerNameText == null || dialogueChoices == null)
                 Debug.LogWarning("[DialogueUIController] Caixa, texto da fala, texto do nome e contêiner de escolhas precisam estar atribuídos.", this);
+
+            if (characterRegistry == null)
+                Debug.LogWarning("[DialogueUIController] Character Registry está vazio: todo nome aparece em texto puro, sem cor e sem retrato.", this);
 
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);

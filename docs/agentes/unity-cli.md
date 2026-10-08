@@ -293,6 +293,7 @@ Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho
 ## Outras armadilhas do projeto
 
 - **Arte da interface em SVG.** Os SVGs são importados como Textured Sprite e desenhados com `Image` comum. Cada textura tem exatamente o tamanho do elemento em 1080p, porque o importador não gera mipmaps e uma textura maior volta a serrilhar. Detalhes no [README do Dialogue](../../Assets/Scripts/Dialogue/README.md).
+- **PNG novo vem como `Sprite Mode: Multiple`.** O importador padrão do projeto 2D importa um PNG como `Sprite (2D and UI)` em modo `Multiple`, e sem fatias o Unity não gera sprite nenhum (`LoadAssetAtPath<Sprite>` devolve `null`). Para uma imagem inteira, ajuste `TextureImporter.spriteImportMode = SpriteImportMode.Single` e chame `SaveAndReimport()` antes de referenciá-la (aconteceu nos retratos da #10).
 - **Nitidez se julga em Full HD.** No Game view, use 1920×1080, não "16:9 Aspect".
 - **Ids de save.** `ItemDataSO.Id` e o `persistentId` dos coletáveis são chaves do save. Um prefab duplicado copia o `persistentId`; use o menu de contexto **Regenerate Persistent Id** no componente.
 - **Rastreamento.** Para ver o fluxo de mensagens e as trocas de estado, acrescente `VN_TRACE_MESSAGES` em Project Settings → Player → Scripting Define Symbols. Isso altera `ProjectSettings`, então não vai para o commit.

@@ -2,7 +2,7 @@
 
 O módulo `Dialogue` é um **adaptador fino** entre o [Yarn Spinner](https://docs.yarnspinner.dev/) (decisão D-17) e o resto do projeto. Quem escreve a conversa é o roteirista, em arquivos `.yarn` de `Assets/Roteiro/`; este módulo só começa a conversa, entrega cada fala e cada escolha à interface, liga as variáveis do roteiro ao estado da história e avisa o jogo quando a conversa começa e termina.
 
-> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) (D-05, D-06, D-11, D-12, D-17, D-18, D-22) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md) · [armadilhas do Yarn Spinner](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)
+> **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) (D-05, D-06, D-11, D-12, D-17, D-18, D-21, D-22) · [fluxo de trabalho](../../../docs/agentes/fluxo-de-trabalho.md) · [armadilhas do Yarn Spinner](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)
 
 O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmdef` referencia `YarnSpinner.Unity` e duas DLLs do pacote). Ele **não** referencia `Inventory`: os comandos de roteiro que mexem em itens (`<<dar_item>>`, `<<remover_item>>`, `tem_item()`) moram no `GameFlow` (`ItemScriptActions`).
 
@@ -18,7 +18,10 @@ O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmd
 | `DialogueManager` | `MonoBehaviour` com `Instance`, o dono do diálogo: a API pública e o adaptador do runner | `Managers.prefab` |
 | `ConversationNotifier` | C# puro: publica `DialogueStartedMessage` e `DialogueEndedMessage`, cada uma uma vez por conversa | `Logic/` |
 | `ScriptNodeName` | C# puro: o formato dos nomes de nó (`FollowsConvention`) | `Logic/` |
-| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, as escolhas e o indicador de continuar | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
+| `CharacterSO` | ScriptableObject somente leitura (D-02): `Id`, `DisplayName`, `NameColor` e a lista de retratos (`CharacterPortrait`: expressão e `Sprite`). A primeira é a expressão padrão | `Characters/`; os assets em `Assets/Scripts/ScriptableObjects/Characters/` |
+| `CharacterRegistry` | ScriptableObject com a lista de `CharacterSO`. `TryGetByScriptName` acha o personagem pelo nome exibido (comparação exata). Sem `Instance` (D-04): é referenciado pelo apresentador | `Characters/` |
+| `ExpressionTag` | C# puro: lê de `line.Metadata` a etiqueta de expressão, ignorando as do Yarn (`lastline`, `line:…`) | `Logic/` |
+| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, o retrato, as escolhas e o indicador de continuar | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
 | `DialogueChoiceButton` | Um por botão de escolha: `OnClick` → `DialogueManager.MakeChoice(índice)` | `GameUI.prefab` |
 | `DialogueInputHandler` | Lê a ação `UI/AdvanceDialogue` (botão esquerdo, espaço, enter, botão sul) e chama `AdvanceDialogue` (D-08) | `Managers.prefab` |
 
@@ -87,7 +90,7 @@ O `DialogueUIController` herda de `DialoguePresenterBase`. Ele se **registra** n
 
 **A interface é persistente (#9), então recarregar ou trocar a cena não a destrói e não encerra a conversa:** a fala continua na tela por cima da cena nova, com o `PlayerInputGate` fechado, até o jogador avançar até o fim (medido na #9: `Reload Scene` do painel de debug durante uma fala deixa `IsDialogueActive()` verdadeiro). Hoje só esse botão chega aí. O que acontece com uma conversa aberta numa troca de sala é decisão da #12.
 
-- **Fala:** o nome é o do personagem da fala (`Gótica: ...`); sem personagem (**narração**), a placa de nome fica escondida. O texto é a fala sem o nome.
+- **Fala:** o nome é o do personagem da fala (`Gótica: ...`); sem personagem (**narração**), a placa de nome e o retrato ficam escondidos. O texto é a fala sem o nome. O personagem é resolvido como descrito em [Personagem e retrato](#personagem-e-retrato).
 - **A fala antes de opções** (regra do `lastline`): o compilador etiqueta com `lastline` a fala que é o comando imediatamente anterior a um bloco de opções. O apresentador não espera clique nela: mostra fala e opções juntas, sem o indicador de continuar. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
 - **Escolhas:** mostra, em ordem, **todas** as opções do bloco. Uma opção indisponível (a condição `<<if>>` dela é falsa) aparece com o `Button` desabilitado (`interactable = false`, esmaecido pelo `disabledColor` do botão) e ocupa um botão, para o jogador ver que existe um caminho fechado (D-11). `Choose` ignora o índice de uma opção indisponível, também numa chamada direta a `MakeChoice`. O `Button` de cada `choiceButtonObjects[i]` é lido uma vez no `Start`; sem `Button`, o `OnValidate` avisa e a opção indisponível não fica desabilitada. Há quatro botões; mais opções do que botões (disponíveis ou não) é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. **Nenhuma opção disponível:** `RunOptionsAsync` devolve `null` sem mostrar nada e a conversa segue pela fala depois do bloco; isso depende de `allowOptionFallthrough` ligado no `DialogueRunner` do `Managers.prefab` (sem ele o runner loga erro e a conversa fica presa).
 - **Indicador de continuar** (`>>`): aparece a cada fala que espera clique e some quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança em qualquer lugar, e um `>>` clicável avançaria duas falas por clique.
@@ -95,6 +98,30 @@ O `DialogueUIController` herda de `DialoguePresenterBase`. Ele se **registra** n
 - **Assíncrono (D-06):** o runner e o apresentador usam `YarnTask`, que no Unity 6 é `Awaitable` na thread principal. Depois de cada `await` o apresentador reconfere se ainda existe.
 
 Todo campo exposto no Inspector do `DialogueUIController` tem tooltip, e o `OnValidate` avisa quando um campo obrigatório está vazio ou quando `Choice Texts` não tem o tamanho de `Choice Button Objects`.
+
+### Personagem e retrato
+
+A cada fala, o `ShowLine` procura o nome de quem fala (`line.CharacterName`) no `CharacterRegistry` do controller e decide o que mostrar:
+
+| Fala | Placa de nome | Retrato |
+|---|---|---|
+| **Narração** (sem nome) | desligada | desligado |
+| **Personagem conhecido**, sem etiqueta | o `DisplayName`, na `NameColor` do asset | o padrão (o primeiro da lista) |
+| Personagem conhecido, **com etiqueta** (`#raiva`) | idem | o da expressão, **só para esta fala** |
+| Personagem conhecido, **expressão que ele não tem** | idem | o padrão, com `LogWarning` (personagem, expressão e nó) |
+| Personagem conhecido **sem nenhum retrato** | idem | desligado, sem aviso |
+| **Personagem desconhecido** | o nome do roteiro, na cor padrão da placa | desligado, com `LogWarning` (nome e nó) |
+
+Nada trava: o aviso sai e a conversa segue. O que isso exige de quem monta o prefab e o conteúdo:
+
+- **Não há estado de expressão.** A etiqueta vale só para a fala em que está (D-02: o asset não guarda a expressão atual, e o apresentador também não).
+- **O retrato é ligado e desligado pelo `gameObject` do `Image`**, não pelo `sprite`: um `Image` sem sprite desenha um quadrado branco. Como é filho da `DialogueBox`, some junto com ela no fim da conversa.
+- **O nome mostrado sai de um único método privado** (`NameToDisplay`), que hoje devolve o `DisplayName`. É onde a #26 troca `Protagonista` pelo nome que o jogador escolheu, sem reescrever roteiro (D-21).
+- **`characterRegistry` vazio:** todo nome aparece em texto puro, sem cor e sem retrato, com **um** erro no `Start` e um aviso no `OnValidate`. **`portraitImage` vazio:** o retrato não é controlado.
+- A cor padrão da placa é a que o `SpeakerName` tem no prefab, guardada no `Start`.
+- O `ScriptContentTests` reprova nome fora do registro e expressão inexistente antes do Play; os avisos acima são a rede de segurança para o que chegar ao jogo.
+
+O retrato é 300×300, à esquerda da caixa (`Portrait`, filho da `DialogueBox`, âncora e pivô na base, `anchoredPosition (-20, 0)`). A `DialogueBox` anda 150 px para a direita (`anchoredPosition (150, 24)`) **também na narração**, para não pular entre fala e narração; em 1080p a caixa ocupa x 360–1860 e o retrato x 40–340. Os retratos atuais são placeholders.
 
 ### Arte
 
@@ -124,9 +151,10 @@ O módulo não conhece o `GameFlow` nem o `PointNClick`: a direção das depend�
 
 ## O que ainda não existe
 
-- Retrato do personagem: issue #10. Texto revelado aos poucos: issue #11.
+- Texto revelado aos poucos: issue #11.
+- O nome do protagonista escolhido pelo jogador na placa de nome: issue #26 (o ponto de troca é o `NameToDisplay`). Histórico de falas: issue #25.
 - Seletor de nó no Inspector: issue #32.
 
 ## Escrevendo roteiro
 
-O guia dos roteiristas é [docs/autoria/roteiro.md](../../../docs/autoria/roteiro.md); o roteiro de exemplo comentado ([`Assets/Roteiro/exemplo_comentado.yarn`](../../../Assets/Roteiro/exemplo_comentado.yarn)) mostra cada recurso funcionando (narração, fala, o protagonista, condição, opção, opção bloqueada, `<<detour>>`, `<<jump>>`, `<<stop>>`, `visited()`, item), e os roteiros de teste (`Assets/Roteiro/Testes/`) são as fixtures da suíte: não os use de modelo nem os edite. Em uma linha de narração, **qualquer** dois-pontos (`Atenção: ...`, `10:30`) faz o que vem antes virar o nome de um personagem; o guia ensina o escape `\:`. Também medidos e registrados no guia: `//` e `#etiqueta` somem do texto, `[b]` é removido, `[` solto derruba a compilação do projeto, e a caixa, o botão e a placa têm limite de texto.
+O guia dos roteiristas é [docs/autoria/roteiro.md](../../../docs/autoria/roteiro.md); o roteiro de exemplo comentado ([`Assets/Roteiro/exemplo_comentado.yarn`](../../../Assets/Roteiro/exemplo_comentado.yarn)) mostra cada recurso funcionando (narração, fala, o protagonista, condição, opção, opção bloqueada, `<<detour>>`, `<<jump>>`, `<<stop>>`, `visited()`, item), e os roteiros de teste (`Assets/Roteiro/Testes/`) são as fixtures da suíte: não os use de modelo nem os edite. Em uma linha de narração, **qualquer** dois-pontos (`Atenção: ...`, `10:30`) faz o que vem antes virar o nome de um personagem; o guia ensina o escape `\:`. Também medidos e registrados no guia: `//` e `#etiqueta` somem do texto (a etiqueta no fim de uma fala com nome é a expressão do retrato), `[b]` é removido, `[` solto derruba a compilação do projeto, e a caixa, o botão e a placa têm limite de texto.

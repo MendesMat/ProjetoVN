@@ -140,10 +140,17 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 ### D-22 — Vocabulário do roteiro em português
 - **Decisão:** tudo o que o roteirista digita é em português: comandos (`<<dar_item chave>>`), variáveis (`$afinidade_gotica`) e nomes de nó. Identificadores de C# são em inglês. Mensagens de log, comentários e documentação são em português.
 - **Formato do id de item:** minúsculas sem acento, dígitos e `_` (`chave_teste`), igual aos nomes de nó e de variável. O roteiro cita o id sempre como literal (`<<dar_item chave_teste>>`, `tem_item("chave_teste")`), nunca por variável ou expressão; um teste EditMode confere cada id citado contra o `ItemRegistry`. Não há validação automática do formato no `ItemDataSO`.
+- **Formato do id de personagem e do nome de expressão (#10):** o mesmo, minúsculas sem acento, dígitos e `_` (`gotica`, `raiva`). O nome exibido é português normal (`Gótica`) e é o que o roteiro escreve antes dos dois-pontos. Um teste EditMode confere todo nome de quem fala e toda etiqueta de expressão dos roteiros contra o `CharacterRegistry`; o formato é validado no `OnValidate` do `CharacterSO` e por um teste do registro.
 - **Por quê:** os roteiristas escrevem em português. Mudar isso depois que houver roteiro escrito é caro.
 
 ### D-21 — Personagem como dado
 - **Decisão:** cada personagem é um asset (`CharacterSO`: identificador, nome exibido, cor do nome, retratos por expressão). O diálogo mostra o retrato de quem fala ao lado da caixa.
+- **Detalhes decididos na #10:**
+  - **O roteiro cita o personagem pelo nome exibido** (`Gótica: ...`), comparado de forma exata. O `id` (`gotica`) é para o código. O `CharacterRegistry` é um asset referenciado pelo `DialogueUIController`, sem `Instance` (D-04).
+  - **A expressão é uma etiqueta no fim da fala** (`Gótica: Sai daqui. #raiva`) e **não persiste**: vale só para aquela fala, e não há estado de expressão em lugar nenhum. Sem etiqueta, aparece a primeira expressão da lista do asset. Expressão que o personagem não tem: aviso e expressão padrão. Descartado: um comando `<<expressao ...>>` que persiste, porque pede estado por personagem, um segundo nome para o personagem no roteiro e tira a etiqueta `lastline` da fala antes de opções.
+  - **O retrato fica à esquerda, fora da caixa**, que se desloca 150 px para a direita (também na narração, para não pular entre fala e narração). Some em narração, em personagem desconhecido e em personagem sem retrato.
+  - **O protagonista tem retrato**, como qualquer personagem.
+  - **Onde a #26 troca o nome do protagonista:** em um único método privado do `DialogueUIController` que devolve o nome a exibir de um `CharacterSO`. Hoje devolve o `DisplayName`; a #26 o faz devolver a variável de texto do `StoryState` quando o `Id` for `protagonista`. O roteiro continua escrevendo `Protagonista:`. O histórico (#25) recebe a fala já com o nome resolvido (D-12).
 - **Fora do escopo atual:** sprites de corpo inteiro sobre o cenário e vários personagens na tela.
 
 ### D-30 — Histórico de falas
@@ -253,6 +260,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-03 | **Revistas (#7):** **D-11** deixa de esconder a opção indisponível: ela aparece desabilitada e conta para o limite de quatro botões; um bloco sem opção disponível não é mostrado (decisão do programador no levantamento da #7: mostrar que existem caminhos bloqueados faz o jogador entender que as escolhas têm peso). **D-18** ganha o registro central `variaveis.yarn`. **D-01:** o asmdef `ProjetoVN.Editor` (só Editor; referencia `Core`, `YarnSpinner.Unity` e `YarnSpinner.Unity.Editor`), autorizado pelo programador na #7. |
 | 2026-10-08 | **Restauradas:** as seções de detalhe da D-19 e da D-08, que saíram do arquivo no PR da #5 (#33) sem que este registro citasse a remoção, enquanto as duas continuavam no resumo e sendo citadas por issues e READMEs. O texto é o mesmo de antes; nenhuma decisão mudou. Encontrado no levantamento da #9. |
 | 2026-10-08 | **Cumprida em parte (#9):** D-19. A interface de jogo (diálogo e inventário) e o `EventSystem` saem das cenas e viram o `GameUI.prefab`, aninhado no `Managers.prefab` por decisão do programador no levantamento da #9 (a alternativa, um segundo prefab em `Resources`, exigiria rever a D-09). Nenhuma decisão mudou. |
+| 2026-10-08 | **Revistas (#10):** **D-21** ganha o que o levantamento decidiu com o programador: o roteiro cita o personagem pelo nome exibido; a expressão é uma etiqueta no fim da fala, sem persistir, e o padrão é a primeira da lista; o retrato fica à esquerda, fora da caixa, que se desloca 150 px; o protagonista tem retrato; a troca do nome do protagonista (#26) mora em um único método do apresentador. **D-22** ganha o formato do id de personagem e do nome de expressão. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

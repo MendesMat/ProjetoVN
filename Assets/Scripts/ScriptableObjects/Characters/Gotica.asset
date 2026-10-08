@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5048805560e1c1a488097d0871428c1b, type: 3}
+  m_Name: Gotica
+  m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Characters.CharacterSO
+  id: gotica
+  displayName: "G\xF3tica"
+  nameColor: {r: 0.8509804, g: 0.6509804, b: 1, a: 1}
+  portraits:
+  - expression: neutra
+    sprite: {fileID: 21300000, guid: 3bf42b1b271d4b84a8cc35947e0dcc51, type: 3}
+  - expression: raiva
+    sprite: {fileID: 21300000, guid: 7fb224fec59fb644d8a9f94a6acc716c, type: 3}
