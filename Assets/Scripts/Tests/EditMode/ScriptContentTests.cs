@@ -14,19 +14,19 @@ namespace ProjetoVN.Tests.EditMode
     {
         private static readonly string[] ExpectedNodes =
         {
-            "gotica_cheguei_cedo", "gotica_resposta_sim", "gotica_resposta_nao", "gotica_resposta_talvez",
-            "gotica_resposta_sentar", "gotica_cadeira_no_fundo", "peguei_chave", "porta_trancada", "porta_destrancada",
+            "luna_cheguei_cedo", "luna_resposta_sim", "luna_resposta_nao", "luna_resposta_talvez",
+            "luna_resposta_sentar", "luna_cadeira_no_fundo", "peguei_chave", "porta_trancada", "porta_destrancada",
             "variaveis",
         };
 
         private const string CentralVariablesFile = "variaveis.yarn";
-        private const string GoticaAffinity = "$afinidade_gotica";
+        private const string LunaAffinity = "$afinidade_luna";
         private const string ConditionalOption = "Posso sentar perto de você?";
         private const int ConditionalOptionIndex = 3;
-        private const string ConditionalLine = "Gótica: Gostei de você.";
+        private const string ConditionalLine = "Luna: Gostei de você.";
 
         private const string KeyItemId = "chave_teste";
-        private const string GoticaGivesTheKeyLine = "Gótica: Toma, achei esta chave no corredor.";
+        private const string LunaGivesTheKeyLine = "Luna: Toma, achei esta chave no corredor.";
 
         [SetUp]
         public void SetUp() => StoryState.ClearAll();
@@ -100,9 +100,9 @@ namespace ProjetoVN.Tests.EditMode
             Assert.IsEmpty(run.Declarations.Select(d => d.Name).Where(name => !StoryVariableName.FollowsConvention(name)));
         }
 
-        [TestCase("$falou_com_gotica", "Bool")]
+        [TestCase("$falou_com_luna", "Bool")]
         [TestCase("$porta_mecanicas_destrancada", "Bool")]
-        [TestCase(GoticaAffinity, "Number")]
+        [TestCase(LunaAffinity, "Number")]
         public void ProjectScripts_DeclareTheVariablesTheTestSceneUses(string variable, string typeName)
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
@@ -156,13 +156,13 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
-        public void GoticaRespostaNao_AsksForTheAngryExpression()
+        public void LunaRespostaNao_AsksForTheAngryExpression()
         {
             ScriptSpeakers speakers = ProjectSpeakers();
 
-            ScriptSpeakerLine line = speakers.Spoken.Single(l => l.NodeName == "gotica_resposta_nao");
+            ScriptSpeakerLine line = speakers.Spoken.Single(l => l.NodeName == "luna_resposta_nao");
 
-            Assert.AreEqual("Gótica", line.Character);
+            Assert.AreEqual("Luna", line.Character);
             CollectionAssert.AreEqual(new[] { "raiva" }, line.Expressions);
         }
 
@@ -198,122 +198,122 @@ namespace ProjetoVN.Tests.EditMode
             values.GroupBy(value => value).Where(group => group.Count() > 1).Select(group => group.Key);
 
         [Test]
-        public void GoticaChegueiCedo_AsksFourOptions()
+        public void LunaChegueiCedo_AsksFourOptions()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
 
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
-            CollectionAssert.AreEqual(new[] { "Gótica: Acho que cheguei muito cedo..." }, run.Lines);
+            CollectionAssert.AreEqual(new[] { "Luna: Acho que cheguei muito cedo..." }, run.Lines);
             CollectionAssert.AreEqual(new[] { "Sim", "Não", "Talvez", ConditionalOption }, run.OptionTexts);
         }
 
         [Test]
-        public void GoticaChegueiCedo_FirstTalk_LocksTheConditionalOption()
+        public void LunaChegueiCedo_FirstTalk_LocksTheConditionalOption()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
 
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             CollectionAssert.AreEqual(new[] { ConditionalOption }, run.UnavailableOptionTexts);
         }
 
         [Test]
-        public void GoticaChegueiCedo_ChoosingSim_RaisesTheAffinity_AndShowsTheConditionalLine()
+        public void LunaChegueiCedo_ChoosingSim_RaisesTheAffinity_AndShowsTheConditionalLine()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(0);
 
-            Assert.IsTrue(StoryState.TryGetNumber(GoticaAffinity, out float affinity));
+            Assert.IsTrue(StoryState.TryGetNumber(LunaAffinity, out float affinity));
             Assert.AreEqual(1f, affinity);
             CollectionAssert.Contains(run.Lines, ConditionalLine);
         }
 
         [Test]
-        public void GoticaChegueiCedo_ChoosingNao_KeepsTheAffinity_AndSkipsTheConditionalLine()
+        public void LunaChegueiCedo_ChoosingNao_KeepsTheAffinity_AndSkipsTheConditionalLine()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(1);
 
-            Assert.IsFalse(StoryState.TryGetNumber(GoticaAffinity, out _));
+            Assert.IsFalse(StoryState.TryGetNumber(LunaAffinity, out _));
             CollectionAssert.DoesNotContain(run.Lines, ConditionalLine);
         }
 
         [Test]
-        public void GoticaChegueiCedo_SecondTalkAfterSim_OffersTheConditionalOption()
+        public void LunaChegueiCedo_SecondTalkAfterSim_OffersTheConditionalOption()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
             run.Choose(0);
             run.Lines.Clear();
 
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
             Assert.IsEmpty(run.UnavailableOptionTexts);
             run.Choose(ConditionalOptionIndex);
 
-            Assert.AreEqual("Gótica: Pode. Só não puxa assunto.", run.Lines[1]);
+            Assert.AreEqual("Luna: Pode. Só não puxa assunto.", run.Lines[1]);
             Assert.IsTrue(run.Completed);
         }
 
         [Test]
-        public void GoticaChegueiCedo_ChoosingSim_ShowsAllTheLines_Ends_AndMarksTheTalk()
+        public void LunaChegueiCedo_ChoosingSim_ShowsAllTheLines_Ends_AndMarksTheTalk()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(0);
 
             CollectionAssert.AreEqual(new[]
             {
-                "Gótica: Acho que cheguei muito cedo...",
-                "Gótica: Ele falou sim.",
+                "Luna: Acho que cheguei muito cedo...",
+                "Luna: Ele falou sim.",
                 ConditionalLine,
-                "Gótica: A escola está mais quieta do que eu imaginava.",
-                GoticaGivesTheKeyLine,
-                "Gótica: Já vou aproveitar pra pegar uma cadeira no fundo.",
+                "Luna: A escola está mais quieta do que eu imaginava.",
+                LunaGivesTheKeyLine,
+                "Luna: Já vou aproveitar pra pegar uma cadeira no fundo.",
             }, run.Lines);
             Assert.IsTrue(run.Completed);
-            Assert.IsTrue(StoryState.IsTrue("$falou_com_gotica"));
+            Assert.IsTrue(StoryState.IsTrue("$falou_com_luna"));
         }
 
         [Test]
-        public void GoticaChegueiCedo_ChoosingNao_DoesNotMarkTheTalk()
+        public void LunaChegueiCedo_ChoosingNao_DoesNotMarkTheTalk()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(1);
 
-            Assert.AreEqual("Gótica: Ele falou não.", run.Lines[1]);
-            Assert.IsFalse(StoryState.TryGetBool("$falou_com_gotica", out _));
+            Assert.AreEqual("Luna: Ele falou não.", run.Lines[1]);
+            Assert.IsFalse(StoryState.TryGetBool("$falou_com_luna", out _));
         }
 
         [Test]
-        public void GoticaChegueiCedo_GivesTheKey_WhenThePlayerDoesNotHaveIt()
+        public void LunaChegueiCedo_GivesTheKey_WhenThePlayerDoesNotHaveIt()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(1);
 
-            CollectionAssert.Contains(run.Lines, GoticaGivesTheKeyLine);
+            CollectionAssert.Contains(run.Lines, LunaGivesTheKeyLine);
             CollectionAssert.AreEqual(new[] { "dar_item " + KeyItemId }, run.Commands);
         }
 
         [Test]
-        public void GoticaChegueiCedo_DoesNotGiveTheKeyAgain_WhenThePlayerAlreadyHasIt()
+        public void LunaChegueiCedo_DoesNotGiveTheKeyAgain_WhenThePlayerAlreadyHasIt()
         {
             ScriptRun run = ScriptRun.FromProjectFiles();
             run.OwnedItems.Add(KeyItemId);
-            run.Start("gotica_cheguei_cedo");
+            run.Start("luna_cheguei_cedo");
 
             run.Choose(1);
 
-            CollectionAssert.DoesNotContain(run.Lines, GoticaGivesTheKeyLine);
+            CollectionAssert.DoesNotContain(run.Lines, LunaGivesTheKeyLine);
             Assert.IsEmpty(run.Commands);
             Assert.IsTrue(run.Completed);
         }

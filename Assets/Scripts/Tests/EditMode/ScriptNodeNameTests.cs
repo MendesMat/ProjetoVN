@@ -18,7 +18,7 @@ namespace ProjetoVN.Tests.EditMode
         [TestCase("Porta")]
         [TestCase("porta trancada")]
         [TestCase("porta-trancada")]
-        [TestCase("gótica")]
+        [TestCase("ação")]
         [TestCase("1porta")]
         public void FollowsConvention_OffConvention_ReturnsFalse(string name)
         {

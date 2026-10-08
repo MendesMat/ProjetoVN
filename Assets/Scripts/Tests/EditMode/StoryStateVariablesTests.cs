@@ -26,18 +26,18 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SetValue_Bool_WritesABoolToStoryState()
         {
-            _variables.SetValue("$falou_com_gotica", true);
+            _variables.SetValue("$falou_com_luna", true);
 
-            Assert.IsTrue(StoryState.TryGetBool("$falou_com_gotica", out bool value));
+            Assert.IsTrue(StoryState.TryGetBool("$falou_com_luna", out bool value));
             Assert.IsTrue(value);
         }
 
         [Test]
         public void SetValue_Number_WritesANumberToStoryState()
         {
-            _variables.SetValue("$afinidade_gotica", 3f);
+            _variables.SetValue("$afinidade_luna", 3f);
 
-            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_gotica", out float value));
+            Assert.IsTrue(StoryState.TryGetNumber("$afinidade_luna", out float value));
             Assert.AreEqual(3f, value);
         }
 
@@ -54,12 +54,12 @@ namespace ProjetoVN.Tests.EditMode
         public void TryGetValue_ReadsWhatWasWrittenOutsideTheAdapter()
         {
             StoryState.SetBool("$porta_aberta", true);
-            StoryState.SetNumber("$afinidade_gotica", 2f);
+            StoryState.SetNumber("$afinidade_luna", 2f);
             StoryState.SetText("$nome_jogador", "Ana");
 
             Assert.IsTrue(_variables.TryGetValue("$porta_aberta", out bool flag));
             Assert.IsTrue(flag);
-            Assert.IsTrue(_variables.TryGetValue("$afinidade_gotica", out float number));
+            Assert.IsTrue(_variables.TryGetValue("$afinidade_luna", out float number));
             Assert.AreEqual(2f, number);
             Assert.IsTrue(_variables.TryGetValue("$nome_jogador", out string text));
             Assert.AreEqual("Ana", text);
@@ -83,11 +83,11 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void TryGetValue_AsADifferentTypeThanWritten_ReturnsFalse()
         {
-            StoryState.SetNumber("$afinidade_gotica", 2f);
+            StoryState.SetNumber("$afinidade_luna", 2f);
 
-            Assert.IsFalse(_variables.TryGetValue("$afinidade_gotica", out bool _),
+            Assert.IsFalse(_variables.TryGetValue("$afinidade_luna", out bool _),
                 "converter em silêncio esconderia um roteiro que usa a variável com o tipo errado");
-            Assert.IsFalse(_variables.TryGetValue("$afinidade_gotica", out string _));
+            Assert.IsFalse(_variables.TryGetValue("$afinidade_luna", out string _));
         }
 
         [Test]

@@ -26,10 +26,10 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SpokenLine_CarriesTheCharacter_TheNodeAndTheLineNumber()
         {
-            ScriptSpeakers speakers = SpeakersInNodeBody("Gótica: Oi.");
+            ScriptSpeakers speakers = SpeakersInNodeBody("Luna: Oi.");
 
             ScriptSpeakerLine line = speakers.Spoken.Single();
-            Assert.AreEqual("Gótica", line.Character);
+            Assert.AreEqual("Luna", line.Character);
             Assert.AreEqual(Node, line.NodeName);
             Assert.AreEqual(FirstBodyLine, line.LineNumber);
         }
@@ -55,7 +55,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SpokenLineWithATag_CarriesTheExpression()
         {
-            ScriptSpeakers speakers = SpeakersInNodeBody("Gótica: Oi. #raiva");
+            ScriptSpeakers speakers = SpeakersInNodeBody("Luna: Oi. #raiva");
 
             CollectionAssert.AreEqual(new[] { "raiva" }, speakers.Spoken.Single().Expressions);
         }
@@ -81,7 +81,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void SpeakerFromAnExpression_IsThePlaceholder_ThatNoRegistryHas()
         {
-            ScriptSpeakers speakers = SpeakersInNodeBody("<<declare $quem = \"Gótica\">>\n{$quem}: oi");
+            ScriptSpeakers speakers = SpeakersInNodeBody("<<declare $quem = \"Luna\">>\n{$quem}: oi");
 
             Assert.AreEqual("{0}", speakers.Spoken.Single().Character);
         }
@@ -89,7 +89,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void LineBeforeOptions_DoesNotCarryTheLastLineTagAsAnExpression()
         {
-            ScriptSpeakers speakers = SpeakersInNodeBody("Gótica: E aí?\n" + TwoOptionsThatStop);
+            ScriptSpeakers speakers = SpeakersInNodeBody("Luna: E aí?\n" + TwoOptionsThatStop);
 
             Assert.IsEmpty(speakers.Spoken.Single().Expressions);
         }
