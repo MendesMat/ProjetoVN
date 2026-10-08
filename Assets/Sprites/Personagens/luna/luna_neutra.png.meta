@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 3bf42b1b271d4b84a8cc35947e0dcc51
+guid: d90561cd9771699478cd5b10a1bf94a9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7134658236159113394
-    second: luna_neutra_0
+      213: 4125636645744980110
+    second: Luna_0
+  - first:
+      213: 758070524931626382
+    second: Luna_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -98,29 +101,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites:
-    - serializedVersion: 2
-      name: luna_neutra_0
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 300
-        height: 300
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e47cbef922a9cfc90800000000000000
-      internalID: -7134658236159113394
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
+    sprites: []
     outline: []
     customData: 
     physicsShape: []
@@ -135,7 +116,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      luna_neutra_0: -7134658236159113394
+      Luna_0: 4125636645744980110
+      Luna_1: 758070524931626382
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

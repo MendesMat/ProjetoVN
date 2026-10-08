@@ -11,10 +11,15 @@ namespace ProjetoVN.Dialogue.Characters
     [CreateAssetMenu(fileName = "CharacterRegistry", menuName = "Characters/Character Registry")]
     public sealed class CharacterRegistry : ScriptableObject
     {
-        [Tooltip("Todos os personagens que o roteiro pode citar. Um personagem fora da lista aparece no jogo só com o nome, sem cor e sem retrato.")]
+        [Tooltip("Todos os personagens que o roteiro pode citar. Um personagem fora da lista aparece no jogo só com o nome, sem cor e sem sprite.")]
         [SerializeField] private List<CharacterSO> characters = new();
 
+        [Tooltip("O protagonista: quem entra na tela quando as opções de resposta abrem. Precisa estar na lista acima. " +
+                 "Vazio: as opções não trazem ninguém para a tela e o console avisa.")]
+        [SerializeField] private CharacterSO protagonist;
+
         public IReadOnlyList<CharacterSO> Characters => characters;
+        public CharacterSO Protagonist => protagonist;
 
         public bool TryGetByScriptName(string scriptName, out CharacterSO character)
         {
@@ -26,6 +31,8 @@ namespace ProjetoVN.Dialogue.Characters
 #if UNITY_EDITOR
         private void OnValidate()
         {
+            WarnAboutProtagonist();
+
             var ids = new HashSet<string>(StringComparer.Ordinal);
             var names = new HashSet<string>(StringComparer.Ordinal);
             foreach (CharacterSO character in characters)
@@ -38,6 +45,14 @@ namespace ProjetoVN.Dialogue.Characters
                 if (!names.Add(character.DisplayName))
                     Debug.LogError($"[CharacterRegistry] Nome exibido duplicado: '{character.DisplayName}' em {character.name}.", character);
             }
+        }
+
+        private void WarnAboutProtagonist()
+        {
+            if (protagonist == null)
+                Debug.LogWarning($"[CharacterRegistry] {name}: o 'Protagonist' está vazio: as opções de resposta não trazem ninguém para a tela.", this);
+            else if (!characters.Contains(protagonist))
+                Debug.LogWarning($"[CharacterRegistry] {name}: o 'Protagonist' ({protagonist.name}) não está na lista 'Characters'.", this);
         }
 #endif
     }

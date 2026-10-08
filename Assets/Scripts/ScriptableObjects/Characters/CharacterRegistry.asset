@@ -15,3 +15,4 @@ MonoBehaviour:
   characters:
   - {fileID: 11400000, guid: 8273a605eec4628439ade64308098e64, type: 2}
   - {fileID: 11400000, guid: 4f7cf3272ff3ec240bac803b783339bd, type: 2}
+  protagonist: {fileID: 11400000, guid: 4f7cf3272ff3ec240bac803b783339bd, type: 2}

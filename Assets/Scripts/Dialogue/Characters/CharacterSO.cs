@@ -6,8 +6,8 @@ using UnityEngine;
 namespace ProjetoVN.Dialogue.Characters
 {
     /// <summary>
-    /// Um personagem do jogo (D-21). Somente leitura em runtime (D-02): não guarda a expressão atual,
-    /// porque a etiqueta do roteiro vale só para a fala em que aparece.
+    /// Um personagem do jogo (D-21). Somente leitura em runtime (D-02): não guarda a expressão atual nem o lugar
+    /// na tela, que são estado da conversa em curso (<see cref="ConversationStage"/>).
     /// </summary>
     [CreateAssetMenu(fileName = "NewCharacterSO", menuName = "Characters/Character")]
     public sealed class CharacterSO : ScriptableObject
@@ -23,34 +23,34 @@ namespace ProjetoVN.Dialogue.Characters
         [Tooltip("Cor do nome na placa de nome.")]
         [SerializeField] private Color nameColor = Color.white;
 
-        [Tooltip("Retratos por expressão. O primeiro é o padrão, mostrado nas falas sem etiqueta de expressão. " +
-                 "Vazio: o personagem fala sem retrato.")]
-        [SerializeField] private List<CharacterPortrait> portraits = new();
+        [Tooltip("Sprites por expressão. O primeiro é o padrão, mostrado nas falas sem etiqueta de expressão. " +
+                 "Vazio: o personagem fala sem aparecer na tela.")]
+        [SerializeField] private List<CharacterExpression> expressions = new();
 
         public string Id => id;
         public string DisplayName => displayName;
         public Color NameColor => nameColor;
-        public IReadOnlyList<CharacterPortrait> Portraits => portraits;
+        public IReadOnlyList<CharacterExpression> Expressions => expressions;
 
-        public Sprite DefaultPortrait => portraits.Count > 0 ? portraits[0].Sprite : null;
+        public string DefaultExpression => expressions.Count > 0 ? expressions[0].Expression : null;
 
-        public bool HasExpression(string expression) => FindPortrait(expression) != null;
+        public bool HasExpression(string expression) => Find(expression) != null;
 
-        public bool TryGetPortrait(string expression, out Sprite portrait)
+        public bool TryGetSprite(string expression, out Sprite sprite)
         {
-            CharacterPortrait found = FindPortrait(expression);
-            portrait = found?.Sprite;
+            CharacterExpression found = Find(expression);
+            sprite = found?.Sprite;
             return found != null;
         }
 
-        private CharacterPortrait FindPortrait(string expression) =>
-            portraits.Find(portrait => string.Equals(portrait.Expression, expression, StringComparison.Ordinal));
+        private CharacterExpression Find(string expression) =>
+            expressions.Find(candidate => string.Equals(candidate.Expression, expression, StringComparison.Ordinal));
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
             WarnAboutIdentity();
-            WarnAboutPortraits();
+            WarnAboutExpressions();
         }
 
         private void WarnAboutIdentity()
@@ -62,18 +62,18 @@ namespace ProjetoVN.Dialogue.Characters
                 Warn("O 'Display Name' está vazio ou tem espaço no começo ou no fim: o roteiro não vai achar o personagem.");
         }
 
-        private void WarnAboutPortraits()
+        private void WarnAboutExpressions()
         {
             var seen = new HashSet<string>(StringComparer.Ordinal);
-            foreach (CharacterPortrait portrait in portraits)
+            foreach (CharacterExpression expression in expressions)
             {
-                if (!ScriptNodeName.FollowsConvention(portrait.Expression))
-                    Warn($"A expressão '{portrait.Expression}' está vazia ou fora do formato: use minúsculas sem acento, dígitos e _ (ex.: raiva).");
-                else if (!seen.Add(portrait.Expression))
-                    Warn($"A expressão '{portrait.Expression}' aparece mais de uma vez.");
+                if (!ScriptNodeName.FollowsConvention(expression.Expression))
+                    Warn($"A expressão '{expression.Expression}' está vazia ou fora do formato: use minúsculas sem acento, dígitos e _ (ex.: raiva).");
+                else if (!seen.Add(expression.Expression))
+                    Warn($"A expressão '{expression.Expression}' aparece mais de uma vez.");
 
-                if (portrait.Sprite == null)
-                    Warn($"A expressão '{portrait.Expression}' está sem Sprite.");
+                if (expression.Sprite == null)
+                    Warn($"A expressão '{expression.Expression}' está sem Sprite.");
             }
         }
 

@@ -15,6 +15,6 @@ MonoBehaviour:
   id: protagonista
   displayName: Protagonista
   nameColor: {r: 1, g: 0.9529412, b: 0.9843137, a: 1}
-  portraits:
+  expressions:
   - expression: neutra
-    sprite: {fileID: 21300000, guid: 005a061467b564840ab3d845510648d3, type: 3}
+    sprite: {fileID: 21300000, guid: 2ea781e557088bd4490b2eda8543284c, type: 3}
