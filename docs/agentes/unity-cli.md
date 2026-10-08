@@ -223,9 +223,15 @@ Mova com `move_asset` para que o `.meta` vá junto. Se o `.meta` se perder, o GU
 
 Vale também para `.md`, `.yarn` e pastas. Atualize o banco de assets e commite o `.meta` junto.
 
-### Managers não entram em cena
+### Managers e interface de jogo não entram em cena
 
 `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
+
+O mesmo vale para a interface de jogo, que vem aninhada nesse prefab (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game` e `EventSystem`):
+
+- **Um `EventSystem` em uma cena** soma-se ao persistente e o uGUI loga `There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene` **a cada frame** (milhares de avisos em segundos). Na verificação, conte os `EventSystem` em Play Mode (deve ser 1) e confira que esse aviso não aparece.
+- **Um `Canvas_Game` em uma cena** duplica o apresentador: o da cena se registra por último no `DialogueManager` e, ao ser destruído com a cena, deixa o diálogo sem interface.
+- Em Play Mode, `GameObject.Find("Canvas_Game")` devolve o objeto persistente (cena `DontDestroyOnLoad`, pai `GameUI`, avô `Managers`). Para editar a interface fora do Play, abra o `GameUI.prefab`, não a cena.
 
 ## Armadilhas do Yarn Spinner
 

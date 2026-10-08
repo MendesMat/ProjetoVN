@@ -14,7 +14,7 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 - **`States/`**: Os estados concretos:
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
-- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions`) e o marca `DontDestroyOnLoad`. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
+- **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions`) e o marca `DontDestroyOnLoad`. O prefab traz aninhada a interface de jogo (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game` e `EventSystem`), que nasce e persiste junto, sem código no bootstrap (D-19); o `GameFlow` não referencia o módulo `UI`, a ligação é só de asset. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers, nem `Canvas` de jogo, nem `EventSystem`.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
 - **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e o **estado da história** (`StoryState`, do módulo `Core`: booleanos, números e textos). Ainda não há menu de save; na cena de teste, use o painel de debug.
   - O save tem **um formato único**: `GameState` guarda o estado da história em três listas de pares nome e valor (`storyBools`, `storyNumbers`, `storyTexts`, tipos em `StoryEntries.cs`), porque o `JsonUtility` não serializa dicionários. Não há campo nem conversão de formato anterior (D-20).
   - `StoryStatePersistence` (C# puro, estático) faz a cópia entre o `StoryState` e o `GameState`: `Capture` no `Save()` e `Restore` no `Load()`. Fica fora do `GameSaveManager`, que é `MonoBehaviour` e lê arquivo, para a cópia ser testável em EditMode. Acesso a arquivo continua só no `GameSaveManager`.
@@ -47,7 +47,7 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - *Limitação conhecida:* um comando com o número errado de parâmetros trava a conversa (comportamento do pacote, #37). O teste acima reprova esse roteiro antes do Play.
 - **`DevTools/PlaceholderTint`**: Marcador visual provisório. Hoje está ligado ao **`OnOpened`** da porta de `[Teste] Mecanicas`, pintando-a de verde — ou seja, verde quer dizer "esta porta está aberta", e não "você clicou nela". Existe como componente porque um `UnityEvent` do Inspector não aceita argumento do tipo `Color`, então não dá para ligar `SpriteRenderer.color` direto. Troque pela arte de porta aberta quando existir.
 - **`StoryVariableNameCheck`**: o aviso de autoria que o `OnValidate` do portão mostra quando um campo de variável está fora do formato (`StoryVariableName.FollowsConvention`, no `Core`).
-- **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo.
+- **`DevTools/`**: `SaveLoadDebugPanel`, ligado aos botões Save / Load / Reset Session / Reload Scene do `Canvas_Debug` da cena `[Teste] Mecanicas`. Ferramenta de teste, não UI de jogo: o `Canvas_Debug` fica **na cena**, fora do `GameUI.prefab`, e os botões dele dependem do `EventSystem` persistente (a cena não tem um).
 
 ---
 
@@ -101,7 +101,6 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #9 | O bootstrap passa a criar também o prefab da interface de jogo |
 | #12, #13 | Troca de sala com estado de transição; saídas e pontos de entrada |
 | #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |
 | #16 | Save automático ao entrar na sala; carregar recarrega a cena |
