@@ -201,16 +201,18 @@ Linhas em branco entre as falas não fazem diferença para o jogo: use para orga
 
 ### Quem fala
 
-**Escreva o nome sempre igual, com a mesma letra e o mesmo acento.** Para o jogo, cada grafia é uma personagem diferente, e nada avisa do engano:
+**Escreva o nome sempre igual ao da tabela, com a mesma letra e o mesmo acento.** Para o jogo, cada grafia é uma personagem diferente, e só as da tabela existem:
 
 | Você escreveu | O jogo entende |
 |---|---|
 | `Gótica: Oi.` | A Gótica. |
-| `Gotica: Oi.` | Outra personagem, chamada "Gotica". |
-| `gótica: Oi.` | Outra personagem, chamada "gótica". |
-| `Gótica : Oi.` | Outra personagem, chamada "Gótica " (com um espaço no fim). |
+| `Gotica: Oi.` | Uma personagem "Gotica", que não existe. |
+| `gótica: Oi.` | Uma personagem "gótica", que não existe. |
+| `Gótica : Oi.` | Uma personagem "Gótica " (com um espaço no fim), que não existe. |
 
-Os nomes que existem hoje:
+O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, sem a cor e sem o retrato da personagem, e a conversa não travaria.
+
+Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 
 | Nome | Quem é |
 |---|---|
@@ -245,6 +247,35 @@ Gótica: Uma com um morcego no chaveiro. E aí?
 ```
 
 Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros.
+
+### Expressões
+
+Cada personagem tem um retrato por expressão, e o retrato de quem fala aparece ao lado da caixa de diálogo. Em narração não há retrato. **Sem etiqueta, o jogo mostra a expressão padrão** da personagem. Para mudar a cara dela em uma fala, escreva no **fim** da linha um espaço, `#` e o nome da expressão:
+
+```
+Gótica: Você não devia ter visto isso. #raiva
+Gótica: Desculpa. Perdi a cabeça.
+```
+
+A primeira fala aparece com a Gótica brava; a segunda volta à expressão padrão, porque **a etiqueta vale só para a fala em que está**. Para manter a mesma cara em duas falas seguidas, repita a etiqueta nas duas.
+
+| Regra | Por quê |
+|---|---|
+| A etiqueta vai no **fim** da linha, depois do texto, com um espaço antes do `#`. | No meio da fala, `#` é erro de sintaxe. |
+| **Uma etiqueta por fala.** | A verificação do jogo reprova duas. |
+| **Só em fala com nome.** Nunca em narração nem em opção. | Narração e opção não têm retrato; a verificação reprova a etiqueta ali. |
+| O nome da expressão é um da tabela abaixo, em minúsculas e sem acento. | A verificação reprova uma expressão que a personagem não tem; se ela chegasse ao jogo, apareceria a expressão padrão e o console avisaria. |
+
+A fala logo antes de um bloco de [opções](#opções) aceita expressão normalmente.
+
+As expressões que existem hoje (a primeira de cada personagem é a padrão):
+
+| Personagem | Expressões |
+|---|---|
+| `Gótica` | `neutra` (padrão), `raiva` |
+| `Protagonista` | `neutra` (padrão) |
+
+Os retratos atuais são provisórios: quadrados coloridos com o nome do arquivo. Quando uma expressão nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
 ### Dois-pontos na narração
 
@@ -291,7 +322,7 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 | Caractere | O que acontece se você só digitar | Para aparecer no texto | Exemplo |
 |---|---|---|---|
 | `#` no meio da fala | Erro de sintaxe. | `\#` | `Gótica: Sala \#12, no fim do corredor.` |
-| `#palavra` no fim da linha | A palavra **some** do texto, sem aviso. | `\#palavra` | `Gótica: Ela postou com \#saudade` |
+| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o retrato. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Gótica: Ela postou com \#saudade` |
 | `//` | O resto da linha **some**, sem aviso. | `\/\/` | `Gótica: O site é escola.com\/\/alunos` |
 | `{` e `}` | Abrem uma expressão. Um `{` sem fechar é erro e quebra o arquivo. | `\{` e `\}` | `Rabiscado na carteira, um \{ torto.` |
 | `[` e `]` | Abrem marcação. `[b]x[/b]` vira só `x`. Um **`[` sem fechar derruba o projeto inteiro.** | `\[` e `\]` | `Gótica: Escreve \[urgente\] no bilhete.` |
@@ -523,13 +554,20 @@ Estas não são comandos: não levam `<<` `>>` e só valem dentro de um `<<if>>`
 | `tem_item("id")` | O jogador tem o item? | [Itens](#itens) |
 | `visited("nome_do_no")` | O jogador já passou por aquele nó? | [Condicionar uma fala](#condicionar-uma-fala) |
 
+**Etiquetas**
+
+Não são comandos: não levam `<<` `>>`, e vão no fim de uma fala.
+
+| Etiqueta | O que faz | Explicado em |
+|---|---|---|
+| `#expressao` | Mostra o retrato daquela expressão só nesta fala | [Expressões](#expressões) |
+
 **Ainda não existem**
 
 Não escreva estes; enquanto a issue não entrar, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
 | Comando | O que vai fazer | Entra com |
 |---|---|---|
-| Expressão do personagem | *a definir* | issue #10 |
 | `<<tocar_musica id>>` | Trocar a música | issue #20 |
 | `<<tocar_efeito id>>` | Tocar um efeito sonoro | issue #20 |
 
@@ -600,6 +638,7 @@ Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta ta
 | Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_gotica` |
 | Id de item | minúsculas, sem acento, dígitos e `_` | `chave_teste` |
 | Quem fala | como na tabela [Quem fala](#quem-fala), com acento | `Gótica` |
+| Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
 | Branch | `roteiro/<seu-nome>-<assunto>` | `roteiro/ana-chave-perdida` |
 
 ## Como pedir o que ainda não existe
@@ -616,7 +655,7 @@ Gótica: Não perde, que eu não tenho outra.
 
 ```
 Gótica: Você não devia ter visto isso.
-// PEDIDO: a Gótica fica com expressão de raiva nesta fala.
+// PEDIDO: a Gótica fica com uma expressão de medo nesta fala (ela só tem neutra e raiva).
 // PEDIDO: tocar uma música tensa a partir daqui.
 ```
 
@@ -677,7 +716,8 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
 | O nome do nó é minúsculo e sem acento? | `title: Gótica_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
-| O nome de quem fala está igual ao da tabela? | `Gotica: Oi.` | Vira outra personagem, sem aviso. |
+| O nome de quem fala está igual ao da tabela? | `Gotica: Oi.` | A verificação do jogo reprova. |
+| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Gótica: Oi. #medo`, `Narração. #raiva` | A verificação do jogo reprova. |
 | As variáveis novas estão em `variaveis.yarn`, com `///`? | `<<declare>>` dentro da conversa | A verificação reprova. |
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |
 | Há dois-pontos em alguma narração? | `Eram 10:30 da manhã.` | Vira nome de personagem ([Dois-pontos na narração](#dois-pontos-na-narração)). |

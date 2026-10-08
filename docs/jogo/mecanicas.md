@@ -12,7 +12,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Diálogo](#diálogo) | parcial | `Dialogue` | #11 |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
-| [Personagens](#personagens) | planejada | — | #10, #26 |
+| [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
 | [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
@@ -78,7 +78,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
 - Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
 - As variáveis do roteiro (`$falou_com_gotica`) leem e gravam no estado da história.
-- Narração (fala sem nome de personagem) esconde a placa de nome.
+- Narração (fala sem nome de personagem) esconde a placa de nome e o retrato.
+- O nome de quem fala aparece na cor do personagem, e o retrato dele aparece ao lado da caixa ([Personagens](#personagens)).
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 - Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
 
@@ -134,13 +135,19 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Para o jogador:** o retrato de quem fala aparece ao lado da caixa de diálogo e muda de expressão.
 
-**Planejada (#10, D-21):**
-- Cada personagem é um asset: identificador, nome exibido, cor do nome, retratos por expressão.
-- O roteiro cita o personagem pelo nome; um nome desconhecido é avisado e não trava o jogo.
+**Existe (#10, D-21):**
+- Cada personagem é um asset (`CharacterSO`): identificador, nome exibido, cor do nome, retratos por expressão. Os personagens ficam reunidos em um registro (`CharacterRegistry`); personagem novo é um asset e uma linha no registro, sem código.
+- O roteiro cita o personagem pelo nome exibido (`Gótica: ...`). A placa de nome mostra o nome na cor do personagem, e o retrato aparece à esquerda da caixa de diálogo. Em narração, em personagem desconhecido e em personagem sem retrato, o retrato some; a caixa não muda de lugar.
+- O roteiro troca a expressão com uma etiqueta no fim da fala (`Gótica: Sai daqui. #raiva`). Ela vale só para aquela fala; sem etiqueta, aparece a primeira expressão do asset.
+- Um nome desconhecido no roteiro aparece em texto puro, sem cor e sem retrato, com aviso no console. Uma expressão que o personagem não tem mostra a expressão padrão, com aviso. Nenhum dos dois trava o jogo.
+- Um teste automático reprova nome de quem fala fora do registro e etiqueta de expressão que o personagem não tem, em narração, em opção ou repetida na fala.
+- O protagonista também é um personagem, com retrato.
+
+**Limitação conhecida:** os retratos são placeholders (um quadrado colorido com o nome do arquivo), em 300×300.
 
 **Planejada (#26):**
 - O nome do protagonista é escolhido pelo jogador ao começar um jogo novo, com um nome padrão.
-- O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico.
+- O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico. O roteiro continua escrevendo `Protagonista:`; a troca pelo nome escolhido acontece na hora de mostrar a placa (ver D-21).
 
 **Fora do escopo:** sprites de corpo inteiro sobre o cenário, vários personagens na tela, animação de entrada e saída, trocar o nome do protagonista depois de o jogo começar.
 
