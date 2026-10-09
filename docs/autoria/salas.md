@@ -97,7 +97,7 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
 
 ### Criar um personagem
 
-1. **A arte.** Cada expressão é uma imagem PNG de **corpo inteiro, de frente, com fundo transparente**, e **todos os personagens são desenhados na mesma escala** (a cabeça de um tem o mesmo tamanho da de outro; quem é mais alto ou mais largo ocupa mais imagem). **Os pés ficam na borda de baixo da imagem**, porque o jogo alinha todos pela base. A imagem fica em `Assets/Sprites/Personagens/<personagem>/`, uma pasta por personagem, com o nome `<personagem>_<expressão>.png`, tudo em minúsculas sem acento (`Assets/Sprites/Personagens/luna/luna_raiva.png`). Na tela só aparece do busto para cima: a caixa de diálogo cobre o resto.
+1. **A arte.** Os personagens são desenhados **dentro de uma cena de conversa composta em 3840×2160** (16:9), todos na mesma cena, de frente, com os pés na mesma linha: é ali que a arte decide o tamanho de cada um e a diferença de altura entre eles. A cena atual é a referência [`docs/arte/referencia_cena_de_conversa.png`](../arte/referencia_cena_de_conversa.png). Cada expressão é entregue como um PNG **com fundo transparente, exportado em 100% (sem redimensionar), cortado rente à figura nos lados e em cima, e cortado embaixo exatamente na borda de baixo da tela**. O jogo desenha todas as imagens na mesma escala e alinhadas pela borda de baixo, então uma imagem fora desse padrão aparece no tamanho ou na altura errados. Todas as expressões do mesmo personagem têm o mesmo tamanho de imagem. A imagem fica em `Assets/Sprites/Personagens/<personagem>/`, uma pasta por personagem, com o nome `<personagem>_<expressão>.png`, tudo em minúsculas sem acento (`Assets/Sprites/Personagens/luna/luna_raiva.png`). Na tela só aparece do busto para cima: a caixa de diálogo cobre o resto.
    No Inspector da imagem (**Import Settings**), confira antes de usá-la:
 
    | Campo | Valor | Por quê |
@@ -106,7 +106,7 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
    | **Sprite Mode** | `Single` | O padrão do projeto vem `Multiple`, e com ele o Unity fatia a imagem sozinho (ou não gera sprite nenhum). Uma imagem inteira é `Single` |
    | **Pixels Per Unit** | `100` | O jogo desenha o sprite pelo tamanho em unidades, que **não muda** quando o Unity reduz a textura. Com outro valor, esse personagem aparece num tamanho diferente dos outros |
    | **Generate Mipmaps** | desligado | |
-   | **Max Size** | `2048` | A arte original é maior que isso e é reduzida na importação; em Full HD o busto continua nítido |
+   | **Max Size** | `2048` | Uma arte mais alta que isso é reduzida na importação; como o jogo a desenha na metade do tamanho, em Full HD continua nítida |
 
    Os dois personagens atuais (`luna` e `protagonista`) são o modelo. Não existe ajuste de tamanho ou de posição por personagem: a escala e a linha de chão são as mesmas para todos, definidas no `GameUI.prefab`. Se um personagem ficar estranho, peça um ajuste à arte ou abra uma issue.
 2. **O personagem.** Botão direito na pasta `Characters/` → **Create → Characters → Character**. Preencha:

@@ -140,7 +140,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O roteiro cita o personagem pelo nome exibido (`Luna: ...`). A placa de nome mostra o nome na cor do personagem, no canto superior esquerdo da caixa, também quando fala quem está à direita.
 - **A tela de personagens (#48)** tem dois lugares, esquerda e direita, atrás da caixa e na frente do cenário; o centro fica livre para as opções. O primeiro personagem a falar na conversa fica à esquerda e o segundo à direita (o protagonista não tem lado fixo). Cada um entra na primeira fala e fica até a conversa acabar. Com os dois lugares ocupados, um terceiro toma o lugar de quem falou há mais tempo, e quem saiu volta pela mesma regra quando falar de novo.
 - **Destaque:** quem fala fica em destaque; quem mais está na tela fica um pouco escurecido (a cor do escurecido é um campo do Inspector) e mantém a última expressão até a própria fala seguinte. Narração, pensamento, personagem desconhecido e personagem sem sprite não trazem ninguém e escurecem quem está na tela. Ao abrir as opções de resposta, o protagonista entra, se não estiver na tela, e fica em destaque: é o aviso de que é a vez do jogador.
-- `<<jump>>` e `<<detour>>` não mudam quem está na tela; a tela só é limpa quando a conversa termina, e a conversa seguinte começa vazia. Todos os personagens usam a mesma escala e a mesma linha de chão, e entrar, escurecer e trocar de lugar são instantâneos.
+- `<<jump>>` e `<<detour>>` não mudam quem está na tela; a tela só é limpa quando a conversa termina, e a conversa seguinte começa vazia. Todos os personagens usam a mesma escala e a mesma linha de chão (a arte é composta em uma cena de 3840×2160 e desenhada na metade, alinhada pela borda de baixo da tela), e entrar, escurecer e trocar de lugar são instantâneos.
 - O roteiro troca a expressão com uma etiqueta no fim da fala (`Luna: Sai daqui. #raiva`). Ela vale só para aquela fala; sem etiqueta, aparece a primeira expressão do asset.
 - Um nome desconhecido no roteiro aparece em texto puro, sem cor e sem sprite, com aviso no console, e não ocupa lugar na tela. Uma expressão que o personagem não tem mostra a expressão padrão, com aviso. Nenhum dos dois trava o jogo.
 - Um teste automático reprova nome de quem fala fora do registro e etiqueta de expressão que o personagem não tem, em narração, em opção ou repetida na fala.
@@ -148,8 +148,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Limitações conhecidas:**
 - A expressão `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho ao lado da cabeça, até a arte definitiva chegar.
-- O PNG do protagonista tem riscos soltos à direita do braço; a arte vai limpá-los.
-- Os pés da Luna estão a cerca de 9 px da base da imagem e os do protagonista a cerca de 50 px. Sem ajuste por personagem, a Luna aparece uns 16 px mais baixa em relação a ele. O padrão para as próximas artes é "pés na base da imagem".
+- Os personagens passam por baixo das bordas dos botões de opção: a cena de referência da arte não mostra as opções. Resolve-se quando a arte entregar a interface nova, com uma referência de opções abertas.
 - O sprite do lado esquerdo é desenhado por cima do painel de inventário, que fica no canto superior esquerdo. O painel só vai ficar visível em puzzle, e isso será tratado depois.
 - Se um roteiro emendar dois encontros com `<<jump>>` (a Luna se despede e o protagonista fala com um professor), a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Não há comando para tirar alguém de cena.
 

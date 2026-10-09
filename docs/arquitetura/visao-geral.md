@@ -130,7 +130,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
 | Um personagem | Um asset `CharacterSO` (id, nome exibido, cor, sprites por expressão) acrescentado ao `CharacterRegistry`, mais uma linha nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../autoria/roteiro.md). O roteiro o cita pelo nome exibido. Passo a passo em [salas.md](../autoria/salas.md#personagens) |
-| Uma expressão | Uma imagem de corpo inteiro em `Assets/Sprites/Personagens/<personagem>/`, uma entrada em **Expressions** do `CharacterSO` e uma linha na tabela "Expressões" do guia de roteiro. O roteiro a pede com `#nome` no fim da fala |
+| Uma expressão | Uma imagem no padrão de arte de personagem em `Assets/Sprites/Personagens/<personagem>/`, uma entrada em **Expressions** do `CharacterSO` e uma linha na tabela "Expressões" do guia de roteiro. O roteiro a pede com `#nome` no fim da fala |
 | Uma variável de história | Uma linha `<<declare $nome = valor>>` com `/// descrição` em `Assets/Roteiro/variaveis.yarn`, sem código. Se for booleana, ela aparece sozinha nos campos de portão do Inspector |
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
