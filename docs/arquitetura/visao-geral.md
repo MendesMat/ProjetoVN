@@ -90,6 +90,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
 | Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo será bloqueado, D-20) |
+| Quem está na tela de personagens (lado, destaque, última expressão) | `DialogueUIController`, por um `ConversationStage` (D-21); só da conversa em curso | Não |
 | Cena atual | `SceneManager` | Gravada; ainda não é consumida ao carregar |
 
 `GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`. Itens são resolvidos por id pelo `ItemRegistry`.
@@ -106,7 +107,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 1. `InteractableDialogueTrigger.TriggerDialogue()` chama `DialogueManager.Instance.StartDialogue(nodeName)`, com o nome de um nó de um roteiro `.yarn`.
 2. Nome vazio, nó inexistente, roteiro com erro de compilação, conversa já em curso ou nenhuma interface registrada: aviso ou erro no console, retorna `false`, nada muda.
 3. Caso contrário o `DialogueRunner` começa a conversa: `DialogueStartedMessage` é publicada **antes** da primeira fala; o `GameFlow` entra em `DialogueState`.
-4. O runner entrega cada fala e cada grupo de opções ao `DialogueUIController` (D-12), que resolve o nome de quem fala no `CharacterRegistry` e mostra o nome na cor do personagem e o retrato da expressão da fala. O clique esquerdo avança (`DialogueInputHandler` → `AdvanceDialogue`); os botões escolhem (`DialogueChoiceButton` → `MakeChoice`). As variáveis do roteiro leem e gravam no `StoryState`.
+4. O runner entrega cada fala e cada grupo de opções ao `DialogueUIController` (D-12), que resolve o nome de quem fala no `CharacterRegistry`, mostra o nome na cor do personagem e põe o sprite dele em um dos dois lugares da tela de personagens, atrás da caixa (quem decide o lugar, o destaque e a expressão é o `ConversationStage`). Ao abrir as opções, o protagonista entra em destaque. O clique esquerdo avança (`DialogueInputHandler` → `AdvanceDialogue`); os botões escolhem (`DialogueChoiceButton` → `MakeChoice`). As variáveis do roteiro leem e gravam no `StoryState`.
 5. Ao acabar, `DialogueEndedMessage`; o `GameFlow` volta a `GameplayState`. O clique que encerrou o diálogo não atinge o mundo, porque o gate ignora o frame em que foi liberado. Se o roteiro parar sem terminar (por exemplo um `<<jump>>` para um nó que não existe), o `DialogueManager` registra o erro e encerra a conversa do mesmo jeito.
 
 **Coleta**
@@ -128,8 +129,8 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o chama pelo nome no `InteractableDialogueTrigger` |
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
-| Um personagem | Um asset `CharacterSO` (id, nome exibido, cor, retratos) acrescentado ao `CharacterRegistry`, mais uma linha nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../autoria/roteiro.md). O roteiro o cita pelo nome exibido. Passo a passo em [salas.md](../autoria/salas.md#personagens) |
-| Uma expressão | Uma imagem de 300×300, uma entrada em **Portraits** do `CharacterSO` e uma linha na tabela "Expressões" do guia de roteiro. O roteiro a pede com `#nome` no fim da fala |
+| Um personagem | Um asset `CharacterSO` (id, nome exibido, cor, sprites por expressão) acrescentado ao `CharacterRegistry`, mais uma linha nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../autoria/roteiro.md). O roteiro o cita pelo nome exibido. Passo a passo em [salas.md](../autoria/salas.md#personagens) |
+| Uma expressão | Uma imagem no padrão de arte de personagem em `Assets/Sprites/Personagens/<personagem>/`, uma entrada em **Expressions** do `CharacterSO` e uma linha na tabela "Expressões" do guia de roteiro. O roteiro a pede com `#nome` no fim da fala |
 | Uma variável de história | Uma linha `<<declare $nome = valor>>` com `/// descrição` em `Assets/Roteiro/variaveis.yarn`, sem código. Se for booleana, ela aparece sozinha nos campos de portão do Inspector |
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |

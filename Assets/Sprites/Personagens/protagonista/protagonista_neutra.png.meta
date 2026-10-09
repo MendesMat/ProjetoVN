@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7fb224fec59fb644d8a9f94a6acc716c
+guid: bdd81e1be8fe3a64290ad507cd669498
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5725440016956529023
-    second: luna_raiva_0
+      213: 8965163977703934346
+    second: protag_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: luna_raiva_0
+      name: protag_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 300
-        height: 300
+        width: 988
+        height: 3443
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f7910895c59d47f40800000000000000
-      internalID: 5725440016956529023
+      spriteID: a89cb246329aa6c70800000000000000
+      internalID: 8965163977703934346
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      luna_raiva_0: 5725440016956529023
+      protag_0: 8965163977703934346
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

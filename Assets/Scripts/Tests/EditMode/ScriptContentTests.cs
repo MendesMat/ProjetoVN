@@ -136,7 +136,7 @@ namespace ProjetoVN.Tests.EditMode
             Assert.IsEmpty(speakers.Spoken.Where(line => line.Expressions.Length > 1).Select(line => line.ToString()),
                 "uma fala tem no máximo uma etiqueta de expressão");
             Assert.IsEmpty(speakers.Spoken.SelectMany(line => ExpressionsTheSpeakerLacks(registry, line)),
-                "a expressão precisa existir nos retratos de quem fala");
+                "a expressão precisa existir nas expressões de quem fala");
         }
 
         [Test]
@@ -152,7 +152,16 @@ namespace ProjetoVN.Tests.EditMode
             Assert.IsEmpty(registry.Characters.Where(character => string.IsNullOrWhiteSpace(character.DisplayName)).Select(character => character.Id),
                 "todo personagem tem nome exibido");
             Assert.IsEmpty(Repeated(registry.Characters.Select(character => character.DisplayName)), "nomes exibidos únicos");
-            Assert.IsEmpty(registry.Characters.SelectMany(PortraitProblems), "cada retrato tem uma expressão no formato, única, e um sprite");
+            Assert.IsEmpty(registry.Characters.SelectMany(ExpressionProblems), "cada expressão tem nome no formato, único, e um sprite");
+        }
+
+        [Test]
+        public void CharacterRegistry_NamesAProtagonistFromItsList()
+        {
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+
+            Assert.IsNotNull(registry.Protagonist, "o registro aponta o protagonista");
+            CollectionAssert.Contains(registry.Characters, registry.Protagonist, "o protagonista está na lista de personagens");
         }
 
         [Test]
@@ -184,13 +193,13 @@ namespace ProjetoVN.Tests.EditMode
                 .Select(expression => $"{line}: {character.DisplayName} não tem a expressão '{expression}'");
         }
 
-        private static IEnumerable<string> PortraitProblems(CharacterSO character)
+        private static IEnumerable<string> ExpressionProblems(CharacterSO character)
         {
             var problems = new List<string>();
-            problems.AddRange(character.Portraits.Where(p => !ScriptNodeName.FollowsConvention(p.Expression))
+            problems.AddRange(character.Expressions.Where(p => !ScriptNodeName.FollowsConvention(p.Expression))
                 .Select(p => $"{character.Id}: expressão '{p.Expression}' fora do formato"));
-            problems.AddRange(Repeated(character.Portraits.Select(p => p.Expression)).Select(e => $"{character.Id}: expressão '{e}' repetida"));
-            problems.AddRange(character.Portraits.Where(p => p.Sprite == null).Select(p => $"{character.Id}: expressão '{p.Expression}' sem sprite"));
+            problems.AddRange(Repeated(character.Expressions.Select(p => p.Expression)).Select(e => $"{character.Id}: expressão '{e}' repetida"));
+            problems.AddRange(character.Expressions.Where(p => p.Sprite == null).Select(p => $"{character.Id}: expressão '{p.Expression}' sem sprite"));
             return problems;
         }
 

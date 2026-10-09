@@ -29,7 +29,7 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Texto do nome de quem fala. Vazio: a interface de diálogo não funciona e o console avisa.")]
         [SerializeField] private TMP_Text speakerNameText;
 
-        [Tooltip("Lista dos personagens que o roteiro pode citar. Vazio: todo nome aparece em texto puro, sem cor e sem retrato, e o console avisa.")]
+        [Tooltip("Lista dos personagens que o roteiro pode citar. Vazio: todo nome aparece em texto puro, sem cor e sem sprite, e o console avisa.")]
         [SerializeField] private CharacterRegistry characterRegistry;
 
         [Header("Escolhas")]
@@ -47,13 +47,14 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Placa do nome, ligada só quando a fala tem personagem (narração a esconde). Vazio: a placa não é controlada.")]
         [SerializeField] private GameObject speakerNameplate;
 
-        [Tooltip("Imagem do retrato de quem fala, ligada só quando a fala tem um retrato (narração, personagem desconhecido e personagem sem retrato a desligam). Vazio: o retrato não é controlado.")]
-        [SerializeField] private Image portraitImage;
+        [Tooltip("A tela de personagens, desenhada atrás da caixa. Vazio: os personagens não aparecem na tela.")]
+        [SerializeField] private CharacterStageView characterStage;
 
         [Tooltip("O '>>' de continuar, ligado enquanto a fala espera o jogador. Vazio: não é controlado.")]
         [SerializeField] private GameObject continueIndicator;
 
         private readonly List<DialogueOption> _shownOptions = new();
+        private readonly ConversationStage _stage = new();
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
         private Color _defaultNameColor;
@@ -99,6 +100,7 @@ namespace ProjetoVN.Dialogue.UI
             CollectOptions(dialogueOptions);
             if (!HasAvailableOption()) return null;
 
+            GiveTurnToProtagonist();
             ShowOptions();
             var selection = new YarnTaskCompletionSource<DialogueOption>();
             _selection = selection;
@@ -144,7 +146,7 @@ namespace ProjetoVN.Dialogue.UI
             if (isNarration)
             {
                 speakerNameText.text = "";
-                ShowPortrait(null);
+                DimStage();
                 return;
             }
 
@@ -152,13 +154,13 @@ namespace ProjetoVN.Dialogue.UI
             {
                 speakerNameText.text = speaker;
                 speakerNameText.color = _defaultNameColor;
-                ShowPortrait(null);
+                DimStage();
                 return;
             }
 
             speakerNameText.text = NameToDisplay(character);
             speakerNameText.color = character.NameColor;
-            ShowPortrait(PortraitFor(character, line));
+            PutOnStage(character, line);
         }
 
         // A troca do nome do protagonista pelo que o jogador escolheu (#26) entra aqui, sem mexer em nenhum roteiro.
@@ -171,29 +173,57 @@ namespace ProjetoVN.Dialogue.UI
             if (characterRegistry.TryGetByScriptName(scriptName, out character)) return true;
 
             Debug.LogWarning($"[DialogueUIController] Personagem desconhecido no roteiro: '{scriptName}' (nó '{CurrentNodeName()}'). " +
-                             "O nome aparece em texto puro, sem cor e sem retrato.", this);
+                             "O nome aparece em texto puro, sem cor e sem sprite.", this);
             return false;
         }
 
-        private Sprite PortraitFor(CharacterSO character, LocalizedLine line)
+        private void PutOnStage(CharacterSO character, LocalizedLine line)
         {
-            string expression = ExpressionTag.FirstIn(line.Metadata);
-            if (expression == null) return character.DefaultPortrait;
-            if (character.TryGetPortrait(expression, out Sprite portrait)) return portrait;
+            string expression = ExpressionFor(character, line);
+            if (expression == null)
+            {
+                DimStage();
+                return;
+            }
 
-            Debug.LogWarning($"[DialogueUIController] Expressão desconhecida: '{expression}' não existe em '{character.DisplayName}' (nó '{CurrentNodeName()}'). " +
-                             "Mostrando a expressão padrão.", this);
-            return character.DefaultPortrait;
+            _stage.Speak(character, expression);
+            DrawStage();
         }
 
-        // Um Image sem sprite desenha um quadrado branco, então o retrato some pelo objeto, não pelo sprite.
-        private void ShowPortrait(Sprite portrait)
+        private string ExpressionFor(CharacterSO character, LocalizedLine line)
         {
-            if (portraitImage == null) return;
+            string requested = ExpressionTag.FirstIn(line.Metadata);
+            if (requested == null) return character.DefaultExpression;
+            if (character.HasExpression(requested)) return requested;
 
-            bool hasPortrait = portrait != null;
-            portraitImage.gameObject.SetActive(hasPortrait);
-            if (hasPortrait) portraitImage.sprite = portrait;
+            Debug.LogWarning($"[DialogueUIController] Expressão desconhecida: '{requested}' não existe em '{character.DisplayName}' (nó '{CurrentNodeName()}'). " +
+                             "Mostrando a expressão padrão.", this);
+            return character.DefaultExpression;
+        }
+
+        private void GiveTurnToProtagonist()
+        {
+            CharacterSO protagonist = characterRegistry != null ? characterRegistry.Protagonist : null;
+            string expression = protagonist != null ? protagonist.DefaultExpression : null;
+            if (expression == null)
+            {
+                DimStage();
+                return;
+            }
+
+            _stage.GiveTurnToPlayer(protagonist, expression);
+            DrawStage();
+        }
+
+        private void DimStage()
+        {
+            _stage.DimEveryone();
+            DrawStage();
+        }
+
+        private void DrawStage()
+        {
+            if (characterStage != null) characterStage.Show(_stage);
         }
 
         private static string CurrentNodeName() =>
@@ -202,7 +232,7 @@ namespace ProjetoVN.Dialogue.UI
         private void WarnAboutMissingCharacterRegistry()
         {
             if (characterRegistry == null)
-                Debug.LogError("[DialogueUIController] Character Registry não está atribuído: todo nome aparece em texto puro, sem cor e sem retrato.", this);
+                Debug.LogError("[DialogueUIController] Character Registry não está atribuído: todo nome aparece em texto puro, sem cor e sem sprite, e as opções não trazem o protagonista.", this);
         }
 
         private void CacheChoiceButtons()
@@ -261,6 +291,8 @@ namespace ProjetoVN.Dialogue.UI
             dialogueBox.SetActive(false);
             dialogueChoices.SetActive(false);
             SetActiveIfAssigned(continueIndicator, false);
+            _stage.Clear();
+            DrawStage();
         }
 
         private static void SetActiveIfAssigned(GameObject target, bool active)
@@ -284,7 +316,7 @@ namespace ProjetoVN.Dialogue.UI
                 Debug.LogWarning("[DialogueUIController] Caixa, texto da fala, texto do nome e contêiner de escolhas precisam estar atribuídos.", this);
 
             if (characterRegistry == null)
-                Debug.LogWarning("[DialogueUIController] Character Registry está vazio: todo nome aparece em texto puro, sem cor e sem retrato.", this);
+                Debug.LogWarning("[DialogueUIController] Character Registry está vazio: todo nome aparece em texto puro, sem cor e sem sprite.", this);
 
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);

@@ -61,12 +61,12 @@ Protagonista: Sou. Cheguei hoje.
 Respiro fundo. Ela parece me estudar.
 
 // EXPRESSÃO: para a personagem mudar de cara numa fala, escreva no FIM da
-// linha um espaço, "#" e o nome da expressão. Vale só para esta fala: a
-// próxima volta à expressão padrão do personagem (a primeira da tabela
-// "Expressões" do guia). Só em fala com nome, uma etiqueta por fala, nunca em
-// narração nem em opção. Nome de expressão que o personagem não tem não
-// trava o jogo: o console avisa e o retrato padrão aparece. O teste do
-// projeto reprova antes disso.
+// linha um espaço, "#" e o nome da expressão. Vale para esta fala: na próxima
+// fala dela, sem etiqueta, volta à expressão padrão (a primeira da tabela
+// "Expressões" do guia). Enquanto os outros falam, ela fica escurecida com a
+// última expressão. Só em fala com nome, uma etiqueta por fala, nunca em
+// narração nem em opção. Expressão que o personagem não tem não trava o jogo:
+// o console avisa e a padrão aparece. O teste do projeto reprova antes disso.
 Luna: Não olha assim para mim. #raiva
 Luna: Desculpa. Foi mal.
 

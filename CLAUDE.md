@@ -79,10 +79,11 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | Caminho | Conteúdo |
 |---|---|
 | `Assets/Scripts/<Módulo>/` | Código, um asmdef por módulo |
-| `Assets/Scripts/ScriptableObjects/` | Assets de conteúdo (itens) |
+| `Assets/Scripts/ScriptableObjects/` | Assets de conteúdo (itens, personagens) |
+| `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
-| `docs/` | Documentação transversal |
+| `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte |
 | `.claude/skills/` | Os três comandos de trabalho |
 | `.github/` | Modelos de issue e de PR |

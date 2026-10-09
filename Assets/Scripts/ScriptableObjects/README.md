@@ -17,9 +17,9 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO`) resid
   - Um item que o roteiro cita precisa estar no `ItemRegistry.asset`. Um teste EditMode acusa o id que não está lá.
   - **Quem cria um item acrescenta a linha dele na tabela "Itens que existem" de [roteiro.md](../../../docs/autoria/roteiro.md#comandos-disponíveis)** (id, nome no jogo e uma frase). É dali que o roteirista copia o id.
 
-- **`Characters/`**: Os personagens do jogo (`CharacterSO`: id, nome exibido, cor do nome, retratos por expressão) e o `CharacterRegistry.asset`, que os reúne. Os retratos (PNG de 300×300) ficam em `Assets/UI/Retratos/`. Passo a passo em [salas.md](../../../docs/autoria/salas.md#personagens).
+- **`Characters/`**: Os personagens do jogo (`CharacterSO`: id, nome exibido, cor do nome, sprites por expressão) e o `CharacterRegistry.asset`, que os reúne e aponta o **Protagonist**. A arte (PNG no padrão descrito em salas.md, uma pasta por personagem) fica em `Assets/Sprites/Personagens/<personagem>/`, com o nome `<personagem>_<expressão>.png`. Passo a passo em [salas.md](../../../docs/autoria/salas.md#personagens).
   - O **id** de um personagem e o **nome de uma expressão** são em minúsculas sem acento, com dígitos e `_` (`luna`, `raiva`), igual aos demais nomes técnicos (D-22). O **nome exibido** é português normal (`Luna`) e é o que o roteiro escreve antes dos dois-pontos.
-  - Um personagem que o roteiro cita precisa estar no `CharacterRegistry.asset`, e uma expressão que o roteiro pede precisa estar nos retratos dele. Um teste EditMode acusa os dois, com o nó e a linha.
+  - Um personagem que o roteiro cita precisa estar no `CharacterRegistry.asset`, e uma expressão que o roteiro pede precisa estar nas expressões dele. Um teste EditMode acusa os dois, com o nó e a linha.
   - **Quem cria um personagem ou uma expressão acrescenta a linha dele nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../../../docs/autoria/roteiro.md#quem-fala).** É dali que o roteirista copia os nomes.
 
 ---

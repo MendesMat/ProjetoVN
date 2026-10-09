@@ -18,10 +18,12 @@ O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmd
 | `DialogueManager` | `MonoBehaviour` com `Instance`, o dono do diálogo: a API pública e o adaptador do runner | `Managers.prefab` |
 | `ConversationNotifier` | C# puro: publica `DialogueStartedMessage` e `DialogueEndedMessage`, cada uma uma vez por conversa | `Logic/` |
 | `ScriptNodeName` | C# puro: o formato dos nomes de nó (`FollowsConvention`) | `Logic/` |
-| `CharacterSO` | ScriptableObject somente leitura (D-02): `Id`, `DisplayName`, `NameColor` e a lista de retratos (`CharacterPortrait`: expressão e `Sprite`). A primeira é a expressão padrão | `Characters/`; os assets em `Assets/Scripts/ScriptableObjects/Characters/` |
-| `CharacterRegistry` | ScriptableObject com a lista de `CharacterSO`. `TryGetByScriptName` acha o personagem pelo nome exibido (comparação exata). Sem `Instance` (D-04): é referenciado pelo apresentador | `Characters/` |
+| `CharacterSO` | ScriptableObject somente leitura (D-02): `Id`, `DisplayName`, `NameColor` e a lista de sprites por expressão (`CharacterExpression`: nome da expressão e `Sprite`). A primeira é a expressão padrão (`DefaultExpression`); `TryGetSprite` acha o sprite de uma expressão | `Characters/`; os assets em `Assets/Scripts/ScriptableObjects/Characters/` |
+| `CharacterRegistry` | ScriptableObject com a lista de `CharacterSO`. `TryGetByScriptName` acha o personagem pelo nome exibido (comparação exata). O campo `Protagonist` aponta quem o jogo trata como protagonista. Sem `Instance` (D-04): é referenciado pelo apresentador | `Characters/` |
 | `ExpressionTag` | C# puro: lê de `line.Metadata` a etiqueta de expressão, ignorando as do Yarn (`lastline`, `line:…`) | `Logic/` |
-| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, o retrato, as escolhas e o indicador de continuar | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
+| `ConversationStage` | C# puro, criado com `new` pelo apresentador: quem está em cada um dos dois lugares da tela de personagens, quem está em destaque e a última expressão de cada um. Estado só da conversa em curso, fora do save. Ver [Personagens na tela](#personagens-na-tela) | `Logic/` |
+| `CharacterStageView` | `MonoBehaviour` fino: dois `Image` (esquerda e direita) e a cor do escurecido. Só desenha o que o `ConversationStage` decidiu | `GameUI.prefab` (`Canvas_Game/DialogueUI/CharacterStage`) |
+| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, a tela de personagens, as escolhas e o indicador de continuar | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
 | `DialogueChoiceButton` | Um por botão de escolha: `OnClick` → `DialogueManager.MakeChoice(índice)` | `GameUI.prefab` |
 | `DialogueInputHandler` | Lê a ação `UI/AdvanceDialogue` (botão esquerdo, espaço, enter, botão sul) e chama `AdvanceDialogue` (D-08) | `Managers.prefab` |
 
@@ -90,42 +92,68 @@ O `DialogueUIController` herda de `DialoguePresenterBase`. Ele se **registra** n
 
 **A interface é persistente (#9), então recarregar ou trocar a cena não a destrói e não encerra a conversa:** a fala continua na tela por cima da cena nova, com o `PlayerInputGate` fechado, até o jogador avançar até o fim (medido na #9: `Reload Scene` do painel de debug durante uma fala deixa `IsDialogueActive()` verdadeiro). Hoje só esse botão chega aí. O que acontece com uma conversa aberta numa troca de sala é decisão da #12.
 
-- **Fala:** o nome é o do personagem da fala (`Luna: ...`); sem personagem (**narração**), a placa de nome e o retrato ficam escondidos. O texto é a fala sem o nome. O personagem é resolvido como descrito em [Personagem e retrato](#personagem-e-retrato).
+- **Fala:** o nome é o do personagem da fala (`Luna: ...`); sem personagem (**narração**), a placa de nome fica escondida e ninguém entra na tela de personagens. O texto é a fala sem o nome. O personagem é resolvido como descrito em [Personagens na tela](#personagens-na-tela).
 - **A fala antes de opções** (regra do `lastline`): o compilador etiqueta com `lastline` a fala que é o comando imediatamente anterior a um bloco de opções. O apresentador não espera clique nela: mostra fala e opções juntas, sem o indicador de continuar. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
-- **Escolhas:** mostra, em ordem, **todas** as opções do bloco. Uma opção indisponível (a condição `<<if>>` dela é falsa) aparece com o `Button` desabilitado (`interactable = false`, esmaecido pelo `disabledColor` do botão) e ocupa um botão, para o jogador ver que existe um caminho fechado (D-11). `Choose` ignora o índice de uma opção indisponível, também numa chamada direta a `MakeChoice`. O `Button` de cada `choiceButtonObjects[i]` é lido uma vez no `Start`; sem `Button`, o `OnValidate` avisa e a opção indisponível não fica desabilitada. Há quatro botões; mais opções do que botões (disponíveis ou não) é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. **Nenhuma opção disponível:** `RunOptionsAsync` devolve `null` sem mostrar nada e a conversa segue pela fala depois do bloco; isso depende de `allowOptionFallthrough` ligado no `DialogueRunner` do `Managers.prefab` (sem ele o runner loga erro e a conversa fica presa).
+- **Escolhas:** mostra, em ordem, **todas** as opções do bloco. Uma opção indisponível (a condição `<<if>>` dela é falsa) aparece com o `Button` desabilitado (`interactable = false`, esmaecido pelo `disabledColor` do botão) e ocupa um botão, para o jogador ver que existe um caminho fechado (D-11). `Choose` ignora o índice de uma opção indisponível, também numa chamada direta a `MakeChoice`. O `Button` de cada `choiceButtonObjects[i]` é lido uma vez no `Start`; sem `Button`, o `OnValidate` avisa e a opção indisponível não fica desabilitada. Há quatro botões; mais opções do que botões (disponíveis ou não) é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. **Nenhuma opção disponível:** `RunOptionsAsync` devolve `null` sem mostrar nada e a conversa segue pela fala depois do bloco; isso depende de `allowOptionFallthrough` ligado no `DialogueRunner` do `Managers.prefab` (sem ele o runner loga erro e a conversa fica presa). **Quando as opções abrem, o protagonista entra na tela de personagens e fica em destaque** (é a vez do jogador), mesmo com a fala anterior ainda na caixa; ver [Personagens na tela](#personagens-na-tela).
 - **Indicador de continuar** (`>>`): aparece a cada fala que espera clique e some quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança em qualquer lugar, e um `>>` clicável avançaria duas falas por clique.
-- **Fim da conversa:** `DialogueEndedMessage` esconde a caixa e as escolhas, também no fim anormal.
+- **Fim da conversa:** `DialogueEndedMessage` esconde a caixa e as escolhas e limpa a tela de personagens, também no fim anormal.
 - **Assíncrono (D-06):** o runner e o apresentador usam `YarnTask`, que no Unity 6 é `Awaitable` na thread principal. Depois de cada `await` o apresentador reconfere se ainda existe.
 
 Todo campo exposto no Inspector do `DialogueUIController` tem tooltip, e o `OnValidate` avisa quando um campo obrigatório está vazio ou quando `Choice Texts` não tem o tamanho de `Choice Button Objects`.
 
-### Personagem e retrato
+### Personagens na tela
 
-A cada fala, o `ShowLine` procura o nome de quem fala (`line.CharacterName`) no `CharacterRegistry` do controller e decide o que mostrar:
+A cada fala, o `ShowLine` procura o nome de quem fala (`line.CharacterName`) no `CharacterRegistry` do controller, decide o que mostrar na placa de nome e **diz ao `ConversationStage` o que aconteceu**. A tela de personagens (`CharacterStageView`) só desenha o resultado.
 
-| Fala | Placa de nome | Retrato |
+| Momento | Placa de nome | Tela de personagens |
 |---|---|---|
-| **Narração** (sem nome) | desligada | desligado |
-| **Personagem conhecido**, sem etiqueta | o `DisplayName`, na `NameColor` do asset | o padrão (o primeiro da lista) |
-| Personagem conhecido, **com etiqueta** (`#raiva`) | idem | o da expressão, **só para esta fala** |
-| Personagem conhecido, **expressão que ele não tem** | idem | o padrão, com `LogWarning` (personagem, expressão e nó) |
-| Personagem conhecido **sem nenhum retrato** | idem | desligado, sem aviso |
-| **Personagem desconhecido** | o nome do roteiro, na cor padrão da placa | desligado, com `LogWarning` (nome e nó) |
+| **Narração** (sem nome), incluindo o pensamento | desligada | ninguém entra; quem está na tela escurece (`DimEveryone`) |
+| **Personagem conhecido**, sem etiqueta | o `DisplayName`, na `NameColor` do asset | ele fala (`Speak`) com a expressão padrão (a primeira da lista): em destaque, e os demais escurecem |
+| Personagem conhecido, **com etiqueta** (`#raiva`) | idem | idem, com a expressão da etiqueta, **para esta fala** |
+| Personagem conhecido, **expressão que ele não tem** | idem | idem, com a expressão padrão e `LogWarning` (personagem, expressão e nó) |
+| Personagem conhecido **sem nenhuma expressão** | idem | `DimEveryone`, sem aviso |
+| **Personagem desconhecido** | o nome do roteiro, na cor padrão da placa | `DimEveryone`, com `LogWarning` (nome e nó) |
+| **As opções de resposta abrem** | continua a da fala anterior (quem perguntou) | `GiveTurnToPlayer` com o `Protagonist` do registro: entra se não estava e fica em destaque, e quem estava escurece. Sem registro, sem `Protagonist` ou sem expressão: `DimEveryone` |
+| **A conversa termina** | some com a caixa | `Clear`: os dois lugares ficam vazios |
 
-Nada trava: o aviso sai e a conversa segue. O que isso exige de quem monta o prefab e o conteúdo:
+Nada trava: o aviso sai e a conversa segue. A chamada da vez do protagonista fica **depois** de `HasAvailableOption()`: um bloco sem nenhuma opção disponível devolve `null` antes de qualquer coisa (D-11) e não traz ninguém.
 
-- **Não há estado de expressão.** A etiqueta vale só para a fala em que está (D-02: o asset não guarda a expressão atual, e o apresentador também não).
-- **O retrato é ligado e desligado pelo `gameObject` do `Image`**, não pelo `sprite`: um `Image` sem sprite desenha um quadrado branco. Como é filho da `DialogueBox`, some junto com ela no fim da conversa.
+**O `ConversationStage`** (C# puro, `Logic/`, testado em `ConversationStageTests`) é quem decide:
+
+- **O lado:** quem entra ocupa a esquerda se ela está livre, senão a direita. Com os dois ocupados, toma o lugar de **quem teve a vez há mais tempo**. Quem já está na tela fala de novo no mesmo lugar. O protagonista não tem lado fixo.
+- **O que conta como vez:** cada `Speak` e cada `GiveTurnToPlayer`. `DimEveryone` não conta (narração não faz ninguém sair).
+- **O destaque:** só quem falou por último. Quem escurece **mantém a última expressão** até a própria fala seguinte. Nas opções, o protagonista que já estava na tela mantém a última expressão dele (opção não tem etiqueta); se entra agora, usa a padrão.
+- **Estado de apresentação (D-02, D-06):** é criado com `new` pelo controller, vale só para a conversa em curso e não entra no save. Usa o `CharacterSO` apenas como chave (compara referência) e a expressão como `string`. O fim da conversa o limpa, então a conversa seguinte começa vazia. `<<jump>>` e `<<detour>>` não o tocam: o apresentador nem recebe o evento de troca de nó.
+
+**O `CharacterStageView`** liga e desliga o `gameObject` do `Image` de cada lado, **não** o `sprite`: um `Image` sem sprite desenha um quadrado branco. Para cada lado ocupado, atribui o sprite, chama `SetNativeSize()`, pinta de branco (destaque) ou de `dimmedColor` (escurecido) e liga. A cor do escurecido é um campo do Inspector: o padrão do componente é 55% de brilho, e o jogo usa hoje 30%, gravado como override da instância do `GameUI` no `Managers.prefab`. Entrar, escurecer e trocar de lugar são instantâneos. Os dois `Image` têm `Raycast Target` desligado (o sprite não bloqueia o clique que avança a fala nem os botões), e o `OnValidate` avisa se algum for ligado.
+
+**Posições e escala** (o `CharacterStage` é filho do `DialogueUI`, no índice 0, portanto desenhado **antes**, ou seja, atrás da `DialogueBox`, e na frente do cenário e do inventário):
+
+| O quê | Valor |
+|---|---|
+| `CharacterStage` | âncora e pivô `(0,5, 0)`, `anchoredPosition (0, 0)`, **`localScale (0,5, 0,5, 1)`**. É o **único** lugar com a escala e a linha de chão: todos os personagens usam os mesmos, sem ajuste por personagem |
+| `LeftSlot` e `RightSlot` | âncora e pivô `(0,5, 0)`, `anchoredPosition (-812, 0)` e `(812, 0)`: na tela, centros em x 554 e x 1366. Começam desligados |
+| `DialogueBox` | `anchoredPosition (0, 24)`: centrada. Em 1080p ocupa x 210–1710, com o topo em y 392 |
+
+De onde vêm os números: da **cena de referência** que a arte compôs em 3840×2160, guardada em [`docs/arte/referencia_cena_de_conversa.png`](../../../docs/arte/referencia_cena_de_conversa.png). A arte de personagem é exportada em 100% dessa cena e cortada na borda de baixo da tela, então a interface de 1920×1080 a desenha na metade (`0,5`) com a base da imagem na borda de baixo da tela (`y = 0`). Na referência, o centro de cada personagem fica a 406 px do meio da tela. Os personagens têm alturas diferentes de propósito, e o alinhamento pela base preserva a diferença: o topo do cabelo do protagonista fica a 15 px do topo da tela e o da Luna a 128 px.
+
+**O tamanho vem do tamanho em unidades, não dos pixels da textura.** `sprite.rect` muda com o `Max Size` do importador (uma arte mais alta que 2048 é reduzida a 2048, e duas artes de alturas diferentes poderiam ficar do mesmo tamanho); o tamanho em unidades não muda (medido: 8,60×19,04 na Luna e 8,85×21,39 no protagonista, a arte de origem dividida por 100). `SetNativeSize()` usa o segundo, desde que **toda arte de personagem tenha Pixels Per Unit 100**.
+
+O que isso exige de quem monta o prefab e o conteúdo:
+
 - **O nome mostrado sai de um único método privado** (`NameToDisplay`), que hoje devolve o `DisplayName`. É onde a #26 troca `Protagonista` pelo nome que o jogador escolheu, sem reescrever roteiro (D-21).
-- **`characterRegistry` vazio:** todo nome aparece em texto puro, sem cor e sem retrato, com **um** erro no `Start` e um aviso no `OnValidate`. **`portraitImage` vazio:** o retrato não é controlado.
+- **`characterRegistry` vazio:** todo nome aparece em texto puro, sem cor e sem sprite, as opções não trazem ninguém, com **um** erro no `Start` e um aviso no `OnValidate`. **`characterStage` vazio:** os personagens não aparecem na tela.
+- **`CharacterRegistry.Protagonist`** é o campo que diz quem é o protagonista. O `OnValidate` do registro avisa quando está vazio ou fora da lista, e o `ScriptContentTests` confere (`CharacterRegistry_NamesAProtagonistFromItsList`).
 - A cor padrão da placa é a que o `SpeakerName` tem no prefab, guardada no `Start`.
 - O `ScriptContentTests` reprova nome fora do registro e expressão inexistente antes do Play; os avisos acima são a rede de segurança para o que chegar ao jogo.
 
-O retrato é 300×300, à esquerda da caixa (`Portrait`, filho da `DialogueBox`, âncora e pivô na base, `anchoredPosition (-20, 0)`). A `DialogueBox` anda 150 px para a direita (`anchoredPosition (150, 24)`) **também na narração**, para não pular entre fala e narração; em 1080p a caixa ocupa x 360–1860 e o retrato x 40–340. Os retratos atuais são placeholders.
+**Limitações conhecidas:** **os personagens passam por baixo das bordas dos botões de opção** (os botões ocupam x 680–1240; quem está à esquerda chega a x 775 e quem está à direita começa em x 1145), porque a cena de referência não mostra as opções; isso se resolve quando a arte entregar a interface nova, com uma referência de opções abertas; o sprite do lado esquerdo é desenhado por cima do painel de inventário (que só ficará visível em puzzle; será tratado depois); a `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho; e não há comando para o roteiro tirar alguém da tela, então um `<<jump>>` que emenda dois encontros deixa o primeiro personagem na tela, escurecido, até alguém tomar o lugar dele.
 
 ### Arte
 
 A arte fica em `Assets/UI/` (SVGs importados como **Textured Sprite** e desenhados com `Image` comum do uGUI). `Exemplo.svg` é o mockup de layout, não é usado em cena.
+
+A arte de **personagem** não é SVG: é PNG em `Assets/Sprites/Personagens/<personagem>/`, exportado em 100% de uma cena composta em 3840×2160 e cortado na borda de baixo da tela (importada como `Single`, Pixels Per Unit 100, sem mipmaps, `Max Size` 2048; ver [salas.md](../../../docs/autoria/salas.md#personagens)). Em 1080p o sprite é desenhado a 50% do tamanho original, então a textura continua nítida mesmo quando o importador a reduz a 2048.
 
 Não use o tipo "UI SVGImage": ele desenha a arte como malha de triângulos sem anti-aliasing, e as bordas ficam serrilhadas (nem o canvas Overlay nem o URP deste projeto suavizam). Como Textured Sprite, o importador rasteriza o SVG com **8 amostras por pixel** (com 4, aparecia uma emenda diagonal fina no preenchimento semitransparente da caixa).
 
@@ -157,4 +185,4 @@ O módulo não conhece o `GameFlow` nem o `PointNClick`: a direção das depend�
 
 ## Escrevendo roteiro
 
-O guia dos roteiristas é [docs/autoria/roteiro.md](../../../docs/autoria/roteiro.md); o roteiro de exemplo comentado ([`Assets/Roteiro/exemplo_comentado.yarn`](../../../Assets/Roteiro/exemplo_comentado.yarn)) mostra cada recurso funcionando (narração, fala, o protagonista, condição, opção, opção bloqueada, `<<detour>>`, `<<jump>>`, `<<stop>>`, `visited()`, item), e os roteiros de teste (`Assets/Roteiro/Testes/`) são as fixtures da suíte: não os use de modelo nem os edite. Em uma linha de narração, **qualquer** dois-pontos (`Atenção: ...`, `10:30`) faz o que vem antes virar o nome de um personagem; o guia ensina o escape `\:`. Também medidos e registrados no guia: `//` e `#etiqueta` somem do texto (a etiqueta no fim de uma fala com nome é a expressão do retrato), `[b]` é removido, `[` solto derruba a compilação do projeto, e a caixa, o botão e a placa têm limite de texto.
+O guia dos roteiristas é [docs/autoria/roteiro.md](../../../docs/autoria/roteiro.md); o roteiro de exemplo comentado ([`Assets/Roteiro/exemplo_comentado.yarn`](../../../Assets/Roteiro/exemplo_comentado.yarn)) mostra cada recurso funcionando (narração, fala, o protagonista, condição, opção, opção bloqueada, `<<detour>>`, `<<jump>>`, `<<stop>>`, `visited()`, item), e os roteiros de teste (`Assets/Roteiro/Testes/`) são as fixtures da suíte: não os use de modelo nem os edite. Em uma linha de narração, **qualquer** dois-pontos (`Atenção: ...`, `10:30`) faz o que vem antes virar o nome de um personagem; o guia ensina o escape `\:`. Também medidos e registrados no guia: `//` e `#etiqueta` somem do texto (a etiqueta no fim de uma fala com nome é a expressão do personagem), `[b]` é removido, `[` solto derruba a compilação do projeto, e a caixa, o botão e a placa têm limite de texto.

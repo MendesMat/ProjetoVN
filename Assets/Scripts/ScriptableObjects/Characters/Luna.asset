@@ -15,8 +15,8 @@ MonoBehaviour:
   id: luna
   displayName: Luna
   nameColor: {r: 0.8509804, g: 0.6509804, b: 1, a: 1}
-  portraits:
+  expressions:
   - expression: neutra
-    sprite: {fileID: 21300000, guid: 3bf42b1b271d4b84a8cc35947e0dcc51, type: 3}
+    sprite: {fileID: 21300000, guid: e789fb9135199ec4f8db49c01dd47dad, type: 3}
   - expression: raiva
-    sprite: {fileID: 21300000, guid: 7fb224fec59fb644d8a9f94a6acc716c, type: 3}
+    sprite: {fileID: 21300000, guid: b90dc2f1f85717244b7a547c91277bc5, type: 3}
