@@ -17,6 +17,6 @@ MonoBehaviour:
   nameColor: {r: 0.8509804, g: 0.6509804, b: 1, a: 1}
   expressions:
   - expression: neutra
-    sprite: {fileID: 21300000, guid: d90561cd9771699478cd5b10a1bf94a9, type: 3}
+    sprite: {fileID: 21300000, guid: e789fb9135199ec4f8db49c01dd47dad, type: 3}
   - expression: raiva
     sprite: {fileID: 21300000, guid: b90dc2f1f85717244b7a547c91277bc5, type: 3}

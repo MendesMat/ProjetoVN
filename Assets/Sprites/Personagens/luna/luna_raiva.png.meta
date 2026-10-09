@@ -5,12 +5,6 @@ TextureImporter:
   - first:
       213: -3653803558800646765
     second: luna_raiva_0
-  - first:
-      213: -1189963554915568513
-    second: luna_raiva_1
-  - first:
-      213: -5321886169912005788
-    second: luna_raiva_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,10 +103,10 @@ TextureImporter:
       name: luna_raiva_0
       rect:
         serializedVersion: 2
-        x: 416
+        x: 1
         y: 7
-        width: 851
-        height: 2860
+        width: 850
+        height: 2859
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -123,50 +117,6 @@ TextureImporter:
       bones: []
       spriteID: 39d11ae95051b4dc0800000000000000
       internalID: -3653803558800646765
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: luna_raiva_1
-      rect:
-        serializedVersion: 2
-        x: 1199
-        y: 2489
-        width: 242
-        height: 242
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f74b89593766c7fe0800000000000000
-      internalID: -1189963554915568513
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: luna_raiva_2
-      rect:
-        serializedVersion: 2
-        x: 386
-        y: 1452
-        width: 6
-        height: 6
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 46ba45b99bcd426b0800000000000000
-      internalID: -5321886169912005788
       vertices: []
       indices: 
       edges: []
@@ -186,8 +136,6 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       luna_raiva_0: -3653803558800646765
-      luna_raiva_1: -1189963554915568513
-      luna_raiva_2: -5321886169912005788
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

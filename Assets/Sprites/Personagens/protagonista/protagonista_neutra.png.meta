@@ -1,25 +1,10 @@
 fileFormatVersion: 2
-guid: 2ea781e557088bd4490b2eda8543284c
+guid: bdd81e1be8fe3a64290ad507cd669498
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6798941787000764838
-    second: Protagonista_0
-  - first:
-      213: 7668452354109393802
-    second: Protagonista_1
-  - first:
-      213: -7902600285420288784
-    second: Protagonista_2
-  - first:
-      213: 3126580335585425368
-    second: Protagonista_3
-  - first:
-      213: 732984562860091388
-    second: Protagonista_4
-  - first:
-      213: -5069276283725161965
-    second: Protagonista_5
+      213: 8965163977703934346
+    second: protag_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +98,29 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: protag_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 988
+        height: 3443
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a89cb246329aa6c70800000000000000
+      internalID: 8965163977703934346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -128,12 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Protagonista_0: -6798941787000764838
-      Protagonista_1: 7668452354109393802
-      Protagonista_2: -7902600285420288784
-      Protagonista_3: 3126580335585425368
-      Protagonista_4: 732984562860091388
-      Protagonista_5: -5069276283725161965
+      protag_0: 8965163977703934346
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
