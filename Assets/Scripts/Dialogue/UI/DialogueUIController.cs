@@ -106,6 +106,7 @@ namespace ProjetoVN.Dialogue.UI
         public override YarnTask OnDialogueStartedAsync()
         {
             _history.Clear();
+            if (historyView != null) historyView.ForgetShownEntries();
             return YarnTask.CompletedTask;
         }
 
@@ -203,7 +204,7 @@ namespace ProjetoVN.Dialogue.UI
                 return;
             }
 
-            _history.AddSpokenLine(NameToDisplay(Protagonist), Protagonist.NameColor, text);
+            RecordCharacterLine(Protagonist, text);
         }
 
         private static bool IsFollowedByOptions(LocalizedLine line) => System.Array.IndexOf(line.Metadata, LastLineTag) >= 0;
@@ -241,11 +242,16 @@ namespace ProjetoVN.Dialogue.UI
                 return;
             }
 
-            string displayName = NameToDisplay(character);
-            speakerNameText.text = displayName;
+            speakerNameText.text = NameToDisplay(character);
             speakerNameText.color = character.NameColor;
-            _history.AddSpokenLine(displayName, character.NameColor, text);
+            RecordCharacterLine(character, text);
             PutOnStage(character, line);
+        }
+
+        private void RecordCharacterLine(CharacterSO character, string text)
+        {
+            if (character == Protagonist) _history.AddProtagonistLine(NameToDisplay(character), character.NameColor, text);
+            else _history.AddSpokenLine(NameToDisplay(character), character.NameColor, text);
         }
 
         // A troca do nome do protagonista pelo que o jogador escolheu (#26) entra aqui, sem mexer em nenhum roteiro.

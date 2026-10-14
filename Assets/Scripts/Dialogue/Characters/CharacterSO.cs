@@ -20,7 +20,9 @@ namespace ProjetoVN.Dialogue.Characters
                  "Vazio: o roteiro não consegue citar o personagem e o console avisa.")]
         [SerializeField] private string displayName = "";
 
-        [Tooltip("Cor do nome na placa de nome.")]
+        [Tooltip("Cor do nome na placa de nome e do balão do personagem no histórico de falas. O texto do balão fica escuro " +
+                 "ou claro conforme a cor, e a cor precisa permitir contraste de 4,5:1 com um dos dois: um cinza médio " +
+                 "não permite, e o console avisa.")]
         [SerializeField] private Color nameColor = Color.white;
 
         [Tooltip("Sprites por expressão. O primeiro é o padrão, mostrado nas falas sem etiqueta de expressão. " +
@@ -50,6 +52,7 @@ namespace ProjetoVN.Dialogue.Characters
         private void OnValidate()
         {
             WarnAboutIdentity();
+            WarnAboutNameColor();
             WarnAboutExpressions();
         }
 
@@ -60,6 +63,15 @@ namespace ProjetoVN.Dialogue.Characters
 
             if (string.IsNullOrEmpty(displayName) || displayName != displayName.Trim())
                 Warn("O 'Display Name' está vazio ou tem espaço no começo ou no fim: o roteiro não vai achar o personagem.");
+        }
+
+        private void WarnAboutNameColor()
+        {
+            if (BubbleTextColor.IsReadable(nameColor)) return;
+
+            float contrast = BubbleTextColor.ContrastRatio(BubbleTextColor.For(nameColor), nameColor);
+            Warn($"A 'Name Color' não deixa o texto do balão do histórico legível (contraste {contrast:0.00}:1, o mínimo é " +
+                 $"{BubbleTextColor.MinimumContrast}:1): escureça ou clareie a cor.");
         }
 
         private void WarnAboutExpressions()
