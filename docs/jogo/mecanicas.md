@@ -9,7 +9,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Exploração por clique](#exploração-por-clique) | existe | `PointNClick` | — |
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | — |
 | [Portões](#portões) | existe | `GameFlow`, `Editor` | — |
-| [Diálogo](#diálogo) | parcial | `Dialogue` | #11 |
+| [Diálogo](#diálogo) | existe | `Dialogue` | — |
 | [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
@@ -71,7 +71,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 ## Diálogo
 
-**Para o jogador:** uma caixa mostra quem fala e o que diz. Um clique avança. Em alguns pontos aparecem escolhas.
+**Para o jogador:** uma caixa mostra quem fala e o que diz. O texto aparece aos poucos; um clique antes do fim completa a fala, e o clique seguinte avança. Em alguns pontos aparecem escolhas.
 
 **Existe (Yarn Spinner, D-17):**
 - Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó.
@@ -82,9 +82,9 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O nome de quem fala aparece na cor do personagem, e o sprite dele aparece atrás da caixa, em destaque ([Personagens](#personagens)).
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 - Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
+- Texto revelado aos poucos (#11): o primeiro clique completa a fala, o segundo avança. O indicador de continuar e as opções só aparecem com a fala completa. A velocidade se ajusta em um único campo da interface.
 
 **Falta:**
-- Texto revelado aos poucos: o primeiro clique completa a fala, o segundo avança (#11).
 - O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
 
 **Limitação conhecida:** um comando com o número errado de parâmetros (`<<dar_item>>` sem id, ou com dois) trava a conversa (#37). Para os comandos de item, o teste automático dos roteiros reprova esse erro antes do Play.

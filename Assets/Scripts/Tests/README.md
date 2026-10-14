@@ -33,7 +33,9 @@ unity command run_tests --mode EditMode --timeout 180
 > é cola entre três singletons e fica na mesma lacuna. A `Tests.asmdef` referencia `ProjetoVN.Inventory`
 > só para o teste de ids usar o `ItemRegistry`. São verificados em Play Mode na cena `[Teste] Mecanicas`
 > (o roteiro de verificação de cada issue). O que o `DialogueManager` decide sem Unity mora em classes
-> puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`.
+> puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`. A revelação do texto também fica
+> nessa lacuna: a contagem é o `LetterTypewriter` do pacote, e a escolha entre completar e avançar
+> é um `if` do `DialogueManager`; as duas são verificadas em Play Mode (roteiro da #11).
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
 > guardas: a flag é checada antes do item porque `IsTrue` não consome nada e `TryUse` consome.

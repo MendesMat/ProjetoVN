@@ -169,7 +169,7 @@ Quando as linhas acabam, a conversa termina sozinha: o último nó não precisa 
 
 ## Falas e narração
 
-Cada linha do arquivo é **uma caixa de texto e um clique** do jogador.
+Cada linha do arquivo é **uma caixa de texto e um clique** do jogador. O texto aparece aos poucos; um clique antes do fim só completa a fala, e o clique seguinte passa para a próxima.
 
 ```
 Uma sala de aula vazia. Dá para ouvir o relógio.

@@ -72,10 +72,21 @@ namespace ProjetoVN.Dialogue.Logic
             return true;
         }
 
+        /// <summary>Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela, não faz nada.</summary>
         public void AdvanceDialogue()
         {
-            if (_runner != null) _runner.RequestNextLine();
+            if (_runner == null) return;
+
+            if (IsRevealingLine)
+            {
+                _runner.RequestHurryUpLine();
+                return;
+            }
+
+            _runner.RequestNextLine();
         }
+
+        private bool IsRevealingLine => _presenter != null && _presenter.IsRevealingLine;
 
         public void MakeChoice(int index)
         {
