@@ -32,6 +32,7 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 
 - **O diálogo vem primeiro (M1)** porque a migração para o Yarn Spinner muda o estado da história, o formato do save e a interface de diálogo, e as milestones seguintes constroem em cima dos três. Fazer navegação e save antes significaria refazê-los. Além disso, quando a M1 fecha, os roteiristas já podem escrever em paralelo.
 - **A apresentação (M2) vem antes da navegação (M3)** porque a troca de sala depende de a interface de jogo já ser persistente (#9).
+- **O histórico em balões (#55) fecha a M2,** logo depois da #25, porque mexe nos mesmos arquivos (o `ConversationLog`, o `DialogueHistoryView` e o `GameUI.prefab`) e parte da `main` com o histórico já pronto. Ela foi pedida pelo programador em 2026-10-14, durante a revisão da #25, e atrasa a abertura da M3 pelo tempo de uma issue.
 - **O seletor de nó (#32) abre a M3** porque é nela que as salas se multiplicam, cada uma com os seus gatilhos de diálogo. O seletor e o teste que confere os nós citados em cenas e prefabs precisam existir antes disso, e esse teste também serve à #14 para conferir os ids persistentes. Ela veio da triagem e foi priorizada pelo programador em 2026-10-14.
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
@@ -67,6 +68,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #48 | Sprites da conversa: dois lugares na tela, com destaque para quem fala | #10, #47 |
 | #11 | Typewriter com completar e avançar | #5, #9 |
 | #25 | Histórico de falas da conversa em curso | #5, #6, #9, #10, #11 |
+| #55 | Histórico de falas em balões, com lados por quem fala | #10, #25 |
 
 ## M3 — Navegação entre salas
 
