@@ -359,6 +359,7 @@ Luna: Bom, a aula já vai começar.
 
 Como ler este exemplo:
 
+- **O texto da opção escolhida aparece no histórico de falas como fala do protagonista**, então escreva cada opção como algo que ele diria.
 - **O que acontece depois de cada escolha** fica logo abaixo da opção, com quatro espaços de recuo. Quem escolhe "Gostei bastante." lê "Que bom. A maioria reclama."
 - **Depois da resposta, a conversa continua na primeira linha sem recuo** abaixo do bloco. Quem escolheu a primeira ou a segunda opção lê em seguida "Bom, a aula já vai começar."
 - **Um caminho que não deve continuar termina com `<<stop>>`** (ou com `<<jump>>`). Quem escolhe "Preciso ir." lê a despedida e a conversa acaba ali.
@@ -615,6 +616,7 @@ As regras:
 | O id é escrito por extenso | `<<dar_item chave_teste>>` | `<<dar_item {$qual}>>` | A verificação do jogo reprova. |
 
 - **Os itens são únicos.** Dar um item que o jogador já tem não faz nada; tirar um que ele não tem também não. Nenhum dos dois é erro.
+- **O histórico de falas registra o que o roteiro dá e tira:** o jogador lê "Você recebeu: Chave Teste" ou "Você entregou: Chave Teste", com o nome do item no jogo (o da tabela abaixo). Só aparece quando o inventário muda de fato, então dar de novo um item que ele já tem não gera um segundo "Você recebeu".
 - Por isso, **proteja a fala que acompanha a entrega**, para ela não se repetir quando o jogador já tem o item:
 
 ```

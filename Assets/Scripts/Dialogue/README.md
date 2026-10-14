@@ -23,9 +23,11 @@ O módulo enxerga só o `Core` e o pacote Yarn Spinner (`ProjetoVN.Dialogue.asmd
 | `ExpressionTag` | C# puro: lê de `line.Metadata` a etiqueta de expressão, ignorando as do Yarn (`lastline`, `line:…`) | `Logic/` |
 | `ConversationStage` | C# puro, criado com `new` pelo apresentador: quem está em cada um dos dois lugares da tela de personagens, quem está em destaque e a última expressão de cada um. Estado só da conversa em curso, fora do save. Ver [Personagens na tela](#personagens-na-tela) | `Logic/` |
 | `CharacterStageView` | `MonoBehaviour` fino: dois `Image` (esquerda e direita) e a cor do escurecido. Só desenha o que o `ConversationStage` decidiu | `GameUI.prefab` (`Canvas_Game/DialogueUI/CharacterStage`) |
-| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, a tela de personagens, as escolhas e o indicador de continuar, e revela o texto da fala aos poucos (com o `LetterTypewriter` do pacote) | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
+| `ConversationLog` | C# puro, criado com `new` pelo apresentador: o histórico da conversa em curso, uma lista de entradas já formatadas em texto rico do TMP (falas, opção escolhida, itens do roteiro). Fora do save. Ver [O histórico de falas](#o-histórico-de-falas) | `Logic/` |
+| `DialogueUIController` | O **apresentador** do Yarn Spinner (`DialoguePresenterBase`): mostra a caixa, a placa de nome, a tela de personagens, as escolhas e o indicador de continuar, revela o texto da fala aos poucos (com o `LetterTypewriter` do pacote) e é dono do `ConversationLog` | `GameUI.prefab` (`Canvas_Game/DialogueUI`), aninhado no `Managers.prefab` |
+| `DialogueHistoryView` | `MonoBehaviour` fino: o painel do histórico. Só mostra as entradas que o apresentador entrega e rola até a mais recente | `GameUI.prefab` (`Canvas_Game/DialogueUI/DialogueHistory`) |
 | `DialogueChoiceButton` | Um por botão de escolha: `OnClick` → `DialogueManager.MakeChoice(índice)` | `GameUI.prefab` |
-| `DialogueInputHandler` | Lê a ação `UI/AdvanceDialogue` (botão esquerdo, espaço, enter, botão sul) e chama `AdvanceDialogue`, que completa ou avança a fala (D-08) | `Managers.prefab` |
+| `DialogueInputHandler` | Lê a ação `UI/AdvanceDialogue` (botão esquerdo, espaço, enter, botão sul) e chama `AdvanceDialogue`, que completa ou avança a fala (D-08). Um clique de ponteiro sobre um botão da interface não avança | `Managers.prefab` |
 
 O módulo publica duas notificações, `DialogueStartedMessage` e `DialogueEndedMessage` (`Messaging/`), de que o `GameFlow` depende. **Fala e escolha não passam pelo barramento**: o runner as entrega ao apresentador por chamada direta (D-12), porque têm um destinatário só.
 
@@ -52,9 +54,10 @@ Em objetos de cena, o caminho pronto é o `InteractableDialogueTrigger` (módulo
 
 Só então o `DialogueRunner` começa, e a conversa continua com:
 
-- `AdvanceDialogue()`: com a fala ainda sendo revelada, **completa** a fala (`RequestHurryUpLine`); com a fala completa, **avança** para a próxima (`RequestNextLine`). Com escolhas na tela, não faz nada: o clique não pula a escolha. Quem decide entre completar e avançar é o `DialogueManager`, consultando `IsRevealingLine` do apresentador (D-06: completar passa pelo dono do diálogo, não pela view). Dois cliques no mesmo frame só completam: o segundo ainda vê a fala sendo revelada.
+- `AdvanceDialogue()`: com a fala ainda sendo revelada, **completa** a fala (`RequestHurryUpLine`); com a fala completa, **avança** para a próxima (`RequestNextLine`). Com escolhas na tela ou com o histórico aberto, não faz nada: o clique não pula a escolha. Quem decide entre completar e avançar é o `DialogueManager`, consultando `IsRevealingLine` do apresentador (D-06: completar passa pelo dono do diálogo, não pela view). Dois cliques no mesmo frame só completam: o segundo ainda vê a fala sendo revelada.
 - `MakeChoice(int)`: repassa o botão clicado ao apresentador.
 - `IsDialogueActive()`: há uma conversa em curso.
+- `RecordItemReceived(string)` e `RecordItemHandedOver(string)`: acrescentam ao histórico "Você recebeu: <nome>" e "Você entregou: <nome>". São chamadas pelo `ItemScriptActions` (`GameFlow`), que é quem enxerga o inventário; sem conversa aberta ou sem apresentador, não fazem nada.
 - `CurrentNodeName`: o nome do nó em que o roteiro está, ou `null` fora de uma conversa. É `string` de propósito, para quem está fora do módulo dizer o nó em uma mensagem de erro sem depender de tipo do Yarn.
 
 ---
@@ -97,7 +100,7 @@ O `DialogueUIController` herda de `DialoguePresenterBase`. Ele se **registra** n
 - **A fala antes de opções** (regra do `lastline`): o compilador etiqueta com `lastline` a fala que é o comando imediatamente anterior a um bloco de opções. O apresentador não espera clique nela: revela a fala e, **com ela completa**, as opções abrem logo em seguida, sem o indicador de continuar. Clicar durante a revelação completa a fala e as opções abrem; o clique não as pula. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
 - **Escolhas:** mostra, em ordem, **todas** as opções do bloco. Uma opção indisponível (a condição `<<if>>` dela é falsa) aparece com o `Button` desabilitado (`interactable = false`, esmaecido pelo `disabledColor` do botão) e ocupa um botão, para o jogador ver que existe um caminho fechado (D-11). `Choose` ignora o índice de uma opção indisponível, também numa chamada direta a `MakeChoice`. O `Button` de cada `choiceButtonObjects[i]` é lido uma vez no `Start`; sem `Button`, o `OnValidate` avisa e a opção indisponível não fica desabilitada. Há quatro botões; mais opções do que botões (disponíveis ou não) é erro de conteúdo: mostra as primeiras e loga um erro com a contagem. **Nenhuma opção disponível:** `RunOptionsAsync` devolve `null` sem mostrar nada e a conversa segue pela fala depois do bloco; isso depende de `allowOptionFallthrough` ligado no `DialogueRunner` do `Managers.prefab` (sem ele o runner loga erro e a conversa fica presa). **Quando as opções abrem, o protagonista entra na tela de personagens e fica em destaque** (é a vez do jogador), mesmo com a fala anterior ainda na caixa; ver [Personagens na tela](#personagens-na-tela).
 - **Indicador de continuar** (`>>`): aparece só quando a fala terminou de ser revelada e espera clique; some no começo da fala seguinte e quando as escolhas abrem. É só um indicador, **não é clicável**: o clique esquerdo já avança em qualquer lugar, e um `>>` clicável avançaria duas falas por clique.
-- **Fim da conversa:** `DialogueEndedMessage` esconde a caixa e as escolhas e limpa a tela de personagens, também no fim anormal.
+- **Fim da conversa:** `DialogueEndedMessage` esconde a caixa e as escolhas, fecha o painel do histórico e limpa a tela de personagens, também no fim anormal.
 - **Assíncrono (D-06):** o runner e o apresentador usam `YarnTask`, que no Unity 6 é `Awaitable` na thread principal. Depois de cada `await` o apresentador reconfere se ainda existe. O estado "revelando" (`IsRevealingLine`) mora no apresentador. O typewriter é **aguardado** dentro do `RunLineAsync`, e o runner só entrega a fala seguinte quando ele termina: duas revelações nunca escrevem no mesmo texto. O token do typewriter liga o `HurryUpToken` da fala ao `destroyCancellationToken` do apresentador; o `Stop()` do runner cancela os dois tokens da fala e a revelação termina sem exceção. Recarregar ou trocar a cena **não** interrompe a revelação (a interface é persistente); sair do Play Mode no meio dela não deixa erro no console (medido na #11).
 
 Todo campo exposto no Inspector do `DialogueUIController` tem tooltip, e o `OnValidate` avisa quando um campo obrigatório está vazio ou quando `Choice Texts` não tem o tamanho de `Choice Button Objects`.
@@ -150,6 +153,45 @@ O que isso exige de quem monta o prefab e o conteúdo:
 
 **Limitações conhecidas:** **os personagens passam por baixo das bordas dos botões de opção** (os botões ocupam x 680–1240; quem está à esquerda chega a x 775 e quem está à direita começa em x 1145), porque a cena de referência não mostra as opções; isso se resolve quando a arte entregar a interface nova, com uma referência de opções abertas; o sprite do lado esquerdo é desenhado por cima do painel de inventário (que só ficará visível em puzzle; será tratado depois); a `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho; e não há comando para o roteiro tirar alguém da tela, então um `<<jump>>` que emenda dois encontros deixa o primeiro personagem na tela, escurecido, até alguém tomar o lugar dele.
 
+### O histórico de falas
+
+O jogador relê a conversa em curso (D-30, #25). O `DialogueUIController` é dono de um `ConversationLog` (D-12: quem precisa das falas as recebe do apresentador, dentro do módulo) e o `DialogueHistoryView` só mostra o que ele entrega.
+
+**O que entra, e em que formato** (o registro guarda o texto pronto para o TMP):
+
+| Momento | Entrada |
+|---|---|
+| Fala de personagem | `<color=#RRGGBB>Nome</color>: texto`, com a `NameColor` do `CharacterSO` (sem alfa) e o nome já resolvido por `NameToDisplay` (D-21: a #26 troca o nome em um lugar só e o histórico acompanha). Personagem desconhecido: o nome do roteiro e a cor padrão da placa |
+| Narração | só o texto, sem nome |
+| Opção escolhida (`Choose`, depois das guardas) | como fala do `Protagonist` do registro, com o nome e a cor do `CharacterSO` dele. Sem registro ou sem `Protagonist`, entra como narração. O `runSelectedOptionAsLine` do runner está **desligado** no `Managers.prefab`: ligá-lo duplicaria a opção no histórico |
+| Item dado ou tirado pelo roteiro | `Você recebeu: <nome>` / `Você entregou: <nome>`, com o `ItemName` do item. Só quando o inventário muda (`ItemScriptActions`) |
+
+**Quando zera:** no `OnDialogueStartedAsync`, que o runner chama uma vez por `StartDialogue`; `<<jump>>` e `<<detour>>` não o chamam, então os saltos entre nós não apagam nada. O método continua devolvendo `YarnTask.CompletedTask` na hora, porque a rede de segurança do `DialogueManager` depende de o início ser síncrono. O histórico continua legível no objeto depois do fim da conversa, mas o painel só abre durante uma conversa.
+
+**Abrir e fechar:**
+- O botão **Histórico** (`openHistoryButton`) é filho da `DialogueBox` e aparece e some com ela. Fica desabilitado enquanto a fala é revelada (`SetRevealing` liga o `interactable` junto de `IsRevealingLine`); com a fala completa e com as opções na tela, funciona. `OpenHistory()` confere isso de novo: sem conversa, com a fala sendo revelada ou sem a view, não faz nada.
+- O controller liga o clique em código, no `Start`, e a view liga o próprio botão **Fechar** em `OnEnable`. Não há atalho de teclado: abrir e fechar limpam a seleção do `EventSystem`, e os botões têm `Navigation = None`, senão o Enter (`UI/Submit`) reacionaria o botão clicado.
+- **Bloqueio com o histórico aberto** (`IsHistoryOpen`): `DialogueManager.AdvanceDialogue` retorna logo no início (cobre clique, espaço, enter e botão sul) e `Choose` ignora tudo (cobre também `MakeChoice` direto). O fundo do painel ocupa a tela inteira com `Raycast Target` ligado e barra o clique nos botões de opção. As opções continuam esperando: o `RunOptionsAsync` segue no `await`.
+- O clique de ponteiro sobre um botão da interface não avança a fala: veja `DialogueInputHandler` abaixo.
+
+**O painel** (último filho de `Canvas_Game/DialogueUI`, portanto por cima da caixa e das opções, e começa desligado):
+
+| O quê | Valor |
+|---|---|
+| `HistoryButton` (em `DialogueBox`) | âncora e pivô `(1, 1)`, `anchoredPosition (-35, 28)`, 230×71, sprite `Nameplate` (arte provisória), rótulo "Histórico" 32. Espelha a placa de nome e, medido na captura em Full HD proporcional, não cobre o `>>` nem o texto |
+| `DialogueHistory` | âncoras esticadas na tela, `Image` preta sem sprite com alfa 0,85 e `Raycast Target` ligado; leva o `DialogueHistoryView` |
+| `Scroll` | centrado, 1500×900, `ScrollRect` só vertical (`Clamped`, `scrollSensitivity` 20, **não calibrado com mouse de verdade**), barra vertical de 24 à direita sempre visível |
+| `Viewport` | `RectMask2D`, com 40 de folga à direita para a barra |
+| `Content` | `VerticalLayoutGroup` (espaçamento 28, margem 20, controla largura e altura dos filhos) e `ContentSizeFitter` vertical |
+| `EntryTemplate` | `TMP_Text` desligada, LiberationSans SDF 34, cor `F7EBF5` (a do `DialogueText`), `richText` ligado, `Raycast Target` desligado |
+| `CloseButton` | topo, ao centro (`(0,5, 1)`, `anchoredPosition (0, -50)`), 230×71, mesmo sprite; longe do canto superior direito, onde o `Canvas_Debug` da cena de teste fica por cima |
+
+**O `DialogueHistoryView`** reaproveita as `TMP_Text` (D-11): cria uma cópia do template quando falta e desliga as que sobram, nunca as destrói. Ao abrir, atribui os textos, reconstrói o layout na hora (`LayoutRebuilder.ForceRebuildLayoutImmediate`; sem isso a rolagem para no tamanho antigo e não chega à entrada mais recente) e põe `verticalNormalizedPosition = 0`. Um objeto por entrada deixa o `RectMask2D` descartar o que está fora da área; virtualizar a lista foi descartado (D-27). Para contar o que está visível, conte os filhos **ativos** do `Content`, menos o template.
+
+**Medido na #25** (Editor, Game view de 1280×720, 203 entradas de uns 135 caracteres): a primeira abertura leva 231 ms (cria os objetos), as seguintes 141 ms; durante a rolagem o quadro leva 3 a 4 ms. Reabrir não cria objetos novos (204 filhos no `Content`). Ninguém sabe o tamanho real das conversas.
+
+**Limitações conhecidas:** uma conversa que **começa** por opções não tem caixa na tela (ela só liga com uma fala), então não mostra o botão; o histórico estaria vazio de qualquer jeito. O botão e o painel usam arte provisória.
+
 ### Arte
 
 A arte fica em `Assets/UI/` (SVGs importados como **Textured Sprite** e desenhados com `Image` comum do uGUI). `Exemplo.svg` é o mockup de layout, não é usado em cena.
@@ -176,11 +218,19 @@ O Diálogo **é dono do seu próprio ciclo de vida** e **não dita regras de inp
 
 O módulo não conhece o `GameFlow` nem o `PointNClick`: a direção das dependências continua `Core ← Dialogue ← GameFlow`.
 
+### O clique em um botão não avança a fala
+
+O `DialogueInputHandler` ignora um clique de **ponteiro** (`context.control.device is Pointer`) quando o primeiro resultado de `EventSystem.current.RaycastAll`, na posição do ponteiro, tem um `Selectable` no próprio objeto ou no pai (D-08). Teclado e controle não mudam. É necessário porque a ação `UI/AdvanceDialogue` (botão esquerdo, tipo `Button`) dispara ao **apertar**, durante o update do Input System, antes do `Update` do `EventSystem`, enquanto o `Button` só age ao **soltar**: sem a regra, apertar o botão Histórico com a fala completa avançaria a fala antes de o histórico abrir.
+
+- Use `RaycastAll` com um `PointerEventData` novo, e **não** `IsPointerOverGameObject()`: dentro de um callback de `InputAction` ele lê o estado do frame anterior, e o Input System avisa no console.
+- `DialogueBox`, `DialogueText`, `Nameplate` e `ContinueIndicator` têm `Raycast Target` desligado (medido), então clicar na caixa continua avançando. Um clique no botão Histórico desabilitado (durante a revelação) também não completa a fala. Os botões de opção já não avançavam nada (`RequestNextLine` não tem efeito durante opções).
+- O efeito colateral é que os botões do `Canvas_Debug` da cena de teste deixam de avançar a fala quando clicados.
+
 ---
 
 ## O que ainda não existe
 
-- O nome do protagonista escolhido pelo jogador na placa de nome: issue #26 (o ponto de troca é o `NameToDisplay`). Histórico de falas: issue #25.
+- O nome do protagonista escolhido pelo jogador na placa de nome e no histórico: issue #26 (o ponto de troca é o `NameToDisplay`).
 - Seletor de nó no Inspector: issue #32.
 
 ## Escrevendo roteiro

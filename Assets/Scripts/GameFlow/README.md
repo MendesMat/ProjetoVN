@@ -36,11 +36,12 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
 
     | No roteiro | Método | O que faz |
     |---|---|---|
-    | `<<dar_item id>>` | `GiveItem` | `InventoryManager.Collect`. Já ter o item não é erro, e não entra uma segunda cópia |
-    | `<<remover_item id>>` | `RemoveItem` | `InventoryManager.TryUse`. Não ter o item não é erro |
+    | `<<dar_item id>>` | `GiveItem` | `InventoryManager.Collect`. Já ter o item não é erro, e não entra uma segunda cópia. Se o item entrou, registra "Você recebeu: <nome>" no histórico da conversa |
+    | `<<remover_item id>>` | `RemoveItem` | `InventoryManager.TryUse`. Não ter o item não é erro. Se o item saiu, registra "Você entregou: <nome>" no histórico da conversa |
     | `tem_item("id")` | `HasItem` | `InventoryManager.HasItem`; `false` se o id não existe |
 
   - Os métodos são **estáticos** porque é assim que o gerador de código do Yarn Spinner os acha sem registro nosso e sem exigir o nome de um GameObject no roteiro. O componente existe para guardar o `ItemRegistry` (campo `itemRegistry`, no `Managers.prefab`), que traduz o id em `ItemDataSO`; o `Instance` estático é zerado em `SubsystemRegistration` (D-29).
+  - O histórico (#25) recebe o evento por chamada direta a `DialogueManager.RecordItemReceived` e `RecordItemHandedOver`, com o `ItemName` do item já em `string`, **só quando o inventário mudou**. O `Dialogue` não enxerga o `Inventory` (D-01) e não há mensagem nova. Sem conversa aberta, o `DialogueManager` ignora o registro.
   - São comando e consulta: chamada direta ao `InventoryManager` (D-05). Não há mensagem nova; o painel reage a `ItemCollectedMessage` e `ItemUsedMessage`, que o inventário já publica.
   - Um id que não está no `ItemRegistry` loga `[ItemScriptActions] <<dar_item x>>: o item 'x' não existe no ItemRegistry (nó '...'). Ignorado.` e a conversa segue. O nome do nó vem de `DialogueManager.CurrentNodeName`.
   - O teste `ProjectScripts_CiteOnlyItemIdsThatExistInTheItemRegistry` confere todo id citado nos roteiros contra o `ItemRegistry`, e reprova id não literal.
