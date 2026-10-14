@@ -3,28 +3,25 @@ using UnityEngine;
 
 namespace ProjetoVN.Dialogue.Logic
 {
-    /// <summary>
-    /// O histórico da conversa em curso (D-30): cada entrada já vem formatada em texto rico do TMP, na ordem em que
-    /// aconteceu. C# puro, só leitura para quem exibe; quem o possui o zera a cada conversa.
-    /// </summary>
     public sealed class ConversationLog
     {
-        private const string ItemReceivedPrefix = "Você recebeu: ";
-        private const string ItemHandedOverPrefix = "Você entregou: ";
+        private readonly List<ConversationEntry> _entries = new();
 
-        private readonly List<string> _entries = new();
+        public IReadOnlyList<ConversationEntry> Entries => _entries;
 
-        public IReadOnlyList<string> Entries => _entries;
+        public void AddSpokenLine(string speakerName, Color speakerColor, string text) => AddPlaceholder();
 
-        public void AddSpokenLine(string speakerName, Color speakerColor, string text) =>
-            _entries.Add($"<color=#{ColorUtility.ToHtmlStringRGB(speakerColor)}>{speakerName}</color>: {text}");
+        public void AddProtagonistLine(string speakerName, Color speakerColor, string text) => AddPlaceholder();
 
-        public void AddNarration(string text) => _entries.Add(text);
+        public void AddNarration(string text) => AddPlaceholder();
 
-        public void AddItemReceived(string itemName) => _entries.Add(ItemReceivedPrefix + itemName);
+        public void AddItemReceived(string itemName) => AddPlaceholder();
 
-        public void AddItemHandedOver(string itemName) => _entries.Add(ItemHandedOverPrefix + itemName);
+        public void AddItemHandedOver(string itemName) => AddPlaceholder();
 
         public void Clear() => _entries.Clear();
+
+        private void AddPlaceholder() =>
+            _entries.Add(new ConversationEntry(ConversationEntryKind.Narration, null, Color.clear, string.Empty, false, false));
     }
 }

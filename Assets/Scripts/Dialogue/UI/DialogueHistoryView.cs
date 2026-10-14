@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ProjetoVN.Dialogue.Logic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -49,7 +50,7 @@ namespace ProjetoVN.Dialogue.UI
             if (closeButton != null) closeButton.onClick.RemoveListener(Close);
         }
 
-        internal void Open(IReadOnlyList<string> entries)
+        internal void Open(IReadOnlyList<ConversationEntry> entries)
         {
             if (!HasRequiredReferences()) return;
 
@@ -66,13 +67,13 @@ namespace ProjetoVN.Dialogue.UI
             ClearUiSelection();
         }
 
-        private void ShowEntries(IReadOnlyList<string> entries)
+        private void ShowEntries(IReadOnlyList<ConversationEntry> entries)
         {
             for (int i = 0; i < entries.Count; i++)
             {
                 if (i == _entryTexts.Count) _entryTexts.Add(Instantiate(entryTemplate, content));
 
-                _entryTexts[i].text = entries[i];
+                _entryTexts[i].text = entries[i].Text;
                 _entryTexts[i].gameObject.SetActive(true);
             }
 
