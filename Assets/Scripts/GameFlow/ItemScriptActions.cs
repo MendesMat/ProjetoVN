@@ -39,7 +39,9 @@ namespace ProjetoVN.GameFlow
 
             if (!InventoryManager.Instance.Collect(item)) return;
 
-            if (DialogueManager.Instance != null) DialogueManager.Instance.RecordItemReceived(item.ItemName);
+            if (!TryGetDialogueManager($"<<dar_item {itemId}>>", out DialogueManager dialogue)) return;
+
+            dialogue.RecordItemReceived(item.ItemName);
         }
 
         [YarnCommand("remover_item")]
@@ -49,7 +51,9 @@ namespace ProjetoVN.GameFlow
 
             if (!InventoryManager.Instance.TryUse(item)) return;
 
-            if (DialogueManager.Instance != null) DialogueManager.Instance.RecordItemHandedOver(item.ItemName);
+            if (!TryGetDialogueManager($"<<remover_item {itemId}>>", out DialogueManager dialogue)) return;
+
+            dialogue.RecordItemHandedOver(item.ItemName);
         }
 
         [YarnFunction("tem_item")]
@@ -80,6 +84,16 @@ namespace ProjetoVN.GameFlow
 
             Debug.LogError($"[ItemScriptActions] {scriptCall}: o item '{itemId}' não existe no ItemRegistry " +
                            $"(nó '{CurrentNodeName()}'). Ignorado.", Instance);
+            return false;
+        }
+
+        private static bool TryGetDialogueManager(string scriptCall, out DialogueManager dialogue)
+        {
+            dialogue = DialogueManager.Instance;
+            if (dialogue != null) return true;
+
+            Debug.LogError($"[ItemScriptActions] {scriptCall}: não há DialogueManager (o prefab Managers não foi criado). " +
+                           "O item mudou no inventário, mas o histórico não registrou o evento.", Instance);
             return false;
         }
 

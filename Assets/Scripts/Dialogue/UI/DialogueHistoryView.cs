@@ -8,9 +8,11 @@ namespace ProjetoVN.Dialogue.UI
 {
     /// <summary>
     /// O painel do histórico de falas (D-30): só mostra as entradas que o apresentador entrega e rola até a mais
-    /// recente. Fica no próprio objeto do painel, que começa desligado; abrir e fechar ligam e desligam esse objeto.
-    /// Reaproveita as <c>TMP_Text</c> das entradas (D-11): cria as que faltam e desliga as que sobram.
+    /// recente. Fica no próprio objeto do painel, que é um <c>Canvas</c> aninhado: abrir e fechar ligam e desligam
+    /// esse componente, e o objeto fica sempre ativo. Reaproveita as <c>TMP_Text</c> das entradas (D-11): cria as
+    /// que faltam e desliga as que sobram.
     /// </summary>
+    [RequireComponent(typeof(Canvas), typeof(GraphicRaycaster))]
     public sealed class DialogueHistoryView : MonoBehaviour
     {
         [Header("Painel")]
@@ -27,8 +29,15 @@ namespace ProjetoVN.Dialogue.UI
         [SerializeField] private Button closeButton;
 
         private readonly List<TMP_Text> _entryTexts = new();
+        private Canvas _panelCanvas;
 
-        internal bool IsOpen => gameObject.activeSelf;
+        internal bool IsOpen => _panelCanvas != null && _panelCanvas.enabled;
+
+        private void Awake()
+        {
+            _panelCanvas = GetComponent<Canvas>();
+            _panelCanvas.enabled = false;
+        }
 
         private void OnEnable()
         {
@@ -44,15 +53,16 @@ namespace ProjetoVN.Dialogue.UI
         {
             if (!HasRequiredReferences()) return;
 
-            gameObject.SetActive(true);
             ShowEntries(entries);
             ScrollToMostRecent();
+            _panelCanvas.enabled = true;
             ClearUiSelection();
         }
 
+        // Desligar o Canvas, e não o objeto: reativar as entradas faria o TMP refazer o texto de todas (~100 ms com 200 falas).
         internal void Close()
         {
-            gameObject.SetActive(false);
+            if (_panelCanvas != null) _panelCanvas.enabled = false;
             ClearUiSelection();
         }
 
@@ -86,9 +96,9 @@ namespace ProjetoVN.Dialogue.UI
 
         private bool HasRequiredReferences()
         {
-            if (scrollRect != null && content != null && entryTemplate != null) return true;
+            if (_panelCanvas != null && scrollRect != null && content != null && entryTemplate != null) return true;
 
-            Debug.LogError("[DialogueHistoryView] Scroll Rect, Content e Entry Template precisam estar atribuídos. O histórico não abre.", this);
+            Debug.LogError("[DialogueHistoryView] Scroll Rect, Content e Entry Template precisam estar atribuídos, e o objeto do painel precisa ficar ativo no prefab. O histórico não abre.", this);
             return false;
         }
 
@@ -100,6 +110,9 @@ namespace ProjetoVN.Dialogue.UI
 
             if (closeButton == null)
                 Debug.LogWarning("[DialogueHistoryView] Close Button está vazio: não há como fechar o histórico.", this);
+
+            if (!gameObject.activeSelf)
+                Debug.LogWarning("[DialogueHistoryView] O objeto do painel está desligado: o histórico não abre. Deixe-o ativo; o painel se esconde sozinho (Canvas desligado).", this);
         }
 #endif
     }

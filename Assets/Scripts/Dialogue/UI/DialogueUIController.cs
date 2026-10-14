@@ -80,6 +80,8 @@ namespace ProjetoVN.Dialogue.UI
         /// <summary>O histórico está aberto por cima do diálogo; avançar a fala e escolher opção ficam bloqueados.</summary>
         internal bool IsHistoryOpen => historyView != null && historyView.IsOpen;
 
+        private CharacterSO Protagonist => characterRegistry != null ? characterRegistry.Protagonist : null;
+
         private void Start()
         {
             _typewriter = new LetterTypewriter { TextElement = dialogueText };
@@ -195,14 +197,13 @@ namespace ProjetoVN.Dialogue.UI
         private void RecordChosenOption(DialogueOption option)
         {
             string text = option.Line.TextWithoutCharacterName.Text;
-            CharacterSO protagonist = characterRegistry != null ? characterRegistry.Protagonist : null;
-            if (protagonist == null)
+            if (Protagonist == null)
             {
                 _history.AddNarration(text);
                 return;
             }
 
-            _history.AddSpokenLine(NameToDisplay(protagonist), protagonist.NameColor, text);
+            _history.AddSpokenLine(NameToDisplay(Protagonist), Protagonist.NameColor, text);
         }
 
         private static bool IsFollowedByOptions(LocalizedLine line) => System.Array.IndexOf(line.Metadata, LastLineTag) >= 0;
@@ -240,9 +241,10 @@ namespace ProjetoVN.Dialogue.UI
                 return;
             }
 
-            speakerNameText.text = NameToDisplay(character);
+            string displayName = NameToDisplay(character);
+            speakerNameText.text = displayName;
             speakerNameText.color = character.NameColor;
-            _history.AddSpokenLine(NameToDisplay(character), character.NameColor, text);
+            _history.AddSpokenLine(displayName, character.NameColor, text);
             PutOnStage(character, line);
         }
 
@@ -286,15 +288,14 @@ namespace ProjetoVN.Dialogue.UI
 
         private void GiveTurnToProtagonist()
         {
-            CharacterSO protagonist = characterRegistry != null ? characterRegistry.Protagonist : null;
-            string expression = protagonist != null ? protagonist.DefaultExpression : null;
+            string expression = Protagonist != null ? Protagonist.DefaultExpression : null;
             if (expression == null)
             {
                 DimStage();
                 return;
             }
 
-            _stage.GiveTurnToPlayer(protagonist, expression);
+            _stage.GiveTurnToPlayer(Protagonist, expression);
             DrawStage();
         }
 
