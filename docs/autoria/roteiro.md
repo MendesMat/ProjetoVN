@@ -359,7 +359,7 @@ Luna: Bom, a aula já vai começar.
 
 Como ler este exemplo:
 
-- **O texto da opção escolhida aparece no histórico de falas como fala do protagonista**, então escreva cada opção como algo que ele diria.
+- **O texto da opção escolhida aparece no histórico de falas como fala do protagonista, do lado direito**, então escreva cada opção como algo que ele diria.
 - **O que acontece depois de cada escolha** fica logo abaixo da opção, com quatro espaços de recuo. Quem escolhe "Gostei bastante." lê "Que bom. A maioria reclama."
 - **Depois da resposta, a conversa continua na primeira linha sem recuo** abaixo do bloco. Quem escolheu a primeira ou a segunda opção lê em seguida "Bom, a aula já vai começar."
 - **Um caminho que não deve continuar termina com `<<stop>>`** (ou com `<<jump>>`). Quem escolhe "Preciso ir." lê a despedida e a conversa acaba ali.

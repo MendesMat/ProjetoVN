@@ -172,6 +172,12 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
   - O registro é a classe pura `ConversationLog`, que vive no apresentador (`DialogueUIController`) e é zerado no início de cada conversa (D-12). `<<jump>>` e `<<detour>>` não o zeram.
   - Os itens chegam pelo `GameFlow`: `ItemScriptActions` chama `DialogueManager.RecordItemReceived` e `RecordItemHandedOver` por chamada direta, **só quando o inventário muda**. O `Dialogue` continua sem enxergar o `Inventory` (D-01), e nenhuma mensagem nova foi criada (D-05).
   - O bloqueio com o histórico aberto mora no dono do diálogo (`DialogueManager.AdvanceDialogue` e `DialogueUIController.Choose`), como o do `IsRevealingLine` (D-06). Não há modo novo no `GameFlow`: ele só mexe no `PlayerInputGate`, que o avanço de fala não consulta (D-28).
+- **Revisto na #55:** a apresentação do histórico deixou de ser uma lista de linhas `Nome: texto` e virou **balões**, como num app de mensagens. O critério "`Nome: texto`, com o nome na cor do personagem" da #25 foi **substituído** por este; o restante da D-30 não mudou.
+  - A fala do protagonista (o `Protagonist` do `CharacterRegistry`) e a opção escolhida ficam à direita; as dos demais personagens, à esquerda, com um personagem desconhecido na cor padrão da placa de nome. Narração e itens ficam centralizados, em um balão neutro.
+  - O balão usa a `NameColor` do `CharacterSO`, sem campo novo (D-02, D-16). O nome fica dentro do balão, **sem cor própria**, e só aparece na primeira fala de uma sequência do mesmo personagem; narração e item a interrompem.
+  - A cor do texto é escolhida pelo contraste com o balão (`BubbleTextColor`, C# puro): a escura ou a clara, a de maior contraste (WCAG). Uma `NameColor` sem contraste de 4,5:1 com nenhuma das duas (um cinza médio) é reprovada por um teste EditMode do registro de personagens e avisada no `OnValidate` do `CharacterSO`; a correção é ajustar a cor do personagem.
+  - O `ConversationLog` guarda entradas estruturadas (`ConversationEntry`: tipo, nome, cor opaca, texto, se é do protagonista e se mostra o nome) com a cor já resolvida, e não o `CharacterSO`: o personagem desconhecido não tem asset e o nome já chega resolvido por `NameToDisplay` (D-21).
+  - O painel só acrescenta as entradas novas a cada abertura; o apresentador avisa a view quando uma conversa começa. A lista continua sem virtualização (D-27).
 - **Rever só se:** os roteiristas pedirem releitura fora da conversa.
 
 ### D-12 — Fala e escolhas chegam à interface direto do Yarn Spinner
@@ -278,6 +284,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-08 | **Exemplos trocados (#47):** a personagem de exemplo passa do nome provisório ao definitivo, Luna (id `luna`, nós `luna_*`, `$afinidade_luna`) em D-18, D-21 e D-22, porque o nome definitivo da personagem chegou com a arte dela. Nenhuma decisão mudou. |
 | 2026-10-14 | **Nota (#11)** na D-06: o typewriter, onde mora o estado da revelação e como completar passa pelo `DialogueManager`. Nenhuma decisão mudou. |
 | 2026-10-14 | **Cumprida (#25):** D-30. O histórico de falas existe: registro no apresentador, itens pelo `GameFlow` só quando o inventário muda, bloqueio no dono do diálogo, sem modo novo no `GameFlow`. **Nota na D-08:** um clique de ponteiro sobre um botão da interface não avança a fala. Nenhuma decisão mudou. |
+| 2026-10-14 | **Revista (#55):** D-30. O histórico de falas passa de lista `Nome: texto` a balões com lados (protagonista à direita, os demais à esquerda, narração e item ao centro), com a cor do balão vinda da `NameColor` e o texto escolhido pelo contraste. **O critério "`Nome: texto`, com o nome na cor do personagem" da #25 foi substituído:** o nome fica dentro do balão, sem cor própria, só na primeira fala de uma sequência. O `ConversationLog` guarda entradas estruturadas. Nenhuma outra decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 
