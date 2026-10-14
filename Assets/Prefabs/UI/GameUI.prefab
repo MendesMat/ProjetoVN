@@ -1040,6 +1040,7 @@ MonoBehaviour:
   speakerNameplate: {fileID: 8812390390457851742}
   characterStage: {fileID: 5509552786330699483}
   continueIndicator: {fileID: 1463709431943471647}
+  charactersPerSecond: 40
 --- !u!1 &5178700137783149617
 GameObject:
   m_ObjectHideFlags: 0
