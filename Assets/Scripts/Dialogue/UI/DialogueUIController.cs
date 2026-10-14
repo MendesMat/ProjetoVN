@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using ProjetoVN.Core.Messaging;
 using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
@@ -50,17 +51,27 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("A tela de personagens, desenhada atrás da caixa. Vazio: os personagens não aparecem na tela.")]
         [SerializeField] private CharacterStageView characterStage;
 
-        [Tooltip("O '>>' de continuar, ligado enquanto a fala espera o jogador. Vazio: não é controlado.")]
+        [Tooltip("O '>>' de continuar, ligado só quando a fala terminou de aparecer e espera o jogador. Vazio: não é controlado.")]
         [SerializeField] private GameObject continueIndicator;
+
+        [Header("Revelação do texto")]
+        [Tooltip("Quantos caracteres da fala aparecem por segundo. É o único lugar onde se ajusta a velocidade do texto. Mínimo 1.")]
+        [Min(1f)]
+        [SerializeField] private float charactersPerSecond = 40f;
 
         private readonly List<DialogueOption> _shownOptions = new();
         private readonly ConversationStage _stage = new();
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
         private Color _defaultNameColor;
+        private LetterTypewriter _typewriter;
+
+        /// <summary>A fala está aparecendo aos poucos; um pedido de pressa a completa.</summary>
+        internal bool IsRevealingLine { get; private set; }
 
         private void Start()
         {
+            _typewriter = new LetterTypewriter { TextElement = dialogueText };
             _defaultNameColor = speakerNameText.color;
             CacheChoiceButtons();
             HideAll();
@@ -83,16 +94,32 @@ namespace ProjetoVN.Dialogue.UI
 
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
+            SetActiveIfAssigned(continueIndicator, false);
             ShowLine(line);
 
-            if (IsFollowedByOptions(line))
-            {
-                SetActiveIfAssigned(continueIndicator, false);
-                return;
-            }
+            await RevealAsync(line, token.HurryUpToken);
+            if (this == null) return;
+            if (IsFollowedByOptions(line)) return;
 
             SetActiveIfAssigned(continueIndicator, true);
             await YarnTask.WaitUntilCanceled(token.NextContentToken).SuppressCancellationThrow();
+        }
+
+        // Aguardada dentro do RunLineAsync de propósito: o runner só entrega a fala seguinte quando ele termina,
+        // então duas revelações nunca escrevem no mesmo texto ao mesmo tempo.
+        private async YarnTask RevealAsync(LocalizedLine line, CancellationToken hurryUpToken)
+        {
+            using var reveal = CancellationTokenSource.CreateLinkedTokenSource(hurryUpToken, destroyCancellationToken);
+            _typewriter.CharactersPerSecond = charactersPerSecond;
+            IsRevealingLine = true;
+            try
+            {
+                await _typewriter.RunTypewriter(line.TextWithoutCharacterName, reveal.Token).SuppressCancellationThrow();
+            }
+            finally
+            {
+                IsRevealingLine = false;
+            }
         }
 
         public override async YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken token)
@@ -132,7 +159,7 @@ namespace ProjetoVN.Dialogue.UI
         private void ShowLine(LocalizedLine line)
         {
             ShowSpeaker(line);
-            dialogueText.text = line.TextWithoutCharacterName.Text;
+            _typewriter.PrepareForContent(line.TextWithoutCharacterName);
             dialogueBox.SetActive(true);
             dialogueChoices.SetActive(false);
         }
