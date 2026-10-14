@@ -11,7 +11,7 @@ gh issue list --state open --milestone "M1 - Diálogo em Yarn Spinner"
 ## Regras
 
 - Uma issue em andamento por vez; uma milestone só abre quando a anterior fecha.
-- Dentro de uma milestone, as issues são feitas **na ordem numérica**, que já respeita as dependências.
+- Dentro de uma milestone, as issues são feitas **na ordem da tabela**, que respeita as dependências. Em geral é a ordem numérica; uma issue priorizada depois (vinda da triagem) entra na posição que o programador escolher.
 - Toda issue passa pelas três sessões descritas em [../agentes/fluxo-de-trabalho.md](../agentes/fluxo-de-trabalho.md).
 - Uma issue nova entra com a label `triagem` e só ganha milestone quando o programador a prioriza.
 
@@ -32,6 +32,7 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 
 - **O diálogo vem primeiro (M1)** porque a migração para o Yarn Spinner muda o estado da história, o formato do save e a interface de diálogo, e as milestones seguintes constroem em cima dos três. Fazer navegação e save antes significaria refazê-los. Além disso, quando a M1 fecha, os roteiristas já podem escrever em paralelo.
 - **A apresentação (M2) vem antes da navegação (M3)** porque a troca de sala depende de a interface de jogo já ser persistente (#9).
+- **O seletor de nó (#32) abre a M3** porque é nela que as salas se multiplicam, cada uma com os seus gatilhos de diálogo. O seletor e o teste que confere os nós citados em cenas e prefabs precisam existir antes disso, e esse teste também serve à #14 para conferir os ids persistentes. Ela veio da triagem e foi priorizada pelo programador em 2026-10-14.
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 
@@ -71,6 +72,7 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 
 | Issue | Título | Depende de |
 |---|---|---|
+| #32 | Seletor de nó do roteiro no InteractableDialogueTrigger | #5 |
 | #12 | Troca de sala com fade | #9 |
 | #13 | Saídas e pontos de entrada das salas | #12 |
 | #14 | Persistência dos objetos de mundo entre salas | #12 |
