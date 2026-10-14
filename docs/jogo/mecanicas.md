@@ -10,7 +10,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Inventário](#inventário) | existe | `Inventory`, `UI` | — |
 | [Portões](#portões) | existe | `GameFlow`, `Editor` | — |
 | [Diálogo](#diálogo) | existe | `Dialogue` | — |
-| [Histórico de falas](#histórico-de-falas) | planejada | `Dialogue` | #25 |
+| [Histórico de falas](#histórico-de-falas) | existe | `Dialogue` | — |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
@@ -83,9 +83,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Conteúdo inválido nunca trava o jogo: roteiro com erro de compilação, nó inexistente, `<<jump>>` para nó inexistente e comando desconhecido avisam no console e o jogo segue em exploração.
 - Comandos de roteiro para dar, tirar e consultar itens, implementados no `GameFlow`. Um id de item que não existe loga erro com o nome do nó e a conversa segue; um teste automático acusa o id errado antes do Play.
 - Texto revelado aos poucos (#11): o primeiro clique completa a fala, o segundo avança. O indicador de continuar e as opções só aparecem com a fala completa. A velocidade se ajusta em um único campo da interface.
-
-**Falta:**
-- O histórico da conversa em curso (#25), descrito em [Histórico de falas](#histórico-de-falas).
+- Um botão **Histórico** na caixa abre a lista do que já foi dito na conversa em curso (#25), descrita em [Histórico de falas](#histórico-de-falas).
 
 **Limitação conhecida:** um comando com o número errado de parâmetros (`<<dar_item>>` sem id, ou com dois) trava a conversa (#37). Para os comandos de item, o teste automático dos roteiros reprova esse erro antes do Play.
 
@@ -93,6 +91,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Iniciar um diálogo é um comando direto ao dono.
 - O jogo sabe que um diálogo começou e acabou por `DialogueStartedMessage` e `DialogueEndedMessage`; uma conversa, por mais longa que seja, publica cada uma só uma vez.
 - Durante o diálogo, o mundo não aceita cliques.
+- Um clique em um botão da interface (o do histórico, por exemplo) não avança a fala; só o clique fora dos botões avança (#25).
 - Não se salva durante um diálogo (D-20).
 
 **Fora do escopo:** avanço automático, pular texto já lido, voz.
@@ -101,8 +100,8 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Para o jogador:** durante uma conversa, um botão na caixa de diálogo abre a lista do que já foi dito nela. Ele relê, fecha e a conversa continua de onde estava.
 
-**Planejada (#25, D-30):**
-- Registra as falas, a opção escolhida e os itens dados ou retirados pelo roteiro durante a conversa.
+**Existe (#25, D-30):**
+- Registra as falas, a opção escolhida e os itens dados ou retirados pelo roteiro durante a conversa. O item entra no histórico **só quando o inventário muda**: um `<<dar_item>>` de um item que o jogador já tem, ou um `<<remover_item>>` de um item que ele não tem, não deixa registro.
 - Cada fala aparece como `Nome: texto`, com o nome na cor do personagem. A narração aparece sem nome, e a opção escolhida aparece como fala do protagonista.
 - O botão fica desabilitado enquanto o texto da fala está sendo revelado; funciona com a fala completa e com as opções na tela.
 - Abre na entrada mais recente; a roda do mouse e a barra de rolagem levam às anteriores.
@@ -110,7 +109,10 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Regras:**
 - É só leitura: nada no histórico altera o estado do jogo.
 - Guarda só a conversa em curso. Começa vazio a cada conversa e não entra no save.
-- Com o histórico aberto, um clique não avança a fala e não escolhe opção.
+- Com o histórico aberto, um clique não avança a fala e não escolhe opção. Fechar devolve o diálogo ao ponto em que estava, com as opções ainda esperando.
+- Uma conversa que **começa** por opções, sem nenhuma fala antes, não mostra a caixa e, portanto, não mostra o botão. O histórico estaria vazio de qualquer jeito.
+
+**Limitação conhecida:** o botão e o painel usam arte provisória (o sprite da placa de nome e fundo preto translúcido). Com 200 falas de uma vez, a primeira abertura leva uns 0,25 s no Editor (cria os objetos das entradas); as reaberturas levam poucos milissegundos, e a rolagem é fluida. Ninguém sabe ainda o tamanho real das conversas.
 
 **Fora do escopo:** voltar a uma fala anterior, histórico da sessão inteira, abrir na exploração ou pela pausa, coleta feita no cenário, eventos de som e de efeito visual, retrato por entrada, busca, atalho de teclado.
 

@@ -19,6 +19,7 @@ unity command run_tests --mode EditMode --timeout 180
 - **`ScriptSpeakersTests`**: o `ScriptSpeakers`, que lista, por linha do roteiro compilado, o nó, o número da linha, quem fala e as etiquetas de expressão. Lê o personagem com o `LineParser` do próprio Yarn, então o escape `\:` e o nome vindo de expressão (`{0}`) se comportam como no jogo. Narração e opção não têm personagem; `TaggedWithoutSpeaker` lista as etiquetas nelas.
 - **`ScriptItemReferencesTests`**: o `ScriptItemReferences`, que lê do roteiro compilado cada `dar_item`, `remover_item` e `tem_item` com o nó e o id, e separa as referências sem id literal (variável, expressão, id ausente, parâmetro a mais). Lê o programa, não o texto, então um comando em comentário não conta.
 - **`ScriptItemCommandsTests`**: `tem_item` em uma condição, com e sem o item, e o texto que `dar_item` e `remover_item` entregam ao jogo.
+- **`ConversationLogTests`**: o histórico da conversa: o formato de cada entrada (nome na cor do personagem, narração sem nome, "Você recebeu" e "Você entregou"), a ordem, a limpeza entre conversas e o volume de 200 entradas.
 - **`ConversationNotifierTests`**: um `DialogueStartedMessage` e um `DialogueEndedMessage` por conversa, e nunca um Ended sem Started.
 - **`ScriptNodeNameTests`**: o formato dos nomes de nó.
 - **`StoryVariableNameTests`**: as duas regras de nome: o que o armazenamento aceita (inclusive os nomes internos do Yarn) e o que quem monta cena pode digitar.
@@ -27,7 +28,8 @@ unity command run_tests --mode EditMode --timeout 180
 - **`GameStateTests`**: ida e volta do JSON, com os três tipos de estado da história.
 
 > **Lacuna conhecida e deliberada:** `LockedActionBehaviour`, o `DialogueManager`, o apresentador
-> `DialogueUIController` e o `InteractableDialogueTrigger` não têm teste de EditMode. Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
+> `DialogueUIController`, o `DialogueHistoryView`, o `DialogueInputHandler` (inclusive a regra de que um
+> clique em botão da interface não avança a fala) e o `InteractableDialogueTrigger` não têm teste de EditMode. Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
 > a regra "C# puro, sem GameObjects" desta suíte; o `LockedActionBehaviour` ainda por cima é um
 > `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando. O `ItemScriptActions`
 > é cola entre três singletons e fica na mesma lacuna. A `Tests.asmdef` referencia `ProjetoVN.Inventory`

@@ -168,13 +168,16 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
   - só abre **durante uma conversa**, nunca na exploração nem pela pausa;
   - registra falas, a opção escolhida e os itens dados ou retirados pelo roteiro. Sons e efeitos visuais não entram.
 - **Por quê:** é uma mecânica esperada do gênero, e o alcance segue o modelo de Persona 5. Guardar a sessão inteira e perdê-la ao reabrir o jogo não faz sentido; gravá-la mudaria o formato do save (D-20); voltar no tempo exigiria desfazer afinidade, itens e variáveis.
-- **Chega na issue #25.** Até lá, nada no código prepara terreno para ele (D-27).
+- **Chegou na issue #25.**
+  - O registro é a classe pura `ConversationLog`, que vive no apresentador (`DialogueUIController`) e é zerado no início de cada conversa (D-12). `<<jump>>` e `<<detour>>` não o zeram.
+  - Os itens chegam pelo `GameFlow`: `ItemScriptActions` chama `DialogueManager.RecordItemReceived` e `RecordItemHandedOver` por chamada direta, **só quando o inventário muda**. O `Dialogue` continua sem enxergar o `Inventory` (D-01), e nenhuma mensagem nova foi criada (D-05).
+  - O bloqueio com o histórico aberto mora no dono do diálogo (`DialogueManager.AdvanceDialogue` e `DialogueUIController.Choose`), como o do `IsRevealingLine` (D-06). Não há modo novo no `GameFlow`: ele só mexe no `PlayerInputGate`, que o avanço de fala não consulta (D-28).
 - **Rever só se:** os roteiristas pedirem releitura fora da conversa.
 
 ### D-12 — Fala e escolhas chegam à interface direto do Yarn Spinner
 - **Decisão:** o `DialogueRunner` entrega cada fala e cada grupo de opções ao apresentador (`DialogueUIController`) por chamada direta. `DialogueLineMessage` e `DialogueChoicesMessage` deixaram de existir: só a interface as escutava, e fala e opção têm um destinatário, não são notificação (D-05). `DialogueStartedMessage` e `DialogueEndedMessage` continuam, publicadas pelo `DialogueManager`, uma vez por conversa (o `GameFlow` depende delas).
 - **Por quê:** uma notificação com um único ouvinte, dentro do mesmo módulo, só acrescenta indireção, e o apresentador do Yarn Spinner já recebe fala e opções por chamada.
-- **Quem precisar das falas** (o histórico da #25) as recebe do apresentador, dentro do módulo.
+- **Quem precisar das falas** (o histórico da #25) as recebe do apresentador, dentro do módulo. Foi o que a #25 fez.
 
 ---
 
@@ -206,6 +209,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 
 ### D-08 — Input
 - **Decisão:** `InputActionReference` para avançar o diálogo; leitura direta de `Mouse.current` para o mundo; EventSystem para a interface. O `PlayerInputGate` é a única arbitragem.
+- **Nota (#25):** um clique de **ponteiro** (mouse ou toque) sobre um botão da interface não avança a fala. O `DialogueInputHandler` confere, por `RaycastAll` do `EventSystem`, se o primeiro objeto sob o ponteiro é de um `Selectable`. Teclado e controle não mudam. Sem isso, o clique no botão do histórico avançaria a fala ao apertar, antes de o botão agir ao soltar.
 - **Rever só se:** entrar navegação do mundo por teclado ou controle.
 
 ---
@@ -273,6 +277,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-09 | **Detalhada (#48):** **D-21**, enquadramento. O programador rejeitou a primeira composição (arte de corpo inteiro a 39%, calibrada pelo protagonista) e decidiu com os artistas que a composição é da arte: personagens desenhados em uma cena de 3840×2160, exportados em 100% e cortados na borda de baixo da tela, desenhados pelo jogo na metade. Continua valendo uma escala e uma linha de chão únicas, sem ajuste por personagem, e a diferença de altura entre os personagens é mantida de propósito. |
 | 2026-10-08 | **Exemplos trocados (#47):** a personagem de exemplo passa do nome provisório ao definitivo, Luna (id `luna`, nós `luna_*`, `$afinidade_luna`) em D-18, D-21 e D-22, porque o nome definitivo da personagem chegou com a arte dela. Nenhuma decisão mudou. |
 | 2026-10-14 | **Nota (#11)** na D-06: o typewriter, onde mora o estado da revelação e como completar passa pelo `DialogueManager`. Nenhuma decisão mudou. |
+| 2026-10-14 | **Cumprida (#25):** D-30. O histórico de falas existe: registro no apresentador, itens pelo `GameFlow` só quando o inventário muda, bloqueio no dono do diálogo, sem modo novo no `GameFlow`. **Nota na D-08:** um clique de ponteiro sobre um botão da interface não avança a fala. Nenhuma decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 
