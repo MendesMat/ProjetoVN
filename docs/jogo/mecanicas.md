@@ -112,7 +112,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Com o histórico aberto, um clique não avança a fala e não escolhe opção. Fechar devolve o diálogo ao ponto em que estava, com as opções ainda esperando.
 - Uma conversa que **começa** por opções, sem nenhuma fala antes, não mostra a caixa e, portanto, não mostra o botão. O histórico estaria vazio de qualquer jeito.
 
-**Limitação conhecida:** o botão e o painel usam arte provisória (o sprite da placa de nome e fundo preto translúcido). Abrir um histórico de 200 falas leva de 0,14 s a 0,23 s no Editor (a rolagem é fluida); ninguém sabe ainda o tamanho real das conversas.
+**Limitação conhecida:** o botão e o painel usam arte provisória (o sprite da placa de nome e fundo preto translúcido). Com 200 falas de uma vez, a primeira abertura leva uns 0,25 s no Editor (cria os objetos das entradas); as reaberturas levam poucos milissegundos, e a rolagem é fluida. Ninguém sabe ainda o tamanho real das conversas.
 
 **Fora do escopo:** voltar a uma fala anterior, histórico da sessão inteira, abrir na exploração ou pela pausa, coleta feita no cenário, eventos de som e de efeito visual, retrato por entrada, busca, atalho de teclado.
 
