@@ -72,10 +72,14 @@ namespace ProjetoVN.Dialogue.Logic
             return true;
         }
 
-        /// <summary>Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela, não faz nada.</summary>
+        /// <summary>
+        /// Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela ou com o histórico
+        /// aberto, não faz nada.
+        /// </summary>
         public void AdvanceDialogue()
         {
             if (_runner == null) return;
+            if (IsHistoryOpen) return;
 
             if (IsRevealingLine)
             {
@@ -88,12 +92,26 @@ namespace ProjetoVN.Dialogue.Logic
 
         private bool IsRevealingLine => _presenter != null && _presenter.IsRevealingLine;
 
+        private bool IsHistoryOpen => _presenter != null && _presenter.IsHistoryOpen;
+
         public void MakeChoice(int index)
         {
             if (_presenter != null) _presenter.Choose(index);
         }
 
         public bool IsDialogueActive() => _conversation.IsOpen;
+
+        /// <summary>Registra no histórico que o roteiro deu um item ao jogador. Sem conversa em curso, não faz nada.</summary>
+        public void RecordItemReceived(string itemName)
+        {
+            if (_conversation.IsOpen && _presenter != null) _presenter.RecordItemReceived(itemName);
+        }
+
+        /// <summary>Registra no histórico que o roteiro tirou um item do jogador. Sem conversa em curso, não faz nada.</summary>
+        public void RecordItemHandedOver(string itemName)
+        {
+            if (_conversation.IsOpen && _presenter != null) _presenter.RecordItemHandedOver(itemName);
+        }
 
         /// <summary>O nó em que o roteiro está; <c>null</c> fora de uma conversa.</summary>
         public string CurrentNodeName => _runner != null && _conversation.IsOpen ? _runner.Dialogue.CurrentNode : null;

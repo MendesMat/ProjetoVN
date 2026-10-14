@@ -54,6 +54,13 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O '>>' de continuar, ligado só quando a fala terminou de aparecer e espera o jogador. Vazio: não é controlado.")]
         [SerializeField] private GameObject continueIndicator;
 
+        [Header("Histórico")]
+        [Tooltip("Botão da caixa de diálogo que abre o histórico, desabilitado enquanto a fala é revelada. Vazio: o jogador não consegue abrir o histórico.")]
+        [SerializeField] private Button openHistoryButton;
+
+        [Tooltip("O painel do histórico, desenhado por cima da caixa e das opções. Vazio: o jogador não consegue abrir o histórico.")]
+        [SerializeField] private DialogueHistoryView historyView;
+
         [Header("Revelação do texto")]
         [Tooltip("Quantos caracteres da fala aparecem por segundo. É o único lugar onde se ajusta a velocidade do texto. Mínimo 1.")]
         [Min(1f)]
@@ -61,6 +68,7 @@ namespace ProjetoVN.Dialogue.UI
 
         private readonly List<DialogueOption> _shownOptions = new();
         private readonly ConversationStage _stage = new();
+        private readonly ConversationLog _history = new();
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
         private Color _defaultNameColor;
@@ -69,11 +77,15 @@ namespace ProjetoVN.Dialogue.UI
         /// <summary>A fala está aparecendo aos poucos; um pedido de pressa a completa.</summary>
         internal bool IsRevealingLine { get; private set; }
 
+        /// <summary>O histórico está aberto por cima do diálogo; avançar a fala e escolher opção ficam bloqueados.</summary>
+        internal bool IsHistoryOpen => historyView != null && historyView.IsOpen;
+
         private void Start()
         {
             _typewriter = new LetterTypewriter { TextElement = dialogueText };
             _defaultNameColor = speakerNameText.color;
             CacheChoiceButtons();
+            ListenToOpenHistoryButton();
             HideAll();
             WarnAboutMissingCharacterRegistry();
             RegisterOnDialogueManager();
@@ -88,7 +100,12 @@ namespace ProjetoVN.Dialogue.UI
             if (DialogueManager.Instance != null) DialogueManager.Instance.UnregisterPresenter(this);
         }
 
-        public override YarnTask OnDialogueStartedAsync() => YarnTask.CompletedTask;
+        // Devolve na hora de propósito: a rede de segurança do DialogueManager depende de o início ser síncrono.
+        public override YarnTask OnDialogueStartedAsync()
+        {
+            _history.Clear();
+            return YarnTask.CompletedTask;
+        }
 
         public override YarnTask OnDialogueCompleteAsync() => YarnTask.CompletedTask;
 
@@ -111,15 +128,21 @@ namespace ProjetoVN.Dialogue.UI
         {
             using var reveal = CancellationTokenSource.CreateLinkedTokenSource(hurryUpToken, destroyCancellationToken);
             _typewriter.CharactersPerSecond = charactersPerSecond;
-            IsRevealingLine = true;
+            SetRevealing(true);
             try
             {
                 await _typewriter.RunTypewriter(line.TextWithoutCharacterName, reveal.Token).SuppressCancellationThrow();
             }
             finally
             {
-                IsRevealingLine = false;
+                SetRevealing(false);
             }
+        }
+
+        private void SetRevealing(bool isRevealing)
+        {
+            IsRevealingLine = isRevealing;
+            if (openHistoryButton != null) openHistoryButton.interactable = !isRevealing;
         }
 
         public override async YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken token)
@@ -150,8 +173,36 @@ namespace ProjetoVN.Dialogue.UI
             if (_selection == null) return;
             if (buttonIndex < 0 || buttonIndex >= _shownOptions.Count) return;
             if (!_shownOptions[buttonIndex].IsAvailable) return;
+            if (IsHistoryOpen) return;
 
+            RecordChosenOption(_shownOptions[buttonIndex]);
             _selection.TrySetResult(_shownOptions[buttonIndex]);
+        }
+
+        /// <summary>Abre o histórico se há conversa e a fala já terminou de aparecer; do contrário, não faz nada.</summary>
+        public void OpenHistory()
+        {
+            if (historyView == null || IsHistoryOpen || IsRevealingLine) return;
+            if (DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive()) return;
+
+            historyView.Open(_history.Entries);
+        }
+
+        internal void RecordItemReceived(string itemName) => _history.AddItemReceived(itemName);
+
+        internal void RecordItemHandedOver(string itemName) => _history.AddItemHandedOver(itemName);
+
+        private void RecordChosenOption(DialogueOption option)
+        {
+            string text = option.Line.TextWithoutCharacterName.Text;
+            CharacterSO protagonist = characterRegistry != null ? characterRegistry.Protagonist : null;
+            if (protagonist == null)
+            {
+                _history.AddNarration(text);
+                return;
+            }
+
+            _history.AddSpokenLine(NameToDisplay(protagonist), protagonist.NameColor, text);
         }
 
         private static bool IsFollowedByOptions(LocalizedLine line) => System.Array.IndexOf(line.Metadata, LastLineTag) >= 0;
@@ -170,9 +221,12 @@ namespace ProjetoVN.Dialogue.UI
             bool isNarration = string.IsNullOrWhiteSpace(speaker);
             SetActiveIfAssigned(speakerNameplate, !isNarration);
 
+            string text = line.TextWithoutCharacterName.Text;
+
             if (isNarration)
             {
                 speakerNameText.text = "";
+                _history.AddNarration(text);
                 DimStage();
                 return;
             }
@@ -181,12 +235,14 @@ namespace ProjetoVN.Dialogue.UI
             {
                 speakerNameText.text = speaker;
                 speakerNameText.color = _defaultNameColor;
+                _history.AddSpokenLine(speaker, _defaultNameColor, text);
                 DimStage();
                 return;
             }
 
             speakerNameText.text = NameToDisplay(character);
             speakerNameText.color = character.NameColor;
+            _history.AddSpokenLine(NameToDisplay(character), character.NameColor, text);
             PutOnStage(character, line);
         }
 
@@ -300,6 +356,11 @@ namespace ProjetoVN.Dialogue.UI
             dialogueChoices.SetActive(true);
         }
 
+        private void ListenToOpenHistoryButton()
+        {
+            if (openHistoryButton != null) openHistoryButton.onClick.AddListener(OpenHistory);
+        }
+
         private void RegisterOnDialogueManager()
         {
             if (DialogueManager.Instance == null)
@@ -318,6 +379,7 @@ namespace ProjetoVN.Dialogue.UI
             dialogueBox.SetActive(false);
             dialogueChoices.SetActive(false);
             SetActiveIfAssigned(continueIndicator, false);
+            if (historyView != null) historyView.Close();
             _stage.Clear();
             DrawStage();
         }
@@ -344,6 +406,9 @@ namespace ProjetoVN.Dialogue.UI
 
             if (characterRegistry == null)
                 Debug.LogWarning("[DialogueUIController] Character Registry está vazio: todo nome aparece em texto puro, sem cor e sem sprite.", this);
+
+            if (openHistoryButton == null || historyView == null)
+                Debug.LogWarning("[DialogueUIController] Open History Button e History View estão vazios: o jogador não consegue abrir o histórico.", this);
 
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);
