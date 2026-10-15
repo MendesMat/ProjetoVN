@@ -115,7 +115,7 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
    |---|---|---|
    | **Id** | Minúsculas sem acento, dígitos e `_` (`luna`). É o que o código usa; único no projeto | O console avisa |
    | **Display Name** | O nome **exatamente como o roteiro o escreve** antes dos dois-pontos, e como aparece na placa (`Luna`). Único no projeto | Vazio ou com espaço nas pontas: o roteiro não acha o personagem, e o console avisa |
-   | **Name Color** | A cor do nome na placa | |
+   | **Name Color** | A cor do nome na placa de nome **e do balão do personagem** no histórico de falas | O texto do balão fica escuro ou claro conforme a cor, e a cor precisa permitir contraste de 4,5:1 com um dos dois. Um cinza médio não permite: o console avisa e um teste da suíte reprova |
    | **Expressions** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem aparecer na tela |
 
 3. **O registro.** Abra `CharacterRegistry.asset` (na mesma pasta) e acrescente o personagem à lista **Characters**. Um personagem fora do registro aparece no jogo só com o nome, sem cor e sem sprite, e o console avisa. O registro acusa id e nome exibido repetidos. O campo **Protagonist** do registro aponta o personagem que o jogo trata como protagonista: é ele quem entra na tela quando as opções de resposta abrem. Ele precisa estar na lista **Characters**; vazio ou fora da lista, o console avisa e as opções não trazem ninguém.

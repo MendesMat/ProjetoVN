@@ -98,11 +98,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 ## Histórico de falas
 
-**Para o jogador:** durante uma conversa, um botão na caixa de diálogo abre a lista do que já foi dito nela. Ele relê, fecha e a conversa continua de onde estava.
+**Para o jogador:** durante uma conversa, um botão na caixa de diálogo abre o que já foi dito nela, com a aparência de um app de mensagens. Ele relê, fecha e a conversa continua de onde estava.
 
 **Existe (#25, D-30):**
 - Registra as falas, a opção escolhida e os itens dados ou retirados pelo roteiro durante a conversa. O item entra no histórico **só quando o inventário muda**: um `<<dar_item>>` de um item que o jogador já tem, ou um `<<remover_item>>` de um item que ele não tem, não deixa registro.
-- Cada fala aparece como `Nome: texto`, com o nome na cor do personagem. A narração aparece sem nome, e a opção escolhida aparece como fala do protagonista.
+- Cada fala é um **balão** (#55). A fala do protagonista e a opção escolhida ficam à **direita**; a de qualquer outro personagem, à **esquerda**. O balão tem a cor do personagem (a **Name Color** dele), e o texto dentro é escuro ou claro conforme a cor do balão. Um personagem que o roteiro cita e não existe no jogo fica à esquerda, em um balão branco.
+- O **nome** fica dentro do balão, em negrito e sem cor própria, e só aparece na primeira fala de uma sequência do mesmo personagem. Narração ou item no meio da sequência a interrompe, e o nome volta na fala seguinte.
+- **Narração** e **itens** ("Você recebeu: …", "Você entregou: …") ficam centralizados, em um balão escuro e translúcido de texto claro: a narração em itálico, o item em tamanho menor.
+- Um balão tem no máximo cerca de 65% da largura do painel, e o texto quebra dentro dele. A barra de rolagem é fina, rosa e translúcida, e fica dentro do painel, longe do painel de Debug da cena de teste.
 - O botão fica desabilitado enquanto o texto da fala está sendo revelado; funciona com a fala completa e com as opções na tela.
 - Abre na entrada mais recente; a roda do mouse e a barra de rolagem levam às anteriores.
 
@@ -112,9 +115,9 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Com o histórico aberto, um clique não avança a fala e não escolhe opção. Fechar devolve o diálogo ao ponto em que estava, com as opções ainda esperando.
 - Uma conversa que **começa** por opções, sem nenhuma fala antes, não mostra a caixa e, portanto, não mostra o botão. O histórico estaria vazio de qualquer jeito.
 
-**Limitação conhecida:** o botão e o painel usam arte provisória (o sprite da placa de nome e fundo preto translúcido). Com 200 falas de uma vez, a primeira abertura leva uns 0,25 s no Editor (cria os objetos das entradas); as reaberturas levam poucos milissegundos, e a rolagem é fluida. Ninguém sabe ainda o tamanho real das conversas.
+**Limitação conhecida:** o botão, o painel e o balão usam arte provisória (o balão é um retângulo arredondado branco, fatiado em 9 partes e tingido pela cor do personagem; sem "rabinho"). Com 200 falas de uma vez, a primeira abertura leva de 0,3 a 0,4 s no Editor (cria os balões); a reabertura só acrescenta as falas novas e leva poucos milissegundos de trabalho próprio, e a rolagem é fluida. Ninguém sabe ainda o tamanho real das conversas. O painel foi dimensionado para a cena de teste em 16:9: em telas mais estreitas o painel de Debug anda para a esquerda e volta a encostar na barra de rolagem.
 
-**Fora do escopo:** voltar a uma fala anterior, histórico da sessão inteira, abrir na exploração ou pela pausa, coleta feita no cenário, eventos de som e de efeito visual, retrato por entrada, busca, atalho de teclado.
+**Fora do escopo:** voltar a uma fala anterior, histórico da sessão inteira, abrir na exploração ou pela pausa, coleta feita no cenário, eventos de som e de efeito visual, retrato por entrada, hora de envio, busca, "rabinho" do balão, atalho de teclado.
 
 ## Estado da história e afinidade
 

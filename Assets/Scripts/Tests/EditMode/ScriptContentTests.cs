@@ -6,6 +6,7 @@ using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Inventory;
 using UnityEditor;
+using UnityEngine;
 
 namespace ProjetoVN.Tests.EditMode
 {
@@ -156,6 +157,17 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void CharacterRegistry_NameColorsAllowReadableBubbleText()
+        {
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+
+            Assert.IsEmpty(registry.Characters.Where(character => !BubbleTextColor.IsReadable(character.NameColor))
+                    .Select(character => $"{character.Id}: contraste {BestContrast(character.NameColor):0.00}:1"),
+                $"a Name Color também é o balão do histórico, e o texto dele precisa de contraste de {BubbleTextColor.MinimumContrast}:1; " +
+                "escureça ou clareie a cor do personagem");
+        }
+
+        [Test]
         public void CharacterRegistry_NamesAProtagonistFromItsList()
         {
             CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
@@ -174,6 +186,9 @@ namespace ProjetoVN.Tests.EditMode
             Assert.AreEqual("Luna", line.Character);
             CollectionAssert.AreEqual(new[] { "raiva" }, line.Expressions);
         }
+
+        private static float BestContrast(Color bubble) => Mathf.Max(
+            BubbleTextColor.ContrastRatio(BubbleTextColor.Dark, bubble), BubbleTextColor.ContrastRatio(BubbleTextColor.Light, bubble));
 
         private static ScriptSpeakers ProjectSpeakers() => ScriptSpeakers.In(ScriptRun.FromProjectFiles().StringTable.Values);
 
