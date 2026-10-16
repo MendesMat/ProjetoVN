@@ -108,7 +108,7 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
    | **Generate Mipmaps** | desligado | |
    | **Max Size** | `2048` | Uma arte mais alta que isso é reduzida na importação; como o jogo a desenha na metade do tamanho, em Full HD continua nítida |
 
-   Os dois personagens atuais (`luna` e `protagonista`) são o modelo. Não existe ajuste de tamanho ou de posição por personagem: a escala e a linha de chão são as mesmas para todos, definidas no `GameUI.prefab`. Se um personagem ficar estranho, peça um ajuste à arte ou abra uma issue.
+   Os dois personagens com arte (`luna` e `protagonista`) são o modelo. Não existe ajuste de tamanho ou de posição por personagem: a escala e a linha de chão são as mesmas para todos, definidas no `GameUI.prefab`. Se um personagem ficar estranho, peça um ajuste à arte ou abra uma issue.
 2. **O personagem.** Botão direito na pasta `Characters/` → **Create → Characters → Character**. Preencha:
 
    | Campo | O que escrever | Se errar |
@@ -116,7 +116,7 @@ Um personagem é um asset **Character** (`CharacterSO`) e uma linha no registro.
    | **Id** | Minúsculas sem acento, dígitos e `_` (`luna`). É o que o código usa; único no projeto | O console avisa |
    | **Display Name** | O nome **exatamente como o roteiro o escreve** antes dos dois-pontos, e como aparece na placa (`Luna`). Único no projeto | Vazio ou com espaço nas pontas: o roteiro não acha o personagem, e o console avisa |
    | **Name Color** | A cor do nome na placa de nome **e do balão do personagem** no histórico de falas | O texto do balão fica escuro ou claro conforme a cor, e a cor precisa permitir contraste de 4,5:1 com um dos dois. Um cinza médio não permite: o console avisa e um teste da suíte reprova |
-   | **Expressions** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem aparecer na tela |
+   | **Expressions** | Uma entrada por expressão: **Expression** (minúsculas sem acento, dígitos e `_`: `raiva`) e **Sprite**. **A primeira é a expressão padrão**, mostrada nas falas sem etiqueta | Expressão vazia, fora do formato ou repetida, ou sem Sprite: o console avisa. Sem nenhuma entrada, o personagem fala sem aparecer na tela: é assim que um personagem entra antes da arte (`mae`, `pai`, `motorista`, `homem` e `mulher`), e quando ela chegar acrescentam-se as expressões, sem mexer nos roteiros |
 
 3. **O registro.** Abra `CharacterRegistry.asset` (na mesma pasta) e acrescente o personagem à lista **Characters**. Um personagem fora do registro aparece no jogo só com o nome, sem cor e sem sprite, e o console avisa. O registro acusa id e nome exibido repetidos. O campo **Protagonist** do registro aponta o personagem que o jogo trata como protagonista: é ele quem entra na tela quando as opções de resposta abrem. Ele precisa estar na lista **Characters**; vazio ou fora da lista, o console avisa e as opções não trazem ninguém.
 4. **O guia de roteiro.** Acrescente uma linha para o personagem na tabela "Quem fala" e as expressões dele na tabela "Expressões" de [roteiro.md](roteiro.md). É dali que o roteirista copia os nomes.
