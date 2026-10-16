@@ -223,6 +223,13 @@ Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 | `Luna` | A Luna |
 | `Protagonista` | O protagonista (nome reservado, veja abaixo) |
 | `Pensamento` | O pensamento do protagonista (nome reservado: não é uma personagem e não tem sprite, veja abaixo) |
+| `Mãe` | A mãe do protagonista (ainda sem arte) |
+| `Pai` | O pai do protagonista (ainda sem arte) |
+| `Motorista` | O motorista do ônibus (ainda sem arte) |
+| `Homem` | Um passageiro do ônibus (ainda sem arte) |
+| `Mulher` | Uma passageira do ônibus (ainda sem arte) |
+
+Uma personagem pode existir **antes da arte**, como as cinco últimas da tabela: o nome aparece na placa, na cor dela, e a fala entra no histórico num balão dessa cor, mas **nenhum sprite aparece** e quem está na tela escurece, como na narração. Você escreve as falas normalmente; quando a arte chegar, nada muda no roteiro.
 
 Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
@@ -294,6 +301,9 @@ As expressões que existem hoje (a primeira de cada personagem é a padrão):
 |---|---|
 | `Luna` | `neutra` (padrão), `raiva` |
 | `Protagonista` | `neutra` (padrão) |
+| `Mãe`, `Pai`, `Motorista`, `Homem`, `Mulher` | nenhuma (ainda sem arte): **não use etiqueta** nessas falas |
+
+Uma etiqueta em uma personagem sem expressões é reprovada pela verificação do jogo. Quando a arte dela chegar, o programador acrescenta as expressões e a linha desta tabela passa a listá-las.
 
 A `raiva` da Luna é provisória: hoje é uma cópia da expressão neutra com um quadrado vermelho ao lado da cabeça, até a arte definitiva chegar. Quando uma expressão nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
