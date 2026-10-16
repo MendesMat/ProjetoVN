@@ -175,15 +175,17 @@ Cada linha do arquivo é **uma caixa de texto e um clique** do jogador. O texto 
 Uma sala de aula vazia. Dá para ouvir o relógio.
 Luna: Você é novo aqui?
 Protagonista: Sou. Cheguei hoje.
-Respiro fundo. Ela parece me estudar.
+Respiro fundo.
+Pensamento: Ela parece me estudar.
 ```
 
 | Tipo | Como se escreve | O que o jogador vê |
 |---|---|---|
 | **Fala** | `Nome: texto` (o nome, dois-pontos, um espaço, o texto) | O texto, com o nome em uma placa acima da caixa. |
 | **Narração** | Só o texto, sem nome | O texto, sem placa. |
+| **Pensamento** | `Pensamento: texto` (só do protagonista) | O texto em itálico e numa cor própria, sem placa. |
 
-No exemplo, a primeira e a última linha são narração; as do meio são falas.
+No exemplo, a primeira e a quarta linha são narração; a segunda e a terceira são falas; a última é o pensamento do protagonista.
 
 **Fala longa se divide em várias linhas.** Em vez de:
 
@@ -220,6 +222,7 @@ Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 |---|---|
 | `Luna` | A Luna |
 | `Protagonista` | O protagonista (nome reservado, veja abaixo) |
+| `Pensamento` | O pensamento do protagonista (nome reservado: não é uma personagem e não tem sprite, veja abaixo) |
 
 Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
@@ -233,13 +236,22 @@ O protagonista aparece no texto de três jeitos:
 |---|---|---|
 | Ele **fala**, e o jogador não escolhe nada | Uma linha com o nome reservado `Protagonista` | `Protagonista: Sou. Cheguei hoje.` |
 | Ele **fala**, e o jogador escolhe o que dizer | Um bloco de [opções](#opções), com duas ou mais | `-> Vi. Estava embaixo do bebedouro.` |
-| Ele **pensa** | Narração em primeira pessoa, sem nome | `Sinto o peso da chave no bolso.` |
+| Ele **pensa** | Uma linha com o nome reservado `Pensamento` | `Pensamento: Sinto o peso da chave no bolso.` |
+
+Há ainda a **narração em primeira pessoa**, que não é nenhum dos três: é o que ele **faz** (`Respiro fundo.`). Cada voz tem o seu jeito de escrever:
+
+| O protagonista... | Escreva | Exemplo |
+|---|---|---|
+| **faz** algo | Narração, sem nome | `Respiro fundo.` |
+| **pensa** algo | `Pensamento: texto` | `Pensamento: Será que falei alguma coisa errada?` |
+| **diz** algo em voz alta | `Protagonista: texto` | `Protagonista: Algum problema?` |
 
 Os três juntos:
 
 ```
 Luna: Você viu uma chave por aí?
-Sinto o peso da chave no bolso.
+Respiro fundo.
+Pensamento: Sinto o peso da chave no bolso.
 Protagonista: Que chave?
 Luna: Uma com um morcego no chaveiro. E aí?
 -> Vi. Estava embaixo do bebedouro.
@@ -248,9 +260,11 @@ Luna: Uma com um morcego no chaveiro. E aí?
     Luna: Droga. Se você achar, me avisa?
 ```
 
-**O protagonista aparece na tela quando fala** (como qualquer personagem) **e quando as opções de resposta abrem**: é o sinal visual de que é a vez do jogador, e ele fica em destaque. Quando ele **pensa**, nada aparece: para o jogo, pensamento é narração sem nome, igual a `A porta está trancada.`
+**O protagonista aparece na tela quando fala** (como qualquer personagem) **e quando as opções de resposta abrem**: é o sinal visual de que é a vez do jogador, e ele fica em destaque. Quando ele **pensa**, ninguém aparece na tela: o jogo mostra o texto **sem placa de nome, em itálico e numa cor própria** (um azul claro), e quem está na tela escurece, como na narração. No histórico da conversa, o pensamento fica do lado do protagonista (à direita), num balão translúcido da mesma cor, sem nome, para o jogador distinguir o que ele pensou do que ele disse.
 
-Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros.
+**`Pensamento` só vale escrito assim**, com a inicial maiúscula e os dois-pontos logo depois, como o nome de qualquer personagem (`pensamento:` e `PENSAMENTO:` são personagens que não existem, e a verificação do jogo reprova). Só o protagonista pensa: não há `Pensamento` de outra personagem. Um pensamento **não leva etiqueta de expressão** (`Pensamento: Que dia. #raiva` é reprovado), porque não há sprite para trocar.
+
+Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros: o `Pensamento:` continua igual, e nenhum nome aparece nele.
 
 ### Expressões
 
@@ -269,7 +283,7 @@ Enquanto outra pessoa fala, a personagem continua na tela, um pouco escurecida, 
 |---|---|
 | A etiqueta vai no **fim** da linha, depois do texto, com um espaço antes do `#`. | No meio da fala, `#` é erro de sintaxe. |
 | **Uma etiqueta por fala.** | A verificação do jogo reprova duas. |
-| **Só em fala com nome.** Nunca em narração nem em opção. | Narração e opção não têm personagem falando; a verificação reprova a etiqueta ali. |
+| **Só em fala com nome.** Nunca em narração, pensamento nem opção. | Narração, pensamento e opção não têm personagem falando; a verificação reprova a etiqueta ali. |
 | O nome da expressão é um da tabela abaixo, em minúsculas e sem acento. | A verificação reprova uma expressão que a personagem não tem; se ela chegasse ao jogo, apareceria a expressão padrão e o console avisaria. |
 
 A fala logo antes de um bloco de [opções](#opções) aceita expressão normalmente.
@@ -725,7 +739,8 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
 | O nome de quem fala está igual ao da tabela? | `luna: Oi.` | A verificação do jogo reprova. |
-| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Luna: Oi. #medo`, `Narração. #raiva` | A verificação do jogo reprova. |
+| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Luna: Oi. #medo`, `Narração. #raiva`, `Pensamento: Que dia. #raiva` | A verificação do jogo reprova. |
+| `Pensamento:` está escrito certo? | `pensamento: Que dia.` | Vira uma personagem desconhecida: a verificação reprova. |
 | As variáveis novas estão em `variaveis.yarn`, com `///`? | `<<declare>>` dentro da conversa | A verificação reprova. |
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |
 | Há dois-pontos em alguma narração? | `Eram 10:30 da manhã.` | Vira nome de personagem ([Dois-pontos na narração](#dois-pontos-na-narração)). |
@@ -869,7 +884,7 @@ Luna: Você viu uma chave por aí? Tem um morcego no chaveiro.
     <<stop>>
 <<endif>>
 
-Sinto o peso da chave no bolso.
+Pensamento: Sinto o peso da chave no bolso.
 Luna: E aí? Viu ou não viu?
 -> Vi. Estava embaixo do bebedouro.
     // ENTREGA: o item sai do inventário. GANHO de afinidade.
