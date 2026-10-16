@@ -1,0 +1,64 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 1 · A viagem
+
+title: onibus_viagem
+---
+// ----- NO ÔNIBUS -----
+// PEDIDO: começar com a tela preta e clarear aos poucos até o cenário do ônibus por dentro, à noite.
+// PEDIDO: tocar em loop, a partir daqui, o som do ônibus na estrada.
+Pensamento: Em qualquer outro dia, esse cenário me deixaria mais calmo...
+Pensamento: Mas o lugar para onde este ônibus está me levando não me traz paz nenhuma...
+Pensamento: Agronomia... Outra cidade... Que ideia de merda.
+Pensamento: Por que eu fui concordar com isso?
+
+// ----- A LEMBRANÇA -----
+// PEDIDO: tela preta, com uma fumaça ao redor e as silhuetas dos pais.
+// PEDIDO: o som do ônibus some enquanto dura a lembrança.
+Pai: Veja só o seu primo, sustentando a família!
+Pai: Você acha que isso de computação, cineminha ou sei lá o quê vai te trazer futuro?
+Mãe: Não seja tão duro com ele, querido...
+Mãe: Mas ouça o seu pai. A situação vai ficar complicada daqui a um tempo.
+// Na lembrança o protagonista fala em voz alta, então aqui é Protagonista, e não Pensamento.
+Protagonista: Mas, mãe, você sabe que eu não quero fazer isso...
+Pai: Olha aqui, seu moleque, a gente não pode fazer apostas sem garantia!
+Pai: Você acha que esse negócio de internet vai dar futuro?
+Protagonista: Mas eu não vou saber se não tentar...
+Pai: E gastar não sei quanto tempo vagabundeando, sem fazer nada?!
+Pai: Sem um puto no bolso?!
+Protagonista: MAS EU NÃO QUERO FAZER ISSO, PAI!
+// Fala cortada no meio: termine com um travessão.
+Pai: Não aumente o tom comigo, seu—
+Mãe: Chega! Vocês dois, parem de gritar!
+Mãe: Filho, se você quer o bem da sua família...
+Mãe: ...então, por favor, faça isso por nós.
+
+// ----- DE VOLTA AO ÔNIBUS -----
+// PEDIDO: a lembrança some aos poucos e o cenário do ônibus volta.
+// PEDIDO: o som do ônibus na estrada volta.
+Pensamento: Espero ter feito a escolha certa, mãe...
+Pensamento: Abandonar a minha cidade, os meus amigos... Foda...
+Pensamento: Mas vamos pensar pelo lado bom. Talvez eu goste do curso, do lugar, faça amigos...
+Pensamento: ...
+Pensamento: ...
+Pensamento: Uma namorada...
+Pensamento: Eu posso sonhar, não pos—
+
+// ----- O ACIDENTE -----
+// PEDIDO: parar o som do ônibus e tocar uma freada forte seguida de uma batida.
+Protagonista: Que porra é essa?!
+Instintivamente, olho para o corredor. Do meu lugar, não consigo ver nada além do vidro do motorista, quebrado.
+Homem: O que foi isso?!
+Mulher: Acordou o meu filho!
+Motorista: Ô, pessoal, tivemos um problema aqui. Já chamei o mecânico.
+Motorista: Pra nossa sorte, tem um posto aqui na frente. Vocês podem ficar um tempo lá.
+// #acao no fim da opção: ela é um gesto do protagonista, não uma fala.
+Motorista: Só peço que quem for sair assine o papel aqui.
+-> Assinar e sair #acao
+-> Perguntar sobre o papel #acao
+    Protagonista: O que eu tô assinando, exatamente?
+    Motorista: Lista de passageiros...
+    O motorista me encara por alguns segundos, em silêncio.
+    Motorista: Sabe como é, né? A mata é perigosa...
+
+// Os dois caminhos chegam aqui: o protagonista assina a lista.
+// PEDIDO: o jogador escreve o nome do protagonista na lista de passageiros, numa folha de lista, com fonte de caneta (#26).
+===
