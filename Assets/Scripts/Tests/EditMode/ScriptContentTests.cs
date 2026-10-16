@@ -133,7 +133,7 @@ namespace ProjetoVN.Tests.EditMode
             ScriptSpeakers speakers = ProjectSpeakers();
 
             Assert.IsEmpty(speakers.TaggedWithoutSpeaker.Select(line => $"{line}: #{string.Join(" #", line.Expressions)}"),
-                "etiqueta de expressão só vale em fala com nome, nunca em narração nem em opção");
+                "etiqueta de expressão só vale em fala com nome, nunca em narração, pensamento nem opção");
             Assert.IsEmpty(speakers.Spoken.Where(line => line.Expressions.Length > 1).Select(line => line.ToString()),
                 "uma fala tem no máximo uma etiqueta de expressão");
             Assert.IsEmpty(speakers.Spoken.SelectMany(line => ExpressionsTheSpeakerLacks(registry, line)),
@@ -154,6 +154,15 @@ namespace ProjetoVN.Tests.EditMode
                 "todo personagem tem nome exibido");
             Assert.IsEmpty(Repeated(registry.Characters.Select(character => character.DisplayName)), "nomes exibidos únicos");
             Assert.IsEmpty(registry.Characters.SelectMany(ExpressionProblems), "cada expressão tem nome no formato, único, e um sprite");
+        }
+
+        [Test]
+        public void CharacterRegistry_HasNoCharacterNamedLikeTheThought()
+        {
+            CharacterRegistry registry = LoadTheOnly<CharacterRegistry>();
+
+            Assert.IsEmpty(registry.Characters.Where(character => ThoughtLine.Is(character.DisplayName)).Select(character => character.Id),
+                $"'{ThoughtLine.ReservedName}' é o nome reservado do pensamento do protagonista: o roteiro nunca chegaria a esse personagem");
         }
 
         [Test]

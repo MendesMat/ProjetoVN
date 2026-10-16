@@ -57,15 +57,21 @@ Luna: Você é novo aqui?
 // pelo nome que o jogador escolher, e o roteiro não precisa mudar.)
 Protagonista: Sou. Cheguei hoje.
 
-// PENSAMENTO do protagonista: narração em primeira pessoa, sem nome.
-Respiro fundo. Ela parece me estudar.
+// NARRAÇÃO EM PRIMEIRA PESSOA: o que o protagonista faz.
+Respiro fundo.
+
+// PENSAMENTO do protagonista: o nome reservado "Pensamento". Aparece sem
+// placa, em itálico e numa cor própria; no histórico, do lado dele. Nunca
+// leva etiqueta de expressão. Só o protagonista pensa.
+Pensamento: Ela parece me estudar. Será que falei alguma coisa errada?
+Protagonista: Algum problema?
 
 // EXPRESSÃO: para a personagem mudar de cara numa fala, escreva no FIM da
 // linha um espaço, "#" e o nome da expressão. Vale para esta fala: na próxima
 // fala dela, sem etiqueta, volta à expressão padrão (a primeira da tabela
 // "Expressões" do guia). Enquanto os outros falam, ela fica escurecida com a
 // última expressão. Só em fala com nome, uma etiqueta por fala, nunca em
-// narração nem em opção. Expressão que o personagem não tem não trava o jogo:
+// narração, pensamento nem opção. Expressão que o personagem não tem não trava o jogo:
 // o console avisa e a padrão aparece. O teste do projeto reprova antes disso.
 Luna: Não olha assim para mim. #raiva
 Luna: Desculpa. Foi mal.

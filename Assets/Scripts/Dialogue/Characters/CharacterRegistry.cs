@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ProjetoVN.Dialogue.Logic;
 using UnityEngine;
 
 namespace ProjetoVN.Dialogue.Characters
@@ -44,6 +45,10 @@ namespace ProjetoVN.Dialogue.Characters
 
                 if (!names.Add(character.DisplayName))
                     Debug.LogError($"[CharacterRegistry] Nome exibido duplicado: '{character.DisplayName}' em {character.name}.", character);
+
+                if (ThoughtLine.Is(character.DisplayName))
+                    Debug.LogError($"[CharacterRegistry] '{character.DisplayName}' em {character.name} é o nome reservado do pensamento do protagonista: " +
+                                   "o roteiro nunca chegaria a este personagem.", character);
             }
         }
 

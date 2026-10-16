@@ -36,6 +36,11 @@ namespace ProjetoVN.Dialogue.UI
                  "O balão de um personagem usa a Name Color dele.")]
         [SerializeField] private Color neutralBubbleColor = new Color32(0x24, 0x11, 0x1F, 0xD1);
 
+        [Tooltip("Quanto a cor de pensamento do Dialogue UI Controller tinge o balão do pensamento do protagonista, que parte da cor do balão neutro " +
+                 "(0 = igual ao neutro, 1 = a cor de pensamento). Acima de 0,3 o texto perde contraste com o balão (abaixo de ~5:1 sobre uma cena branca).")]
+        [Range(0.05f, 0.3f)]
+        [SerializeField] private float thoughtBubbleTint = 0.2f;
+
         [Tooltip("Largura máxima de um balão, como fração da largura do conteúdo. Um texto maior quebra em linhas.")]
         [Range(0.3f, 1f)]
         [SerializeField] private float maxBubbleWidth = 0.65f;
@@ -116,20 +121,43 @@ namespace ProjetoVN.Dialogue.UI
 
         private void Show(BubbleRow row, ConversationEntry entry)
         {
-            Color bubbleColor = entry.Kind == ConversationEntryKind.Speech ? entry.SpeakerColor : neutralBubbleColor;
+            Color bubbleColor = BubbleColorOf(entry);
 
             row.Layout.childAlignment = AlignmentOf(entry);
             row.Background.color = bubbleColor;
-            row.Text.color = BubbleTextColor.For(bubbleColor);
+            row.Text.color = TextColorOf(entry, bubbleColor);
             row.Text.fontSize = entry.Kind == ConversationEntryKind.Item ? itemFontSize : row.SpeechFontSize;
-            row.Text.fontStyle = entry.Kind == ConversationEntryKind.Narration ? FontStyles.Italic : FontStyles.Normal;
+            row.Text.fontStyle = IsItalic(entry) ? FontStyles.Italic : FontStyles.Normal;
             row.Text.text = TextOf(entry);
             row.Size.preferredWidth = WidthOf(row);
             row.GameObject.SetActive(true);
         }
 
+        private Color BubbleColorOf(ConversationEntry entry)
+        {
+            if (entry.Kind == ConversationEntryKind.Speech) return entry.SpeakerColor;
+            if (entry.Kind == ConversationEntryKind.Thought) return TintedNeutralBubble(entry.SpeakerColor);
+
+            return neutralBubbleColor;
+        }
+
+        // Tingir o balão neutro, que é escuro, e não deixá-lo transparente: a transparência deixava a cena clara aparecer atrás do texto.
+        private Color TintedNeutralBubble(Color tint)
+        {
+            Color tintWithNeutralAlpha = new Color(tint.r, tint.g, tint.b, neutralBubbleColor.a);
+
+            return Color.Lerp(neutralBubbleColor, tintWithNeutralAlpha, thoughtBubbleTint);
+        }
+
+        private static Color TextColorOf(ConversationEntry entry, Color bubbleColor) =>
+            entry.Kind == ConversationEntryKind.Thought ? entry.SpeakerColor : BubbleTextColor.For(bubbleColor);
+
+        private static bool IsItalic(ConversationEntry entry) =>
+            entry.Kind == ConversationEntryKind.Narration || entry.Kind == ConversationEntryKind.Thought;
+
         private static TextAnchor AlignmentOf(ConversationEntry entry)
         {
+            if (entry.Kind == ConversationEntryKind.Thought) return TextAnchor.UpperRight;
             if (entry.Kind != ConversationEntryKind.Speech) return TextAnchor.UpperCenter;
 
             return entry.IsProtagonist ? TextAnchor.UpperRight : TextAnchor.UpperLeft;

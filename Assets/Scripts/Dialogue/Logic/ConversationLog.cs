@@ -26,6 +26,9 @@ namespace ProjetoVN.Dialogue.Logic
 
         public void AddNarration(string text) => AddWithoutSpeaker(ConversationEntryKind.Narration, text);
 
+        public void AddThought(string text, Color thoughtColor) =>
+            _entries.Add(new ConversationEntry(ConversationEntryKind.Thought, null, Opaque(thoughtColor), text, isProtagonist: false, showsName: false));
+
         public void AddItemReceived(string itemName) => AddWithoutSpeaker(ConversationEntryKind.Item, ItemReceivedPrefix + itemName);
 
         public void AddItemHandedOver(string itemName) => AddWithoutSpeaker(ConversationEntryKind.Item, ItemHandedOverPrefix + itemName);
@@ -34,11 +37,12 @@ namespace ProjetoVN.Dialogue.Logic
 
         private void AddSpeech(string speakerName, Color speakerColor, string text, bool isProtagonist)
         {
-            Color opaqueColor = new(speakerColor.r, speakerColor.g, speakerColor.b, 1f);
             bool showsName = !ContinuesSequenceOf(speakerName);
 
-            _entries.Add(new ConversationEntry(ConversationEntryKind.Speech, speakerName, opaqueColor, text, isProtagonist, showsName));
+            _entries.Add(new ConversationEntry(ConversationEntryKind.Speech, speakerName, Opaque(speakerColor), text, isProtagonist, showsName));
         }
+
+        private static Color Opaque(Color color) => new(color.r, color.g, color.b, 1f);
 
         private void AddWithoutSpeaker(ConversationEntryKind kind, string text) =>
             _entries.Add(new ConversationEntry(kind, null, Color.clear, text, isProtagonist: false, showsName: false));

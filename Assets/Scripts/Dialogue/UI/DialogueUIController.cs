@@ -61,6 +61,11 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O painel do histórico, desenhado por cima da caixa e das opções. Vazio: o jogador não consegue abrir o histórico.")]
         [SerializeField] private DialogueHistoryView historyView;
 
+        [Header("Pensamento")]
+        [Tooltip("Cor do texto do pensamento do protagonista (Pensamento: no roteiro), na caixa e no histórico. O pensamento aparece também em itálico, " +
+                 "sem placa de nome. Uma cor clara: o texto precisa de contraste com a caixa e com o balão do histórico.")]
+        [SerializeField] private Color thoughtColor = new Color32(0xC9, 0xDC, 0xFF, 0xFF);
+
         [Header("Revelação do texto")]
         [Tooltip("Quantos caracteres da fala aparecem por segundo. É o único lugar onde se ajusta a velocidade do texto. Mínimo 1.")]
         [Min(1f)]
@@ -72,6 +77,8 @@ namespace ProjetoVN.Dialogue.UI
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
         private Color _defaultNameColor;
+        private Color _defaultTextColor;
+        private FontStyles _defaultTextStyle;
         private LetterTypewriter _typewriter;
 
         /// <summary>A fala está aparecendo aos poucos; um pedido de pressa a completa.</summary>
@@ -86,6 +93,8 @@ namespace ProjetoVN.Dialogue.UI
         {
             _typewriter = new LetterTypewriter { TextElement = dialogueText };
             _defaultNameColor = speakerNameText.color;
+            _defaultTextColor = dialogueText.color;
+            _defaultTextStyle = dialogueText.fontStyle;
             CacheChoiceButtons();
             ListenToOpenHistoryButton();
             HideAll();
@@ -221,7 +230,9 @@ namespace ProjetoVN.Dialogue.UI
         {
             string speaker = line.CharacterName;
             bool isNarration = string.IsNullOrWhiteSpace(speaker);
-            SetActiveIfAssigned(speakerNameplate, !isNarration);
+            bool isThought = ThoughtLine.Is(speaker);
+            SetActiveIfAssigned(speakerNameplate, !isNarration && !isThought);
+            ApplyTextStyle(isThought);
 
             string text = line.TextWithoutCharacterName.Text;
 
@@ -229,6 +240,15 @@ namespace ProjetoVN.Dialogue.UI
             {
                 speakerNameText.text = "";
                 _history.AddNarration(text);
+                DimStage();
+                return;
+            }
+
+            // Antes de TryResolveCharacter: o nome reservado não é um personagem e não deve gerar o aviso de personagem desconhecido.
+            if (isThought)
+            {
+                speakerNameText.text = "";
+                _history.AddThought(text, thoughtColor);
                 DimStage();
                 return;
             }
@@ -246,6 +266,13 @@ namespace ProjetoVN.Dialogue.UI
             speakerNameText.color = character.NameColor;
             RecordCharacterLine(character, text);
             PutOnStage(character, line);
+        }
+
+        // A caixa é a mesma entre as falas: o estilo do pensamento precisa ser desfeito na fala seguinte.
+        private void ApplyTextStyle(bool isThought)
+        {
+            dialogueText.fontStyle = isThought ? FontStyles.Italic : _defaultTextStyle;
+            dialogueText.color = isThought ? thoughtColor : _defaultTextColor;
         }
 
         private void RecordCharacterLine(CharacterSO character, string text)
@@ -416,6 +443,9 @@ namespace ProjetoVN.Dialogue.UI
 
             if (openHistoryButton == null || historyView == null)
                 Debug.LogWarning("[DialogueUIController] Open History Button e History View estão vazios: o jogador não consegue abrir o histórico.", this);
+
+            if (thoughtColor.a < 1f)
+                Debug.LogWarning("[DialogueUIController] Thought Color tem alfa menor que 1: o pensamento ficaria translúcido na caixa e opaco no histórico. Use alfa 255.", this);
 
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);
