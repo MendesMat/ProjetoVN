@@ -6,6 +6,7 @@ namespace ProjetoVN.Dialogue.Logic
     {
         Speech,
         Narration,
+        Thought,
         Item,
     }
 
