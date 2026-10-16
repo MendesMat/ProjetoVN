@@ -79,6 +79,33 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void Thought_IsNotSpoken_AndIsMarkedAsThought()
+        {
+            ScriptSpeakers speakers = SpeakersInNodeBody("Pensamento: Sinto o peso da chave.");
+
+            Assert.IsTrue(speakers.Lines.Single().IsThought);
+            Assert.IsEmpty(speakers.Spoken);
+        }
+
+        [Test]
+        public void ThoughtWithATag_IsListedWithoutASpeaker()
+        {
+            ScriptSpeakers speakers = SpeakersInNodeBody("Pensamento: Que dia. #raiva");
+
+            ScriptSpeakerLine line = speakers.TaggedWithoutSpeaker.Single();
+            Assert.AreEqual(Node, line.NodeName);
+            Assert.AreEqual(FirstBodyLine, line.LineNumber);
+        }
+
+        [Test]
+        public void LowercaseThought_IsSpoken()
+        {
+            ScriptSpeakers speakers = SpeakersInNodeBody("pensamento: oi");
+
+            Assert.AreEqual("pensamento", speakers.Spoken.Single().Character);
+        }
+
+        [Test]
         public void SpeakerFromAnExpression_IsThePlaceholder_ThatNoRegistryHas()
         {
             ScriptSpeakers speakers = SpeakersInNodeBody("<<declare $quem = \"Luna\">>\n{$quem}: oi");

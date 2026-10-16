@@ -22,6 +22,8 @@ namespace ProjetoVN.Tests.EditMode
             Expressions = expressions;
         }
 
+        public bool IsThought => ThoughtLine.Is(Character);
+
         public override string ToString() => $"{NodeName}, linha {LineNumber}";
     }
 
@@ -37,12 +39,12 @@ namespace ProjetoVN.Tests.EditMode
 
         public IReadOnlyList<ScriptSpeakerLine> Lines { get; }
 
-        /// <summary>As linhas com personagem.</summary>
-        public IEnumerable<ScriptSpeakerLine> Spoken => Lines.Where(line => line.Character != null);
+        /// <summary>As linhas com personagem. O pensamento (<c>Pensamento:</c>) não é personagem.</summary>
+        public IEnumerable<ScriptSpeakerLine> Spoken => Lines.Where(line => line.Character != null && !line.IsThought);
 
-        /// <summary>Etiquetas de expressão em narração ou opção: não há retrato para trocar.</summary>
+        /// <summary>Etiquetas de expressão em narração, pensamento ou opção: não há retrato para trocar.</summary>
         public IEnumerable<ScriptSpeakerLine> TaggedWithoutSpeaker =>
-            Lines.Where(line => line.Character == null && line.Expressions.Length > 0);
+            Lines.Where(line => (line.Character == null || line.IsThought) && line.Expressions.Length > 0);
 
         private ScriptSpeakers(IReadOnlyList<ScriptSpeakerLine> lines) => Lines = lines;
 
