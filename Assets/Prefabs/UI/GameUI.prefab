@@ -1916,7 +1916,7 @@ MonoBehaviour:
   bubbleTemplate: {fileID: 7162106088881629984}
   closeButton: {fileID: 3091410001686494332}
   neutralBubbleColor: {r: 0.14117648, g: 0.06666667, b: 0.12156863, a: 0.81960785}
-  thoughtBubbleOpacity: 0.2
+  thoughtBubbleTint: 0.2
   maxBubbleWidth: 0.65
   itemFontSize: 28
 --- !u!223 &890341112479785509

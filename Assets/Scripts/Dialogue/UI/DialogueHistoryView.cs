@@ -36,10 +36,10 @@ namespace ProjetoVN.Dialogue.UI
                  "O balão de um personagem usa a Name Color dele.")]
         [SerializeField] private Color neutralBubbleColor = new Color32(0x24, 0x11, 0x1F, 0xD1);
 
-        [Tooltip("Opacidade do balão do pensamento do protagonista, tingido pela cor de pensamento do Dialogue UI Controller. " +
-                 "Acima de 0,3 o texto perde contraste com o balão.")]
+        [Tooltip("Quanto a cor de pensamento do Dialogue UI Controller tinge o balão do pensamento do protagonista, que parte da cor do balão neutro " +
+                 "(0 = igual ao neutro, 1 = a cor de pensamento). Acima de 0,3 o texto perde contraste com o balão (abaixo de ~5:1 sobre uma cena branca).")]
         [Range(0.05f, 0.3f)]
-        [SerializeField] private float thoughtBubbleOpacity = 0.2f;
+        [SerializeField] private float thoughtBubbleTint = 0.2f;
 
         [Tooltip("Largura máxima de um balão, como fração da largura do conteúdo. Um texto maior quebra em linhas.")]
         [Range(0.3f, 1f)]
@@ -136,9 +136,17 @@ namespace ProjetoVN.Dialogue.UI
         private Color BubbleColorOf(ConversationEntry entry)
         {
             if (entry.Kind == ConversationEntryKind.Speech) return entry.SpeakerColor;
-            if (entry.Kind == ConversationEntryKind.Thought) return new Color(entry.SpeakerColor.r, entry.SpeakerColor.g, entry.SpeakerColor.b, thoughtBubbleOpacity);
+            if (entry.Kind == ConversationEntryKind.Thought) return TintedNeutralBubble(entry.SpeakerColor);
 
             return neutralBubbleColor;
+        }
+
+        // Tingir o balão neutro, que é escuro, e não deixá-lo transparente: a transparência deixava a cena clara aparecer atrás do texto.
+        private Color TintedNeutralBubble(Color tint)
+        {
+            Color tintWithNeutralAlpha = new Color(tint.r, tint.g, tint.b, neutralBubbleColor.a);
+
+            return Color.Lerp(neutralBubbleColor, tintWithNeutralAlpha, thoughtBubbleTint);
         }
 
         private static Color TextColorOf(ConversationEntry entry, Color bubbleColor) =>

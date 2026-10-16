@@ -444,6 +444,9 @@ namespace ProjetoVN.Dialogue.UI
             if (openHistoryButton == null || historyView == null)
                 Debug.LogWarning("[DialogueUIController] Open History Button e History View estão vazios: o jogador não consegue abrir o histórico.", this);
 
+            if (thoughtColor.a < 1f)
+                Debug.LogWarning("[DialogueUIController] Thought Color tem alfa menor que 1: o pensamento ficaria translúcido na caixa e opaco no histórico. Use alfa 255.", this);
+
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);
             else if (choiceTexts == null || choiceTexts.Length != choiceButtonObjects.Length)

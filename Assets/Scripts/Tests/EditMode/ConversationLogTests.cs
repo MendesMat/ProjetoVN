@@ -177,11 +177,10 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ChosenOptionAfterAThought_ShowsTheName()
         {
-            _log.AddProtagonistLine("Protagonista", ProtagonistColor, "Oi.");
             _log.AddThought("Que dia.", ThoughtColor);
             _log.AddProtagonistLine("Protagonista", ProtagonistColor, "Sim");
 
-            Assert.IsTrue(_log.Entries[2].ShowsName);
+            Assert.IsTrue(_log.Entries[1].ShowsName);
         }
 
         [Test]

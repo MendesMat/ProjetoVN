@@ -260,7 +260,7 @@ Luna: Uma com um morcego no chaveiro. E aí?
     Luna: Droga. Se você achar, me avisa?
 ```
 
-**O protagonista aparece na tela quando fala** (como qualquer personagem) **e quando as opções de resposta abrem**: é o sinal visual de que é a vez do jogador, e ele fica em destaque. Quando ele **pensa**, ninguém aparece na tela: o jogo mostra o texto **sem placa de nome, em itálico e numa cor própria** (um azul claro), e quem está na tela escurece, como na narração. No histórico da conversa, o pensamento fica do lado do protagonista (à direita), num balão translúcido da mesma cor, sem nome, para o jogador distinguir o que ele pensou do que ele disse.
+**O protagonista aparece na tela quando fala** (como qualquer personagem) **e quando as opções de resposta abrem**: é o sinal visual de que é a vez do jogador, e ele fica em destaque. Quando ele **pensa**, ninguém aparece na tela: o jogo mostra o texto **sem placa de nome, em itálico e numa cor própria** (um azul claro), e quem está na tela escurece, como na narração. No histórico da conversa, o pensamento fica do lado do protagonista (à direita), num balão tingido da mesma cor, sem nome, para o jogador distinguir o que ele pensou do que ele disse.
 
 **`Pensamento` só vale escrito assim**, com a inicial maiúscula e os dois-pontos logo depois, como o nome de qualquer personagem (`pensamento:` e `PENSAMENTO:` são personagens que não existem, e a verificação do jogo reprova). Só o protagonista pensa: não há `Pensamento` de outra personagem. Um pensamento **não leva etiqueta de expressão** (`Pensamento: Que dia. #raiva` é reprovado), porque não há sprite para trocar.
 
