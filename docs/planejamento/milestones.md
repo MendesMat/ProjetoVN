@@ -33,7 +33,8 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 - **O diálogo vem primeiro (M1)** porque a migração para o Yarn Spinner muda o estado da história, o formato do save e a interface de diálogo, e as milestones seguintes constroem em cima dos três. Fazer navegação e save antes significaria refazê-los. Além disso, quando a M1 fecha, os roteiristas já podem escrever em paralelo.
 - **A apresentação (M2) vem antes da navegação (M3)** porque a troca de sala depende de a interface de jogo já ser persistente (#9).
 - **O histórico em balões (#55) fecha a M2,** logo depois da #25, porque mexe nos mesmos arquivos (o `ConversationLog`, o `DialogueHistoryView` e o `GameUI.prefab`) e parte da `main` com o histórico já pronto. Ela foi pedida pelo programador em 2026-10-14, durante a revisão da #25, e atrasa a abertura da M3 pelo tempo de uma issue.
-- **O seletor de nó (#32) abre a M3** porque é nela que as salas se multiplicam, cada uma com os seus gatilhos de diálogo. O seletor e o teste que confere os nós citados em cenas e prefabs precisam existir antes disso, e esse teste também serve à #14 para conferir os ids persistentes. Ela veio da triagem e foi priorizada pelo programador em 2026-10-14.
+- **O pensamento do protagonista (#61), a opção de ação (#65) e os personagens sem arte (#62) abrem a M3, antes do seletor de nó,** porque o primeiro roteiro de verdade (o prólogo do ato 1, "A viagem") precisa dos três para passar na verificação, e ele vai servir de exemplo para os roteiristas. Mudar o jeito de escrever o pensamento ou as opções depois obrigaria a reescrever tudo o que já tivesse sido escrito. A #65 vem logo depois da #61 porque as duas mexem no histórico e no apresentador do diálogo. O PR do roteiro fica em rascunho até as três fecharem. Priorizadas pelo programador em 2026-10-15 e 2026-10-16; atrasam a #32 pelo tempo de três issues pequenas.
+- **O seletor de nó (#32) vem logo depois, ainda no começo da M3,** porque é nela que as salas se multiplicam, cada uma com os seus gatilhos de diálogo. O seletor e o teste que confere os nós citados em cenas e prefabs precisam existir antes disso, e esse teste também serve à #14 para conferir os ids persistentes. Ela veio da triagem e foi priorizada pelo programador em 2026-10-14.
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 
@@ -74,6 +75,9 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 
 | Issue | Título | Depende de |
 |---|---|---|
+| #61 | Pensamento do protagonista: nome reservado no roteiro, itálico e cor na caixa, lado dele no histórico | #10, #48, #55 |
+| #65 | Opção de ação no roteiro: etiqueta #acao, botão em itálico, narração no histórico | #61 |
+| #62 | Personagens sem arte do prólogo: Mãe, Pai, Motorista, Homem e Mulher | #10, #48 |
 | #32 | Seletor de nó do roteiro no InteractableDialogueTrigger | #5 |
 | #12 | Troca de sala com fade | #9 |
 | #13 | Saídas e pontos de entrada das salas | #12 |
