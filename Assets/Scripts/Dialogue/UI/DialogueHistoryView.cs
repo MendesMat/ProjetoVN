@@ -33,7 +33,8 @@ namespace ProjetoVN.Dialogue.UI
 
         [Header("Balões")]
         [Tooltip("Cor do balão de narração e de item (uma cor translúcida e escura combina com a caixa de diálogo). " +
-                 "O balão de um personagem usa a Name Color dele.")]
+                 "O balão de um personagem usa a Name Color dele. É também a base do balão do pensamento do protagonista, tingido pela cor de pensamento: " +
+                 "uma cor clara aqui tira o contraste do texto do pensamento.")]
         [SerializeField] private Color neutralBubbleColor = new Color32(0x24, 0x11, 0x1F, 0xD1);
 
         [Tooltip("Quanto a cor de pensamento do Dialogue UI Controller tinge o balão do pensamento do protagonista, que parte da cor do balão neutro " +
