@@ -32,6 +32,9 @@ Organizar assim serve para qualquer pessoa da equipe achar um texto sabendo só 
 ```
 Assets/Roteiro/
   ato_1/
+    prologo/
+      episodio_1/
+        onibus_viagem.yarn
     capitulo_1/
       episodio_1/
         luna_primeiro_oi.yarn
@@ -46,6 +49,7 @@ Assets/Roteiro/
 ```
 
 - As pastas se chamam `ato_1`, `capitulo_1`, `episodio_1`: a palavra, `_` e o número. Sem acento e sem título no nome da pasta.
+- **O prólogo é um capítulo sem número.** A pasta dele se chama `prologo`, no lugar de `capitulo_N`, e fica dentro do ato: `ato_1/prologo/episodio_1/`. Os episódios do prólogo são numerados como os de qualquer capítulo.
 - **Um arquivo por conversa.** O nome do arquivo é o nome da conversa: `luna_chave_perdida.yarn`.
 - Se a pasta do ato, do capítulo ou do episódio ainda não existe, crie.
 - Uma conversa que vale para vários episódios (a descrição de um objeto que fica sempre na sala, por exemplo) fica na pasta do **primeiro** episódio em que ela aparece.
@@ -68,6 +72,12 @@ A linha começa com `//`, que marca um comentário: o jogador nunca vê e o jogo
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 1 · O primeiro dia
 // ATO 1 · CAPÍTULO 1 · EPISÓDIO 3 · O ensaio
 // ATO 1 · CAPÍTULO 2 · EPISÓDIO 1 · A biblioteca fechada
+```
+
+No prólogo, a palavra `PRÓLOGO` ocupa o lugar do capítulo:
+
+```
+// ATO 1 · PRÓLOGO · EPISÓDIO 1 · A viagem
 ```
 
 Arquivos do mesmo episódio repetem a mesma linha:
@@ -638,7 +648,7 @@ Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta ta
 
 | O quê | Formato | Exemplo |
 |---|---|---|
-| Pasta | `ato_N/capitulo_N/episodio_N/` | `Assets/Roteiro/ato_1/capitulo_1/episodio_2/` |
+| Pasta | `ato_N/capitulo_N/episodio_N/`; no prólogo, `ato_N/prologo/episodio_N/` | `Assets/Roteiro/ato_1/capitulo_1/episodio_2/` |
 | Arquivo | o nome do nó de entrada + `.yarn` | `luna_chave_perdida.yarn` |
 | Nome do episódio (na linha de título) | português normal, com acento | `A chave perdida` |
 | Nó de entrada | `<quem_ou_onde>_<assunto>` | `luna_chave_perdida` |
