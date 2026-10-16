@@ -36,6 +36,11 @@ namespace ProjetoVN.Dialogue.UI
                  "O balão de um personagem usa a Name Color dele.")]
         [SerializeField] private Color neutralBubbleColor = new Color32(0x24, 0x11, 0x1F, 0xD1);
 
+        [Tooltip("Opacidade do balão do pensamento do protagonista, tingido pela cor de pensamento do Dialogue UI Controller. " +
+                 "Acima de 0,3 o texto perde contraste com o balão.")]
+        [Range(0.05f, 0.3f)]
+        [SerializeField] private float thoughtBubbleOpacity = 0.2f;
+
         [Tooltip("Largura máxima de um balão, como fração da largura do conteúdo. Um texto maior quebra em linhas.")]
         [Range(0.3f, 1f)]
         [SerializeField] private float maxBubbleWidth = 0.65f;
@@ -116,20 +121,35 @@ namespace ProjetoVN.Dialogue.UI
 
         private void Show(BubbleRow row, ConversationEntry entry)
         {
-            Color bubbleColor = entry.Kind == ConversationEntryKind.Speech ? entry.SpeakerColor : neutralBubbleColor;
+            Color bubbleColor = BubbleColorOf(entry);
 
             row.Layout.childAlignment = AlignmentOf(entry);
             row.Background.color = bubbleColor;
-            row.Text.color = BubbleTextColor.For(bubbleColor);
+            row.Text.color = TextColorOf(entry, bubbleColor);
             row.Text.fontSize = entry.Kind == ConversationEntryKind.Item ? itemFontSize : row.SpeechFontSize;
-            row.Text.fontStyle = entry.Kind == ConversationEntryKind.Narration ? FontStyles.Italic : FontStyles.Normal;
+            row.Text.fontStyle = IsItalic(entry) ? FontStyles.Italic : FontStyles.Normal;
             row.Text.text = TextOf(entry);
             row.Size.preferredWidth = WidthOf(row);
             row.GameObject.SetActive(true);
         }
 
+        private Color BubbleColorOf(ConversationEntry entry)
+        {
+            if (entry.Kind == ConversationEntryKind.Speech) return entry.SpeakerColor;
+            if (entry.Kind == ConversationEntryKind.Thought) return new Color(entry.SpeakerColor.r, entry.SpeakerColor.g, entry.SpeakerColor.b, thoughtBubbleOpacity);
+
+            return neutralBubbleColor;
+        }
+
+        private static Color TextColorOf(ConversationEntry entry, Color bubbleColor) =>
+            entry.Kind == ConversationEntryKind.Thought ? entry.SpeakerColor : BubbleTextColor.For(bubbleColor);
+
+        private static bool IsItalic(ConversationEntry entry) =>
+            entry.Kind == ConversationEntryKind.Narration || entry.Kind == ConversationEntryKind.Thought;
+
         private static TextAnchor AlignmentOf(ConversationEntry entry)
         {
+            if (entry.Kind == ConversationEntryKind.Thought) return TextAnchor.UpperRight;
             if (entry.Kind != ConversationEntryKind.Speech) return TextAnchor.UpperCenter;
 
             return entry.IsProtagonist ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
