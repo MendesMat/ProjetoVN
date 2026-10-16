@@ -92,7 +92,8 @@ Luna: Desculpa. Foi mal.
 // roteiro de verdade, não mostre número para o jogador.
 Sua afinidade com a Luna agora é {$afinidade_luna}.
 
-// OPÇÕES: cada "->" é uma opção. O texto da opção é a fala do protagonista.
+// OPÇÕES: cada "->" é uma opção. O texto da opção é a fala do protagonista,
+// ou, com "#acao" no fim, o gesto dele (veja a terceira opção abaixo).
 // Regras:
 //   - Um bloco tem de duas a quatro opções. Nunca uma só: se o protagonista só
 //     tem uma resposta, ela é uma linha "Protagonista:".
@@ -109,7 +110,12 @@ Luna: O que você achou da escola?
     <<detour exemplo_apresentacao_gostei>>
 -> Achei estranha.
     <<detour exemplo_apresentacao_estranha>>
--> Preciso ir.
+// OPÇÃO DE AÇÃO: "#acao" no fim da opção a torna um gesto do protagonista, não
+// algo que ele diz. O botão mostra o texto em itálico e, escolhida, ela vai
+// para o histórico no centro, como narração. Com condição, a etiqueta vem
+// DEPOIS do "<<if ...>>" (ao contrário, o Yarn dá erro de sintaxe). Só vale em
+// opção, e uma opção não leva etiqueta de expressão.
+-> Pegar a mochila e sair #acao
     Luna: Então vai. A gente se vê.
     // <<stop>> encerra a conversa aqui. Nada abaixo roda por este caminho.
     <<stop>>
