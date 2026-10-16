@@ -171,7 +171,7 @@ O que isso exige de quem monta o prefab e o conteúdo:
 
 Uma etiqueta de expressão em um pensamento é ignorada em runtime (não há sprite); a verificação dos roteiros a reprova antes do Play. `CharacterRegistry.OnValidate` loga erro se algum personagem tem `DisplayName` igual a `ThoughtLine.ReservedName`, e `CharacterRegistry_HasNoCharacterNamedLikeTheThought` o reprova no teste, porque o roteiro nunca chegaria a ele.
 
-**Contraste medido (#61, Game view de 1920×1080, cena de teste, fala completa).** A caixa de diálogo é translúcida, então o fundo dela depende do cenário: na sala de aula da cena de teste a caixa mede `#956A81`, e o `#C9DCFF` tem **3,26:1** ali (o texto normal, `#F7EBF5`, tem 3,90:1 no mesmo ponto; o cálculo de partida, com a caixa em `#745167`, previa 4,87:1). Candidatas sobre esse mesmo fundo: `#D8E6FF` 3,58:1, `#E3EEFF` 3,85:1, `#EEF4FF` 4,08:1. A cor é um campo do Inspector e se ajusta sem código. No histórico, o balão é o `#C9DCFF` a 20% sobre o painel: **6,36:1** com o painel sobre uma cena branca (pior caso) e 10,12:1 sobre uma cena preta, acima dos 4,5:1 do critério.
+**Contraste medido (#61, Game view de 1920×1080, cena de teste, fala completa).** Medido nos pixels da captura, a caixa de diálogo valia `#956A81` e o `#C9DCFF` tinha só **3,26:1** nela (o texto normal, `#F7EBF5`, 3,90:1). O que deixava a caixa clara **não era o cenário aparecendo, e sim a camada rosa da arte** (`DialogueBox.svg`, 42%): o Unity mistura o alfa em espaço linear, e o rosa fica bem mais claro do que o valor do SVG sugere. Por isso a arte mudou na #61 (pedido do programador, a caixa estava difícil de ler): a camada escura (`cls-2`) passou de 82% a **opaca** e o rosa (`cls-7`) de 42% a **25%**. A caixa mede agora `#775367`, igual em qualquer cenário, e o `#C9DCFF` tem **4,71:1** (o texto normal, 5,64:1). Se alguém reclarear a caixa, refaça essa conta: o pensamento precisa de ~4,5:1. A cor é um campo do Inspector e se ajusta sem código. No histórico, o balão é o `#C9DCFF` a 20% sobre o painel: **6,36:1** com o painel sobre uma cena branca (pior caso) e 10,12:1 sobre uma cena preta, acima dos 4,5:1 do critério.
 
 ### O histórico de falas
 
@@ -235,6 +235,8 @@ O jogador relê a conversa em curso (D-30, #25), com a aparência de um app de m
 **Limitações conhecidas:** uma conversa que **começa** por opções não tem caixa na tela (ela só liga com uma fala), então não mostra o botão; o histórico estaria vazio de qualquer jeito. O botão, o painel e o balão usam arte provisória (`ChatBubble.svg`, um retângulo arredondado branco, trocável: precisa continuar **branco puro**, porque a `Image` multiplica o sprite pela cor do balão). O painel de 1240 px foi calculado para a cena de teste em **16:9**: em proporções mais estreitas (16:10, 4:3) o `DebugPanel`, ancorado no canto superior direito, anda para a esquerda e volta a cruzar o painel. O fundo do painel (preto com alfa 0,85) deixa a cena aparecer, como a revisão da #25 apontou.
 
 ### Arte
+
+**A caixa (`DialogueBox.svg`) é opaca (#61):** o preenchimento escuro é `rgb(36,17,31)` sem transparência e a camada rosa tem 25%, para o texto ter contraste igual em qualquer cenário. Os valores medidos estão em [O pensamento do protagonista](#o-pensamento-do-protagonista).
 
 A arte fica em `Assets/UI/` (SVGs importados como **Textured Sprite** e desenhados com `Image` comum do uGUI). `Exemplo.svg` é o mockup de layout, não é usado em cena.
 
