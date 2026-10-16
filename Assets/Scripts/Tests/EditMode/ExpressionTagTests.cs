@@ -32,6 +32,19 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void FirstIn_IgnoresTheActionTag()
+        {
+            Assert.IsNull(ExpressionTag.FirstIn(new[] { "acao" }));
+            Assert.AreEqual("raiva", ExpressionTag.FirstIn(new[] { "acao", "raiva" }));
+        }
+
+        [Test]
+        public void AllIn_IgnoresTheActionTag()
+        {
+            CollectionAssert.AreEqual(new[] { "raiva" }, ExpressionTag.AllIn(new[] { "acao", "raiva" }));
+        }
+
+        [Test]
         public void AllIn_TwoTags_ReturnsBothInOrder()
         {
             CollectionAssert.AreEqual(new[] { "raiva", "triste" }, ExpressionTag.AllIn(new[] { "raiva", "triste" }));
