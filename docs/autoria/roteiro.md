@@ -237,19 +237,21 @@ Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a 
 
 Provisório: a issue #26 (nome escolhido pelo jogador) revê esta parte do guia.
 
-O protagonista aparece no texto de três jeitos:
+O protagonista aparece no texto de quatro jeitos:
 
 | Situação | Como escrever | Exemplo |
 |---|---|---|
 | Ele **fala**, e o jogador não escolhe nada | Uma linha com o nome reservado `Protagonista` | `Protagonista: Sou. Cheguei hoje.` |
 | Ele **fala**, e o jogador escolhe o que dizer | Um bloco de [opções](#opções), com duas ou mais | `-> Vi. Estava embaixo do bebedouro.` |
+| Ele **faz** algo, e o jogador escolhe o quê | Uma [opção de ação](#opção-de-ação), com `#acao` no fim | `-> Pegar a mochila e sair #acao` |
 | Ele **pensa** | Uma linha com o nome reservado `Pensamento` | `Pensamento: Sinto o peso da chave no bolso.` |
 
-Há ainda a **narração em primeira pessoa**, que não é nenhum dos três: é o que ele **faz** (`Respiro fundo.`). Cada voz tem o seu jeito de escrever:
+Há ainda a **narração em primeira pessoa**, que não é nenhum dos quatro: é o que ele **faz** sem o jogador escolher (`Respiro fundo.`). Cada voz tem o seu jeito de escrever:
 
 | O protagonista... | Escreva | Exemplo |
 |---|---|---|
 | **faz** algo | Narração, sem nome | `Respiro fundo.` |
+| **faz** algo que o jogador escolhe | Opção com `#acao` | `-> Pegar a mochila e sair #acao` |
 | **pensa** algo | `Pensamento: texto` | `Pensamento: Será que falei alguma coisa errada?` |
 | **diz** algo em voz alta | `Protagonista: texto` | `Protagonista: Algum problema?` |
 
@@ -290,7 +292,7 @@ Enquanto outra pessoa fala, a personagem continua na tela, um pouco escurecida, 
 |---|---|
 | A etiqueta vai no **fim** da linha, depois do texto, com um espaço antes do `#`. | No meio da fala, `#` é erro de sintaxe. |
 | **Uma etiqueta por fala.** | A verificação do jogo reprova duas. |
-| **Só em fala com nome.** Nunca em narração, pensamento nem opção. | Narração, pensamento e opção não têm personagem falando; a verificação reprova a etiqueta ali. |
+| **Só em fala com nome.** Nunca em narração, pensamento nem opção. | Narração, pensamento e opção não têm personagem falando; a verificação reprova a etiqueta ali. A única etiqueta que uma opção aceita é a [`#acao`](#opção-de-ação). |
 | O nome da expressão é um da tabela abaixo, em minúsculas e sem acento. | A verificação reprova uma expressão que a personagem não tem; se ela chegasse ao jogo, apareceria a expressão padrão e o console avisaria. |
 
 A fala logo antes de um bloco de [opções](#opções) aceita expressão normalmente.
@@ -352,7 +354,7 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 | Caractere | O que acontece se você só digitar | Para aparecer no texto | Exemplo |
 |---|---|---|---|
 | `#` no meio da fala | Erro de sintaxe. | `\#` | `Luna: Sala \#12, no fim do corredor.` |
-| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o sprite da personagem. Uma palavra que não é expressão da personagem é reprovada pela verificação. | `\#palavra` | `Luna: Ela postou com \#saudade` |
+| `#palavra` no fim da linha | É uma [expressão](#expressões): a palavra **some** do texto e troca o sprite da personagem. Uma palavra que não é expressão da personagem é reprovada pela verificação. No fim de uma **opção**, `#acao` é a [opção de ação](#opção-de-ação). | `\#palavra` | `Luna: Ela postou com \#saudade` |
 | `//` | O resto da linha **some**, sem aviso. | `\/\/` | `Luna: O site é escola.com\/\/alunos` |
 | `{` e `}` | Abrem uma expressão. Um `{` sem fechar é erro e quebra o arquivo. | `\{` e `\}` | `Rabiscado na carteira, um \{ torto.` |
 | `[` e `]` | Abrem marcação. `[b]x[/b]` vira só `x`. Um **`[` sem fechar derruba o projeto inteiro.** | `\[` e `\]` | `Luna: Escreve \[urgente\] no bilhete.` |
@@ -367,7 +369,7 @@ Alguns caracteres têm um significado para o Yarn. Para escrevê-los como texto 
 
 ## Opções
 
-Um bloco de opções é uma pergunta ao jogador. Cada opção começa com `->`, e o texto da opção é **a fala do protagonista**.
+Um bloco de opções é uma pergunta ao jogador. Cada opção começa com `->`, e o texto da opção é **o que o protagonista diz** ou, com `#acao` no fim, **o que ele faz** ([Opção de ação](#opção-de-ação)).
 
 ```
 Luna: O que você achou da escola?
@@ -383,7 +385,7 @@ Luna: Bom, a aula já vai começar.
 
 Como ler este exemplo:
 
-- **O texto da opção escolhida aparece no histórico de falas como fala do protagonista, do lado direito**, então escreva cada opção como algo que ele diria.
+- **O texto da opção escolhida aparece no histórico de falas como fala do protagonista, do lado direito**, então, sem `#acao`, escreva cada opção como algo que ele diria.
 - **O que acontece depois de cada escolha** fica logo abaixo da opção, com quatro espaços de recuo. Quem escolhe "Gostei bastante." lê "Que bom. A maioria reclama."
 - **Depois da resposta, a conversa continua na primeira linha sem recuo** abaixo do bloco. Quem escolheu a primeira ou a segunda opção lê em seguida "Bom, a aula já vai começar."
 - **Um caminho que não deve continuar termina com `<<stop>>`** (ou com `<<jump>>`). Quem escolhe "Preciso ir." lê a despedida e a conversa acaba ali.
@@ -410,6 +412,27 @@ Luna: Quer saber um segredo?
 -> Melhor não.
     Luna: Sábia decisão.
 ```
+
+### Opção de ação
+
+Nem toda opção é uma fala. Quando o protagonista **faz** algo em vez de dizer, escreva `#acao` no **fim** da opção, com um espaço antes:
+
+```
+Luna: O que você achou da escola?
+-> Gostei bastante.
+    Luna: Que bom. A maioria reclama.
+-> Pegar a mochila e sair #acao
+    Luna: Então vai. A gente se vê.
+    <<stop>>
+```
+
+- **O botão mostra o texto em itálico**, e o jogador entende de relance que é um gesto, não uma fala. A etiqueta não aparece. Uma opção bloqueada pela condição também fica em itálico.
+- **No histórico, a opção de ação escolhida aparece no centro, em itálico, como a narração**, e não como balão do protagonista, à direita. A opção sem `#acao` continua sendo fala, do lado direito.
+- **Escreva o texto como o nome do gesto**, curto, como em qualquer botão (cabem cerca de 50 caracteres, veja [Quanto cabe](#quanto-cabe)): `Assinar e sair`, `Pegar a mochila e sair`.
+- **Um bloco pode misturar falas e ações**, mas cada opção é uma coisa ou outra. Uma opção que é gesto e fala ao mesmo tempo não existe: escolha uma, e ponha a outra logo abaixo da opção (`Protagonista: ...`).
+- **O protagonista entra na tela em destaque** quando o bloco abre, como em qualquer bloco de opções, haja ou não opção de ação.
+- **Com condição, a etiqueta vem depois do `<<if>>`:** `-> Abrir a porta <<if $porta_destrancada>> #acao`. Ao contrário, o editor acusa erro de sintaxe ([Deu erro, e agora?](#deu-erro-e-agora)).
+- **`#acao` só vale em opção.** Em fala, narração ou pensamento, a verificação do jogo reprova. E uma opção aceita só essa etiqueta: `-> Sim #feliz` é reprovado, porque opção não leva [expressão](#expressões).
 
 ## Variáveis e afinidade
 
@@ -530,6 +553,7 @@ Luna: Vou ensaiar no auditório. A banda toca na sexta.
 - **O jogador vê a opção bloqueada**, esmaecida e sem clique. É de propósito: ele entende que existe um caminho fechado e que as escolhas têm peso.
 - Por isso **o texto de uma opção bloqueada não pode entregar o que ela esconde**. "Posso assistir?" funciona; "Contar que eu sei quem roubou a chave" estraga a surpresa.
 - Uma opção bloqueada **conta** para o limite de quatro.
+- Numa [opção de ação](#opção-de-ação), a etiqueta vai **depois** da condição: `-> Abrir a porta <<if $x>> #acao`.
 - Se **todas** as opções do bloco estiverem bloqueadas, o bloco não aparece e a conversa segue pela linha depois dele.
 
 ### Mostrar um valor no texto
@@ -587,11 +611,12 @@ Estas não são comandos: não levam `<<` `>>` e só valem dentro de um `<<if>>`
 
 **Etiquetas**
 
-Não são comandos: não levam `<<` `>>`, e vão no fim de uma fala.
+Não são comandos: não levam `<<` `>>`, e vão no fim de uma fala ou de uma opção.
 
 | Etiqueta | O que faz | Explicado em |
 |---|---|---|
 | `#expressao` | Mostra a expressão daquela personagem nesta fala; na fala seguinte dela, sem etiqueta, volta à padrão | [Expressões](#expressões) |
+| `#acao` | No fim de uma **opção**: ela é um gesto do protagonista, em itálico no botão e como narração no histórico | [Opção de ação](#opção-de-ação) |
 
 **Ainda não existem**
 
@@ -671,6 +696,7 @@ Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta ta
 | Id de item | minúsculas, sem acento, dígitos e `_` | `chave_teste` |
 | Quem fala | como na tabela [Quem fala](#quem-fala), com a mesma letra maiúscula ou minúscula | `Luna` |
 | Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
+| Opção de ação | `#acao` no fim da opção, depois do `<<if>>` se houver | `-> Abrir a porta <<if $x>> #acao` |
 | Branch | `roteiro/<seu-nome>-<assunto>` | `roteiro/ana-chave-perdida` |
 
 ## Como pedir o que ainda não existe
@@ -719,6 +745,7 @@ Procure a mensagem nesta tabela.
 | `YS0007 Unclosed scope: expected an <<endif>> to match the <<if>> statement on line N` | Falta o `<<endif>>` do `<<if>>` da linha N. | Acrescente o `<<endif>>`. |
 | `YS0005 Syntax error: Unexpected "endif" while reading a statement` (ou `"else"`) | Um `<<endif>>` ou `<<else>>` sobrando, ou fora do `<<if>>`. | Apague, ou ponha o `<<if>>` que falta. |
 | `YS0005 Syntax error: extraneous input 'x' expecting {NEWLINE, '#'}` | Um `#` no meio da fala. | Escreva `\#`. |
+| `YS0005 Syntax error: Unexpected "<<" while reading a shortcut option statement` | Na opção, a etiqueta `#acao` veio **antes** do `<<if>>`. | Ponha a etiqueta depois: `-> Abrir a porta <<if $x>> #acao`. |
 | `YS0005 Syntax error: Unexpected "=" while reading an if clause` | `=` sozinho numa condição. | Compare com `>=` ou `<=`. |
 | `YS0005 Syntax error: missing {OPERATOR_ASSIGNMENT, ...} at '1'` | Faltou o `to` no `<<set>>`. | `<<set $x to 1>>`. |
 | `YS0005 Syntax error: missing NEWLINE at 'x'` | O nome do nó tem espaço ou caractere inválido. | Use só minúsculas, dígitos e `_`. |
@@ -749,7 +776,8 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
 | O nome de quem fala está igual ao da tabela? | `luna: Oi.` | A verificação do jogo reprova. |
-| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Luna: Oi. #medo`, `Narração. #raiva`, `Pensamento: Que dia. #raiva` | A verificação do jogo reprova. |
+| A expressão existe para quem fala, e há só uma por fala, em fala com nome? | `Luna: Oi. #medo`, `Narração. #raiva`, `Pensamento: Que dia. #raiva`, `-> Sim #feliz` | A verificação do jogo reprova. |
+| `#acao` está só em opção? | `Abro a porta. #acao`, `Luna: Oi. #acao` | A verificação do jogo reprova. |
 | `Pensamento:` está escrito certo? | `pensamento: Que dia.` | Vira uma personagem desconhecida: a verificação reprova. |
 | As variáveis novas estão em `variaveis.yarn`, com `///`? | `<<declare>>` dentro da conversa | A verificação reprova. |
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |

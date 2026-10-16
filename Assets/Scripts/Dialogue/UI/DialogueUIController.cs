@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ProjetoVN.Core.Messaging;
 using ProjetoVN.Dialogue.Characters;
@@ -79,6 +80,7 @@ namespace ProjetoVN.Dialogue.UI
         private Color _defaultNameColor;
         private Color _defaultTextColor;
         private FontStyles _defaultTextStyle;
+        private FontStyles[] _defaultChoiceStyles;
         private LetterTypewriter _typewriter;
 
         /// <summary>A fala está aparecendo aos poucos; um pedido de pressa a completa.</summary>
@@ -96,6 +98,7 @@ namespace ProjetoVN.Dialogue.UI
             _defaultTextColor = dialogueText.color;
             _defaultTextStyle = dialogueText.fontStyle;
             CacheChoiceButtons();
+            CacheChoiceTextStyles();
             ListenToOpenHistoryButton();
             HideAll();
             WarnAboutMissingCharacterRegistry();
@@ -207,7 +210,7 @@ namespace ProjetoVN.Dialogue.UI
         private void RecordChosenOption(DialogueOption option)
         {
             string text = option.Line.TextWithoutCharacterName.Text;
-            if (Protagonist == null)
+            if (IsAction(option) || Protagonist == null)
             {
                 _history.AddNarration(text);
                 return;
@@ -359,6 +362,11 @@ namespace ProjetoVN.Dialogue.UI
                 _choiceButtons[i] = choiceButtonObjects[i].GetComponent<Button>();
         }
 
+        private void CacheChoiceTextStyles() =>
+            _defaultChoiceStyles = choiceTexts.Select(choiceText => choiceText.fontStyle).ToArray();
+
+        private static bool IsAction(DialogueOption option) => ActionOption.IsMarkedIn(option.Line.Metadata);
+
         private bool HasAvailableOption() => _shownOptions.Exists(option => option.IsAvailable);
 
         private void CollectOptions(DialogueOption[] dialogueOptions)
@@ -383,6 +391,7 @@ namespace ProjetoVN.Dialogue.UI
                 if (!isVisible) continue;
 
                 choiceTexts[i].text = _shownOptions[i].Line.TextWithoutCharacterName.Text;
+                choiceTexts[i].fontStyle = IsAction(_shownOptions[i]) ? FontStyles.Italic : _defaultChoiceStyles[i];
                 if (_choiceButtons[i] != null) _choiceButtons[i].interactable = _shownOptions[i].IsAvailable;
             }
 

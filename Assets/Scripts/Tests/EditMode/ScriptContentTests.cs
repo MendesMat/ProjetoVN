@@ -133,11 +133,20 @@ namespace ProjetoVN.Tests.EditMode
             ScriptSpeakers speakers = ProjectSpeakers();
 
             Assert.IsEmpty(speakers.TaggedWithoutSpeaker.Select(line => $"{line}: #{string.Join(" #", line.Expressions)}"),
-                "etiqueta de expressão só vale em fala com nome, nunca em narração, pensamento nem opção");
+                "etiqueta de expressão só vale em fala com nome; em narração, pensamento e opção ela não vale (a opção só aceita #acao)");
             Assert.IsEmpty(speakers.Spoken.Where(line => line.Expressions.Length > 1).Select(line => line.ToString()),
                 "uma fala tem no máximo uma etiqueta de expressão");
             Assert.IsEmpty(speakers.Spoken.SelectMany(line => ExpressionsTheSpeakerLacks(registry, line)),
                 "a expressão precisa existir nas expressões de quem fala");
+        }
+
+        [Test]
+        public void ProjectScripts_MarkOnlyOptionsAsActions()
+        {
+            ScriptSpeakers speakers = ProjectSpeakers();
+
+            Assert.IsEmpty(speakers.ActionOutsideOptions.Select(line => line.ToString()),
+                "#acao só vale em opção (-> texto #acao), nunca em fala, narração ou pensamento");
         }
 
         [Test]
@@ -199,7 +208,11 @@ namespace ProjetoVN.Tests.EditMode
         private static float BestContrast(Color bubble) => Mathf.Max(
             BubbleTextColor.ContrastRatio(BubbleTextColor.Dark, bubble), BubbleTextColor.ContrastRatio(BubbleTextColor.Light, bubble));
 
-        private static ScriptSpeakers ProjectSpeakers() => ScriptSpeakers.In(ScriptRun.FromProjectFiles().StringTable.Values);
+        private static ScriptSpeakers ProjectSpeakers()
+        {
+            ScriptRun run = ScriptRun.FromProjectFiles();
+            return ScriptSpeakers.In(run.StringTable, run.Program);
+        }
 
         private static T LoadTheOnly<T>() where T : UnityEngine.Object
         {
