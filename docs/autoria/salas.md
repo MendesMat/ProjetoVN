@@ -10,7 +10,7 @@
 - **Não coloque `Canvas` de jogo nem `EventSystem` na cena.** A caixa de diálogo, os botões de escolha, o painel de inventário, o fade de tela da troca de sala e o `EventSystem` também são criados sozinhos quando o jogo começa, e são os mesmos em todas as salas. Se o console mostrar `There are 2 event systems in the scene` sem parar, há um `EventSystem` sobrando na cena: apague-o.
 - **Não altere um asset durante o Play.** Itens são dados somente leitura.
 - **Leia os avisos do console ao salvar.** Os componentes avisam quando um campo obrigatório ficou vazio.
-- **Todo id é único.** O id de um item e o id persistente de um coletável são gravados no save.
+- **Todo id é único.** O id de um item e o id persistente de um coletável são gravados no save. O id persistente é único no **jogo inteiro**, não só na sala.
 
 ## Objeto interativo
 
@@ -31,7 +31,9 @@ Um objeto que vira item do inventário ao ser clicado.
 3. No objeto interativo, acrescente o componente **Collectable Item Behaviour** e aponte **Item Data** para o item.
 4. Em **On Interact**, ligue `CollectableItemBehaviour.Collect`.
 
-O campo **Persistent Id** é gerado sozinho. **Se você duplicar um coletável, o id vem copiado:** clique com o botão direito no componente e escolha **Regenerate Persistent Id** na cópia.
+O campo **Persistent Id** é gerado sozinho e é **único no jogo inteiro**: é por ele que o save lembra que o objeto foi coletado, em qualquer sala. **Se você duplicar um coletável, ou copiá-lo para outra sala, o id vem copiado:** clique com o botão direito no componente e escolha **Regenerate Persistent Id** na cópia.
+
+O componente avisa no console e no Inspector quando **Item Data** ou **Persistent Id** está vazio e quando outro coletável **da mesma cena** tem o mesmo id (o aviso cita o outro objeto). O aviso não enxerga outras salas: depois de duplicar ou copiar coletáveis, rode a suíte de testes, cujo `CollectableIdsTests` reprova id vazio ou repetido em qualquer sala e diz a cena e o caminho de cada objeto.
 
 ## Diálogo ao clicar
 
@@ -50,7 +52,7 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 2. Preencha pelo menos um requisito:
    - **Required Item:** o item exigido. Ele é **consumido** ao abrir.
    - **Required Flag Id:** uma variável de história que precisa estar ligada. Ela **não** é consumida.
-3. Preencha **Unlocked Flag Id** com uma variável **única para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com a mesma variável abrem juntos.
+3. Preencha **Unlocked Flag Id** com uma variável **única para este portão** (por exemplo `$porta_biblioteca_destrancada`). É o que mantém o portão aberto depois. Dois portões com a mesma variável abrem juntos. Se a **mesma porta** é vista das duas salas que ela liga, use a **mesma** variável nos dois lados: é isso que a faz continuar aberta de ambos. Por isso nenhum teste reprova uma variável repetida entre portões.
 
 **Os dois campos de variável são listas.** Eles mostram as variáveis **booleanas** declaradas em `Assets/Roteiro/variaveis.yarn`, em ordem alfabética, mais **(nenhuma)** para deixar o campo vazio. Abaixo do campo aparece a descrição da variável escolhida. As variáveis numéricas (afinidade) e de texto não aparecem.
 

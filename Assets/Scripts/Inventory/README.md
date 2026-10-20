@@ -53,7 +53,9 @@ Consultar antes com `HasItem` seria um segundo lookup sem nada a ganhar: `TryUse
 O caso concreto — a porta trancada — vive em [`GameFlow/LockedActionBehaviour`](../GameFlow/README.md). Dois detalhes de lá que afetam este módulo: uma porta que **já foi aberta** dispara `OnAlreadyUnlocked` e não chama `TryUse` de novo, porque ela lembra pela flag; e um portão que exige só uma flag abre sem consumir item nenhum. Ou seja, `OnUnlocked` não implica que um consumo acabou de acontecer.
 
 ### 3. Objetos de mundo já consumidos
-O `InventoryManager` também guarda os ids dos coletáveis já recolhidos (`IsWorldObjectConsumed`, `MarkWorldObjectConsumed`), para que um objeto coletado não reapareça ao recarregar a cena. Isso mora aqui só porque o `CollectableItemBehaviour` não pode referenciar o `GameFlow`. A issue #14 decide o lugar definitivo desse registro.
+O `InventoryManager` também guarda os ids dos coletáveis já recolhidos (`IsWorldObjectConsumed`, `MarkWorldObjectConsumed`), para que um objeto coletado não reapareça ao recarregar a cena. Esse é o lugar definitivo do registro (D-10, nota da #14): o `Core` só abriga o que dois módulos que não se enxergam usam, e aqui o `GameFlow` já enxerga o `Inventory`; levar o registro para o `GameFlow` obrigaria a mudar o `CollectableItemBehaviour` de asmdef, o que quebra as ligações de `UnityEvent` das cenas. Reveja só se um objeto de mundo que não é item precisar sumir para sempre.
+
+O `persistentId` é a chave desse registro e do save, e é **único no jogo inteiro**, não só na sala. O componente avisa no Inspector (`OnValidate`) quando o id está vazio, quando o item está vazio e quando outro coletável da mesma cena tem o mesmo id; o `CollectableIdsTests` reprova id vazio ou repetido em qualquer cena do projeto.
 
 ### 4. Consultas de Estado
 Sistemas da cena que precisem bifurcar conforme os itens do jogador chamam `InventoryManager.Instance.HasItem(item)` **diretamente**. Nunca faça pergunta pelo `MessageBroker`: com 0 ouvintes ela falha em silêncio, e com 2 ela responde duas vezes.

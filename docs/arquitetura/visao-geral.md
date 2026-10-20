@@ -86,7 +86,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Estado | Dono | Entra no save? |
 |---|---|---|
 | Itens do jogador | `InventoryManager` (via `InventoryModel`) | Sim, por id |
-| Objetos de mundo já consumidos | `InventoryManager` (provisório; a issue #14 decide o lugar definitivo) | Sim |
+| Objetos de mundo já consumidos | `InventoryManager` (lugar definitivo, D-10) | Sim |
 | Estado da história (booleanos, números, textos) | `StoryState`, estático em `Core` | Sim, em três listas de pares nome e valor |
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
@@ -122,7 +122,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
-2. Se o item entrou, o objeto é marcado como consumido e desativado, e `ItemCollectedMessage` é publicada.
+2. Se o item entrou, o objeto é marcado como consumido e desativado, e `ItemCollectedMessage` é publicada. O registro é um só para o jogo inteiro, então o id persistente do coletável é único em **todas** as salas; o `OnValidate` avisa o repetido na mesma cena e o `CollectableIdsTests` reprova o vazio ou repetido em qualquer cena.
 3. O `InventoryPresenter` acrescenta o slot.
 
 **Portão**

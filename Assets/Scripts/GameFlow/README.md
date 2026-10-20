@@ -136,6 +136,5 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |
 | #16 | Save automático ao entrar na sala; carregar recarrega a cena |
 | #18 | Estado de pausa, sobreposto com `Push`/`Pop` |
