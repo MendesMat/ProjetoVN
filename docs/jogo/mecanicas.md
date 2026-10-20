@@ -13,7 +13,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Histórico de falas](#histórico-de-falas) | existe | `Dialogue` | — |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
-| [Navegação entre salas](#navegação-entre-salas) | parcial | `GameFlow` | #13, #14 |
+| [Navegação entre salas](#navegação-entre-salas) | parcial | `GameFlow` | #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
 | [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
@@ -63,9 +63,6 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Regras:**
 - A flag é conferida antes do item, para não gastar a chave à toa.
 - Uma ação iniciada pelo jogador (atravessar a porta) pertence ao evento de ação, nunca ao de estado, que também dispara sozinho ao carregar a cena.
-
-**Falta:**
-- Atravessar uma porta aberta levar a outra sala (#13).
 
 **Limitação conhecida:** renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado no Inspector.
 
@@ -173,11 +170,11 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Existe (D-19):**
 - A interface de jogo (diálogo e inventário) é persistente: é criada uma vez, junto com os managers, e continua a mesma quando a cena é recarregada ou trocada. Uma cena só com câmera, fundo e objetos interativos já tem diálogo e inventário, sem montar interface.
-- Troca de sala com fade: a tela escurece, a cena nova carrega e a tela clareia. Nenhum clique passa durante a troca, nem no mundo nem na interface (#12). Um único comando, `RoomNavigator.ChangeRoom`, faz a troca; sala inexistente dá erro no console e o jogo fica onde está. **Não existe troca durante uma conversa:** o pedido é recusado. Ainda não há como o jogador pedir a troca: o único chamador é o **Reload Scene** do painel de debug, até as saídas da #13.
+- Troca de sala com fade: a tela escurece, a cena nova carrega e a tela clareia. Nenhum clique passa durante a troca, nem no mundo nem na interface (#12). Um único comando, `RoomNavigator.ChangeRoom`, faz a troca; sala inexistente dá erro no console e o jogo fica onde está. **Não existe troca durante uma conversa:** o pedido é recusado. Os chamadores são as saídas (#13) e o **Reload Scene** do painel de debug.
+- Saídas clicáveis e pontos de entrada (#13): um objeto da sala leva a outra por **On Interact**, e uma porta aberta, por **On Already Unlocked**. A saída diz a sala de destino e o ponto de entrada; o ponto marca o lugar do cenário que fica no centro da tela na chegada, então ir e voltar entre duas salas chega sempre no ponto certo. Destino vazio e ponto inexistente são avisados (Inspector, console e a suíte de testes). Uma falha inesperada durante a troca aparece no console e o jogo volta à exploração, sem ficar preso. Não há mapa nem viagem rápida.
 
 **Planejada (D-19):**
 - Uma cena por sala, que contém só o mundo.
-- Saídas clicáveis e pontos de entrada (#13). Não há mapa.
 - Itens coletados e portões abertos persistem entre salas (#14).
 
 ## Salvar e carregar

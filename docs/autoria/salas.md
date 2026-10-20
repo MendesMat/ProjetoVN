@@ -66,7 +66,7 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 | **On Locked** | O jogador clicou e faltou o requisito | A fala de "está trancada" |
 | **On Unlocked** | O instante em que destrancou, uma vez só | A fala de "a chave serviu" |
 | **On Opened** | Ao destrancar **e** toda vez que a cena carrega com o portão já aberto | Aparência: trocar o sprite, desligar um collider |
-| **On Already Unlocked** | O jogador clicou em um portão já aberto | Ação: atravessar, ir para outra sala |
+| **On Already Unlocked** | O jogador clicou em um portão já aberto | Ação: atravessar, ir para outra sala (ligue `RoomExit.Leave`, veja [Saídas e pontos de entrada](#saídas-e-pontos-de-entrada)) |
 
 **Cuidado:** nunca ligue em **On Opened** algo que o jogador deveria iniciar. Ele dispara sozinho quando a cena carrega; uma troca de sala ali levaria o jogador embora sem ele clicar. Isso pertence a **On Already Unlocked**.
 
@@ -84,6 +84,7 @@ Uma cena de sala contém **só o mundo**:
 - **O fundo** (um ou mais sprites).
 - **Os objetos interativos**, montados como descrito em [Objeto interativo](#objeto-interativo).
 - Opcional: o **Screen Pan Controller**, se o fundo for mais largo que a tela.
+- Um **Room Entry Point** para cada lugar em que o jogador pode chegar vindo de outra sala, e um **Room Exit** em cada saída (veja [Saídas e pontos de entrada](#saídas-e-pontos-de-entrada)).
 
 E **não** contém: managers, `Canvas` de jogo (diálogo, inventário) nem `EventSystem`. Dê Play direto na cena nova: a interface aparece sozinha e um objeto com **Interactable Dialogue Trigger** já abre a conversa.
 
@@ -100,7 +101,43 @@ Uma cena só pode ser alvo de uma troca de sala se estiver na lista de cenas do 
 
 Durante uma conversa aberta o jogo recusa a troca de sala.
 
-*A preencher pela issue #13:* como definir pontos de entrada e saídas.
+## Saídas e pontos de entrada
+
+A navegação do jogo é só por saídas no cenário: não há mapa. Uma **saída** (`Room Exit`) é o que o jogador clica para ir a outra sala, e um **ponto de entrada** (`Room Entry Point`) é onde ele chega na sala de destino.
+
+### Criar um ponto de entrada
+
+1. Na cena da **sala de destino**, crie um objeto vazio e acrescente o componente **Room Entry Point**. Um objeto filho do cenário que se move (o **Environment Container** do pan) é o mais prático, porque anda junto com o fundo; mas funciona em qualquer lugar.
+2. Preencha **Id**: o nome do ponto, **único nesta sala**, em minúsculas e sem espaços (por exemplo `porta_biblioteca`). As saídas o citam por esse nome.
+3. Posicione o objeto. **O que importa é o X:** o lugar do cenário que fica **no centro da tela** quando o jogador chega, medido com o cenário na posição em que a cena foi salva. Na Scene view o ponto aparece como uma linha vertical ciano.
+
+Se a sala não tem **Screen Pan Controller** (o fundo tem a largura da tela), o ponto não move nada: ele só existe para a saída achar onde chegar. Mesmo assim ele precisa existir, com id.
+
+Se o pan limita o movimento (**Min X** e **Max X**), um ponto fora dos limites faz o jogador chegar na borda mais próxima.
+
+### Criar uma saída
+
+1. No objeto que o jogador clica, acrescente o componente **Room Exit** (o prefab `Interactable` serve de base).
+2. Preencha:
+
+| Campo | O que escrever | Se ficar vazio ou errado |
+|---|---|---|
+| **Destination Room** | O nome da cena de destino, **exatamente como o arquivo** (`[Teste] Sala B`). A cena precisa estar na [lista de cenas do build](#registrar-a-sala) | Vazio: aviso no Inspector, e o clique avisa no console e nada acontece. Nome que não é uma cena do build: erro no console ao clicar, e o jogo fica onde está |
+| **Entry Point Id** | O **Id** de um Room Entry Point da sala de destino | Vazio: aviso no Inspector, e o jogador chega na posição em que a cena foi salva. Id que a sala de destino não tem: erro no console ao chegar (diz a sala e o id), e o jogador chega na posição em que a cena foi salva |
+
+3. Ligue `RoomExit.Leave`:
+   - em um objeto comum, em **On Interact** do **Interactable Item**;
+   - em uma porta trancada, em **On Already Unlocked** do **Locked Action Behaviour** (a porta só leva a outra sala depois de aberta).
+
+   **Não ligue em On Opened**: ele dispara sozinho quando a cena carrega, e o jogador seria levado embora sem clicar.
+
+Para ir e voltar entre duas salas, cada sala tem a sua saída e o seu ponto de entrada, e cada saída cita o ponto **da outra sala**. Exemplo da cena de teste: a porta de `[Teste] Mecanicas` (destino `[Teste] Sala B`, ponto `porta_mecanicas`) e, na `Sala B`, `Exit_Porta` (destino `[Teste] Mecanicas`, ponto `porta_sala_b`, que na Mecanicas fica na posição da porta).
+
+### O que confere por você
+
+- O **Inspector** avisa destino vazio, ponto de entrada vazio e id vazio no ponto.
+- O teste `RoomLinksTests`, na suíte de EditMode, reprova saída com destino que não é uma cena do build, saída que cita um ponto que a sala de destino não tem, e ponto sem id ou com id repetido na mesma sala. A mensagem diz a cena, o caminho do objeto e o nome. **Rode a suíte depois de montar ou renomear uma saída ou um ponto.**
+- Se algo falhar de forma inesperada no meio da troca, o erro aparece no console e o jogo volta a ficar jogável na sala que ficou carregada, em vez de travar com a tela preta.
 
 ## Personagens
 
