@@ -33,6 +33,12 @@ namespace ProjetoVN.GameFlow.Rooms
             _canvasGroup.blocksRaycasts = false;
         }
 
+        public void HideImmediately()
+        {
+            _canvasGroup.alpha = Transparent;
+            _canvasGroup.blocksRaycasts = false;
+        }
+
         private async Awaitable AnimateAlphaAsync(float targetAlpha, float seconds, CancellationToken cancellationToken)
         {
             float startAlpha = _canvasGroup.alpha;
