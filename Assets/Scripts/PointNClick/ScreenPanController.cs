@@ -49,17 +49,29 @@ namespace ProjetoVN.PointNClick
             return PanDirection.None;
         }
 
+        public void CenterOn(float worldX)
+        {
+            if (environmentContainer == null) return;
+
+            Camera camera = Camera.main;
+            if (camera == null)
+            {
+                Debug.LogError("[ScreenPanController] Não há câmera principal (tag MainCamera). O cenário não foi centralizado.", this);
+                return;
+            }
+
+            MoveContainerToX(environmentContainer.position.x + camera.transform.position.x - worldX);
+        }
+
         private void ApplyPan(PanDirection direction)
         {
-            float displacement = CalculateDisplacement(direction);
-            Vector3 position = environmentContainer.position;
-            float clampedX = Mathf.Clamp(position.x + displacement, minX, maxX);
+            MoveContainerToX(environmentContainer.position.x + CalculateDisplacement(direction));
+        }
 
-            environmentContainer.position = new Vector3(
-                clampedX,
-                position.y,
-                position.z
-            );
+        private void MoveContainerToX(float x)
+        {
+            Vector3 position = environmentContainer.position;
+            environmentContainer.position = new Vector3(Mathf.Clamp(x, minX, maxX), position.y, position.z);
         }
 
         private float CalculateDisplacement(PanDirection direction)

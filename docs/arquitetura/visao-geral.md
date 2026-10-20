@@ -115,9 +115,10 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 5. Ao acabar, `DialogueEndedMessage`; o `GameFlow` volta a `GameplayState`. O clique que encerrou o diálogo não atinge o mundo, porque o gate ignora o frame em que foi liberado. Se o roteiro parar sem terminar (por exemplo um `<<jump>>` para um nó que não existe), o `DialogueManager` registra o erro e encerra a conversa do mesmo jeito.
 
 **Troca de sala**
-1. Alguém chama `RoomNavigator.Instance.ChangeRoom(nomeDaCena)`. Hoje só o **Reload Scene** do painel de debug; as saídas clicáveis chegam na #13.
+1. Alguém chama `RoomNavigator.Instance.ChangeRoom(nomeDaCena, idDoPontoDeEntrada)`: uma `RoomExit` (por `UnityEvent`, #13) ou o **Reload Scene** do painel de debug, que usa a sobrecarga sem ponto de entrada.
 2. Nome vazio, sem `ScreenFader`, troca já em curso, conversa aberta ou sala inexistente (cena fora da lista do build): aviso ou erro no console, retorna `false`, nada muda.
-3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada.
+3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, o `RoomNavigator` acha o `RoomEntryPoint` pedido na cena nova e manda o `ScreenPanController` centralizar o cenário nele (chamada direta; sem ponto pedido, nada; ponto inexistente, erro no console), a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada.
+4. Uma exceção inesperada no meio da troca é registrada no console (`Debug.LogException`), a tela clareia na hora e o `GameFlow` volta a `GameplayState`, na sala que tiver ficado carregada: o jogo não fica preso na transição.
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
@@ -142,6 +143,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Uma expressão | Uma imagem no padrão de arte de personagem em `Assets/Sprites/Personagens/<personagem>/`, uma entrada em **Expressions** do `CharacterSO` e uma linha na tabela "Expressões" do guia de roteiro. O roteiro a pede com `#nome` no fim da fala |
 | Uma variável de história | Uma linha `<<declare $nome = valor>>` com `/// descrição` em `Assets/Roteiro/variaveis.yarn`, sem código. Se for booleana, ela aparece sozinha nos campos de portão do Inspector |
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`. O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
+| Uma saída ou um ponto de entrada de sala | Um `RoomExit` no objeto, ligado ao `OnInteract` (ou ao `OnAlreadyUnlocked` de uma porta), e um `RoomEntryPoint` na sala de destino, sem código. A sala precisa estar na lista de cenas do build. Passo a passo em [salas.md](../autoria/salas.md#saídas-e-pontos-de-entrada) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
 | Um elemento de interface de jogo | Um objeto dentro do `Canvas_Game` de `Assets/Prefabs/UI/GameUI.prefab`. Nunca em uma cena |
 

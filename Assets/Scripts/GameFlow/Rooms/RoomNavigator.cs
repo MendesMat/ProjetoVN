@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using ProjetoVN.Dialogue.Logic;
+using ProjetoVN.PointNClick;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -42,13 +44,15 @@ namespace ProjetoVN.GameFlow.Rooms
             if (Instance == this) Instance = null;
         }
 
-        public bool ChangeRoom(string roomName)
+        public bool ChangeRoom(string roomName) => ChangeRoom(roomName, null);
+
+        public bool ChangeRoom(string roomName, string entryPointId)
         {
             if (!CanChangeRoom(roomName)) return false;
 
             _isChanging = true;
             _stateController.EnterRoomTransition();
-            _ = ChangeRoomAsync(roomName);
+            _ = ChangeRoomAsync(roomName, entryPointId);
             return true;
         }
 
@@ -60,9 +64,15 @@ namespace ProjetoVN.GameFlow.Rooms
                 return false;
             }
 
-            if (_stateController == null || screenFader == null)
+            if (_stateController == null)
             {
-                Debug.LogError($"[RoomNavigator] Troca para '{roomName}' ignorada: falta o GameStateController ou o ScreenFader.", this);
+                Debug.LogError($"[RoomNavigator] Troca para '{roomName}' ignorada: falta o GameStateController (no mesmo objeto).", this);
+                return false;
+            }
+
+            if (screenFader == null)
+            {
+                Debug.LogError($"[RoomNavigator] Troca para '{roomName}' ignorada: falta o ScreenFader (campo Screen Fader).", this);
                 return false;
             }
 
@@ -91,18 +101,23 @@ namespace ProjetoVN.GameFlow.Rooms
             return "o jogo não está em exploração";
         }
 
-        private async Awaitable ChangeRoomAsync(string roomName)
+        private async Awaitable ChangeRoomAsync(string roomName, string entryPointId)
         {
             try
             {
                 await screenFader.FadeOutAsync(fadeSeconds, destroyCancellationToken);
                 await SceneManager.LoadSceneAsync(roomName);
                 destroyCancellationToken.ThrowIfCancellationRequested();
+                ArriveAt(roomName, entryPointId);
                 await screenFader.FadeInAsync(fadeSeconds, destroyCancellationToken);
             }
             catch (OperationCanceledException)
             {
                 return;
+            }
+            catch (Exception exception)
+            {
+                RecoverFromFailure(exception);
             }
             finally
             {
@@ -110,6 +125,43 @@ namespace ProjetoVN.GameFlow.Rooms
             }
 
             _stateController.LeaveRoomTransition();
+        }
+
+        // Um Awaitable descartado engole a exceção sem log, e o jogo ficaria preso em RoomTransitionState com a tela escura.
+        private void RecoverFromFailure(Exception exception)
+        {
+            Debug.LogException(exception, this);
+
+            if (screenFader != null) screenFader.HideImmediately();
+        }
+
+        private void ArriveAt(string roomName, string entryPointId)
+        {
+            if (string.IsNullOrWhiteSpace(entryPointId)) return;
+
+            RoomEntryPoint entryPoint = FindEntryPoint(entryPointId);
+            if (entryPoint == null)
+            {
+                Debug.LogError($"[RoomNavigator] A sala '{roomName}' não tem o ponto de entrada '{entryPointId}'. " +
+                               "O jogador chega na posição em que a cena foi salva.", this);
+                return;
+            }
+
+            CenterPanOn(entryPoint);
+        }
+
+        private static RoomEntryPoint FindEntryPoint(string entryPointId)
+        {
+            return FindObjectsByType<RoomEntryPoint>(FindObjectsSortMode.None)
+                .FirstOrDefault(entryPoint => entryPoint.Id == entryPointId);
+        }
+
+        private static void CenterPanOn(RoomEntryPoint entryPoint)
+        {
+            ScreenPanController pan = FindFirstObjectByType<ScreenPanController>();
+            if (pan == null) return;
+
+            pan.CenterOn(entryPoint.transform.position.x);
         }
 
 #if UNITY_EDITOR

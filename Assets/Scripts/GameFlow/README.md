@@ -15,9 +15,11 @@ A responsabilidade deste módulo não é implementar como um diálogo funciona o
   - `GameplayState`: exploração e interação. Seu `Enter()` libera o `PlayerInputGate`.
   - `DialogueState`: narrativa em curso. Seu `Enter()` bloqueia o `PlayerInputGate`.
   - `RoomTransitionState`: troca de sala em curso (#12). Seu `Enter()` bloqueia o `PlayerInputGate`. Quem entra e sai dele é o `RoomNavigator`, pelos três membros `internal` do `GameStateController`: `IsExploring` (o modo atual é o `GameplayState`), `EnterRoomTransition()` e `LeaveRoomTransition()`.
-- **`Rooms/`** (#12): a troca de sala.
-  - `RoomNavigator`: o **único dono** da troca de sala e o único lugar do jogo que chama `SceneManager.LoadScene*`. `public bool ChangeRoom(string roomName)` recusa o pedido ou o aceita e dispara a troca (fluxo em "Troca de sala", abaixo). O nome da sala é o **nome da cena**, e a cena precisa estar na lista de cenas do build. Vive no `Managers.prefab`, na raiz, ao lado do `GameStateController` (pega-o com `GetComponent` no `Awake`). Dois campos: `screenFader` (o `Canvas_Fade`; vazio = nenhuma troca é aceita, erro no console, aviso no `OnValidate`) e `fadeSeconds` (duração de **cada metade**, escurecer e clarear; 0,4 de partida; 0 = sem fade). `Instance` zerado em `SubsystemRegistration` (D-29).
-  - `ScreenFader`: a apresentação do fade. Anima o `alpha` de um `CanvasGroup` com `Time.unscaledDeltaTime` (um `timeScale` zerado nunca prende a tela no preto) e liga o `blocksRaycasts` **antes** de escurecer e desliga **depois** de clarear. Não decide nada.
+- **`Rooms/`** (#12, #13): a troca de sala, as saídas e os pontos de entrada.
+  - `RoomNavigator`: o **único dono** da troca de sala e o único lugar do jogo que chama `SceneManager.LoadScene*`. `public bool ChangeRoom(string roomName, string entryPointId)` recusa o pedido ou o aceita e dispara a troca (fluxo em "Troca de sala", abaixo); a sobrecarga de um parâmetro (`ChangeRoom(roomName)`, a do Reload Scene) chega sem ponto de entrada. O nome da sala é o **nome da cena**, e a cena precisa estar na lista de cenas do build. Vive no `Managers.prefab`, na raiz, ao lado do `GameStateController` (pega-o com `GetComponent` no `Awake`). Dois campos: `screenFader` (o `Canvas_Fade`; vazio = nenhuma troca é aceita, erro no console, aviso no `OnValidate`) e `fadeSeconds` (duração de **cada metade**, escurecer e clarear; 0,4 de partida; 0 = sem fade). `Instance` zerado em `SubsystemRegistration` (D-29).
+  - `RoomExit` (#13): uma saída da sala. Dois campos com tooltip, `destinationRoom` (o nome da cena de destino) e `entryPointId` (o id de um `RoomEntryPoint` da sala de destino). `public void Leave()` chama `RoomNavigator.Instance.ChangeRoom(destinationRoom, entryPointId)` e ignora o `bool` (as recusas já logam); sem `RoomNavigator.Instance`, `LogError` (D-04). É `void` porque um `UnityEvent` do Inspector não lista métodos que devolvem `bool`: liga-se no **On Interact** de um objeto ou no **On Already Unlocked** de uma porta. O `OnValidate` avisa destino vazio e ponto de entrada vazio.
+  - `RoomEntryPoint` (#13): um marcador na cena da sala, sem lógica. O campo `id` (público como `Id`) é o nome que as saídas citam; o ponto marca o lugar do cenário que fica **no centro da tela** na chegada, e só o X importa. O `OnValidate` avisa id vazio e o `OnDrawGizmos` desenha uma linha vertical na Scene view. Não tem `Instance` (D-29): o `RoomNavigator` o procura na cena nova.
+  - `ScreenFader`: a apresentação do fade. Anima o `alpha` de um `CanvasGroup` com `Time.unscaledDeltaTime` (um `timeScale` zerado nunca prende a tela no preto) e liga o `blocksRaycasts` **antes** de escurecer e desliga **depois** de clarear. `HideImmediately()` zera o `alpha` e o bloqueio sem animação: só a recuperação de falha o usa. Não decide nada.
   - O `Canvas_Fade` é filho do `GameUI.prefab`, irmão do `Canvas_Game`: `Canvas` Overlay com **Sort Order 100** (acima do `Canvas_Game`, 0, e do `Canvas_Debug` da cena de teste, 10), `GraphicRaycaster`, `CanvasGroup` (alpha 0, `blocksRaycasts` e `interactable` desligados), `ScreenFader` e uma `Image` preta `Black` que ocupa a tela toda. Em repouso nada é desenhado nem captura clique; durante a troca o `GraphicRaycaster` dele engole os cliques na interface (inventário, histórico, botões de debug), e os cliques no mundo, o hover e o pan param pelo `PlayerInputGate`.
 - **`ManagersBootstrap`**: cria, uma única vez por sessão, o prefab `Assets/Prefabs/Resources/Managers.prefab` (`GameStateController`, `RoomNavigator`, `DialogueManager`, `DialogueRunner`, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions`) e o marca `DontDestroyOnLoad`. O prefab traz aninhada a interface de jogo (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game`, `Canvas_Fade` e `EventSystem`), que nasce e persiste junto, sem código no bootstrap (D-19); o `GameFlow` não referencia o módulo `UI`, a ligação é só de asset. Roda em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, então funciona em qualquer cena. **Cenas não devem conter esses managers, nem `Canvas` de jogo, nem `EventSystem`.** O prefab fica numa pasta `Resources` dentro de `Prefabs` porque `Resources.Load` só encontra arquivos em pastas com esse nome.
 - **`Persistence/`**: `GameState` (POCO serializado) e `GameSaveManager` (`Save()`/`Load()` em JSON em `Application.persistentDataPath/savegame.json`). Salva itens, objetos de mundo consumidos e o **estado da história** (`StoryState`, do módulo `Core`: booleanos, números e textos). Ainda não há menu de save; na cena de teste, use o painel de debug.
@@ -92,12 +94,13 @@ Como o efeito mora no estado, e não em quem manda trocar de estado, é impossí
 Ao liberar o input, o gate registra o frame da liberação e ignora cliques nesse mesmo frame. Sem isso, o clique que fecha o diálogo reabriria o diálogo imediatamente, porque o input é processado antes do `Update`.
 
 ### 4. Troca de sala (#12)
-`RoomNavigator.ChangeRoom(roomName)` devolve `bool`, como `StartDialogue`. Uma troca recusada loga e **não muda nada**: sem fade, sem mexer no gate. As recusas, nesta ordem:
+`RoomNavigator.ChangeRoom(roomName, entryPointId)` devolve `bool`, como `StartDialogue`. Uma troca recusada loga e **não muda nada**: sem fade, sem mexer no gate. As recusas, nesta ordem:
 
 | Pedido | Resposta |
 |---|---|
 | Nome vazio ou em branco | aviso |
-| Sem `ScreenFader` ou sem `GameStateController` | erro |
+| Sem `GameStateController` | erro que cita só ele |
+| Sem `ScreenFader` | erro que cita só ele |
 | Fora da exploração: **troca já em curso** ou **conversa aberta** (o aviso diz qual) | aviso |
 | Sala inexistente (`Application.CanStreamedLevelBeLoaded` falso) | **erro** com o nome pedido; o jogo permanece na sala atual. Vale também para uma cena que existe no projeto mas não está na lista de cenas do build |
 
@@ -107,10 +110,13 @@ Aceita a troca, na ordem:
 1. `EnterRoomTransition()` **na hora**, no mesmo frame da chamada: o `RoomTransitionState` fecha o `PlayerInputGate`.
 2. `ScreenFader.FadeOutAsync`: liga o bloqueio do `Canvas_Fade` e escurece em `fadeSeconds`.
 3. `SceneManager.LoadSceneAsync(roomName)`.
-4. `ScreenFader.FadeInAsync`: clareia em `fadeSeconds` e desliga o bloqueio.
-5. `LeaveRoomTransition()`: volta ao `GameplayState`, que libera o gate. O gate ignora o clique do frame da liberação.
+4. **Chegada** (`ArriveAt`), com a cena nova já carregada e a tela ainda escura. Com `entryPointId` vazio ou nulo (Reload Scene, primeira cena do Play), não faz nada. Senão procura o primeiro `RoomEntryPoint` com esse `Id` na cena; se não acha, **erro** no console com a sala e o id, e o jogador chega na posição em que a cena foi salva. Achando, pede ao `ScreenPanController` da sala `CenterOn(x do ponto)`; uma sala sem pan (a largura da tela) não faz nada. O `CenterOn` põe o X no centro da tela e respeita `minX`/`maxX`.
+5. `ScreenFader.FadeInAsync`: clareia em `fadeSeconds` e desliga o bloqueio.
+6. `LeaveRoomTransition()`: volta ao `GameplayState`, que libera o gate. O gate ignora o clique do frame da liberação.
 
-É apresentação e carregamento assíncronos (D-06, `Awaitable`): depois do carregamento o `destroyCancellationToken` é conferido, e sair do Play Mode no meio da troca a cancela sem erro no console. Nenhuma mensagem nova: a troca é um comando com um dono (D-05), e a música por sala (#19) criará a notificação dela quando houver quem a escute.
+É apresentação e carregamento assíncronos (D-06, `Awaitable`): depois do carregamento o `destroyCancellationToken` é conferido, e sair do Play Mode no meio da troca a cancela sem erro no console.
+
+**Falha inesperada na troca** (decisão do programador no levantamento da #13, opção (b)): um `Awaitable` descartado com `_ =` engole a exceção sem log, e o jogo ficaria preso em `RoomTransitionState` com a tela escura. O `ChangeRoomAsync` tem um `catch (Exception)` depois do de cancelamento: registra a exceção com `Debug.LogException(exception, this)`, clareia a tela na hora (`ScreenFader.HideImmediately`, se o fader ainda existir) e segue para o `LeaveRoomTransition()`. O jogador volta à exploração na sala que tiver ficado carregada (a antiga se a falha veio antes do carregamento, a nova se veio depois). Ponto de entrada inexistente e sala sem pan **não** são falha: são erro de conteúdo e têm mensagem própria, sem exceção. Nenhuma mensagem nova: a troca é um comando com um dono (D-05), e a música por sala (#19) criará a notificação dela quando houver quem a escute.
 
 *Limitação conhecida:* uma conversa que começasse **durante** a troca poria o jogo em `DialogueState`, e o `LeaveRoomTransition()` o devolveria à exploração com a conversa aberta. Hoje nada faz isso (os cliques estão bloqueados e nenhum objeto de cena inicia diálogo no `Start`), e não foi tratado (D-27).
 
@@ -130,7 +136,6 @@ Se o novo modo for uma **sobreposição** temporária (inventário, pausa), use 
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #13 | Saídas clicáveis e pontos de entrada. O componente de saída chama `RoomNavigator.ChangeRoom` por código: um `UnityEvent` do Inspector não lista métodos que devolvem `bool`, então `ChangeRoom` não aparece direto no **On Interact** |
 | #14 | Decide onde mora o registro de objetos de mundo consumidos (hoje no `InventoryManager`) |
 | #16 | Save automático ao entrar na sala; carregar recarrega a cena |
 | #18 | Estado de pausa, sobreposto com `Push`/`Pop` |

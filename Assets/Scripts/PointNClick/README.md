@@ -56,4 +56,4 @@ Isso garante que o `PointNClick` nunca conheça a existência de diálogos ou in
 
 - O destaque (hover) ainda aparece em um objeto que esteja atrás de um painel de interface; só o clique é barrado. Só vale corrigir se ficar visivelmente errado no jogo.
 - `PointNClickSelector` guarda `Camera.main` no `Awake`. Cada sala tem a sua câmera, então isso continua valendo com uma cena por sala.
-- **Issue #13:** o ponto de entrada de uma sala define a posição inicial do pan (`ScreenPanController`).
+- `ScreenPanController.CenterOn(float worldX)` (#13) põe o ponto `worldX` do cenário no centro da tela, respeitando `minX`/`maxX`: é como o ponto de entrada de uma sala define a posição inicial do pan. A conta é `container.x + câmera.x - worldX`, então vale com o ponto dentro ou fora do `environmentContainer`, desde que rode com o cenário na posição em que a cena foi salva (logo depois do carregamento). Sem `Camera.main`, erro no console. O pan de borda e o `CenterOn` usam o mesmo método de limite. Quem chama é o `RoomNavigator` (módulo `GameFlow`).
