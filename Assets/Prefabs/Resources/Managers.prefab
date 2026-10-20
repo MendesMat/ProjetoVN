@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7320409207393300824}
   - component: {fileID: 1119890017147649609}
   - component: {fileID: 2701538978368167837}
+  - component: {fileID: 7233960080830787224}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -176,6 +177,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.ItemScriptActions
   itemRegistry: {fileID: 11400000, guid: e70a9b732ab633f429ff272e35a516e2, type: 2}
+--- !u!114 &7233960080830787224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 521f579b57f831a4b84cd037daebe268, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Rooms.RoomNavigator
+  screenFader: {fileID: 3964921294727139080}
+  fadeSeconds: 0.4
 --- !u!1001 &1373167308627270322
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -249,6 +264,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fefda108de350bc468d1b84fa65972a2, type: 3}
+--- !u!114 &3964921294727139080 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2596398360038446522, guid: fefda108de350bc468d1b84fa65972a2, type: 3}
+  m_PrefabInstance: {fileID: 1373167308627270322}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1808879d484cb8b408d5f16cf3ee7860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Rooms.ScreenFader
 --- !u!4 &8525751808234611821 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7304828139146821343, guid: fefda108de350bc468d1b84fa65972a2, type: 3}
