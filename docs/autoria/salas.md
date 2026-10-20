@@ -35,10 +35,10 @@ O campo **Persistent Id** é gerado sozinho. **Se você duplicar um coletável, 
 
 ## Diálogo ao clicar
 
-1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e digite em **Node Name** o nome do nó do roteiro que ele inicia (por exemplo `porta_trancada`). O nome é de um nó dos arquivos `.yarn` em `Assets/Roteiro/`; o nome do nó de entrada vem no PR do roteirista (formato `<quem_ou_onde>_<assunto>`, ver [as convenções do guia](roteiro.md#convenções-de-nome)); na dúvida, procure a linha `title:` no arquivo.
+1. No objeto interativo, acrescente o componente **Interactable Dialogue Trigger** e escolha em **Node Name**, na lista, o nó do roteiro que ele inicia (por exemplo `porta_trancada`). A lista traz os nós dos arquivos `.yarn` em `Assets/Roteiro/`, em ordem alfabética; o nome do nó de entrada vem no PR do roteirista (formato `<quem_ou_onde>_<assunto>`, ver [as convenções do guia](roteiro.md#convenções-de-nome)). Um nó novo aparece na lista depois que o Unity reimporta o roteiro (selecione outro objeto e volte).
 2. Em **On Interact**, ligue `InteractableDialogueTrigger.TriggerDialogue`.
 
-O nome é minúsculas sem acento, dígitos e `_`; o componente avisa no console se ele fugir desse formato. **O nome não é conferido ao montar a cena:** um nome errado só aparece ao clicar no objeto, com um aviso no console ("o nó 'x' não existe no roteiro") e sem iniciar conversa. **Node Name** vazio também não inicia conversa e avisa ao clicar.
+**(nenhum)** deixa o campo vazio: o clique não inicia conversa e avisa no console. Um nó que deixou de existir (o roteirista o renomeou ou apagou) continua no campo, aparece no fim da lista e ganha um aviso no Inspector; o nó `variaveis`, que só declara variáveis, não está na lista e, se estiver gravado, recebe o mesmo aviso. Se o roteiro não compila, o campo vira texto comum, com o motivo no aviso. Além do aviso, o teste de EditMode `DialogueTriggerNodesTests` reprova qualquer gatilho de cena ou prefab cujo nó não existe, e diz a cena (ou o prefab), o caminho do objeto e o nome do nó: rode a suíte depois de uma mudança no roteiro.
 
 Os diálogos não são mais assets do Inspector: quem escreve a conversa é o roteirista, em arquivos de texto; ver [roteiro.md](roteiro.md).
 

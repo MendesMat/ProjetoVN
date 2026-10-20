@@ -46,7 +46,7 @@ Iniciar é um **comando** com um dono, então vai por chamada direta (D-05):
 DialogueManager.Instance.StartDialogue("porta_trancada");
 ```
 
-Em objetos de cena, o caminho pronto é o `InteractableDialogueTrigger` (módulo `GameFlow`): o campo **Node Name** recebe o nome do nó, e o método `TriggerDialogue()` é ligado ao `UnityEvent` `OnInteract` do `InteractableItem`. Não há seletor de nó no Inspector (issue #32): o nome é texto livre, e um nome errado só aparece ao clicar, com um aviso no console.
+Em objetos de cena, o caminho pronto é o `InteractableDialogueTrigger` (módulo `GameFlow`): o campo **Node Name** é uma lista dos nós do roteiro, e o método `TriggerDialogue()` é ligado ao `UnityEvent` `OnInteract` do `InteractableItem`. O seletor é do módulo `Editor` (marcado por `[ScriptNode]`, do `Core`), e um teste de EditMode reprova gatilho que aponte para nó inexistente (#32).
 
 `StartDialogue` confere, nesta ordem, e devolve `false` sem publicar nada em cada caso:
 
@@ -278,7 +278,6 @@ O `DialogueInputHandler` ignora um clique de **ponteiro** (`context.control.devi
 ## O que ainda não existe
 
 - O nome do protagonista escolhido pelo jogador na placa de nome e no histórico: issue #26 (o ponto de troca é o `NameToDisplay`).
-- Seletor de nó no Inspector: issue #32.
 
 ## Escrevendo roteiro
 

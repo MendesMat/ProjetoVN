@@ -74,7 +74,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** uma caixa mostra quem fala e o que diz. O texto aparece aos poucos; um clique antes do fim completa a fala, e o clique seguinte avança. Em alguns pontos aparecem escolhas.
 
 **Existe (Yarn Spinner, D-17):**
-- Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó.
+- Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó, escolhido numa lista no Inspector; um teste automático acusa gatilho apontando para nó que não existe.
 - Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
 - Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
 - **Opção de ação (#65):** uma opção com a etiqueta `#acao` no fim é um gesto do protagonista, não uma fala. O botão mostra o texto em **itálico** (também quando a condição a bloqueia), sem a etiqueta; sem `#acao`, a opção continua sendo fala e o botão não muda. O protagonista entra em destaque ao abrir o bloco, haja ou não opção de ação.
