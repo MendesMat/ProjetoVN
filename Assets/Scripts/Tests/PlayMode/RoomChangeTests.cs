@@ -29,7 +29,8 @@ namespace ProjetoVN.Tests.PlayMode
         {
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim de uma troca de sala pendente");
 
-            Assert.IsNotNull(RoomNavigator.Instance, "Não há RoomNavigator: o Managers.prefab não foi criado pelo ManagersBootstrap ou foi destruído.");
+            Assert.IsNotNull(RoomNavigator.Instance,
+                "Não há RoomNavigator: o Managers.prefab não foi criado pelo ManagersBootstrap ou foi destruído.");
             ResetInventory();
 
             yield return SceneManager.LoadSceneAsync(StartRoom);
@@ -83,20 +84,23 @@ namespace ProjetoVN.Tests.PlayMode
             CanvasGroup fade = Object.FindFirstObjectByType<ScreenFader>().GetComponent<CanvasGroup>();
             Assert.IsTrue(PlayerInputGate.IsEnabled, "O jogo deveria começar em exploração, com o input liberado.");
 
+            int callFrame = Time.frameCount;
             Assert.IsTrue(RoomNavigator.Instance.ChangeRoom(OtherRoom, EntryPointId));
             AssertInputIsBlocked(fade);
 
             LogAssert.Expect(LogType.Warning, new Regex("já há uma troca de sala em curso"));
             Assert.IsFalse(RoomNavigator.Instance.ChangeRoom(StartRoom), "Uma segunda troca foi aceita no meio da primeira.");
 
-            int framesInTransition = 0;
+            int blockedFramesAfterCall = 0;
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o input voltar depois da troca", () =>
             {
                 AssertInputIsBlocked(fade);
-                framesInTransition++;
+                if (Time.frameCount > callFrame)
+                    blockedFramesAfterCall++;
             });
 
-            Assert.Greater(framesInTransition, 0, "A troca terminou sem passar por nenhum frame: o teste não provou o bloqueio.");
+            Assert.Greater(blockedFramesAfterCall, 0,
+                "Nenhum frame depois da chamada foi conferido com o input bloqueado: o teste não provou o bloqueio durante a troca.");
             Assert.AreEqual(OtherRoom, SceneManager.GetActiveScene().name, "O input voltou antes de a sala nova estar na tela.");
             Assert.IsFalse(fade.blocksRaycasts, "A interface continua barrada depois da troca.");
             Assert.AreEqual(0f, fade.alpha, "A tela continua escura depois da troca.");
