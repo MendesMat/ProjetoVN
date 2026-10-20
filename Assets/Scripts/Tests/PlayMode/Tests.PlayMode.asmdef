@@ -1,0 +1,27 @@
+{
+    "name": "Tests.PlayMode",
+    "rootNamespace": "ProjetoVN.Tests.PlayMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "GUID:eaa15409731623142a1e86b06222eeda",
+        "GUID:9ce98ac309bf1ea49b3581202329cd57",
+        "GUID:0dbdab83b5dbfc24d911a9fa055518fd",
+        "GUID:5154efaf2e3550d4890bdb8dc40259ff",
+        "GUID:2bafac87e7f4b9b418d9448d219b01ab",
+        "GUID:34aa492b82754644eac2f903cd496268"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
