@@ -23,7 +23,8 @@ namespace ProjetoVN.Tests.EditMode
     /// <summary>
     /// Percorre os componentes de um tipo em todas as cenas e prefabs de <c>Assets/</c> (os pacotes ficam de fora).
     /// O que se quer saber de cada componente sai por <c>read</c>, que roda enquanto a cena está aberta: o
-    /// componente deixa de existir quando ela fecha. Uma cena já aberta é lida como está e nunca é fechada.
+    /// componente deixa de existir quando ela fecha. Uma cena aberta é lida como está e nunca é fechada; uma cena
+    /// que está na Hierarchy mas descarregada é carregada para a leitura e volta descarregada, na Hierarchy.
     /// </summary>
     public static class ProjectComponents
     {
@@ -50,6 +51,7 @@ namespace ProjetoVN.Tests.EditMode
             Scene scene = SceneManager.GetSceneByPath(scenePath);
             if (scene.isLoaded) return ReadRoots(scenePath, scene.GetRootGameObjects(), read);
 
+            bool wasInHierarchy = scene.IsValid();
             scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
             try
             {
@@ -57,7 +59,7 @@ namespace ProjetoVN.Tests.EditMode
             }
             finally
             {
-                EditorSceneManager.CloseScene(scene, true);
+                EditorSceneManager.CloseScene(scene, removeScene: !wasInHierarchy);
             }
         }
 
