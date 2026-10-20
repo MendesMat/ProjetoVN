@@ -29,7 +29,7 @@ namespace ProjetoVN.Tests.PlayMode
         {
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim de uma troca de sala pendente");
 
-            Assert.IsNotNull(RoomNavigator.Instance, "O ManagersBootstrap não criou o Managers.prefab.");
+            Assert.IsNotNull(RoomNavigator.Instance, "Não há RoomNavigator: o Managers.prefab não foi criado pelo ManagersBootstrap ou foi destruído.");
             ResetInventory();
 
             yield return SceneManager.LoadSceneAsync(StartRoom);

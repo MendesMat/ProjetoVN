@@ -66,6 +66,16 @@ unity command recompile
 unity command run_tests --mode EditMode --timeout 180
 ```
 
+```bash
+unity command run_tests --mode playmode --async_tests true --timeout 300
+```
+
+```bash
+unity command test_status
+```
+
+A PlayMode só roda assíncrona: repita o `test_status` até `completed` (receita em `docs/agentes/unity-cli.md`).
+
 Depois, execute o **roteiro de verificação em Play Mode** do levantamento, passo a passo, seguindo `docs/agentes/unity-cli.md` (comece por `Application.runInBackground = true` se algum passo depender de frames). Guarde a saída de cada passo: ela é a evidência do parecer.
 
 Você não confia no que o PR diz que foi verificado. Você verifica de novo.
@@ -107,6 +117,7 @@ Use exatamente esta estrutura:
 
 ### Testes e verificação
 - Suíte EditMode: <resultado colado>
+- Suíte PlayMode: <resultado colado>
 - Roteiro de Play Mode: <cada passo, com o resultado>
 - Não foi possível verificar: <o quê e por quê, ou "nada">
 

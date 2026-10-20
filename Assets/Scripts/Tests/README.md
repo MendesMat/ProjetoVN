@@ -1,14 +1,26 @@
 # Tests
 
-Este módulo é reservado para os testes automatizados do projeto (Unity Test Framework).
+Este módulo guarda os testes automatizados do projeto (Unity Test Framework), em duas suítes: **EditMode** (`EditMode/`, assembly `Tests`) e **PlayMode** (`PlayMode/`, assembly `Tests.PlayMode`).
 
 > **Antes de escrever testes:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisão D-24, sobre testes](../../../docs/arquitetura/decisoes.md#d-24--testes) · [como a TDD se aplica aqui](../../../docs/agentes/skills.md#como-a-tdd-se-aplica-aqui)
 
-Os testes vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*, ou pelo Unity CLI:
+Os testes EditMode vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*, ou pelo Unity CLI:
 
 ```bash
 unity command run_tests --mode EditMode --timeout 180
 ```
+
+Os testes PlayMode vivem em `PlayMode/`, aba *PlayMode*, e pelo CLI só rodam de forma assíncrona ([receita](../../../docs/agentes/unity-cli.md#rodar-a-suíte-playmode)):
+
+```bash
+unity command run_tests --mode playmode --async_tests true --timeout 300
+```
+
+```bash
+unity command test_status
+```
+
+### Suíte EditMode
 
 - **`MessageBrokerTests`**: entrega, cancelamento de assinatura, assinatura duplicada, isolamento de exceções, `Clear`, e o comportamento de snapshot quando alguém assina durante um despacho.
 - **`StoryStateVariablesTests`**: o armazenamento de variáveis do Yarn sobre o `StoryState`: gravar e ler cada tipo, ler o que foi gravado por fora, sem conversão silenciosa de tipo, nome sem `$` com aviso, `Clear`.
@@ -34,6 +46,16 @@ unity command run_tests --mode EditMode --timeout 180
 - **`RoomLinksTests`** (#13): três testes de conteúdo sobre `RoomExit` e `RoomEntryPoint` em cenas e prefabs de `Assets/`, no padrão do `DialogueTriggerNodesTests` (campos privados lidos por `SerializedObject`, com `Assert.Fail` se um campo for renomeado). As salas válidas são as cenas **habilitadas** em `EditorBuildSettings.scenes`, pelo nome do arquivo. `ScenesAndPrefabs_ExitsNameARoomInTheBuildList`: todo destino está preenchido e é uma sala do build (`<asset>: <objeto>: destino '<nome>'`). `ScenesAndPrefabs_ExitsNameAnEntryPointOfTheDestination`: todo ponto de entrada citado está preenchido e existe na cena de destino (`…: ponto '<id>' em '<sala>'`); saída com destino inválido não é repetida aqui. `Scenes_EntryPointIdsAreFilledAndUniquePerRoom`: nenhum ponto sem id nem com id repetido na mesma cena (a troca usa o primeiro que achar); ponto em prefab é ignorado.
 - **`CollectableIdsTests`** (#14): `Scenes_CollectablePersistentIdsAreFilledAndUniqueAcrossRooms` lê o `persistentId` de todo `CollectableItemBehaviour` de cena (por `SerializedObject`, com `Assert.Fail` se o campo for renomeado) e reprova o id vazio (`<asset>: <objeto>: id vazio`) e o id repetido **em qualquer cena**, não só na mesma, porque o registro de consumidos é um só para o jogo inteiro (`'<id>' repetido em: <local 1>; <local 2>`). Coletável em prefab é ignorado, como o ponto de entrada no `RoomLinksTests`; as instâncias de um prefab aparecem nas cenas e reprovam se repetirem o id.
 
+### Suíte PlayMode
+
+`RoomChangeTests` (#15) roda o jogo de verdade: o `Managers.prefab` criado pelo `ManagersBootstrap` ao entrar no Play e as cenas `[Teste] Mecanicas` e `[Teste] Sala B`, trocadas pelo ponto de entrada `janela`. São testes de **caracterização**: o comportamento já existia, verificado à mão nas #12 a #14.
+
+- **`RoomChange_KeepsASingleInstanceOfEachManager`**: depois de duas idas e voltas, há exatamente um `GameStateController`, `RoomNavigator`, `InventoryManager`, `GameSaveManager`, `DialogueManager`, `DialogueUIController`, `ScreenFader` e `EventSystem`, todos dentro do mesmo `Managers.prefab` do começo (não foram recriados nem vieram de uma cena). Um `Canvas_Game` ou `EventSystem` esquecido numa cena aparece como contagem 2.
+- **`CollectedItem_StaysCollectedAfterLeavingAndComingBack`**: o coletável recolhido (por `Collect()` direto) está desativado na volta à sala, e o inventário continua com aquele item.
+- **`RoomChange_BlocksInputUntilTheNewRoomIsShown`**: no frame da chamada e em todo frame até a sala nova estar na tela, o `PlayerInputGate` está fechado, `CanClickThisFrame` é falso e o fade barra a interface (`blocksRaycasts`); uma segunda troca no meio é recusada (aviso esperado); no fim a sala ativa é a nova, o fade está transparente e sem barrar. O teste exige ao menos um frame de transição, para não passar vazio.
+
+Regras próprias (D-24): o `SetUp` zera o inventário e os consumidos **pelos donos**, nunca por `MessageBroker.Clear()` (apagaria as assinaturas dos managers vivos); o teste só lê o `PlayerInputGate` (D-28); a espera de uma troca tem limite de 10 s e falha dizendo em que sala parou; o `TearDown` espera uma troca pendente acabar. A fase vermelha de cada teste é uma sabotagem temporária do código de jogo (descrita no PR), nunca commitada.
+
 > **Lacuna conhecida e deliberada:** `LockedActionBehaviour`, o `DialogueManager`, o apresentador
 > `DialogueUIController`, o `DialogueHistoryView`, o `DialogueInputHandler` (inclusive a regra de que um
 > clique em botão da interface não avança a fala), o `InteractableDialogueTrigger`, o `RoomNavigator`, o `RoomExit`, o `RoomEntryPoint` e o `ScreenFader` não têm teste de comportamento em EditMode (os nós que os gatilhos citam são conferidos pelo `DialogueTriggerNodesTests`). Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
@@ -45,9 +67,9 @@ unity command run_tests --mode EditMode --timeout 180
 > puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`. A revelação do texto também fica
 > nessa lacuna: a contagem é o `LetterTypewriter` do pacote, e a escolha entre completar e avançar
 > é um `if` do `DialogueManager`; as duas são verificadas em Play Mode (roteiro da #11). A troca de sala
-> (recusas, ordem dos passos, gate fechado durante o fade, managers únicos depois de várias trocas) também:
-> é `MonoBehaviour`, estado, cena e prefab, verificada em Play Mode (roteiro da #12); a automação em
-> PlayMode é a #15.
+> (recusas, ordem dos passos) também: é `MonoBehaviour`, estado, cena e prefab, e continua no roteiro
+> de Play Mode da #12. Managers únicos depois de várias trocas, persistência do coletável e gate fechado
+> durante a transição estão na suíte PlayMode (#15).
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
 > guardas: a flag é checada antes do item porque `IsTrue` não consome nada e `TryUse` consome.

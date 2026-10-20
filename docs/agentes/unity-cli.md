@@ -62,7 +62,23 @@ unity command run_tests --mode EditMode --filter StoryStateTests
 
 Alguns testes provocam um erro de propósito (o do `MessageBroker` com assinante que lança exceção). A entrada `InvalidOperationException: falha proposital` no console é esperada.
 
-**Salve a cena antes de rodar os testes.** Com a cena aberta suja, o Test Runner abre o diálogo "Scene(s) Have Been Modified" e bloqueia a thread principal do Editor: `run_tests` e `eval` expiram sem erro claro, e só um clique no diálogo destrava (medido na execução da #3). Rode `save_scene` depois de qualquer alteração de cena e antes do `run_tests`.
+### Rodar a suíte PlayMode
+
+```bash
+unity command run_tests --mode playmode --async_tests true --timeout 300
+```
+
+```bash
+unity command test_status
+```
+
+A PlayMode **não roda de forma síncrona** pelo CLI: `run_tests --mode playmode` sem `--async_tests` é recusado, porque entrar no Play recarrega o domínio e derruba a requisição. O comando devolve `running` na hora; repita o `test_status` a cada uns 5 s até ele dizer `completed: 3/3 aprovados` (o número cresce com as issues). Durante a recarga de domínio da entrada no Play o `test_status` pode falhar com `Network error`: repita. Para ver a mensagem de uma falha, use `unity command test_status --format json`: o campo `result` traz, por teste, `Status`, `Message` e `StackTrace`. `--mode all` roda a EditMode na hora e devolve a PlayMode como `playmode_running`.
+
+Para conferir quais testes cada suíte enxerga, `unity command list_tests --mode playmode` e `--mode editor` (um asmdef só de Editor faria um teste PlayMode aparecer na EditMode).
+
+**O Test Framework liga o `runInBackground` durante a execução** (`PreparePlayModeRunTask.cs`) e devolve o valor no fim, então a armadilha do Editor sem foco, descrita adiante, **não** vale para a suíte PlayMode. Ela continua valendo para a verificação feita por `eval`.
+
+**Salve a cena antes de rodar os testes.** Com a cena aberta suja, o Test Runner abre o diálogo "Scene(s) Have Been Modified" e bloqueia a thread principal do Editor: `run_tests` e `eval` expiram sem erro claro, e só um clique no diálogo destrava (medido na execução da #3). Rode `save_scene` depois de qualquer alteração de cena e antes do `run_tests`, **só se a cena estiver suja** (`SceneManager.GetActiveScene().isDirty`) e confira o `git status` depois: na #15, uma sequência de execuções com `save_scene` antes de cada uma deixou o `[Teste] Mecanicas.unity` modificado, com `RectTransform` de filhos de um layout group do canvas gravados com valores calculados (a causa não foi isolada). Reverta a cena com `git checkout` se isso acontecer; ele não entra no commit.
 
 ### Executar C# no Editor
 
@@ -196,6 +212,15 @@ Para a troca ser observável, suba a duração só em runtime: em Play Mode, `Se
 **Provocar uma falha inesperada na troca.** Destruir o `Canvas_Fade` no meio da troca faz o `ScreenFader` lançar `MissingReferenceException` (é o único jeito de fora, sem gancho de teste). Suba `fadeSeconds` para 8 e: (a) antes do carregamento, destrua o fade 1 ou 2 s depois de disparar a troca; (b) depois do carregamento, dispare, leia a cena ativa em laço (um `eval` por volta) até ela mudar, e só então destrua o fade (com 3 s a troca inteira termina entre dois `eval` e a falha não acontece). Cada tentativa gasta o `Canvas_Fade` da sessão de Play: **saia e entre no Play de novo** antes de repetir.
 
 **Gravar uma cena alterada por `eval_file`.** `EditorSceneManager.SaveOpenScenes()` dentro de um `eval` **não gravou** a cena (`SerializedObject.ApplyModifiedProperties` deixa a cena suja, mas o arquivo ficou como estava), e o `run_tests` seguinte abriu o diálogo "Scene(s) Have Been Modified": o Editor travou e todo comando do CLI (inclusive `cancel_tests`) expirou até reiniciar o Unity. Grave sempre com `unity command save_scene` e **confira no arquivo** (`grep` no `.unity`) antes de rodar a suíte. Numa fase vermelha de teste de conteúdo (sabotar a cena de propósito) isso importa em dobro: ao reiniciar o Editor, a cena sabotada é a que está no disco.
+
+### Os testes PlayMode dividem uma sessão de Play (#15)
+
+O `Managers.prefab` é criado uma vez por sessão de Play (`ManagersBootstrap`, `AfterSceneLoad`) e é `DontDestroyOnLoad`: os três testes da `Tests.PlayMode` compartilham os mesmos managers, e o que um deixa no inventário o outro vê. O `SetUp` zera o estado **pelos donos** (`InventoryManager.ReplaceAll`, `ReplaceConsumedWorldObjectIds`); **`MessageBroker.Clear()` não serve aqui**, porque apagaria as assinaturas do `GameStateController` e o jogo deixaria de entrar e sair do modo de diálogo pelo resto da sessão. Mais quatro pontos:
+
+- **`Start` só roda no frame seguinte.** Depois de `LoadSceneAsync`, um `yield return null` antes de chamar `ChangeRoom`: `IsExploring` só fica verdadeiro no `Start` do `GameStateController`.
+- **O fim da troca é o `PlayerInputGate.IsEnabled` voltar a `true`** (é o `GameplayState.Enter`, a última coisa que ela faz); `GameStateController.IsExploring` é `internal` e não deve ser aberto só para o teste.
+- **Erro no console reprova o teste PlayMode** (`LogAssert`); aviso não. Uma recusa de troca loga aviso, então `LogAssert.Expect` a documenta.
+- **Chamar `Collect()` direto.** O `OnClick` do `Item_Chave` também abre a conversa `peguei_chave`, e uma conversa aberta recusa a troca de sala (D-19).
 
 ### Contar o que está visível
 
