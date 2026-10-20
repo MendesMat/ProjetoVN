@@ -12,7 +12,7 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
 | `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick` e o pacote Yarn Spinner |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
-| `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: o seletor de variável de história do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
+| `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: os seletores de variável de história e de nó do roteiro do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
 | `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode | `Core`, `Dialogue`, `GameFlow`, `Inventory` e o pacote Yarn Spinner |
 
 ```
@@ -106,7 +106,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 4. O que acontece depende do que quem montou a cena ligou ali.
 
 **Diálogo**
-1. `InteractableDialogueTrigger.TriggerDialogue()` chama `DialogueManager.Instance.StartDialogue(nodeName)`, com o nome de um nó de um roteiro `.yarn`.
+1. `InteractableDialogueTrigger.TriggerDialogue()` chama `DialogueManager.Instance.StartDialogue(nodeName)`, com o nome de um nó de um roteiro `.yarn`, que quem monta a cena escolhe numa lista no Inspector (`[ScriptNode]`, desenhado pelo módulo `Editor`).
 2. Nome vazio, nó inexistente, roteiro com erro de compilação, conversa já em curso ou nenhuma interface registrada: aviso ou erro no console, retorna `false`, nada muda.
 3. Caso contrário o `DialogueRunner` começa a conversa: `DialogueStartedMessage` é publicada **antes** da primeira fala; o `GameFlow` entra em `DialogueState`.
 4. O runner entrega cada fala e cada grupo de opções ao `DialogueUIController` (D-12), que resolve o nome de quem fala no `CharacterRegistry`, mostra o nome na cor do personagem e põe o sprite dele em um dos dois lugares da tela de personagens, atrás da caixa (quem decide o lugar, o destaque e a expressão é o `ConversationStage`). Ao abrir as opções, o protagonista entra em destaque. O texto da fala é revelado aos poucos; o clique esquerdo (`DialogueInputHandler` → `AdvanceDialogue`) completa a fala que está sendo revelada e, com ela completa, avança; os botões escolhem (`DialogueChoiceButton` → `MakeChoice`). Um clique de ponteiro sobre um botão da interface não avança a fala. O apresentador anota cada fala e a opção escolhida no `ConversationLog`, e os itens que o roteiro dá ou tira chegam do `GameFlow` (`ItemScriptActions` → `DialogueManager.RecordItemReceived`/`RecordItemHandedOver`); o botão Histórico abre a lista, e com ela aberta avançar e escolher não fazem nada (#25). As variáveis do roteiro leem e gravam no `StoryState`.
@@ -128,7 +128,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 |---|---|
 | Um modo de jogo | Uma classe que herda de `BaseState`, criada com `new` no `GameStateController`. O módulo dono publica notificações de início e fim |
 | Uma notificação | Um `readonly struct` que implementa `IMessage`, no módulo que publica, com nome no passado |
-| Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o chama pelo nome no `InteractableDialogueTrigger` |
+| Um diálogo | Um nó em um arquivo `.yarn` de `Assets/Roteiro/`, sem código. A cena o escolhe na lista do `InteractableDialogueTrigger` |
 | Um comportamento de objeto de cena | Um MonoBehaviour pequeno com um método público, ligado ao `OnInteract` |
 | Um item | Um asset `ItemDataSO` com id único, acrescentado ao `ItemRegistry` |
 | Um personagem | Um asset `CharacterSO` (id, nome exibido, cor, sprites por expressão) acrescentado ao `CharacterRegistry`, mais uma linha nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../autoria/roteiro.md). O roteiro o cita pelo nome exibido. Passo a passo em [salas.md](../autoria/salas.md#personagens) |

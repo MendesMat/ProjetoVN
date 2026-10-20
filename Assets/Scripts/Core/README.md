@@ -13,6 +13,7 @@ O módulo **Core** guarda o que todos os outros módulos podem usar e que não p
 | `Messaging/` | `MessageBroker` e `IMessage`: o barramento de **notificações** | [Messaging/README.md](Messaging/README.md) |
 | `StateMachine/` | `StateMachine` e `BaseState`: a máquina de modos de jogo, em C# puro | [StateMachine/README.md](StateMachine/README.md) |
 | `State/` | `StoryState`, `StoryVariableName` e `StoryFlagAttribute`: o estado global da história, a regra dos nomes e o marcador de campo de variável booleana | abaixo |
+| (raiz) | `ScriptNodeAttribute`: o marcador de campo `string` que guarda o nome de um nó do roteiro. No Inspector vira uma lista dos nós (desenhada pelo módulo `Editor`). Mora no `Core` pelo mesmo critério do `StoryFlagAttribute`: o `GameFlow` (que o usa) e o `Editor` (que o desenha) não se enxergam. Não é estado da história, então não vai para `State/` | — |
 
 ## O critério para algo morar no Core
 
