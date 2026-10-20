@@ -35,6 +35,7 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 - **O histórico em balões (#55) fecha a M2,** logo depois da #25, porque mexe nos mesmos arquivos (o `ConversationLog`, o `DialogueHistoryView` e o `GameUI.prefab`) e parte da `main` com o histórico já pronto. Ela foi pedida pelo programador em 2026-10-14, durante a revisão da #25, e atrasa a abertura da M3 pelo tempo de uma issue.
 - **O pensamento do protagonista (#61), a opção de ação (#65) e os personagens sem arte (#62) abrem a M3, antes do seletor de nó,** porque o primeiro roteiro de verdade (o prólogo do ato 1, "A viagem") precisa dos três para passar na verificação, e ele vai servir de exemplo para os roteiristas. Mudar o jeito de escrever o pensamento ou as opções depois obrigaria a reescrever tudo o que já tivesse sido escrito. A #65 vem logo depois da #61 porque as duas mexem no histórico e no apresentador do diálogo. O PR do roteiro fica em rascunho até as três fecharem. Priorizadas pelo programador em 2026-10-15 e 2026-10-16; atrasam a #32 pelo tempo de três issues pequenas.
 - **O seletor de nó (#32) vem logo depois, ainda no começo da M3,** porque é nela que as salas se multiplicam, cada uma com os seus gatilhos de diálogo. O seletor e o teste que confere os nós citados em cenas e prefabs precisam existir antes disso, e esse teste também serve à #14 para conferir os ids persistentes. Ela veio da triagem e foi priorizada pelo programador em 2026-10-14.
+- **A janela sem foco (#79), os testes com FPS baixo e alto (#80) e o limite de FPS em segundo plano (#81) abrem a M4, antes do save,** nessa ordem. A #79 vem primeiro porque, com o jogo rodando sem foco, o Play Mode dirigido pelo CLI deixa de congelar, e isso simplifica a verificação de todas as issues seguintes. A #80 vem antes da #81 porque o limite põe o jogo de propósito em FPS baixo, e o teste que mostra o que quebra com FPS baixo precisa existir antes. Priorizadas pelo programador em 2026-10-20, durante a revisão da #15; atrasam a #16 pelo tempo de três issues pequenas.
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 
@@ -88,6 +89,9 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 
 | Issue | Título | Depende de |
 |---|---|---|
+| #79 | Jogo roda com a janela sem foco (runInBackground: 1) | — |
+| #80 | Testes do jogo com FPS baixo e alto | #15 |
+| #81 | Limitar o FPS com a janela sem foco | #79, #80 |
 | #16 | Save automático por sala e carregamento que recarrega a cena | #12, #14 |
 | #17 | Menu principal ligado ao jogo | #16 |
 | #18 | Pausa com salvar manual e voltar ao menu | #16, #17 |
