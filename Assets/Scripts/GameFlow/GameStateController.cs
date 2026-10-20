@@ -12,11 +12,15 @@ namespace ProjetoVN.GameFlow
 
         private GameplayState _gameplayState;
         private DialogueState _dialogueState;
+        private RoomTransitionState _roomTransitionState;
+
+        internal bool IsExploring => _stateMachine.CurrentState == _gameplayState;
 
         private void Awake()
         {
             _gameplayState = new GameplayState(_stateMachine);
             _dialogueState = new DialogueState(_stateMachine);
+            _roomTransitionState = new RoomTransitionState(_stateMachine);
         }
 
         private void Start()
@@ -34,6 +38,10 @@ namespace ProjetoVN.GameFlow
         {
             UnsubscribeFromMessages();
         }
+
+        internal void EnterRoomTransition() => _stateMachine.ChangeState(_roomTransitionState);
+
+        internal void LeaveRoomTransition() => _stateMachine.ChangeState(_gameplayState);
 
         private void SubscribeToMessages()
         {

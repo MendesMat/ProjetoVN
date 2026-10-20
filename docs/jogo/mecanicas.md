@@ -13,7 +13,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Histórico de falas](#histórico-de-falas) | existe | `Dialogue` | — |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
-| [Navegação entre salas](#navegação-entre-salas) | planejada | `GameFlow` | #12, #13, #14 |
+| [Navegação entre salas](#navegação-entre-salas) | parcial | `GameFlow` | #13, #14 |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
 | [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
@@ -173,10 +173,10 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Existe (D-19):**
 - A interface de jogo (diálogo e inventário) é persistente: é criada uma vez, junto com os managers, e continua a mesma quando a cena é recarregada ou trocada. Uma cena só com câmera, fundo e objetos interativos já tem diálogo e inventário, sem montar interface.
+- Troca de sala com fade: a tela escurece, a cena nova carrega e a tela clareia. Nenhum clique passa durante a troca, nem no mundo nem na interface (#12). Um único comando, `RoomNavigator.ChangeRoom`, faz a troca; sala inexistente dá erro no console e o jogo fica onde está. **Não existe troca durante uma conversa:** o pedido é recusado. Ainda não há como o jogador pedir a troca: o único chamador é o **Reload Scene** do painel de debug, até as saídas da #13.
 
 **Planejada (D-19):**
 - Uma cena por sala, que contém só o mundo.
-- Troca com fade; nenhum clique passa durante a troca (#12).
 - Saídas clicáveis e pontos de entrada (#13). Não há mapa.
 - Itens coletados e portões abertos persistem entre salas (#14).
 

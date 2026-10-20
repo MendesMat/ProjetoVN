@@ -6,8 +6,8 @@
 
 ## Regras que valem sempre
 
-- **Não coloque managers na cena.** `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
-- **Não coloque `Canvas` de jogo nem `EventSystem` na cena.** A caixa de diálogo, os botões de escolha, o painel de inventário e o `EventSystem` também são criados sozinhos quando o jogo começa, e são os mesmos em todas as salas. Se o console mostrar `There are 2 event systems in the scene` sem parar, há um `EventSystem` sobrando na cena: apague-o.
+- **Não coloque managers na cena.** `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
+- **Não coloque `Canvas` de jogo nem `EventSystem` na cena.** A caixa de diálogo, os botões de escolha, o painel de inventário, o fade de tela da troca de sala e o `EventSystem` também são criados sozinhos quando o jogo começa, e são os mesmos em todas as salas. Se o console mostrar `There are 2 event systems in the scene` sem parar, há um `EventSystem` sobrando na cena: apague-o.
 - **Não altere um asset durante o Play.** Itens são dados somente leitura.
 - **Leia os avisos do console ao salvar.** Os componentes avisam quando um campo obrigatório ficou vazio.
 - **Todo id é único.** O id de um item e o id persistente de um coletável são gravados no save.
@@ -89,7 +89,18 @@ E **não** contém: managers, `Canvas` de jogo (diálogo, inventário) nem `Even
 
 O `Canvas_Debug` (botões Save, Load, Reset Session e Reload Scene) é ferramenta da cena de teste e não vai para uma sala.
 
-*A preencher pelas issues #12 e #13:* como registrar a sala no jogo, como definir pontos de entrada e saídas.
+### Registrar a sala
+
+Uma cena só pode ser alvo de uma troca de sala se estiver na lista de cenas do build:
+
+1. Salve a cena em `Assets/Scenes/`.
+2. Abra **File → Build Profiles → Scene List** e acrescente a cena (**Add Open Scenes** com ela aberta).
+
+**O nome da sala é o nome da cena** (`[Teste] Sala B`), exatamente como está no arquivo. Uma cena que existe no projeto mas não está na lista é uma sala inexistente para o jogo: o console mostra `A sala '…' não existe. A cena existe e está na lista de cenas do build?` e o jogo fica onde está. A sala de teste `[Teste] Sala B` é o exemplo mais enxuto: câmera, fundo e um objeto que abre `porta_trancada`.
+
+Durante uma conversa aberta o jogo recusa a troca de sala.
+
+*A preencher pela issue #13:* como definir pontos de entrada e saídas.
 
 ## Personagens
 

@@ -1,6 +1,6 @@
 # State Machine
 
-Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo e, no futuro, inventário ou pausa). Fica em `Assets/Scripts/Core/StateMachine`.
+Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo, trocando de sala e, no futuro, inventário ou pausa). Fica em `Assets/Scripts/Core/StateMachine`.
 
 > **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../../docs/agentes/fluxo-de-trabalho.md)
 

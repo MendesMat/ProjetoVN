@@ -41,8 +41,8 @@ O padrão se repete em todos os módulos (decisão D-03):
 
 ## Ciclo de vida
 
-- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
-- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
+- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
+- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
 - A interface de jogo também só se liga aos managers no próprio `Start` (o `DialogueUIController` se registra no `DialogueManager`; o `InventoryPresenter` se reconstrói). Na primeira cena, os `Start` dos objetos de cena entram na fila **antes** dos `Start` do prefab, porque o prefab é instanciado depois. Consequência: **um componente de cena não inicia diálogo no próprio `Start`**; receberia "Nenhuma interface de diálogo registrada". Nada faz isso hoje.
@@ -71,12 +71,13 @@ Regras adicionais:
 
 ## Modos de jogo
 
-O `GameStateController` (em `GameFlow`) possui uma `StateMachine` (em `Core`). Hoje há dois modos:
+O `GameStateController` (em `GameFlow`) possui uma `StateMachine` (em `Core`). Hoje há três modos:
 
 | Modo | Entra quando | Efeito ao entrar |
 |---|---|---|
 | `GameplayState` | o jogo começa; chega `DialogueEndedMessage` | libera o `PlayerInputGate` |
 | `DialogueState` | chega `DialogueStartedMessage` | bloqueia o `PlayerInputGate` |
+| `RoomTransitionState` | o `RoomNavigator` aceita uma troca de sala (chamada direta, não mensagem) | bloqueia o `PlayerInputGate` |
 
 Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeitos no `Exit()`. Um modo sobreposto (pausa) usa `Push`/`Pop`. Estados são criados com `new`, sem fábrica nem registro.
 
@@ -89,6 +90,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Estado da história (booleanos, números, textos) | `StoryState`, estático em `Core` | Sim, em três listas de pares nome e valor |
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
+| Troca de sala em curso | `RoomNavigator` | Não |
 | Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo será bloqueado, D-20) |
 | Quem está na tela de personagens (lado, destaque, última expressão) | `DialogueUIController`, por um `ConversationStage` (D-21); só da conversa em curso | Não |
 | Revelação da fala em curso | `DialogueUIController` (`IsRevealingLine`) | Não |
@@ -111,6 +113,11 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 3. Caso contrário o `DialogueRunner` começa a conversa: `DialogueStartedMessage` é publicada **antes** da primeira fala; o `GameFlow` entra em `DialogueState`.
 4. O runner entrega cada fala e cada grupo de opções ao `DialogueUIController` (D-12), que resolve o nome de quem fala no `CharacterRegistry`, mostra o nome na cor do personagem e põe o sprite dele em um dos dois lugares da tela de personagens, atrás da caixa (quem decide o lugar, o destaque e a expressão é o `ConversationStage`). Ao abrir as opções, o protagonista entra em destaque. O texto da fala é revelado aos poucos; o clique esquerdo (`DialogueInputHandler` → `AdvanceDialogue`) completa a fala que está sendo revelada e, com ela completa, avança; os botões escolhem (`DialogueChoiceButton` → `MakeChoice`). Um clique de ponteiro sobre um botão da interface não avança a fala. O apresentador anota cada fala e a opção escolhida no `ConversationLog`, e os itens que o roteiro dá ou tira chegam do `GameFlow` (`ItemScriptActions` → `DialogueManager.RecordItemReceived`/`RecordItemHandedOver`); o botão Histórico abre a lista, e com ela aberta avançar e escolher não fazem nada (#25). As variáveis do roteiro leem e gravam no `StoryState`.
 5. Ao acabar, `DialogueEndedMessage`; o `GameFlow` volta a `GameplayState`. O clique que encerrou o diálogo não atinge o mundo, porque o gate ignora o frame em que foi liberado. Se o roteiro parar sem terminar (por exemplo um `<<jump>>` para um nó que não existe), o `DialogueManager` registra o erro e encerra a conversa do mesmo jeito.
+
+**Troca de sala**
+1. Alguém chama `RoomNavigator.Instance.ChangeRoom(nomeDaCena)`. Hoje só o **Reload Scene** do painel de debug; as saídas clicáveis chegam na #13.
+2. Nome vazio, sem `ScreenFader`, troca já em curso, conversa aberta ou sala inexistente (cena fora da lista do build): aviso ou erro no console, retorna `false`, nada muda.
+3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada.
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
@@ -144,7 +151,6 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| Troca de sala e estado de transição | #12 |
 | Save automático e carregamento que recarrega a cena | #16 |
 
 Quem implementa cada uma atualiza este documento no mesmo PR.

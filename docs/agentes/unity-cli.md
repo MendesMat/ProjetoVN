@@ -181,6 +181,16 @@ Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pac
 
 O CLI não simula clique de mouse. Um comportamento que dependa do clique real (como o clique que encerra um diálogo não atingir o mundo) é verificado chamando os métodos na mesma ordem e conferindo o estado, e a issue registra que o teste com mouse de verdade fica para o programador.
 
+### Trocar de sala por `eval` (#12)
+
+A troca leva vários frames, e o `eval` roda em um só: dispare num `eval` e observe em outros, com espera entre eles. Só o fechamento do `PlayerInputGate` acontece no mesmo frame da chamada. Sem `Application.runInBackground = true` a troca fica parada no preto e parece bug.
+
+```bash
+unity command eval 'return ProjetoVN.GameFlow.Rooms.RoomNavigator.Instance.ChangeRoom("[Teste] Sala B");'
+```
+
+Para a troca ser observável, suba a duração só em runtime: em Play Mode, `SerializedObject` no `RoomNavigator`, campo `fadeSeconds` (3 deixa cada metade inequívoca), e `ApplyModifiedProperties()`. O valor volta ao do prefab no Play seguinte e o `Managers.prefab` não fica alterado. Durante a troca, `ScreenFader`/`CanvasGroup` mostram `alpha` subindo e `blocksRaycasts` verdadeiro, `PlayerInputGate.IsEnabled` falso, e um `RaycastAll` do `EventSystem` no centro da tela acha primeiro a `Image` `Black` do `Canvas_Fade`. Uma sala só carrega por nome se estiver na lista de cenas do build; o `Application.CanStreamedLevelBeLoaded` é o que decide.
+
 ### Contar o que está visível
 
 O painel de inventário reaproveita slots: um slot devolvido é desativado, não destruído. `transform.childCount` não diz quantos itens estão visíveis. Conte os filhos ativos.
@@ -227,9 +237,9 @@ Vale também para `.md`, `.yarn` e pastas. Atualize o banco de assets e commite 
 
 ### Managers e interface de jogo não entram em cena
 
-`DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
+`DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
 
-O mesmo vale para a interface de jogo, que vem aninhada nesse prefab (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game` e `EventSystem`):
+O mesmo vale para a interface de jogo, que vem aninhada nesse prefab (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game`, `Canvas_Fade` e `EventSystem`):
 
 - **Um `EventSystem` em uma cena** soma-se ao persistente e o uGUI loga `There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene` **a cada frame** (milhares de avisos em segundos). Na verificação, conte os `EventSystem` em Play Mode (deve ser 1) e confira que esse aviso não aparece.
 - **Um `Canvas_Game` em uma cena** duplica o apresentador: o da cena se registra por último no `DialogueManager` e, ao ser destruído com a cena, deixa o diálogo sem interface.

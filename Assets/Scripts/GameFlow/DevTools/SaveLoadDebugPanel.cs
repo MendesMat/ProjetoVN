@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ProjetoVN.Core.State;
 using ProjetoVN.GameFlow.Persistence;
+using ProjetoVN.GameFlow.Rooms;
 using ProjetoVN.Inventory;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -49,7 +50,13 @@ namespace ProjetoVN.GameFlow.DevTools
 
         public void ReloadScene()
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            if (RoomNavigator.Instance == null)
+            {
+                Debug.LogError("[SaveLoadDebugPanel] Não há RoomNavigator.", this);
+                return;
+            }
+
+            RoomNavigator.Instance.ChangeRoom(SceneManager.GetActiveScene().name);
         }
     }
 }

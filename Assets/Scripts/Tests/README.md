@@ -34,7 +34,7 @@ unity command run_tests --mode EditMode --timeout 180
 
 > **Lacuna conhecida e deliberada:** `LockedActionBehaviour`, o `DialogueManager`, o apresentador
 > `DialogueUIController`, o `DialogueHistoryView`, o `DialogueInputHandler` (inclusive a regra de que um
-> clique em botão da interface não avança a fala) e o `InteractableDialogueTrigger` não têm teste de comportamento em EditMode (os nós que os gatilhos citam são conferidos pelo `DialogueTriggerNodesTests`). Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
+> clique em botão da interface não avança a fala), o `InteractableDialogueTrigger`, o `RoomNavigator` e o `ScreenFader` não têm teste de comportamento em EditMode (os nós que os gatilhos citam são conferidos pelo `DialogueTriggerNodesTests`). Todos exigiriam um `GameObject` (o `InventoryManager`, o `DialogueRunner`), o que quebraria
 > a regra "C# puro, sem GameObjects" desta suíte; o `LockedActionBehaviour` ainda por cima é um
 > `MonoBehaviour` cujas asserções interessantes são sobre `UnityEvent` disparando. O `ItemScriptActions`
 > é cola entre três singletons e fica na mesma lacuna. A `Tests.asmdef` referencia `ProjetoVN.Inventory`
@@ -42,7 +42,10 @@ unity command run_tests --mode EditMode --timeout 180
 > (o roteiro de verificação de cada issue). O que o `DialogueManager` decide sem Unity mora em classes
 > puras testadas aqui: `ConversationNotifier` e `ScriptNodeName`. A revelação do texto também fica
 > nessa lacuna: a contagem é o `LetterTypewriter` do pacote, e a escolha entre completar e avançar
-> é um `if` do `DialogueManager`; as duas são verificadas em Play Mode (roteiro da #11).
+> é um `if` do `DialogueManager`; as duas são verificadas em Play Mode (roteiro da #11). A troca de sala
+> (recusas, ordem dos passos, gate fechado durante o fade, managers únicos depois de várias trocas) também:
+> é `MonoBehaviour`, estado, cena e prefab, verificada em Play Mode (roteiro da #12); a automação em
+> PlayMode é a #15.
 >
 > A parte do `LockedActionBehaviour` que **mais** mereceria um teste automatizado é a ordem dos
 > guardas: a flag é checada antes do item porque `IsTrue` não consome nada e `TryUse` consome.

@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/[Teste] Mecanicas.unity
     guid: 47956c4527e7e8d4a8137d39e62780af
+  - enabled: 1
+    path: Assets/Scenes/[Teste] Sala B.unity
+    guid: 961da817869f9d54ca415c5eb97085a7
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
