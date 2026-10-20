@@ -1,3 +1,4 @@
+using ProjetoVN.Core;
 using ProjetoVN.Dialogue.Logic;
 using UnityEngine;
 
@@ -5,8 +6,10 @@ namespace ProjetoVN.GameFlow
 {
     public sealed class InteractableDialogueTrigger : MonoBehaviour
     {
-        [Tooltip("Nome do nó do roteiro (.yarn) que este objeto inicia, por exemplo porta_trancada. " +
-                 "Vazio = o clique não inicia diálogo e avisa no console.")]
+        [Tooltip("Nó do roteiro (.yarn) que este objeto inicia, escolhido na lista dos nós de Assets/Roteiro/. " +
+                 "(nenhum) = o clique não inicia diálogo e avisa no console. " +
+                 "Um nó que não existe mais continua no campo, com aviso.")]
+        [ScriptNode]
         [SerializeField] private string nodeName;
 
         public void TriggerDialogue()
