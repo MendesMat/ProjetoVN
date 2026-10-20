@@ -46,6 +46,16 @@ unity status
 unity command run_tests --mode EditMode --timeout 180
 ```
 
+```bash
+unity command run_tests --mode playmode --async_tests true --timeout 300
+```
+
+```bash
+unity command test_status
+```
+
+A suíte PlayMode só roda de forma assíncrona: repita o `test_status` até `completed`. Rode as duas suítes em toda issue.
+
 Verificação em Play Mode, receitas e armadilhas: [docs/agentes/unity-cli.md](docs/agentes/unity-cli.md). Leia a seção sobre o Editor sem foco antes de confiar em qualquer verificação que dependa de frames.
 
 ## Mapa da documentação

@@ -35,7 +35,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | D-21 | Personagem é um dado; sprites da conversa em dois lugares, atrás da caixa | Padrão |
 | D-22 | Vocabulário do roteiro em português; código em inglês | Padrão |
 | D-23 | Navegador fica possível: três cuidados permanentes | Padrão |
-| D-24 | TDD para C# puro; testes EditMode; sem integração contínua | Padrão |
+| D-24 | TDD para C# puro; testes EditMode e PlayMode; sem integração contínua | Padrão |
 | D-25 | Sem `[SerializeReference]` | Padrão |
 | D-26 | Decisão do projeto prevalece sobre skill | **Absoluta** |
 | D-27 | Nada especulativo | Padrão |
@@ -265,9 +265,10 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Decisão:**
   - **TDD é obrigatória para C# puro** (classes sem `MonoBehaviour`): o teste é escrito antes do código;
   - MonoBehaviours, cenas e prefabs são verificados em **Play Mode pelo Unity CLI**, seguindo o roteiro de verificação da issue;
-  - os testes automatizados são **EditMode**; a suíte PlayMode nasce na issue #15;
+  - há duas suítes automatizadas. A **EditMode** (`Tests`) cobre C# puro e conteúdo. A **PlayMode** (`Tests.PlayMode`, nascida na #15) cobre o que só existe com o jogo rodando, a troca de sala e o ciclo de vida dos managers, sobre o `Managers.prefab` real e as cenas de teste; ela é de **caracterização**, e o resto de MonoBehaviour, cena e prefab continua no roteiro de Play Mode da issue;
   - **sem integração contínua** por enquanto: a sessão de revisão roda os testes e anexa o resultado ao PR.
-- **Regras da suíte:** todo estado estático é limpo no `SetUp` e no `TearDown`; comando e consulta se testam chamando o método, não publicando mensagem.
+- **Regras da suíte EditMode:** todo estado estático é limpo no `SetUp` e no `TearDown`; comando e consulta se testam chamando o método, não publicando mensagem.
+- **Regras da suíte PlayMode:** o estado do jogo se zera **pelos donos** (`InventoryManager.ReplaceAll` e `ReplaceConsumedWorldObjectIds`), nunca por `MessageBroker.Clear()`, que apagaria as assinaturas dos managers vivos, nem escrevendo no `PlayerInputGate` (D-28); os managers sobrevivem de um teste para o outro, então o `SetUp` zera o inventário e o `TearDown` deixa o jogo fora de transição; o teste não instancia manager nem põe nada em cena.
 
 ### D-26 — Decisão do projeto prevalece sobre skill (absoluta)
 - **Decisão:** quando uma skill recomenda algo que uma decisão desta página proíbe, vale a decisão. O agente segue a decisão e, se achar que ela está errada, **diz isso ao programador** em vez de contorná-la.
@@ -301,6 +302,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-20 | **Referência de asmdef autorizada (#32):** `ProjetoVN.Editor` passa a listar `YarnSpinner.dll` e `Yarn.Google.Protobuf.dll` em `precompiledReferences` (com `overrideReferences`), o que o `Tests.asmdef` já faz, para o seletor de nó ler o programa compilado do Yarn (`ParseFrom`). Nenhuma seta entre módulos mudou, nenhum ciclo nasceu. Autorizado pelo programador na execução da #32. Nenhuma decisão mudou. |
 | 2026-10-20 | **Cumprida em parte (#12):** D-19. O fade e o comando de troca de sala existem: o `Canvas_Fade` entra no `GameUI.prefab` e o `RoomNavigator` no `Managers.prefab`, com um modo novo, `RoomTransitionState`. **Regra nova, decidida pelo programador no levantamento da #12:** uma conversa aberta recusa a troca de sala, inclusive o Reload Scene do painel de debug (a nota da #9 deixava a decisão para esta issue). A lista de cenas do build ganhou `[Teste] Sala B`, autorizado pela issue. Nenhuma outra decisão mudou. |
 | 2026-10-20 | **Cumprida em parte (#13):** D-19. As saídas (`RoomExit`) e os pontos de entrada (`RoomEntryPoint`) existem, e a troca de sala ganha a chegada no ponto. **Regra nova, decidida pelo programador no levantamento da #13 (opção (b)):** uma falha inesperada na troca é registrada e o jogo volta à exploração com a tela clara, em vez de ficar preso na transição. Ponto de entrada inexistente é avisado pelo `OnValidate`, reprovado por teste e vira erro no console na chegada; sem seletor no Inspector. Nenhuma outra decisão mudou. |
+| 2026-10-20 | **Cumprida (#15):** D-24. A suíte PlayMode existe (`Tests.PlayMode`, três testes de caracterização da troca de sala) e a D-24 passa a ter duas suítes e as regras próprias da PlayMode. **Referências de asmdef autorizadas pelo programador na #15:** `Tests.PlayMode` → `ProjetoVN.GameFlow`, `ProjetoVN.Inventory`, `ProjetoVN.PointNClick`, `ProjetoVN.Dialogue`, `UnityEngine.UI` e o pacote Yarn Spinner (este por o `DialogueUIController` herdar de uma classe do Yarn, autorizado durante a execução). O assembly fica no topo do grafo: nenhum módulo de jogo o referencia, nenhuma seta entre módulos mudou, nenhum ciclo nasceu. Nenhuma outra decisão mudou. |
 | 2026-10-20 | **Nota (#14)** na D-10: o registro de objetos consumidos fica no `InventoryManager`, de forma definitiva, e o id persistente de um coletável é único no jogo inteiro. Nenhuma decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:

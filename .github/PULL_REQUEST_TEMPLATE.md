@@ -12,6 +12,7 @@ Closes #
 
 ## Verificação
 - **Testes EditMode:** <!-- cole o resultado, por exemplo "52/52 aprovados" -->
+- **Testes PlayMode:** <!-- cole o resultado, por exemplo "3/3 aprovados" -->
 - **Play Mode:** <!-- cada passo do roteiro de verificação, com o resultado -->
 - **Não verificado:** <!-- o quê e por quê; "nada" se tudo foi verificado -->
 
