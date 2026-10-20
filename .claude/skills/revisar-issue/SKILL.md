@@ -87,7 +87,7 @@ Responda a cada pergunta com evidência (arquivo e linha, ou saída de comando):
 1. **Critérios de aceite:** cada um foi cumprido? Um por um.
 2. **Levantamento:** o código segue a abordagem? Um desvio está explicado no PR e faz sentido?
 3. **Decisões:** alguma `D-xx` foi violada? Atenção especial a: mensagem usada como comando ou consulta (D-05), ScriptableObject alterado em runtime (D-02), interface ou abstração sem motivo concreto (D-03), manager em cena, estado estático sem reset (D-29), thread, `Task.Run` ou reflexão (D-23), acesso a arquivo fora do `GameSaveManager` (D-20).
-4. **Testes:** para C# puro, existe teste, e ele falharia sem o código novo? Os testes limpam o estado estático no `SetUp` e no `TearDown`?
+4. **Testes:** para C# puro, existe teste, e ele falharia sem o código novo? Cada suíte segue a sua regra (D-24)? EditMode: estado estático limpo no `SetUp` e no `TearDown`. PlayMode: estado zerado pelos donos, sem `MessageBroker.Clear()`, e `TearDown` deixando o jogo fora de transição.
 5. **Unity:** todo arquivo novo em `Assets/` tem `.meta`? Há arquivo do Editor alterado sem relação com a issue? Ligações de `UnityEvent` sobreviveram a renomeações e mudanças de asmdef?
 6. **Autoria:** todo campo novo exposto no Inspector tem tooltip e validação?
 7. **Escopo:** há algo no diff que a issue não pediu?
