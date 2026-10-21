@@ -258,7 +258,8 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
   - *Jogador:* o jogo espera o clique e não tem nada que dependa do tempo, então a jogabilidade não muda. Muda que a música (quando existir) continua no alt-tab, e que o jogo gasta CPU, GPU e bateria em segundo plano. Com a configuração padrão do Input System, mouse e teclado são desligados sem foco, então um clique fora da janela não chega ao jogo.
 - **Não fazer:** `Application.runInBackground = …` por `eval` ou em código de Editor. No Editor essa propriedade é a própria opção do Player Settings (`SetPlayerSettingsRunInBackground`), e a atribuição suja o `ProjectSettings.asset` (medido na #79: `runInBackground: 1 → 0` no arquivo depois de um `SaveAssets`).
 - **Vale porque:** o alvo é desktop (D-15), onde a opção é respeitada.
-- **Rever só se:** o consumo em segundo plano incomodar (o limite de FPS sem foco é a #81) ou entrar um alvo onde a opção não vale.
+- **Limite sem foco (#81):** com a janela sem foco, o `UnfocusedFrameRateLimiter` (`Managers.prefab`) desliga o VSync e limita o jogo a **30 FPS**, e devolve os dois valores de antes quando o foco volta. O VSync precisa ir junto porque, no desktop, o `targetFrameRate` é ignorado com `vSyncCount != 0`. Um valor só (campo do componente): o Unity não tem API que diferencie janela minimizada de janela sem foco. Vale na build e no Editor; no Editor, "foco" é o da Game view.
+- **Rever só se:** os 30 FPS sem foco incomodarem (um valor para a janela minimizada exigiria chamada nativa por sistema) ou entrar um alvo onde a opção não vale.
 
 ### D-23 — Navegador fica possível
 - **Decisão:** jogar no navegador não é alvo agora, mas a porta fica aberta com três cuidados permanentes:
@@ -316,6 +317,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-20 | **Nota (#14)** na D-10: o registro de objetos consumidos fica no `InventoryManager`, de forma definitiva, e o id persistente de um coletável é único no jogo inteiro. Nenhuma decisão mudou. |
 | 2026-10-21 | **Nova (#79):** D-31, decidida pelo programador na revisão da #15 ("vamos deixar em 1"). A atribuição `Application.runInBackground` no Editor grava o Player Settings (medido na #79), então a "armadilha do Editor sem foco" deixa de valer para o projeto e a receita de atribuir a opção sai da documentação. O congelamento do Play Mode com a opção desligada não se reproduziu na #79. Nenhuma outra decisão mudou. |
 | 2026-10-21 | **Nota (#80)** na D-24: a suíte PlayMode roda em 10 FPS e sem limite, e o teste que muda FPS ou VSync os devolve no `TearDown`. Nenhuma decisão mudou. |
+| 2026-10-21 | **Nota (#81)** na D-31: com a janela sem foco o jogo roda a 30 FPS com o VSync desligado (`UnfocusedFrameRateLimiter`), e o "Rever só se" deixa de citar a #81 como futura. Nenhuma decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

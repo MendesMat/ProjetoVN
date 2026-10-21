@@ -235,6 +235,18 @@ A suíte PlayMode roda em dois modos (10 FPS e sem limite, ver [Tests/README.md]
 - **Provocar um quadro longo:** um laço com `System.Diagnostics.Stopwatch` na thread principal (no `eval` ou no teste); nada de thread nem `Thread.Sleep` (regra 9).
 - **Os quadros de um `eval` para outro:** registre por `Application.onBeforeRender` e guarde a lista com `AppDomain.CurrentDomain.SetData`, para ler em outro `eval`.
 
+#### O limite de FPS sem foco (#81)
+
+O `UnfocusedFrameRateLimiter` (`Managers.prefab`) limita o jogo a 30 FPS e desliga o VSync quando a janela perde o foco (D-31). No Editor, **"foco" é o da Game view, não o da janela** (documentação do `OnApplicationFocus`).
+
+- **Sob o CLI o limite não age.** Medido com o Chrome em primeiro plano e o Play Mode rodando: `Application.isFocused = True`, e um `Application.focusChanged` assinado por `eval` não recebeu evento algum. Por isso uma verificação dirigida pelo CLI continua nos FPS que ela mesma pediu (a suíte PlayMode da #80 inclusive). O limite entra quando alguém clica em outra aba do Editor (Inspector, Console, Scene) durante o Play.
+- **Não clique no Editor durante a suíte PlayMode.** A perda de foco no meio de uma fixture a 10 FPS guarda `(0, 10)` e aplica `(0, 30)`, e o `FrameRate_IsTheOneThisFixtureAsked` reprova. Espere o `test_status` dizer `completed`.
+- **Simular a perda e o ganho de foco:** `UnityEngine.GameObject.Find("Managers").SendMessage("OnApplicationFocus", false);` (e `true`). Hoje só o `UnfocusedFrameRateLimiter` tem `OnApplicationFocus` (`grep` em `Assets/Scripts`); se outro componente do `Managers` ganhar um, mire só o limiter. Em seguida leia `QualitySettings.vSyncCount` e `Application.targetFrameRate` (esperado `0 30` sem foco e os valores de antes com o foco).
+- **Medir o FPS:** um `eval` guarda `Time.frameCount` e `Time.realtimeSinceStartup` com `AppDomain.CurrentDomain.SetData`; ~5 s depois, um segundo `eval` calcula quadros por segundo. Nunca dentro de um `eval` só (ele roda em um quadro). Sem o limite, o Editor sem foco faz ~360 a 470 FPS; limitado, 30,0. Uma janela de medição que pega a transição entre dois estados dá um valor intermediário (visto 169 uma vez, não reproduzido): repita a medição antes de concluir.
+- **Ajustar o campo em Play:** `SerializedObject` no `UnfocusedFrameRateLimiter`, campo `unfocusedFrameRate`, e `ApplyModifiedProperties()`. É lido na hora da perda de foco, e volta ao do prefab no Play seguinte.
+- **Não chame `AssetDatabase.SaveAssets()` com o `vSyncCount` alterado** (como na #80): `QualitySettings` é um asset de `ProjectSettings/`. No Editor, o `vSyncCount` não manda (só o `targetFrameRate` limita a Game view), então a verificação confere a devolução do par, não o efeito do VSync.
+- **O que o CLI não faz:** trocar o foco de janela. O efeito real (alt-tab, minimizar, segundo monitor, uso de GPU no Gerenciador de Tarefas) fica para o programador, numa build de Windows.
+
 ### Contar o que está visível
 
 O painel de inventário reaproveita slots: um slot devolvido é desativado, não destruído. `transform.childCount` não diz quantos itens estão visíveis. Conte os filhos ativos.
@@ -281,7 +293,7 @@ Vale também para `.md`, `.yarn` e pastas. Atualize o banco de assets e commite 
 
 ### Managers e interface de jogo não entram em cena
 
-`DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
+`DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
 
 O mesmo vale para a interface de jogo, que vem aninhada nesse prefab (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game`, `Canvas_Fade` e `EventSystem`):
 
