@@ -295,6 +295,8 @@ Vale também para `.md`, `.yarn` e pastas. Atualize o banco de assets e commite 
 
 `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` existem só no `Managers.prefab`. Um deles colocado em uma cena sobrescreve o `Instance` do persistente.
 
+O `UnfocusedFrameRateLimiter` é a exceção ao motivo: ele não tem `Instance`, mas um segundo exemplar (por exemplo, um posto em uma cena) faz o limite **não ser desfeito**. A perda de foco chega aos dois, e o segundo guarda o `(0, 30)` do primeiro como original; se ele também for o último a receber o ganho de foco, o jogo **fica a 30 FPS com o foco de volta**.
+
 O mesmo vale para a interface de jogo, que vem aninhada nesse prefab (`Assets/Prefabs/UI/GameUI.prefab`: `Canvas_Game`, `Canvas_Fade` e `EventSystem`):
 
 - **Um `EventSystem` em uma cena** soma-se ao persistente e o uGUI loga `There are 2 event systems in the scene. Please ensure there is always exactly one event system in the scene` **a cada frame** (milhares de avisos em segundos). Na verificação, conte os `EventSystem` em Play Mode (deve ser 1) e confira que esse aviso não aparece.
