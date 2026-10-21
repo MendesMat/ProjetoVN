@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 1119890017147649609}
   - component: {fileID: 2701538978368167837}
   - component: {fileID: 7233960080830787224}
+  - component: {fileID: 2680055250336085806}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -191,6 +192,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Rooms.RoomNavigator
   screenFader: {fileID: 3964921294727139080}
   fadeSeconds: 0.4
+--- !u!114 &2680055250336085806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d333ff0460ba0c84286801f89041e9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.FrameRate.UnfocusedFrameRateLimiter
+  unfocusedFrameRate: 30
 --- !u!1001 &1373167308627270322
 PrefabInstance:
   m_ObjectHideFlags: 0
