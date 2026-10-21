@@ -56,7 +56,7 @@ unity command test_status
 
 A suíte PlayMode só roda de forma assíncrona: repita o `test_status` até `completed`. Rode as duas suítes em toda issue.
 
-Verificação em Play Mode, receitas e armadilhas: [docs/agentes/unity-cli.md](docs/agentes/unity-cli.md). Leia a seção sobre o Editor sem foco antes de confiar em qualquer verificação que dependa de frames.
+Verificação em Play Mode, receitas e armadilhas: [docs/agentes/unity-cli.md](docs/agentes/unity-cli.md). Leia a seção "O Play Mode e o Editor sem foco" antes de confiar em qualquer verificação que dependa de frames: confirme que o jogo avança e nunca atribua `Application.runInBackground`.
 
 ## Mapa da documentação
 

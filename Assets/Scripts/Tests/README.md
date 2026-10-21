@@ -99,19 +99,14 @@ Regras próprias (D-24): o `SetUp` zera o inventário e os consumidos **pelos do
 O que não dá para cobrir em EditMode é verificado rodando o jogo pelo Editor conectado; as receitas
 estão em [docs/agentes/unity-cli.md](../../../docs/agentes/unity-cli.md). Uma pegadinha importante:
 
-> **Se o Editor estiver sem foco — o caso normal quando ele é dirigido pela CLI — o Play Mode
-> congela**, porque o Player Settings tem `runInBackground: 0`. Nenhum frame avança, então a Unity
-> **nunca chama `Start()`, `Update()` nem continua corrotinas**. O sintoma engana: `SceneManager.LoadScene`
-> ainda conclui e os objetos são recriados de verdade, então parece que o código de restauração é que
-> está quebrado.
+> **O projeto roda sem foco** (`runInBackground` ligado no Player Settings, D-31), então o Play
+> Mode de um Editor dirigido pela CLI avança e nenhum teste precisa atribuir nada.
+> **Não atribua `UnityEngine.Application.runInBackground`**: no Editor isso grava o
+> `ProjectSettings.asset`.
 >
-> Comece todo teste que dependa de frames com:
-> ```csharp
-> UnityEngine.Application.runInBackground = true;
-> ```
-> É uma mudança só de runtime: não suja o `ProjetoSettings.asset`. Para confirmar que está rodando,
-> leia `UnityEngine.Time.frameCount` duas vezes com alguns segundos de intervalo — se o número não
-> mudar, o jogo está parado e qualquer asserção sobre `Start()` é falso negativo.
+> Para confirmar que o jogo está rodando, leia `UnityEngine.Time.frameCount` duas vezes com alguns
+> segundos de intervalo — se o número não mudar, o jogo está parado e qualquer asserção sobre
+> `Start()` é falso negativo. Detalhes na seção "O Play Mode e o Editor sem foco" do `unity-cli.md`.
 
 Asserções feitas só com chamadas diretas de método (`door.Interact()`, `manager.Save()`) não dependem
 de frames e funcionam mesmo com o jogo parado.

@@ -42,6 +42,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | D-28 | Só o `GameFlow` escreve no `PlayerInputGate` | Padrão |
 | D-29 | Todo estado estático é zerado no início do Play | **Absoluta** |
 | D-30 | Histórico de falas: só leitura, só da conversa em curso, fora do save | Padrão |
+| D-31 | O jogo roda com a janela sem foco (`runInBackground` ligado) | Padrão |
 
 ---
 
@@ -250,6 +251,15 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 - **Decisão:** backend de script Mono. Alvo: Windows, Mac e Linux, distribuído por **download** no itch.io.
 - **Rever só se:** entrar um alvo que exija IL2CPP (navegador, celular, console).
 
+### D-31 — O jogo roda com a janela sem foco
+- **Decisão:** `runInBackground` ligado no Player Settings. O jogo continua rodando quando a janela perde o foco, na build e no Play Mode do Editor.
+- **Por quê:**
+  - *Desenvolvimento:* um Editor dirigido pelo CLI está sempre sem foco, e com a opção desligada o Play Mode já foi visto parado nas verificações da M3 (`Start`, `Update` e corrotinas não rodavam), o que dava falso negativo. Com a opção ligada ninguém precisa conferir isso antes de verificar. Na #79 o congelamento **não se reproduziu** com a opção desligada (o `Time.frameCount` avançou), então a condição exata que o provocava não está isolada; a decisão não depende dela.
+  - *Jogador:* o jogo espera o clique e não tem nada que dependa do tempo, então a jogabilidade não muda. Muda que a música (quando existir) continua no alt-tab, e que o jogo gasta CPU, GPU e bateria em segundo plano. Com a configuração padrão do Input System, mouse e teclado são desligados sem foco, então um clique fora da janela não chega ao jogo.
+- **Não fazer:** `Application.runInBackground = …` por `eval` ou em código de Editor. No Editor essa propriedade é a própria opção do Player Settings (`SetPlayerSettingsRunInBackground`), e a atribuição suja o `ProjectSettings.asset` (medido na #79: `runInBackground: 1 → 0` no arquivo depois de um `SaveAssets`).
+- **Vale porque:** o alvo é desktop (D-15), onde a opção é respeitada.
+- **Rever só se:** o consumo em segundo plano incomodar (o limite de FPS sem foco é a #81) ou entrar um alvo onde a opção não vale.
+
 ### D-23 — Navegador fica possível
 - **Decisão:** jogar no navegador não é alvo agora, mas a porta fica aberta com três cuidados permanentes:
   1. acesso a arquivo só no `GameSaveManager` (D-20);
@@ -304,6 +314,7 @@ Este é o registro das decisões de arquitetura e de processo do ProjetoVN. Cada
 | 2026-10-20 | **Cumprida em parte (#13):** D-19. As saídas (`RoomExit`) e os pontos de entrada (`RoomEntryPoint`) existem, e a troca de sala ganha a chegada no ponto. **Regra nova, decidida pelo programador no levantamento da #13 (opção (b)):** uma falha inesperada na troca é registrada e o jogo volta à exploração com a tela clara, em vez de ficar preso na transição. Ponto de entrada inexistente é avisado pelo `OnValidate`, reprovado por teste e vira erro no console na chegada; sem seletor no Inspector. Nenhuma outra decisão mudou. |
 | 2026-10-20 | **Cumprida (#15):** D-24. A suíte PlayMode existe (`Tests.PlayMode`, três testes de caracterização da troca de sala) e a D-24 passa a ter duas suítes e as regras próprias da PlayMode. **Referências de asmdef autorizadas pelo programador na #15:** `Tests.PlayMode` → `ProjetoVN.GameFlow`, `ProjetoVN.Inventory`, `ProjetoVN.PointNClick`, `ProjetoVN.Dialogue`, `UnityEngine.UI` e o pacote Yarn Spinner (este por o `DialogueUIController` herdar de uma classe do Yarn, autorizado durante a execução). O assembly fica no topo do grafo: nenhum módulo de jogo o referencia, nenhuma seta entre módulos mudou, nenhum ciclo nasceu. Nenhuma outra decisão mudou. |
 | 2026-10-20 | **Nota (#14)** na D-10: o registro de objetos consumidos fica no `InventoryManager`, de forma definitiva, e o id persistente de um coletável é único no jogo inteiro. Nenhuma decisão mudou. |
+| 2026-10-21 | **Nova (#79):** D-31, decidida pelo programador na revisão da #15 ("vamos deixar em 1"). A atribuição `Application.runInBackground` no Editor grava o Player Settings (medido na #79), então a "armadilha do Editor sem foco" deixa de valer para o projeto e a receita de atribuir a opção sai da documentação. O congelamento do Play Mode com a opção desligada não se reproduziu na #79. Nenhuma outra decisão mudou. |
 
 O histórico de execução das refatorações antigas (itens `ARCH-01` a `ARCH-22`, citados em alguns comentários de código) estava no roadmap removido. Para consultá-lo:
 

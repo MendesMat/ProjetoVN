@@ -76,7 +76,7 @@ unity command test_status
 
 A PlayMode só roda assíncrona: repita o `test_status` até `completed` (receita em `docs/agentes/unity-cli.md`).
 
-Depois, execute o **roteiro de verificação em Play Mode** do levantamento, passo a passo, seguindo `docs/agentes/unity-cli.md` (comece por `Application.runInBackground = true` se algum passo depender de frames). Guarde a saída de cada passo: ela é a evidência do parecer.
+Depois, execute o **roteiro de verificação em Play Mode** do levantamento, passo a passo, seguindo `docs/agentes/unity-cli.md` (se algum passo depender de frames, confira antes que o jogo avança: `Time.frameCount` lido duas vezes; não atribua `Application.runInBackground`, que grava o `ProjectSettings`). Guarde a saída de cada passo: ela é a evidência do parecer.
 
 Você não confia no que o PR diz que foi verificado. Você verifica de novo.
 

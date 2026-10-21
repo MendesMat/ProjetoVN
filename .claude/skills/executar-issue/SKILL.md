@@ -115,7 +115,7 @@ Faça de verdade; não declare sem executar.
 
 1. Recompile e confira que não há erro: `unity command recompile`, depois `unity command recompile_status`.
 2. Rode as duas suítes inteiras: `unity command run_tests --mode EditMode --timeout 180` e, depois, `unity command run_tests --mode playmode --async_tests true --timeout 300`, repetindo `unity command test_status` até `completed`.
-3. Execute o roteiro de verificação em Play Mode do levantamento, passo a passo. Comece por `Application.runInBackground = true` se algum passo depender de frames.
+3. Execute o roteiro de verificação em Play Mode do levantamento, passo a passo. Se algum passo depender de frames, confira antes que o jogo avança (`Time.frameCount` lido duas vezes, ver `docs/agentes/unity-cli.md`); não atribua `Application.runInBackground`, que grava o `ProjectSettings`.
 4. Confira cada critério de aceite da issue, um por um.
 5. Confira `git status`: todo arquivo novo em `Assets/` tem o seu `.meta`, e nenhum arquivo alterado pelo Editor sem relação com a issue entra no commit.
 
