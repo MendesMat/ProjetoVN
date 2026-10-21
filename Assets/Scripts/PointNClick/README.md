@@ -42,6 +42,10 @@ Note que **nenhum dos dois desliga o próprio componente** (`enabled = false`). 
 #### Por que `CanClickThisFrame` existe
 O input do mouse é processado **antes** do `Update`. Sem essa checagem, o mesmo clique que fecha um diálogo reabriria o diálogo na sequência: o callback de input encerra a conversa e libera o gate, e o `Update` daquele mesmo frame ainda enxerga `wasPressedThisFrame == true` e clica no objeto embaixo do cursor. Ignorar o frame da liberação corta esse "clique fantasma". A checagem de ponteiro sobre a UI (via `EventSystem`) impede que cliques no inventário ou nos menus atravessem para o cenário.
 
+**Contar quadros vale em qualquer FPS (#80).** A regra não é uma janela de tempo: ela compara um clique por quadro com uma liberação por quadro. O clique que fecha o diálogo é visto por `wasPressedThisFrame` em **um único quadro**, qualquer que seja a duração dele; se o diálogo termina nesse quadro, o gate abre com `_enabledFrame` igual a ele e o `CanClickThisFrame` recusa, e se termina num quadro seguinte o `wasPressedThisFrame` já é falso. A 10 FPS ou a 400 FPS o resultado é o mesmo. Trocar por uma janela de tempo é que criaria a dependência de FPS.
+
+**Pan e quadro longo (#80).** O `ScreenPanController` desloca `panSpeed * Time.deltaTime`, e o `deltaTime` é limitado pelo `Time.maximumDeltaTime` (0,333 s); todo movimento passa por `Mathf.Clamp(x, minX, maxX)`, que vale para qualquer tamanho de passo. Um quadro longo não atravessa o limite da sala.
+
 ### 2. Disparando Ações de Outros Módulos
 O `PointNClickSelector` não sabe *o que* um objeto faz; ele apenas avisa o objeto que ele foi clicado.
 A partir daí, componentes instalados no mesmo GameObject (pertencentes a outros módulos) reagem, via o `UnityEvent` `OnInteract` do `InteractableItem`. Exemplos:

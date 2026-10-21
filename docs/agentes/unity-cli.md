@@ -217,12 +217,23 @@ Para a troca ser observável, suba a duração só em runtime: em Play Mode, `Se
 
 ### Os testes PlayMode dividem uma sessão de Play (#15)
 
-O `Managers.prefab` é criado uma vez por sessão de Play (`ManagersBootstrap`, `AfterSceneLoad`) e é `DontDestroyOnLoad`: os três testes da `Tests.PlayMode` compartilham os mesmos managers, e o que um deixa no inventário o outro vê. O `SetUp` zera o estado **pelos donos** (`InventoryManager.ReplaceAll`, `ReplaceConsumedWorldObjectIds`); **`MessageBroker.Clear()` não serve aqui**, porque apagaria as assinaturas do `GameStateController` e o jogo deixaria de entrar e sair do modo de diálogo pelo resto da sessão. Mais quatro pontos:
+O `Managers.prefab` é criado uma vez por sessão de Play (`ManagersBootstrap`, `AfterSceneLoad`) e é `DontDestroyOnLoad`: os testes da `Tests.PlayMode` compartilham os mesmos managers, e o que um deixa no inventário o outro vê. O `SetUp` zera o estado **pelos donos** (`InventoryManager.ReplaceAll`, `ReplaceConsumedWorldObjectIds`); **`MessageBroker.Clear()` não serve aqui**, porque apagaria as assinaturas do `GameStateController` e o jogo deixaria de entrar e sair do modo de diálogo pelo resto da sessão. Mais quatro pontos:
 
 - **`Start` só roda no frame seguinte.** Depois de `LoadSceneAsync`, um `yield return null` antes de chamar `ChangeRoom`: `IsExploring` só fica verdadeiro no `Start` do `GameStateController`.
 - **O fim da troca é o `PlayerInputGate.IsEnabled` voltar a `true`** (é o `GameplayState.Enter`, a última coisa que ela faz); `GameStateController.IsExploring` é `internal` e não deve ser aberto só para o teste.
 - **Erro no console reprova o teste PlayMode** (`LogAssert`); aviso não. Uma recusa de troca loga aviso, então `LogAssert.Expect` a documenta.
 - **Chamar `Collect()` direto.** O `OnClick` do `Item_Chave` também abre a conversa `peguei_chave`, e uma conversa aberta recusa a troca de sala (D-19).
+
+### FPS, VSync e quadro longo no Play Mode (#80)
+
+A suíte PlayMode roda em dois modos (10 FPS e sem limite, ver [Tests/README.md](../../Assets/Scripts/Tests/README.md)). Fatos medidos no Editor 6000.3.9f1 sem foco:
+
+- **O Editor roda no nível de qualidade `Very Low`** (`vSyncCount: 0`); a build de desktop usa `Ultra` (`vSyncCount: 1`), então **numa build o jogo roda na frequência do monitor** (60, 144, 240 Hz). Sem limite, o Editor sem foco faz ~380 a 470 FPS.
+- **`Application.targetFrameRate` vale no Play Mode sem foco** (`= 10` deu 10 FPS). **No Editor o `vSyncCount` não manda:** com `vSyncCount = 1` o alvo 10 venceu, e com `-1` o jogo seguiu a ~440 FPS. A armadilha de que o `targetFrameRate` é ignorado com VSync ligado vale na **build**; por isso o teste zera o `vSyncCount` mesmo assim.
+- **Sair do Play devolve o `vSyncCount` e o `targetFrameRate`** (medido: `1 10` em Play, `0 -1` depois do `editor_stop`), e o `git status` fica limpo. Por isso ler `0 -1` **fora** do Play não prova que o `TearDown` devolveu os valores; essa devolução só se observa dentro do Play. O código a garante: `RestoreFrameRate()` é a primeira instrução do `[UnityTearDown]`. Mesmo assim, **não chame `AssetDatabase.SaveAssets()`** com o `vSyncCount` alterado: `QualitySettings` é um asset de `ProjectSettings/`, como o `runInBackground` (D-31).
+- **`Time.deltaTime` é limitado pelo `Time.maximumDeltaTime` (0,333 s); `Time.unscaledDeltaTime` não é.** Um travamento de 1,5 s deixou no quadro seguinte `dt = 0,333` e `udt = 1,566`. Código que anima por `unscaledDeltaTime` (o `ScreenFader`) recebe o passo inteiro; o que anima por `deltaTime` (o pan) recebe no máximo 0,333 s.
+- **Provocar um quadro longo:** um laço com `System.Diagnostics.Stopwatch` na thread principal (no `eval` ou no teste); nada de thread nem `Thread.Sleep` (regra 9).
+- **Os quadros de um `eval` para outro:** registre por `Application.onBeforeRender` e guarde a lista com `AppDomain.CurrentDomain.SetData`, para ler em outro `eval`.
 
 ### Contar o que está visível
 
