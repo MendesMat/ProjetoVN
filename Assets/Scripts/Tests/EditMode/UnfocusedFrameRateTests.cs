@@ -63,6 +63,19 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void TryRestore_WhenNotLimiting_GivesDefaultSettings()
+        {
+            _limit.Limit(BuildSettings, 30);
+            _limit.TryRestore(out _);
+
+            var restored = _limit.TryRestore(out var original);
+
+            Assert.That(restored, Is.False);
+            Assert.That(original.VSyncCount, Is.EqualTo(default(FrameRateSettings).VSyncCount));
+            Assert.That(original.TargetFrameRate, Is.EqualTo(default(FrameRateSettings).TargetFrameRate));
+        }
+
+        [Test]
         public void Limit_AfterARestore_SavesTheNewCurrentSettings()
         {
             _limit.Limit(BuildSettings, 30);

@@ -28,9 +28,13 @@ namespace ProjetoVN.GameFlow.FrameRate
 
         public bool TryRestore(out FrameRateSettings original)
         {
-            original = _original;
-            if (!IsLimiting) return false;
+            if (!IsLimiting)
+            {
+                original = default;
+                return false;
+            }
 
+            original = _original;
             IsLimiting = false;
             return true;
         }
