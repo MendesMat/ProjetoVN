@@ -28,6 +28,11 @@ namespace ProjetoVN.Tests.PlayMode
         private const string EntryPointId = "janela";
         private const float TransitionTimeoutSeconds = 10f;
         private const float LongFrameSeconds = 1f;
+        private const float LongFrameDetectionRatio = 0.9f;
+        private const float FrameCountWindowSeconds = 1f;
+        private const int LowFrameRateMinFrames = 5;
+        private const int LowFrameRateMaxFrames = 15;
+        private const int UnlimitedFrameRateMinFrames = 20;
 
         private readonly int _targetFrameRate;
         private int _originalTargetFrameRate;
@@ -50,7 +55,7 @@ namespace ProjetoVN.Tests.PlayMode
             yield return SceneManager.LoadSceneAsync(StartRoom);
             yield return null;
 
-            ApplyFrameRate();
+            SaveOriginalFrameRateAndApplyFixtureFrameRate();
         }
 
         [UnityTearDown]
@@ -64,7 +69,7 @@ namespace ProjetoVN.Tests.PlayMode
         public IEnumerator FrameRate_IsTheOneThisFixtureAsked()
         {
             int frames = 0;
-            float end = Time.realtimeSinceStartup + 1f;
+            float end = Time.realtimeSinceStartup + FrameCountWindowSeconds;
             while (Time.realtimeSinceStartup < end)
             {
                 frames++;
@@ -72,9 +77,14 @@ namespace ProjetoVN.Tests.PlayMode
             }
 
             if (_targetFrameRate == LowFrameRate)
-                Assert.That(frames, Is.InRange(5, 15), $"Pedido {LowFrameRate} FPS, mas passaram {frames} quadros em 1 s.");
-            else
-                Assert.Greater(frames, 20, $"Pedido FPS sem limite, mas passaram só {frames} quadros em 1 s.");
+            {
+                Assert.That(frames, Is.InRange(LowFrameRateMinFrames, LowFrameRateMaxFrames),
+                    $"Pedido {LowFrameRate} FPS, mas passaram {frames} quadros em 1 s.");
+                yield break;
+            }
+
+            Assert.Greater(frames, UnlimitedFrameRateMinFrames,
+                $"Pedido FPS sem limite, mas passaram só {frames} quadros em 1 s.");
         }
 
         [UnityTest]
@@ -147,23 +157,28 @@ namespace ProjetoVN.Tests.PlayMode
             int freezes = 0;
             int longFramesSeen = 0;
 
+            void FreezeOnceWhenTheNewRoomAppears()
+            {
+                if (freezes != 1 || SceneManager.GetActiveScene().name != OtherRoom)
+                    return;
+
+                FreezeMainThread(LongFrameSeconds);
+                freezes++;
+            }
+
             Assert.IsTrue(RoomNavigator.Instance.ChangeRoom(OtherRoom, EntryPointId));
             FreezeMainThread(LongFrameSeconds);
             freezes++;
 
             yield return WaitUntil(() =>
             {
-                if (Time.unscaledDeltaTime >= 0.9f * LongFrameSeconds)
+                if (Time.unscaledDeltaTime >= LongFrameDetectionRatio * LongFrameSeconds)
                     longFramesSeen++;
                 return PlayerInputGate.IsEnabled;
             }, "o input voltar depois da troca com quadros longos", () =>
             {
                 AssertInputIsBlocked(fade);
-                if (freezes == 1 && SceneManager.GetActiveScene().name == OtherRoom)
-                {
-                    FreezeMainThread(LongFrameSeconds);
-                    freezes++;
-                }
+                FreezeOnceWhenTheNewRoomAppears();
             });
 
             Assert.AreEqual(2, freezes, "A sala nova só apareceu depois do clarear: o travamento do clarear não aconteceu.");
@@ -173,7 +188,7 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.AreEqual(0f, fade.alpha, "A tela continua escura depois da troca.");
         }
 
-        private void ApplyFrameRate()
+        private void SaveOriginalFrameRateAndApplyFixtureFrameRate()
         {
             _originalTargetFrameRate = Application.targetFrameRate;
             _originalVSyncCount = QualitySettings.vSyncCount;
