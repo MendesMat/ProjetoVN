@@ -76,7 +76,7 @@ A PlayMode **não roda de forma síncrona** pelo CLI: `run_tests --mode playmode
 
 Para conferir quais testes cada suíte enxerga, `unity command list_tests --mode playmode` e `--mode editor` (um asmdef só de Editor faria um teste PlayMode aparecer na EditMode).
 
-**O Test Framework liga o `runInBackground` durante a execução** (`PreparePlayModeRunTask.cs`) e devolve o valor no fim, então a armadilha do Editor sem foco, descrita adiante, **não** vale para a suíte PlayMode. Ela continua valendo para a verificação feita por `eval`.
+O Test Framework liga o `runInBackground` durante a execução e devolve o valor no fim (`PreparePlayModeRunTask.cs`, `RestoreProjectSettingsTask.cs`). Com a D-31 o valor já é `true`, então isso não muda nada: depois da suíte, `git diff ProjectSettings/ProjectSettings.asset` continua vazio.
 
 **Salve a cena antes de rodar os testes.** Com a cena aberta suja, o Test Runner abre o diálogo "Scene(s) Have Been Modified" e bloqueia a thread principal do Editor: `run_tests` e `eval` expiram sem erro claro, e só um clique no diálogo destrava (medido na execução da #3). Rode `save_scene` depois de qualquer alteração de cena e antes do `run_tests`, **só se a cena estiver suja** (`SceneManager.GetActiveScene().isDirty`) e confira o `git status` depois: na #15, uma sequência de execuções com `save_scene` antes de cada uma deixou o `[Teste] Mecanicas.unity` modificado, com `RectTransform` de filhos de um layout group do canvas gravados com valores calculados (a causa não foi isolada). Reverta a cena com `git checkout` se isso acontecer; ele não entra no commit.
 
@@ -142,17 +142,19 @@ Sempre pelo CLI ou por `AssetDatabase`, nunca por `mv` ou `rm`: é o que leva o 
 
 O que os testes EditMode não cobrem (MonoBehaviours, cenas, `UnityEvent`) é verificado rodando o jogo e conferindo o estado por `eval`. Cada issue traz o seu roteiro de verificação no comentário de levantamento.
 
-### A armadilha do Editor sem foco
+### O Play Mode e o Editor sem foco
 
-**Um Editor dirigido pelo CLI está sem foco, e o projeto tem `runInBackground` desligado. Nessa situação o Play Mode congela:** nenhum frame avança, então `Start()`, `Update()` e corrotinas não rodam. O sintoma engana, porque `SceneManager.LoadScene` ainda conclui e os objetos são recriados, e parece que o código de restauração é que está quebrado.
+Um Editor dirigido pelo CLI está sem foco. O projeto roda sem foco (`runInBackground` ligado no Player Settings, D-31), então **o Play Mode avança e ninguém precisa atribuir nada** antes de uma verificação que dependa de frames.
 
-Toda verificação que dependa de frames começa com:
+**Não atribua `Application.runInBackground`.** No Editor essa propriedade é a própria opção do Player Settings (`SetPlayerSettingsRunInBackground`): uma atribuição muda o `ProjectSettings/ProjectSettings.asset` na próxima gravação (medido na #79: `runInBackground: 1 → 0` no arquivo depois de um `AssetDatabase.SaveAssets()`). Se o `git status` mostrar `runInBackground` alterado, alguém atribuiu; o arquivo não entra no commit e o valor correto é `1`.
+
+**Diagnóstico.** Se uma verificação der resultado estranho em Play Mode, confirme que o jogo avança: leia `Time.frameCount` duas vezes, com alguns segundos de intervalo.
 
 ```bash
-unity command eval 'UnityEngine.Application.runInBackground = true; return UnityEngine.Time.frameCount;'
+unity command eval 'return UnityEngine.Time.frameCount;'
 ```
 
-Rode de novo alguns segundos depois. Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()` é falsa. A atribuição é só de runtime e não altera `ProjectSettings`.
+Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()`, `Update()` ou corrotinas é falsa. O sintoma engana, porque `SceneManager.LoadScene` ainda conclui e os objetos são recriados, e parece que o código de restauração é que está quebrado. Esse congelamento foi visto com `runInBackground` desligado nas verificações da M3; na #79 ele **não se reproduziu** (com a opção desligada e o Editor sem foco, o `frameCount` avançou), então a condição exata que o provoca não está isolada. Por isso o diagnóstico fica, mesmo com a opção ligada.
 
 Asserções feitas só por chamada direta de método (`porta.Interact()`, `GameSaveManager.Instance.Save()`) não dependem de frames e valem mesmo com o jogo parado.
 
@@ -199,7 +201,7 @@ O CLI não simula clique de mouse. Um comportamento que dependa do clique real (
 
 ### Trocar de sala por `eval` (#12)
 
-A troca leva vários frames, e o `eval` roda em um só: dispare num `eval` e observe em outros, com espera entre eles. Só o fechamento do `PlayerInputGate` acontece no mesmo frame da chamada. Sem `Application.runInBackground = true` a troca fica parada no preto e parece bug.
+A troca leva vários frames, e o `eval` roda em um só: dispare num `eval` e observe em outros, com espera entre eles. Só o fechamento do `PlayerInputGate` acontece no mesmo frame da chamada. Se a troca ficar parada no preto, confira antes se o jogo avança (`Time.frameCount` duas vezes, ver [O Play Mode e o Editor sem foco](#o-play-mode-e-o-editor-sem-foco)).
 
 ```bash
 unity command eval 'return ProjetoVN.GameFlow.Rooms.RoomNavigator.Instance.ChangeRoom("[Teste] Sala B");'
@@ -330,7 +332,7 @@ Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho
    unity command run_tests --mode EditMode --timeout 180
    ```
 
-5. Abra a conversa em Play Mode (receita acima, com `Application.runInBackground = true`) e confira falas, opções e tamanho do texto.
+5. Abra a conversa em Play Mode (receita acima) e confira falas, opções e tamanho do texto.
 6. Confira o `git status`: só `Assets/Roteiro/` e os `.meta`. O merge, por *squash*, é do programador.
 
 ## Outras armadilhas do projeto
