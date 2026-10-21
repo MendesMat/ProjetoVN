@@ -41,7 +41,7 @@ O padrão se repete em todos os módulos (decisão D-03):
 
 ## Ciclo de vida
 
-- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
+- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
 - O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
@@ -91,6 +91,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
 | Modo de jogo atual | `GameStateController` | Não |
 | Troca de sala em curso | `RoomNavigator` | Não |
+| VSync e FPS de antes do limite sem foco | `UnfocusedFrameRateLimiter` | Não |
 | Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo será bloqueado, D-20) |
 | Quem está na tela de personagens (lado, destaque, última expressão) | `DialogueUIController`, por um `ConversationStage` (D-21); só da conversa em curso | Não |
 | Revelação da fala em curso | `DialogueUIController` (`IsRevealingLine`) | Não |
