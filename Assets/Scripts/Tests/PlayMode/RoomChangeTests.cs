@@ -79,12 +79,12 @@ namespace ProjetoVN.Tests.PlayMode
             if (_targetFrameRate == LowFrameRate)
             {
                 Assert.That(frames, Is.InRange(LowFrameRateMinFrames, LowFrameRateMaxFrames),
-                    $"Pedido {LowFrameRate} FPS, mas passaram {frames} quadros em 1 s.");
+                    $"Pedido {LowFrameRate} FPS, mas passaram {frames} quadros em {FrameCountWindowSeconds} s.");
                 yield break;
             }
 
             Assert.Greater(frames, UnlimitedFrameRateMinFrames,
-                $"Pedido FPS sem limite, mas passaram só {frames} quadros em 1 s.");
+                $"Pedido FPS sem limite, mas passaram só {frames} quadros em {FrameCountWindowSeconds} s.");
         }
 
         [UnityTest]
