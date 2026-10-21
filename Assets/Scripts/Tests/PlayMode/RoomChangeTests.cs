@@ -17,12 +17,26 @@ using Object = UnityEngine.Object;
 
 namespace ProjetoVN.Tests.PlayMode
 {
+    [TestFixture(LowFrameRate)]
+    [TestFixture(UnlimitedFrameRate)]
     public class RoomChangeTests
     {
+        private const int LowFrameRate = 10;
+        private const int UnlimitedFrameRate = -1;
         private const string StartRoom = "[Teste] Mecanicas";
         private const string OtherRoom = "[Teste] Sala B";
         private const string EntryPointId = "janela";
         private const float TransitionTimeoutSeconds = 10f;
+        private const float LongFrameSeconds = 1f;
+
+        private readonly int _targetFrameRate;
+        private int _originalTargetFrameRate;
+        private int _originalVSyncCount;
+
+        public RoomChangeTests(int targetFrameRate)
+        {
+            _targetFrameRate = targetFrameRate;
+        }
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -35,12 +49,32 @@ namespace ProjetoVN.Tests.PlayMode
 
             yield return SceneManager.LoadSceneAsync(StartRoom);
             yield return null;
+
+            ApplyFrameRate();
         }
 
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            RestoreFrameRate();
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim de uma troca de sala pendente");
+        }
+
+        [UnityTest]
+        public IEnumerator FrameRate_IsTheOneThisFixtureAsked()
+        {
+            int frames = 0;
+            float end = Time.realtimeSinceStartup + 1f;
+            while (Time.realtimeSinceStartup < end)
+            {
+                frames++;
+                yield return null;
+            }
+
+            if (_targetFrameRate == LowFrameRate)
+                Assert.That(frames, Is.InRange(5, 15), $"Pedido {LowFrameRate} FPS, mas passaram {frames} quadros em 1 s.");
+            else
+                Assert.Greater(frames, 20, $"Pedido FPS sem limite, mas passaram só {frames} quadros em 1 s.");
         }
 
         [UnityTest]
@@ -104,6 +138,61 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.AreEqual(OtherRoom, SceneManager.GetActiveScene().name, "O input voltou antes de a sala nova estar na tela.");
             Assert.IsFalse(fade.blocksRaycasts, "A interface continua barrada depois da troca.");
             Assert.AreEqual(0f, fade.alpha, "A tela continua escura depois da troca.");
+        }
+
+        [UnityTest]
+        public IEnumerator RoomChange_SurvivesALongFrameWhileFadingOutAndIn()
+        {
+            CanvasGroup fade = Object.FindFirstObjectByType<ScreenFader>().GetComponent<CanvasGroup>();
+            int freezes = 0;
+            int longFramesSeen = 0;
+
+            Assert.IsTrue(RoomNavigator.Instance.ChangeRoom(OtherRoom, EntryPointId));
+            FreezeMainThread(LongFrameSeconds);
+            freezes++;
+
+            yield return WaitUntil(() =>
+            {
+                if (Time.unscaledDeltaTime >= 0.9f * LongFrameSeconds)
+                    longFramesSeen++;
+                return PlayerInputGate.IsEnabled;
+            }, "o input voltar depois da troca com quadros longos", () =>
+            {
+                AssertInputIsBlocked(fade);
+                if (freezes == 1 && SceneManager.GetActiveScene().name == OtherRoom)
+                {
+                    FreezeMainThread(LongFrameSeconds);
+                    freezes++;
+                }
+            });
+
+            Assert.AreEqual(2, freezes, "A sala nova só apareceu depois do clarear: o travamento do clarear não aconteceu.");
+            Assert.GreaterOrEqual(longFramesSeen, 2, "O jogo não viu os dois quadros longos: o travamento não chegou ao tempo do fade.");
+            Assert.AreEqual(OtherRoom, SceneManager.GetActiveScene().name, "A troca não terminou na sala nova.");
+            Assert.IsFalse(fade.blocksRaycasts, "A interface continua barrada depois da troca.");
+            Assert.AreEqual(0f, fade.alpha, "A tela continua escura depois da troca.");
+        }
+
+        private void ApplyFrameRate()
+        {
+            _originalTargetFrameRate = Application.targetFrameRate;
+            _originalVSyncCount = QualitySettings.vSyncCount;
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = _targetFrameRate;
+        }
+
+        private void RestoreFrameRate()
+        {
+            QualitySettings.vSyncCount = _originalVSyncCount;
+            Application.targetFrameRate = _originalTargetFrameRate;
+        }
+
+        private static void FreezeMainThread(float seconds)
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            while (stopwatch.Elapsed.TotalSeconds < seconds)
+            {
+            }
         }
 
         private static void ResetInventory()
