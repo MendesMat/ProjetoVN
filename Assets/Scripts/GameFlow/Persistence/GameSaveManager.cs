@@ -17,6 +17,8 @@ namespace ProjetoVN.GameFlow.Persistence
 
         private static string SavePath => Path.Combine(Application.persistentDataPath, "savegame.json");
 
+        public bool HasSave => File.Exists(SavePath) && GameStateJson.TryRead(File.ReadAllText(SavePath), out _);
+
         private void Awake()
         {
             Instance = this;
@@ -105,7 +107,30 @@ namespace ProjetoVN.GameFlow.Persistence
             return true;
         }
 
-        public bool StartNewGame(string roomName, string entryPointId) => false;
+        public bool StartNewGame(string roomName, string entryPointId)
+        {
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError("[GameSaveManager] Não há InventoryManager na cena. StartNewGame ignorado.", this);
+                return false;
+            }
+
+            if (RoomNavigator.Instance == null)
+            {
+                Debug.LogError("[GameSaveManager] Não há RoomNavigator na cena. StartNewGame ignorado.", this);
+                return false;
+            }
+
+            if (!RoomNavigator.Instance.ChangeRoom(roomName, entryPointId))
+            {
+                Debug.LogWarning($"[GameSaveManager] StartNewGame ignorado: a troca para a sala inicial '{roomName}' " +
+                                 "foi recusada (motivo acima).", this);
+                return false;
+            }
+
+            Restore(new GameState());
+            return true;
+        }
 
         private void Restore(GameState state)
         {
