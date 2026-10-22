@@ -156,7 +156,7 @@ namespace ProjetoVN.Tests.PlayMode
 
             Assert.AreEqual(StartRoom, SceneManager.GetActiveScene().name);
             CollectableItemBehaviour reloadedCollectable = FindTheCollectable();
-            Assert.IsFalse(staleCollectable != null, "A cena não foi recarregada: o coletável antigo continua vivo.");
+            Assert.IsTrue(staleCollectable == null, "A cena não foi recarregada: o coletável antigo continua vivo.");
             Assert.IsFalse(reloadedCollectable.gameObject.activeSelf, "O coletável apareceu no estado errado depois do Load.");
             Assert.AreEqual(1, InventoryManager.Instance.Items.Count);
             Assert.AreSame(collectedItem, InventoryManager.Instance.Items[0]);
