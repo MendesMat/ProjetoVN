@@ -15,7 +15,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #18 |
-| [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
+| [Menu e pausa](#menu-e-pausa) | parcial | `UI`, `GameFlow` | #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
