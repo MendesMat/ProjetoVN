@@ -105,6 +105,8 @@ namespace ProjetoVN.GameFlow.Persistence
             return true;
         }
 
+        public bool StartNewGame(string roomName, string entryPointId) => false;
+
         private void Restore(GameState state)
         {
             var restoredItems = new List<ItemDataSO>();
