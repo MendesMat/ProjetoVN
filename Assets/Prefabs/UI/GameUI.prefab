@@ -3508,6 +3508,7 @@ GameObject:
   - component: {fileID: 4327729983919368648}
   - component: {fileID: 1270684211569062228}
   - component: {fileID: 1870358778446000121}
+  - component: {fileID: 3045662897861176691}
   m_Layer: 5
   m_Name: Canvas_Game
   m_TagString: Untagged
@@ -3599,6 +3600,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &3045662897861176691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8346530494869790579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2033b957d4aff54f8c3ca385ffc917e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Menu.GameUIVisibility
 --- !u!1 &8581262984495502804
 GameObject:
   m_ObjectHideFlags: 0
