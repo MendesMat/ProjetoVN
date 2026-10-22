@@ -103,6 +103,8 @@ Uma cena só pode ser alvo de uma troca de sala se estiver na lista de cenas do 
 
 Durante uma conversa aberta o jogo recusa a troca de sala.
 
+**A sala onde o Novo Jogo começa** é o campo **Start Room** do objeto `Main Menu`, na cena `Menu.unity` (e **Start Entry Point Id**, o ponto de chegada; vazio = a posição em que a cena foi salva). É o único lugar onde ela é configurada: quando existir a primeira sala de verdade, troque o texto ali, pelo nome exato da cena. Um teste reprova uma sala que não está na lista do build, o próprio menu, ou um ponto que a sala não tem.
+
 ## Saídas e pontos de entrada
 
 A navegação do jogo é só por saídas no cenário: não há mapa. Uma **saída** (`Room Exit`) é o que o jogador clica para ir a outra sala, e um **ponto de entrada** (`Room Entry Point`) é onde ele chega na sala de destino.

@@ -42,11 +42,12 @@ O padrão se repete em todos os módulos (decisão D-03):
 ## Ciclo de vida
 
 - Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
-- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
+- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário, e o `GameUIVisibility` que o liga e desliga), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
 - A interface de jogo também só se liga aos managers no próprio `Start` (o `DialogueUIController` se registra no `DialogueManager`; o `InventoryPresenter` se reconstrói). Na primeira cena, os `Start` dos objetos de cena entram na fila **antes** dos `Start` do prefab, porque o prefab é instanciado depois. Consequência: **um componente de cena não inicia diálogo no próprio `Start`**; receberia "Nenhuma interface de diálogo registrada". Nada faz isso hoje. Outra consequência: **o `Start` da interface de jogo não pode desfazer o que o `Start` da cena fez**, por exemplo a seleção do `EventSystem` (o menu seleciona o Novo Jogo; #88).
 - Dar Play a partir de qualquer cena funciona, porque o bootstrap não depende de uma cena inicial.
+- **O jogo abre em `Menu.unity`, a cena 0 do build (#17).** A interface de jogo persiste por cima de qualquer cena, então o `MainMenu` a esconde no `Start` pelo `GameUIVisibility` (que desliga o `Canvas` de `Canvas_Game`, sem desativar o objeto) e a mostra no `OnDestroy`, quando a cena da sala carrega. Sem `MainMenu` na cena (Play direto numa sala), a interface nasce ligada.
 
 ## Regras de comunicação
 
@@ -126,6 +127,12 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 1. `GameSaveManager.Load()` confere o arquivo, os managers e o `ItemRegistry` e lê o save com o `GameStateJson`. Sem arquivo, sem manager ou save corrompido: aviso ou erro no console, retorna `false`, nada muda.
 2. Pede a troca de sala ao `RoomNavigator` com a sala e o ponto de entrada salvos (`ChangeRoom(currentScene, currentEntryPointId)`). Recusada (conversa aberta, troca em curso, sala fora do build, nome vazio): aviso no console, retorna `false`, **nada foi restaurado**.
 3. Aceita a troca, restaura itens, objetos consumidos e estado da história e retorna `true`. Como a cena nova ainda não foi ativada, o `Start()` dos objetos dela já lê o estado restaurado, e portões e coletáveis aparecem no estado certo. A chegada salva de novo (inofensivo).
+
+**Novo jogo** (#17)
+1. No menu, NOVO JOGO chama `MainMenu.RequestNewGame()` (`Button.onClick`). Com save (`GameSaveManager.HasSave`: o arquivo existe e é legível), o `MainMenu` dispara `onNewGameNeedsConfirmation` e a `Confirm New Game Window` abre; o NOVO JOGO dela chama `MainMenu.StartNewGame()`. Sem save, vai direto.
+2. `GameSaveManager.StartNewGame(startRoom, startEntryPointId)` pede a troca de sala ao `RoomNavigator` **primeiro**. Recusada (sala vazia, fora do build, conversa aberta, troca em curso): aviso, retorna `false`, **nada foi mexido**.
+3. Aceita a troca, restaura um `GameState` vazio (itens, objetos consumidos e `StoryState` zerados, pelo mesmo `Restore` do carregar) e retorna `true`. A cena da sala inicial ainda não está ativa, então seus objetos já leem o estado novo no `Start()`. A chegada salva o jogo novo e sobrescreve o arquivo (D-20); o `StartNewGame` não o apaga.
+4. CONTINUAR (`MainMenu.ContinueGame()`) é o `Load()` descrito acima; fica desabilitado sem save.
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
