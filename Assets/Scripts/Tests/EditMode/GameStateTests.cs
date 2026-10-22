@@ -21,7 +21,8 @@ namespace ProjetoVN.Tests.EditMode
                 },
                 storyNumbers = new List<StoryNumberEntry> { new() { name = "$afinidade_luna", value = 2.5f } },
                 storyTexts = new List<StoryTextEntry> { new() { name = "$nome_jogador", value = "Ana" } },
-                currentScene = "SalaDeTeste"
+                currentScene = "SalaDeTeste",
+                currentEntryPointId = "janela"
             };
 
             string json = JsonUtility.ToJson(original);
@@ -33,6 +34,7 @@ namespace ProjetoVN.Tests.EditMode
             Assert.That(restored.storyNumbers, Is.EqualTo(original.storyNumbers));
             Assert.That(restored.storyTexts, Is.EqualTo(original.storyTexts));
             Assert.That(restored.currentScene, Is.EqualTo(original.currentScene));
+            Assert.That(restored.currentEntryPointId, Is.EqualTo(original.currentEntryPointId));
         }
 
         [Test]
@@ -49,6 +51,7 @@ namespace ProjetoVN.Tests.EditMode
             Assert.That(restored.storyNumbers, Is.Empty);
             Assert.That(restored.storyTexts, Is.Empty);
             Assert.That(restored.currentScene, Is.EqualTo(""));
+            Assert.That(restored.currentEntryPointId, Is.EqualTo(""));
         }
     }
 }

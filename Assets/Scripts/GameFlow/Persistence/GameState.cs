@@ -12,5 +12,6 @@ namespace ProjetoVN.GameFlow.Persistence
         public List<StoryNumberEntry> storyNumbers = new();
         public List<StoryTextEntry> storyTexts = new();
         public string currentScene = "";
+        public string currentEntryPointId = "";
     }
 }
