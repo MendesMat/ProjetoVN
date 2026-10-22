@@ -13,7 +13,7 @@ namespace ProjetoVN.GameFlow.Rooms
         [SerializeField] private string destinationRoom;
 
         [Tooltip("O id de um Room Entry Point da sala de destino: onde o jogador chega. " +
-                 "Vazio = chega na posição em que a cena foi salva, com aviso no console.")]
+                 "Vazio = chega na posição em que a cena foi salva, com aviso no Inspector.")]
         [SerializeField] private string entryPointId;
 
         public void Leave()

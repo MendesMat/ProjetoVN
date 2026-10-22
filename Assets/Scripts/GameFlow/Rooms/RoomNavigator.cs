@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using ProjetoVN.Dialogue.Logic;
+using ProjetoVN.GameFlow.Persistence;
 using ProjetoVN.PointNClick;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,8 @@ namespace ProjetoVN.GameFlow.Rooms
     public sealed class RoomNavigator : MonoBehaviour
     {
         public static RoomNavigator Instance { get; private set; }
+
+        public string CurrentEntryPointId { get; private set; }
 
         [Tooltip("O fade de tela (Canvas_Fade, dentro do GameUI.prefab). " +
                  "Vazio = nenhuma troca de sala é aceita: ChangeRoom loga um erro e devolve false.")]
@@ -109,6 +112,8 @@ namespace ProjetoVN.GameFlow.Rooms
                 await SceneManager.LoadSceneAsync(roomName);
                 destroyCancellationToken.ThrowIfCancellationRequested();
                 ArriveAt(roomName, entryPointId);
+                CurrentEntryPointId = entryPointId;
+                SaveOnArrival();
                 await screenFader.FadeInAsync(fadeSeconds, destroyCancellationToken);
             }
             catch (OperationCanceledException)
@@ -133,6 +138,17 @@ namespace ProjetoVN.GameFlow.Rooms
             Debug.LogException(exception, this);
 
             if (screenFader != null) screenFader.HideImmediately();
+        }
+
+        private void SaveOnArrival()
+        {
+            if (GameSaveManager.Instance == null)
+            {
+                Debug.LogError("[RoomNavigator] Não há GameSaveManager: a chegada na sala não foi salva.", this);
+                return;
+            }
+
+            GameSaveManager.Instance.Save();
         }
 
         private void ArriveAt(string roomName, string entryPointId)
