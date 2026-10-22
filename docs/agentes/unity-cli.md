@@ -215,6 +215,17 @@ Para a troca ser observável, suba a duração só em runtime: em Play Mode, `Se
 
 **Gravar uma cena alterada por `eval_file`.** `EditorSceneManager.SaveOpenScenes()` dentro de um `eval` **não gravou** a cena (`SerializedObject.ApplyModifiedProperties` deixa a cena suja, mas o arquivo ficou como estava), e o `run_tests` seguinte abriu o diálogo "Scene(s) Have Been Modified": o Editor travou e todo comando do CLI (inclusive `cancel_tests`) expirou até reiniciar o Unity. Grave sempre com `unity command save_scene` e **confira no arquivo** (`grep` no `.unity`) antes de rodar a suíte. Numa fase vermelha de teste de conteúdo (sabotar a cena de propósito) isso importa em dobro: ao reiniciar o Editor, a cena sabotada é a que está no disco.
 
+### Salvar e carregar por `eval` (#16)
+
+O arquivo do save é `Application.persistentDataPath/savegame.json` (no Windows, `%USERPROFILE%/AppData/LocalLow/DefaultCompany/ProjetoVN`). **Toda troca de sala salva**, então a suíte PlayMode e qualquer verificação em Play **sobrescrevem o save do Editor**: copie o arquivo antes, se quiser guardá-lo, e devolva depois.
+
+- **O `Load()` é uma troca de sala:** devolve `true` na hora e leva vários frames. Dispare num `eval` e observe em outros (como em "Trocar de sala por `eval`"); no mesmo `eval` do `Load()` só o `PlayerInputGate.IsEnabled == false` já vale. O fim é o gate voltar a `true`.
+- **Ler o arquivo:** `System.IO.File.ReadAllText(System.IO.Path.Combine(UnityEngine.Application.persistentDataPath, "savegame.json"))`. A verificação escreve o arquivo por `eval` ou `eval_file`, o que é ferramenta de teste, não código do jogo.
+- **Save corrompido:** grave `{garbage` (ou um arquivo vazio) no caminho acima e chame `Load()`: `false`, o aviso "O save está corrompido" e nenhuma exceção. Sem o `GameStateJson`, o `JsonUtility` lançava `ArgumentException` (`JSON parse error: Missing a name for object member` para `{garbage`; `JSON must represent an object type` para `null` e `[1,2]`; `""` devolvia `null`).
+- **Sala inexistente:** grave um JSON válido com `"currentScene": "Sala Que Nao Existe"` e um item em `ownedItemIds`. `Load()` devolve `false`, com o erro do `RoomNavigator` e o aviso do `GameSaveManager`, e o inventário **não** muda (prova que o `Load()` é tudo ou nada).
+- **Save recusado em conversa:** `DialogueManager.Instance.StartDialogue("peguei_chave")`, espere 1 s e chame `Save()` (`false`, "Save recusado: há uma conversa aberta") e `Load()` (`false`, com o aviso do `RoomNavigator`). Encerre a conversa com `AdvanceDialogue()`, um `eval` por vez.
+- **Um `eval` com nome de variável de história (`$…`)** vai em `eval_file` ou entre aspas simples.
+
 ### Os testes PlayMode dividem uma sessão de Play (#15)
 
 O `Managers.prefab` é criado uma vez por sessão de Play (`ManagersBootstrap`, `AfterSceneLoad`) e é `DontDestroyOnLoad`: os testes da `Tests.PlayMode` compartilham os mesmos managers, e o que um deixa no inventário o outro vê. O `SetUp` zera o estado **pelos donos** (`InventoryManager.ReplaceAll`, `ReplaceConsumedWorldObjectIds`); **`MessageBroker.Clear()` não serve aqui**, porque apagaria as assinaturas do `GameStateController` e o jogo deixaria de entrar e sair do modo de diálogo pelo resto da sessão. Mais quatro pontos:

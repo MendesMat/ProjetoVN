@@ -123,6 +123,46 @@ namespace ProjetoVN.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator RoomChange_SavesOnArrival()
+        {
+            FindTheCollectable().Collect();
+            ItemDataSO collectedItem = InventoryManager.Instance.Items[0];
+
+            yield return ChangeRoomAndWait(OtherRoom);
+            ResetInventory();
+            Assert.IsTrue(GameSaveManager.Instance.Load(), "O Load foi recusado: não havia save da chegada na sala.");
+            yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim da troca do Load");
+
+            Assert.AreEqual(OtherRoom, SceneManager.GetActiveScene().name, "O save da chegada não guardou a sala nova.");
+            Assert.AreEqual(EntryPointId, RoomNavigator.Instance.CurrentEntryPointId);
+            Assert.AreEqual(1, InventoryManager.Instance.Items.Count, "O save da chegada não guardou o inventário.");
+            Assert.AreSame(collectedItem, InventoryManager.Instance.Items[0]);
+        }
+
+        [UnityTest]
+        public IEnumerator Load_ReloadsTheSavedRoomWithObjectsInTheSavedState()
+        {
+            FindTheCollectable().Collect();
+            ItemDataSO collectedItem = InventoryManager.Instance.Items[0];
+            Assert.IsTrue(GameSaveManager.Instance.Save(), "O Save foi recusado.");
+
+            ResetInventory();
+            FindTheCollectable().gameObject.SetActive(true);
+            CollectableItemBehaviour staleCollectable = FindTheCollectable();
+
+            Assert.IsTrue(GameSaveManager.Instance.Load(), "O Load foi recusado.");
+            Assert.IsFalse(PlayerInputGate.IsEnabled, "O Load não fechou o input: não pediu uma troca de sala.");
+            yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim da troca do Load");
+
+            Assert.AreEqual(StartRoom, SceneManager.GetActiveScene().name);
+            CollectableItemBehaviour reloadedCollectable = FindTheCollectable();
+            Assert.IsTrue(staleCollectable == null, "A cena não foi recarregada: o coletável antigo continua vivo.");
+            Assert.IsFalse(reloadedCollectable.gameObject.activeSelf, "O coletável apareceu no estado errado depois do Load.");
+            Assert.AreEqual(1, InventoryManager.Instance.Items.Count);
+            Assert.AreSame(collectedItem, InventoryManager.Instance.Items[0]);
+        }
+
+        [UnityTest]
         public IEnumerator RoomChange_BlocksInputUntilTheNewRoomIsShown()
         {
             CanvasGroup fade = Object.FindFirstObjectByType<ScreenFader>().GetComponent<CanvasGroup>();
