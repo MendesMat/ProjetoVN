@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d315bc3974d05f419d216cdc5764e35, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.MenuButtonUI
   button: {fileID: 4215378421114216173}
   selectOnHover: 1
@@ -217,10 +217,6 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  invokeClickOnSubmit: 1
-  onClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &7750462959148917380
 GameObject:
   m_ObjectHideFlags: 0

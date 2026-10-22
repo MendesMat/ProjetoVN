@@ -226,6 +226,24 @@ O arquivo do save é `Application.persistentDataPath/savegame.json` (no Windows,
 - **Save recusado em conversa:** `DialogueManager.Instance.StartDialogue("peguei_chave")`, espere 1 s e chame `Save()` (`false`, "Save recusado: há uma conversa aberta") e `Load()` (`false`, com o aviso do `RoomNavigator`). Encerre a conversa com `AdvanceDialogue()`, um `eval` por vez.
 - **Um `eval` com nome de variável de história (`$…`)** vai em `eval_file` ou entre aspas simples.
 
+### Testar o menu por `eval` (#17)
+
+Copie o `savegame.json` para fora do repositório antes (a verificação o sobrescreve) e devolva no fim. Espere ~10 s depois de cada `editor_play` antes do primeiro `eval`; confira que o jogo avança (`Time.frameCount` duas vezes).
+
+- **Os botões do título** são `Button` + `MenuButtonUI`, achados por caminho: `Canvas/Title Window/Left Panel/Midle/Button Icon` = NOVO JOGO, `Button Icon (1)` = CONTINUAR, `(2)` = CONFIGURAÇÕES, `(3)` = SAIR. A `Confirm New Game Window` repete os nomes (`Button Icon` = NOVO JOGO, `Button Icon (1)` = VOLTAR), então **use o caminho inteiro**; `GameObject.Find` só acha objeto ativo (a confirmação, inativa, só aparece depois do clique em NOVO JOGO com save).
+- **Clicar:** `GameObject.Find("<caminho>").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();` (o CLI não simula mouse). **Enter:** `UnityEngine.EventSystems.ExecuteEvents.Execute(go, new UnityEngine.EventSystems.BaseEventData(UnityEngine.EventSystems.EventSystem.current), UnityEngine.EventSystems.ExecuteEvents.submitHandler)`; um clique só, sem o aviso "já há uma troca de sala em curso" no console, prova que o botão tem um caminho de clique único.
+- **A interface de jogo escondida:** `GameObject.Find("Canvas_Game").GetComponent<UnityEngine.Canvas>().enabled` é `false` no menu e `true` na sala. Para provar que ela não recebe clique, um `RaycastAll` do `EventSystem` no centro do `InventoryPanel` (`GetWorldCorners` no canvas Overlay já dá pixels de tela): no menu não acha o `InventoryPanel`, na sala acha.
+- **O Continuar:** `Button.interactable` e a cor do `Button Label` (`disabledTextColor` quando desligado). **Save corrompido:** grave `{garbage` no `savegame.json` e dê Play: Continuar desligado, Novo Jogo direto. **Sair:** `EditorApplication.isPlaying` fica `false`.
+- **O Novo Jogo e o Continuar são trocas de sala** (vários frames): no mesmo `eval` só o `PlayerInputGate.IsEnabled == false` vale; observe em outro `eval`.
+
+### Ligar um `UnityEvent` por script de Editor (#17)
+
+`UnityEventTools.AddVoidPersistentListener(button.onClick, componente.Metodo)` grava a ligação no `Button.onClick`, e `AddObjectPersistentListener<UIWindow>(evento, manager.OpenWindow, janela)` a do `OpenWindow` com argumento de objeto. Para um evento `[SerializeField] private UnityEvent<bool>` de um componente, pegue a instância por reflexão **do Editor** (`GetField(..., NonPublic | Instance).GetValue(componente)`), chame `UnityEventTools.AddPersistentListener(evento, alvo.MetodoBool)` (ligação **dinâmica**, `m_Mode: 0`: o `bool` vem de quem invoca) e termine com `EditorUtility.SetDirty` e `unity command save_scene`. Confira no `.unity` por `grep` (`m_MethodName`, `m_Mode`). Um `eval_file` não aceita `using` no topo: use os nomes completos (`UnityEditor.Events.UnityEventTools`).
+
+### A lista de cenas do build só vai para o disco com `SaveAssets` (#17)
+
+`EditorBuildSettings.scenes = ...` por `eval` muda a lista em memória, mas o `ProjectSettings/EditorBuildSettings.asset` só é regravado depois de `AssetDatabase.SaveAssets()`. Sem o `QualitySettings` alterado, essa chamada não toca o `ProjectSettings.asset` (D-31, #80); confira o `git diff ProjectSettings/`: só a lista de cenas.
+
 ### Os testes PlayMode dividem uma sessão de Play (#15)
 
 O `Managers.prefab` é criado uma vez por sessão de Play (`ManagersBootstrap`, `AfterSceneLoad`) e é `DontDestroyOnLoad`: os testes da `Tests.PlayMode` compartilham os mesmos managers, e o que um deixa no inventário o outro vê. O `SetUp` zera o estado **pelos donos** (`InventoryManager.ReplaceAll`, `ReplaceConsumedWorldObjectIds`); **`MessageBroker.Clear()` não serve aqui**, porque apagaria as assinaturas do `GameStateController` e o jogo deixaria de entrar e sair do modo de diálogo pelo resto da sessão. Mais quatro pontos:

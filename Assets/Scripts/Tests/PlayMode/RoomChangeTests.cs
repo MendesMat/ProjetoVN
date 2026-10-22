@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.UI;
 using ProjetoVN.GameFlow;
@@ -26,6 +27,7 @@ namespace ProjetoVN.Tests.PlayMode
         private const string StartRoom = "[Teste] Mecanicas";
         private const string OtherRoom = "[Teste] Sala B";
         private const string EntryPointId = "janela";
+        private const string StoryVariable = "$sessao_anterior";
         private const float TransitionTimeoutSeconds = 10f;
         private const float LongFrameSeconds = 1f;
         private const float LongFrameDetectionRatio = 0.9f;
@@ -63,6 +65,7 @@ namespace ProjetoVN.Tests.PlayMode
         {
             RestoreFrameRate();
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim de uma troca de sala pendente");
+            StoryState.ClearAll();
         }
 
         [UnityTest]
@@ -163,6 +166,51 @@ namespace ProjetoVN.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator StartNewGame_ArrivesAtTheRoomWithNothingFromTheSession()
+        {
+            FindTheCollectable().Collect();
+            ItemDataSO collectedItem = InventoryManager.Instance.Items[0];
+            StoryState.SetBool(StoryVariable, true);
+            Assert.IsNotEmpty(InventoryManager.Instance.ConsumedWorldObjectIds, "A coleta não registrou o objeto consumido.");
+
+            Assert.IsTrue(GameSaveManager.Instance.StartNewGame(OtherRoom, EntryPointId), "O StartNewGame foi recusado.");
+            Assert.IsFalse(PlayerInputGate.IsEnabled, "O StartNewGame não fechou o input: não pediu uma troca de sala.");
+            yield return WaitUntil(
+                () => SceneManager.GetActiveScene().name == OtherRoom && PlayerInputGate.IsEnabled,
+                "a sala inicial do novo jogo aparecer com o input liberado");
+
+            Assert.AreEqual(EntryPointId, RoomNavigator.Instance.CurrentEntryPointId);
+            AssertNothingFromTheSession();
+
+            InventoryManager.Instance.ReplaceAll(new[] { collectedItem });
+            StoryState.SetBool(StoryVariable, true);
+            Assert.IsTrue(GameSaveManager.Instance.Load(), "O Load foi recusado: não havia save da chegada do novo jogo.");
+            yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim da troca do Load");
+
+            Assert.AreEqual(OtherRoom, SceneManager.GetActiveScene().name);
+            AssertNothingFromTheSession();
+        }
+
+        [UnityTest]
+        public IEnumerator StartNewGame_RefusedChangesNothing()
+        {
+            FindTheCollectable().Collect();
+            ItemDataSO collectedItem = InventoryManager.Instance.Items[0];
+            StoryState.SetBool(StoryVariable, true);
+
+            LogAssert.Expect(LogType.Error, new Regex("'Sala Que Nao Existe' não existe"));
+            Assert.IsFalse(GameSaveManager.Instance.StartNewGame("Sala Que Nao Existe", null),
+                "O StartNewGame aceitou uma sala que não existe.");
+
+            Assert.AreEqual(1, InventoryManager.Instance.Items.Count, "A recusa mexeu no inventário.");
+            Assert.AreSame(collectedItem, InventoryManager.Instance.Items[0]);
+            Assert.IsNotEmpty(InventoryManager.Instance.ConsumedWorldObjectIds, "A recusa zerou os objetos consumidos.");
+            Assert.IsTrue(StoryState.IsTrue(StoryVariable), "A recusa zerou o StoryState.");
+            Assert.AreEqual(StartRoom, SceneManager.GetActiveScene().name);
+            yield return null;
+        }
+
+        [UnityTest]
         public IEnumerator RoomChange_BlocksInputUntilTheNewRoomIsShown()
         {
             CanvasGroup fade = Object.FindFirstObjectByType<ScreenFader>().GetComponent<CanvasGroup>();
@@ -248,6 +296,13 @@ namespace ProjetoVN.Tests.PlayMode
             while (stopwatch.Elapsed.TotalSeconds < seconds)
             {
             }
+        }
+
+        private static void AssertNothingFromTheSession()
+        {
+            Assert.IsEmpty(InventoryManager.Instance.Items, "O inventário não está vazio.");
+            Assert.IsEmpty(InventoryManager.Instance.ConsumedWorldObjectIds, "Há objetos consumidos.");
+            Assert.AreEqual(0, StoryState.Bools.Count, "O StoryState não está vazio.");
         }
 
         private static void ResetInventory()

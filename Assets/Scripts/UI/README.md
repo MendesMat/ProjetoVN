@@ -12,6 +12,8 @@ O módulo **UI** agrupa os elementos visuais de tela (HUDs, menus, janelas e pai
   - **`UIWindow`**: Classe base para um painel que abre, fecha e define qual elemento recebe o foco.
   - **`UIWindowManager`**: Coordena qual janela está aberta (`OpenWindow`, `CloseCurrentWindow`). *Não* trata a tecla ESC nem empilha janelas — se isso for necessário, será preciso implementar.
 - **`Components/`**: Elementos de interface reutilizáveis. `UISelectableBase` centraliza o estado de destaque (`isPointerOver` e `isSelected` são independentes: o mouse sair não desfaz a seleção do teclado) e `MenuButtonUI` o aplica às cores e ao ornamento.
+  - **`MenuButtonUI` só cuida da aparência.** Clique e Enter se ligam no `Button.onClick`, que é o único caminho (o `MenuButtonUI` não tem `onClick` próprio nem `AddListener`: com os dois, uma ligação dispararia duas vezes no Enter, porque o `ExecuteEvents` entrega o Submit a todos os `ISubmitHandler` do objeto).
+  - **Botão desabilitado (#17).** `public void SetInteractable(bool)` liga ou desliga o `Button` e **redesenha na hora** (o visual só era refeito no `OnEnable` e nos eventos de seleção, então desligar o `Button` depois deixaria o texto na cor normal). Desabilitado, o texto vai para `disabledTextColor`, o ornamento (`decorateImage`) não aparece e o mouse por cima **não o seleciona** (`UISelectableBase.OnPointerEnter`). Um `UnityEvent<bool>` do Inspector o liga como método dinâmico (o valor vem de quem invoca).
 - **`Inventory/`** (e outras sub-pastas temáticas): scripts que conectam a parte visual a um módulo específico.
 
 ---
@@ -35,6 +37,12 @@ O passo 2 é o que faz o painel estar certo quando o jogador coleta um item com 
 
 O painel (`InventoryPanel`, com o `InventoryPresenter`) mora em `Assets/Prefabs/UI/GameUI.prefab`, dentro do `Canvas_Game`. Esse prefab é a interface de jogo persistente (D-19): vem aninhado no `Managers.prefab`, é criado uma vez pelo bootstrap e nenhuma cena o contém. O `EventSystem` do jogo mora no mesmo prefab; `Menu.unity` também não tem o seu.
 
+### O menu principal (#17)
+
+`Assets/Scenes/Menu.unity` é a cena 0 do build. O `Title Window` (`UIWindow`) tem os quatro botões, todos `Button` + `MenuButtonUI` com navegação **Explicit**; as ligações moram no `Button.onClick`: NOVO JOGO, CONTINUAR e SAIR chamam o `MainMenu` do módulo `GameFlow`, CONFIGURAÇÕES abre a `Settings Window`. **A UI não enxerga o `GameFlow`** (`ProjetoVN.UI.asmdef`): a ligação é só por `UnityEvent` serializado na cena, e o `MainMenu` chama o `SetInteractable` do CONTINUAR pelo evento `On Save Checked`. A lógica do menu, o que cada botão faz e os campos do `MainMenu` estão no [README do GameFlow](../GameFlow/README.md#6-menu-principal-17).
+
+A `Confirm New Game Window` (`UIWindow`, inativa, irmã da `Settings Window`) é o clone do `Title Window` com a pergunta e dois botões, NOVO JOGO e VOLTAR. Ela abre pelo `On New Game Needs Confirmation` do `MainMenu` (`UIWindowManager.OpenWindow`), tem o VOLTAR como `firstSelected` (a resposta segura sob o Enter) e `rememberLastSelected` desligado, para abrir sempre nele. O `Midle` não controla a altura dos filhos, então o `Confirm Text` tem a altura escrita no próprio `RectTransform` (160): um `LayoutElement` ali não vale e o texto sobreporia os botões.
+
 ### O prefab do slot
 
 `Assets/Prefabs/UI/SlotUI.prefab`: raiz com `Image` de fundo, `LayoutElement` (140×140) e `ItemSlotUI`; filhos `Icon` (`Image`, escondido quando o item não tem ícone) e `Name` (TMP). As referências `iconImage` e `nameLabel` do `ItemSlotUI` precisam estar ligadas no prefab. Slots devolvidos ao pool são **desativados, não destruídos**, então `transform.childCount` do painel não diz quantos itens estão visíveis — conte os filhos ativos.
@@ -57,7 +65,6 @@ A UI de diálogo é a exceção proposital: ela vive dentro do módulo `Dialogue
 
 | Issue | O que muda neste módulo |
 |---|---|
-| #17 | `Menu.unity` vira a primeira cena; Novo Jogo, Continuar e Sair passam a funcionar. A interface de jogo precisa ficar escondida no menu (hoje, dar Play em `Menu.unity` mostra a barra do inventário por cima dele) |
 | #18 | Menu de pausa; o `UIWindowManager` ganha uma pilha simples de janelas (decisão D-13) |
 
 A interface do jogo é **uGUI**. Para criar ou alterar telas, use a skill `unity:ui-ugui`.

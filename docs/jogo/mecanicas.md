@@ -15,7 +15,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #18 |
-| [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
+| [Menu e pausa](#menu-e-pausa) | parcial | `UI`, `GameFlow` | #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
@@ -196,10 +196,15 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo abre em um menu com Novo Jogo, Continuar e Sair. Esc pausa.
 
 **Existe:**
-- A cena `Menu.unity`, com janelas de título e de opções, navegação por mouse e teclado. Só os botões Opções e Voltar estão ligados a algo, e a cena está fora do Build Settings.
+- A cena `Menu.unity` é a **primeira cena** do jogo (cena 0 do build), com janelas de título e de configurações, navegação por mouse e teclado.
+- **Novo Jogo** zera o estado e abre a sala inicial (#17); se já existe um save, pede confirmação antes ("Já existe um jogo salvo. Começar um novo jogo vai substituí-lo."), com VOLTAR selecionado. O save antigo é substituído quando o jogador chega na sala.
+- **Continuar** fica desabilitado sem save (ou com o save corrompido) e, com save, carrega o jogo salvo.
+- **Sair** fecha o jogo (no Editor, encerra o Play Mode).
+- **Configurações** abre a janela de configurações, que ainda não faz nada além de abrir e voltar. O botão se chama CONFIGURAÇÕES, não "Opções".
+- Com o menu aberto, a interface de jogo (inventário e diálogo) fica escondida e não recebe clique.
+- A sala onde o Novo Jogo começa é um campo do `Main Menu` em `Menu.unity` (hoje `[Teste] Mecanicas`).
 
 **Falta:**
-- Novo Jogo, Continuar e Sair funcionando; menu como primeira cena (#17).
 - Novo Jogo pedir o nome do protagonista (#26).
 - Pausa com Continuar, Salvar e Voltar ao menu (#18).
 

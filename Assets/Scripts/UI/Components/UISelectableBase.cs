@@ -53,7 +53,7 @@ namespace ProjetoVN.UI.Components
         public void OnPointerEnter(PointerEventData eventData)
         {
             isPointerOver = true;
-            if (selectOnHover == true && EventSystem.current != null)
+            if (selectOnHover == true && IsInteractable && EventSystem.current != null)
             {
                 EventSystem.current.SetSelectedGameObject(gameObject);
             }
