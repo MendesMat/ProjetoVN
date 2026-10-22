@@ -44,10 +44,13 @@ namespace ProjetoVN.GameFlow.Menu
         {
             if (!TryGetSaveManager(out GameSaveManager saveManager)) return;
 
-            if (saveManager.HasSave)
-                onNewGameNeedsConfirmation.Invoke();
-            else
+            if (!saveManager.HasSave)
+            {
                 StartNewGame();
+                return;
+            }
+
+            onNewGameNeedsConfirmation.Invoke();
         }
 
         public void StartNewGame()
