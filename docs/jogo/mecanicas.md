@@ -14,7 +14,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
-| [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #16 |
+| [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #18 |
 | [Menu e pausa](#menu-e-pausa) | parcial | `UI` | #17, #18, #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
@@ -180,14 +180,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo salva sozinho ao entrar em cada sala, e ele pode salvar pela pausa. Continuar o devolve aonde estava.
 
 **Existe:**
-- Salvar e carregar em JSON, com itens, objetos consumidos, o estado da história (booleanos, números e textos) e o nome da cena. O save tem um formato único (D-20).
-- Acionado só pelo painel de debug da cena de teste.
+- Salvar e carregar em JSON, com itens, objetos consumidos, o estado da história (booleanos, números e textos), o nome da cena e o ponto de entrada por onde o jogador chegou nela. O save tem um formato único (D-20).
+- Save automático ao entrar em cada sala (#16): grava com a tela ainda escura, depois de a sala nova carregar.
+- Carregar leva à sala salva, no ponto de entrada por onde o jogador chegou, e recarrega a cena, então portões e coletáveis aparecem no estado certo sem intervenção (#16). É tudo ou nada: se a troca de sala é recusada (conversa aberta, sala que não existe mais), nada é restaurado.
+- Salvar fica bloqueado durante uma conversa. Um save corrompido ou ilegível é avisado no console e o jogo segue como estava.
+- O salvar manual e o carregar ainda são acionados pelo painel de debug da cena de teste.
 
 **Falta (D-20):**
-- Save automático ao entrar na sala; carregar leva à sala salva e recarrega a cena (#16).
 - Salvar manual pela pausa (#18).
-
-**Limitação conhecida, resolvida pela #16:** carregar no meio da cena restaura o estado, mas a aparência de portões e coletáveis só se acerta ao recarregar a cena.
 
 **Fora do escopo:** vários slots, salvar durante um diálogo.
 

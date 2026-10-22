@@ -92,13 +92,14 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Modo de jogo atual | `GameStateController` | Não |
 | Troca de sala em curso | `RoomNavigator` | Não |
 | VSync e FPS de antes do limite sem foco | `UnfocusedFrameRateLimiter` | Não |
-| Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo será bloqueado, D-20) |
+| Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo é recusado pelo `GameSaveManager`, D-20) |
 | Quem está na tela de personagens (lado, destaque, última expressão) | `DialogueUIController`, por um `ConversationStage` (D-21); só da conversa em curso | Não |
 | Revelação da fala em curso | `DialogueUIController` (`IsRevealingLine`) | Não |
 | Histórico da conversa em curso (falas, opção escolhida, itens do roteiro) | `DialogueUIController`, por um `ConversationLog` (D-30); zerado a cada conversa | Não |
-| Cena atual | `SceneManager` | Gravada; ainda não é consumida ao carregar |
+| Cena atual | `SceneManager` | Sim; ao carregar, o `GameSaveManager` pede a troca para ela ao `RoomNavigator` |
+| Ponto de entrada da sala atual | `RoomNavigator` (`CurrentEntryPointId`) | Sim; vazio se a sala não foi alcançada por uma saída com ponto |
 
-`GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`. Itens são resolvidos por id pelo `ItemRegistry`.
+`GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`, **ao entrar em cada sala** (chamado pelo `RoomNavigator`, #16), e o lê no `Load()`. Itens são resolvidos por id pelo `ItemRegistry`. O texto do arquivo é convertido em `GameState` pelo `GameStateJson`, que devolve `false` para um save corrompido em vez de lançar.
 
 ## Fluxos principais
 
@@ -117,9 +118,14 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 
 **Troca de sala**
 1. Alguém chama `RoomNavigator.Instance.ChangeRoom(nomeDaCena, idDoPontoDeEntrada)`: uma `RoomExit` (por `UnityEvent`, #13) ou o **Reload Scene** do painel de debug, que usa a sobrecarga sem ponto de entrada.
-2. Nome vazio, sem `ScreenFader`, troca já em curso, conversa aberta ou sala inexistente (cena fora da lista do build): aviso ou erro no console, retorna `false`, nada muda.
-3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, o `RoomNavigator` acha o `RoomEntryPoint` pedido na cena nova e manda o `ScreenPanController` centralizar o cenário nele (chamada direta; sem ponto pedido, nada; ponto inexistente, erro no console), a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada.
-4. Uma exceção inesperada no meio da troca é registrada no console (`Debug.LogException`), a tela clareia na hora e o `GameFlow` volta a `GameplayState`, na sala que tiver ficado carregada: o jogo não fica preso na transição.
+2. Nome vazio, sem `GameStateController`, sem `ScreenFader`, troca já em curso, conversa aberta ou sala inexistente (cena fora da lista do build): aviso ou erro no console, retorna `false`, nada muda.
+3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, o `RoomNavigator` acha o `RoomEntryPoint` pedido na cena nova e manda o `ScreenPanController` centralizar o cenário nele (chamada direta; sem ponto pedido, nada; ponto inexistente, erro no console), o `RoomNavigator` guarda o ponto de entrada (`CurrentEntryPointId`) e **salva o jogo** (`GameSaveManager.Save()`, chamada direta; recusado se houver conversa, o que a troca já impede), a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada. O save é gravado com a tela ainda escura.
+4. Uma exceção inesperada no meio da troca (inclusive uma falha de gravação do save) é registrada no console (`Debug.LogException`), a tela clareia na hora e o `GameFlow` volta a `GameplayState`, na sala que tiver ficado carregada: o jogo não fica preso na transição. A falha não salva.
+
+**Carregar** (#16)
+1. `GameSaveManager.Load()` confere o arquivo, os managers e o `ItemRegistry` e lê o save com o `GameStateJson`. Sem arquivo, sem manager ou save corrompido: aviso ou erro no console, retorna `false`, nada muda.
+2. Pede a troca de sala ao `RoomNavigator` com a sala e o ponto de entrada salvos (`ChangeRoom(currentScene, currentEntryPointId)`). Recusada (conversa aberta, troca em curso, sala fora do build, nome vazio): aviso no console, retorna `false`, **nada foi restaurado**.
+3. Aceita a troca, restaura itens, objetos consumidos e estado da história e retorna `true`. Como a cena nova ainda não foi ativada, o `Start()` dos objetos dela já lê o estado restaurado, e portões e coletáveis aparecem no estado certo. A chegada salva de novo (inofensivo).
 
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
@@ -154,6 +160,6 @@ A arquitetura acima descreve o que está em `main`. As mudanças planejadas est�
 
 | Mudança | Issue |
 |---|---|
-| Save automático e carregamento que recarrega a cena | #16 |
+| Pausa com salvar manual | #18 |
 
 Quem implementa cada uma atualiza este documento no mesmo PR.
