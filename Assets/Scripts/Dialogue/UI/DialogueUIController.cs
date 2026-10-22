@@ -7,6 +7,7 @@ using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.Messaging;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Yarn.Unity;
 
@@ -423,8 +424,20 @@ namespace ProjetoVN.Dialogue.UI
             dialogueChoices.SetActive(false);
             SetActiveIfAssigned(continueIndicator, false);
             if (historyView != null) historyView.Close();
+            ClearSelectionInsideDialogue();
             _stage.Clear();
             DrawStage();
+        }
+
+        // A opção clicada continua selecionada, escondida, até o fim da conversa; uma seleção de fora (o menu) não é dela.
+        private void ClearSelectionInsideDialogue()
+        {
+            EventSystem eventSystem = EventSystem.current;
+            if (eventSystem == null) return;
+
+            GameObject selected = eventSystem.currentSelectedGameObject;
+            if (selected != null && selected.transform.IsChildOf(transform))
+                eventSystem.SetSelectedGameObject(null);
         }
 
         private static void SetActiveIfAssigned(GameObject target, bool active)
