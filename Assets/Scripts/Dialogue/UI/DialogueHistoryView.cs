@@ -85,7 +85,9 @@ namespace ProjetoVN.Dialogue.UI
         // Desligar o Canvas, e não o objeto: reativar as entradas faria o TMP refazer o texto de todas (~100 ms com 200 falas).
         internal void Close()
         {
-            if (_panelCanvas != null) _panelCanvas.enabled = false;
+            if (!IsOpen) return;
+
+            _panelCanvas.enabled = false;
             ClearUiSelection();
         }
 
