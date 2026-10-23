@@ -73,13 +73,13 @@ namespace ProjetoVN.Dialogue.Logic
         }
 
         /// <summary>
-        /// Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela ou com o histórico
-        /// aberto, não faz nada.
+        /// Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela, com o histórico
+        /// aberto ou com o diálogo pausado, não faz nada.
         /// </summary>
         public void AdvanceDialogue()
         {
             if (_runner == null) return;
-            if (IsHistoryOpen) return;
+            if (IsPaused || IsHistoryOpen) return;
 
             if (IsRevealingLine)
             {
@@ -96,10 +96,28 @@ namespace ProjetoVN.Dialogue.Logic
 
         public void MakeChoice(int index)
         {
+            if (IsPaused) return;
+
             if (_presenter != null) _presenter.Choose(index);
         }
 
         public bool IsDialogueActive() => _conversation.IsOpen;
+
+        /// <summary>
+        /// O jogo está pausado: avançar a fala, escolher opção e abrir o histórico não fazem nada. Quem escreve é o
+        /// <c>PauseState</c>, do <c>GameFlow</c> (D-28); a leitura é de quem bloqueia a própria entrada.
+        /// </summary>
+        public bool IsPaused { get; private set; }
+
+        public void SetPaused(bool isPaused) => IsPaused = isPaused;
+
+        /// <summary>Encerra a conversa em curso na hora; <c>DialogueEndedMessage</c> sai uma vez. Sem conversa, não faz nada.</summary>
+        public void StopDialogue()
+        {
+            if (_runner == null || !_conversation.IsOpen) return;
+
+            _runner.Stop().Forget();
+        }
 
         /// <summary>Registra no histórico que o roteiro deu um item ao jogador. Sem conversa em curso, não faz nada.</summary>
         public void RecordItemReceived(string itemName)
