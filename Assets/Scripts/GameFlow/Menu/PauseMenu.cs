@@ -72,6 +72,7 @@ namespace ProjetoVN.GameFlow.Menu
 
         public void Resume()
         {
+            if (!HasGameStateController()) return;
             if (!IsPaused) return;
 
             onResumed.Invoke();
@@ -114,10 +115,19 @@ namespace ProjetoVN.GameFlow.Menu
             }
 
             if (!GameUIVisibility.Instance.IsShown) return;
-            if (GameStateController.Instance == null || !GameStateController.Instance.TryEnterPause()) return;
+            if (!HasGameStateController()) return;
+            if (!GameStateController.Instance.TryEnterPause()) return;
 
             onSaveAvailabilityChecked.Invoke(!IsInConversation());
             onPaused.Invoke();
+        }
+
+        private bool HasGameStateController()
+        {
+            if (GameStateController.Instance != null) return true;
+
+            Debug.LogError("[PauseMenu] Não há GameStateController (o prefab Managers não foi criado). Pausa ignorada.", this);
+            return false;
         }
 
         private void StopTheConversation()

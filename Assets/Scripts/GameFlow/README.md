@@ -228,7 +228,7 @@ A pausa é o primeiro modo **sobreposto** do jogo: `PauseState` entra por `Push`
 
 **Bloqueio da fala com a pausa aberta:** o `DialogueManager` ganhou `IsPaused`/`SetPaused(bool)` (escrito só pelo `PauseState`); `AdvanceDialogue` e `MakeChoice` não fazem nada, e o `DialogueUIController` recusa `Choose` e `OpenHistory`. Detalhes no [README do Dialogue](../Dialogue/README.md).
 
-O `OnValidate` avisa `pauseAction` e `mainMenuScene` vazios e cada `UnityEvent` sem ligação. Sem `GameStateController`, o `Esc` não abre nada e a pausa fica fechada (é o que acontece também com o jogo em outro modo).
+O `OnValidate` avisa `pauseAction` e `mainMenuScene` vazios e cada `UnityEvent` sem ligação. Sem `GameStateController`, o `Esc` e o `Resume` logam um erro com contexto (D-04) e a pausa fica fechada. A recusa silenciosa é só a do menu principal (`GameUIVisibility.IsShown == false`) e a da troca de sala (`TryEnterPause()` falso).
 
 **O tempo congelado e o resto do jogo.** `Time.timeScale = 0` para o que usa tempo escalado (typewriter por `Time.timeAsDouble`, `<<wait>>`, animações do `Animator` com tempo normal, `WaitForSeconds`). Não para o que usa `Time.unscaledDeltaTime`: o `ScreenFader` (a troca de sala continua animando) e a entrada do Input System. **A música e os sons de interface (#19, #20) não são parados pelo `timeScale`:** quem os implementar decide o que a pausa faz com eles (nota do programador, deixada nessas issues). `Application.targetFrameRate` e o limite sem foco (D-31) não mudam.
 
