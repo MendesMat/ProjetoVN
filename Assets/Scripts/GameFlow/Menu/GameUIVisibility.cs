@@ -28,6 +28,8 @@ namespace ProjetoVN.GameFlow.Menu
             if (Instance == this) Instance = null;
         }
 
+        public bool IsShown => _canvas.enabled;
+
         public void Show() => _canvas.enabled = true;
 
         public void Hide() => _canvas.enabled = false;

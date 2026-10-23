@@ -22,7 +22,7 @@ namespace ProjetoVN.UI.Framework
 
         public void Hide()
         {
-            SaveCurrentSelection();
+            ReleaseSelectionInsideWindow();
             Root.SetActive(false);
         }
 
@@ -43,7 +43,8 @@ namespace ProjetoVN.UI.Framework
             }
         }
 
-        private void SaveCurrentSelection()
+        // Sem soltar a seleção, o botão escondido continuaria selecionado e um Submit seguinte o acionaria.
+        private void ReleaseSelectionInsideWindow()
         {
             if (EventSystem.current == null) { return; }
 
@@ -53,6 +54,7 @@ namespace ProjetoVN.UI.Framework
             if (current.transform.IsChildOf(Root.transform))
             {
                 lastSelected = current;
+                EventSystem.current.SetSelectedGameObject(null);
             }
         }
     }
