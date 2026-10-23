@@ -23,7 +23,7 @@ Consequência para o código: o **Inspector e o arquivo de roteiro são as inter
 O planejamento atual termina quando este percurso funciona de ponta a ponta, em um build de desktop:
 
 1. O jogo abre no **menu principal**.
-2. **Novo Jogo** pede o **nome do protagonista** e leva à primeira sala.
+2. **Novo Jogo** leva à primeira sala. O jogador escreve o **nome do protagonista** dentro da história, ao assinar a lista de passageiros no fim do prólogo (#26).
 3. O jogador explora **duas salas**, ligadas por uma porta.
 4. Conversa com personagens que aparecem como **sprites atrás da caixa de diálogo**, com destaque para quem fala, e texto revelado aos poucos; uma **escolha altera a afinidade** e um trecho do diálogo só aparece com afinidade suficiente. Durante a conversa, o jogador abre o **histórico** e relê o que foi dito.
 5. Resolve um **puzzle de item**: algo obtido numa sala abre algo na outra.

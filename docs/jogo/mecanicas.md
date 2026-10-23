@@ -15,7 +15,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
-| [Menu e pausa](#menu-e-pausa) | parcial | `UI`, `GameFlow` | #26 |
+| [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
@@ -159,7 +159,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Se um roteiro emendar dois encontros com `<<jump>>` (a Luna se despede e o protagonista fala com um professor), a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Não há comando para tirar alguém de cena.
 
 **Planejada (#26):**
-- O nome do protagonista é escolhido pelo jogador ao começar um jogo novo, com um nome padrão.
+- O nome do protagonista é escrito pelo jogador dentro da história, quando ele assina a lista de passageiros do ônibus no fim do prólogo (`onibus_viagem`), numa tela que imita a folha da lista. Há um nome padrão, e um nome vazio não é aceito. Até a assinatura, a placa de nome e o histórico mostram `???` nas falas do protagonista.
 - O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico. O roteiro continua escrevendo `Protagonista:`; a troca pelo nome escolhido acontece na hora de mostrar a placa (ver D-21).
 
 **Fora do escopo:** mais de dois lugares na tela, o roteiro escolher a posição de alguém ou tirar alguém de cena, transição suave (entrada, saída e escurecer, depois da #11), ajuste de enquadramento por personagem, sprite de personagem parado no cenário fora de uma conversa, trocar o nome do protagonista depois de o jogo começar.
@@ -205,9 +205,6 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - **Pausa** (#18): Esc (ou Start do controle) abre e fecha a pausa. Ela só abre na exploração e durante uma conversa; **no menu principal e durante a troca de sala o Esc não faz nada**. As opções são CONTINUAR, SALVAR e VOLTAR AO MENU.
 - Com a pausa aberta o jogo fica **congelado**: o input do mundo é bloqueado, o texto da fala para de aparecer, o roteiro não avança sozinho (`<<wait>>` incluído), e clique, Espaço e Enter não avançam a fala, não escolhem opção e não abrem o histórico. Ao retomar, a conversa segue do mesmo ponto. Com o histórico aberto, a pausa abre por cima e, ao retomar, ele continua aberto.
 - **Voltar ao menu** pede confirmação ("Voltar ao menu? O progresso desde o último save será perdido."), com VOLTAR selecionado; Esc com a confirmação aberta fecha tudo e retoma o jogo. Funciona também durante uma conversa, que é encerrada. O Novo Jogo iniciado depois não herda nada da sessão anterior.
-
-**Falta:**
-- Novo Jogo pedir o nome do protagonista (#26).
 
 **Fora do escopo:** tela de configurações (volume, velocidade do texto), Esc fechando as janelas do menu principal, "Sair do jogo" na pausa.
 
