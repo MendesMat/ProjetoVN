@@ -1,6 +1,6 @@
 # State Machine
 
-Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo, trocando de sala e, no futuro, inventário ou pausa). Fica em `Assets/Scripts/Core/StateMachine`.
+Máquina de estados que controla em qual **modo** o jogo está (explorando, em diálogo, trocando de sala ou em pausa, que é sobreposta). Fica em `Assets/Scripts/Core/StateMachine`.
 
 > **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../../docs/arquitetura/decisoes.md) · [fluxo de trabalho](../../../../docs/agentes/fluxo-de-trabalho.md)
 
@@ -37,7 +37,13 @@ C# puro. API completa:
 | `Pop()` | Volta para o modo que estava embaixo. |
 | `Tick()` | Repassa o `Update` para o estado ativo. O dono chama isto do seu próprio `Update`. |
 
-`Push`/`Pop` dão `Exit`/`Enter` completos no modo de baixo. Isso é intencional: como os efeitos colaterais moram no `Enter`/`Exit`, a simetria garante que abrir e fechar um overlay deixa o jogo exatamente como estava.
+`Push`/`Pop` dão `Exit`/`Enter` completos no modo de baixo. Isso é intencional: como os efeitos colaterais moram no `Enter`/`Exit`, a simetria garante que abrir e fechar um overlay deixa o jogo exatamente como estava. A pausa (#18) é o primeiro overlay: o `PauseState` cobre a exploração ou a conversa.
+
+**`ChangeState` não conhece a pilha de overlays:** trocar de modo com um overlay aberto sai do overlay e deixa o modo coberto empilhado. Quem usa um overlay garante que nada troca o modo de baixo enquanto ele está aberto (a pausa o faz congelando o tempo e bloqueando o diálogo). Mudar isso mudaria o contrato para todos os modos.
+
+### Testes
+
+`StateMachineTests` (EditMode, #18; **caracterização**, a máquina não tinha teste): `Push` dá `Exit` no coberto e `Enter` no overlay, nessa ordem; `Pop` dá `Exit` no overlay e `Enter` no coberto; `Pop` sem nada empilhado avisa e mantém o modo; `ChangeState` para o modo atual não reentra nele.
 
 ---
 
@@ -45,14 +51,21 @@ C# puro. API completa:
 
 São dois passos, e nenhum deles envolve registrar nada:
 
-1. Crie a classe:
+1. Crie a classe (o exemplo é uma versão enxuta do `PauseState` real, que também fecha o `PlayerInputGate`, bloqueia o diálogo e devolve o `timeScale` que **guardou**, e não um `1` fixo):
    ```csharp
    public sealed class PauseState : BaseState
    {
+       private float _timeScaleBeforePause = 1f;
+
        public PauseState(StateMachine stateMachine) : base(stateMachine) { }
 
-       public override void Enter() => Time.timeScale = 0f;
-       public override void Exit()  => Time.timeScale = 1f;
+       public override void Enter()
+       {
+           _timeScaleBeforePause = Time.timeScale;
+           Time.timeScale = 0f;
+       }
+
+       public override void Exit() => Time.timeScale = _timeScaleBeforePause;
    }
    ```
 2. No dono da máquina (hoje o `GameStateController`, no módulo `GameFlow`), crie a instância no `Awake` e troque para ela quando for o caso:

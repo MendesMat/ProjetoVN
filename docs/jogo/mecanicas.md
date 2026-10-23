@@ -14,8 +14,8 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
 | [Personagens](#personagens) | parcial | `Dialogue` | #26 |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
-| [Salvar e carregar](#salvar-e-carregar) | parcial | `GameFlow` | #18 |
-| [Menu e pausa](#menu-e-pausa) | parcial | `UI`, `GameFlow` | #18, #26 |
+| [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
+| [Menu e pausa](#menu-e-pausa) | parcial | `UI`, `GameFlow` | #26 |
 | [Áudio](#áudio) | planejada | — | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
@@ -183,17 +183,16 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Salvar e carregar em JSON, com itens, objetos consumidos, o estado da história (booleanos, números e textos), o nome da cena e o ponto de entrada por onde o jogador chegou nela. O save tem um formato único (D-20).
 - Save automático ao entrar em cada sala (#16): grava com a tela ainda escura, depois de a sala nova carregar.
 - Carregar leva à sala salva, no ponto de entrada por onde o jogador chegou, e recarrega a cena, então portões e coletáveis aparecem no estado certo sem intervenção (#16). É tudo ou nada: se a troca de sala é recusada (conversa aberta, sala que não existe mais), nada é restaurado.
-- Salvar fica bloqueado durante uma conversa. Um save corrompido ou ilegível é avisado no console e o jogo segue como estava.
-- O salvar manual e o carregar ainda são acionados pelo painel de debug da cena de teste.
-
-**Falta (D-20):**
-- Salvar manual pela pausa (#18).
+- Salvar manual pela pausa (#18): grava a sala atual e o ponto de entrada por onde o jogador chegou nela (não o lugar onde ele estava no cenário), e a janela mostra "Jogo salvo." até fechar.
+- Salvar fica bloqueado durante uma conversa: o botão SALVAR da pausa fica desabilitado. Um save corrompido ou ilegível é avisado no console e o jogo segue como estava.
+- Voltar ao menu pela pausa **não grava** o save: o Continuar abre a sala do último save, não o menu.
+- O painel de debug da cena de teste ainda tem os botões Save e Load.
 
 **Fora do escopo:** vários slots, salvar durante um diálogo.
 
 ## Menu e pausa
 
-**Para o jogador:** o jogo abre em um menu com Novo Jogo, Continuar e Sair. Esc pausa.
+**Para o jogador:** o jogo abre em um menu com Novo Jogo, Continuar e Sair. Esc pausa o jogo, e a pausa salva e volta ao menu.
 
 **Existe:**
 - A cena `Menu.unity` é a **primeira cena** do jogo (cena 0 do build), com janelas de título e de configurações, navegação por mouse e teclado.
@@ -203,12 +202,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - **Configurações** abre a janela de configurações, que ainda não faz nada além de abrir e voltar. O botão se chama CONFIGURAÇÕES, não "Opções".
 - Com o menu aberto, a interface de jogo (inventário e diálogo) fica escondida e não recebe clique.
 - A sala onde o Novo Jogo começa é um campo do `Main Menu` em `Menu.unity` (hoje `[Teste] Mecanicas`).
+- **Pausa** (#18): Esc (ou Start do controle) abre e fecha a pausa. Ela só abre na exploração e durante uma conversa; **no menu principal e durante a troca de sala o Esc não faz nada**. As opções são CONTINUAR, SALVAR e VOLTAR AO MENU.
+- Com a pausa aberta o jogo fica **congelado**: o input do mundo é bloqueado, o texto da fala para de aparecer, o roteiro não avança sozinho (`<<wait>>` incluído), e clique, Espaço e Enter não avançam a fala, não escolhem opção e não abrem o histórico. Ao retomar, a conversa segue do mesmo ponto. Com o histórico aberto, a pausa abre por cima e, ao retomar, ele continua aberto.
+- **Voltar ao menu** pede confirmação ("Voltar ao menu? O progresso desde o último save será perdido."), com VOLTAR selecionado; Esc com a confirmação aberta fecha tudo e retoma o jogo. Funciona também durante uma conversa, que é encerrada. O Novo Jogo iniciado depois não herda nada da sessão anterior.
 
 **Falta:**
 - Novo Jogo pedir o nome do protagonista (#26).
-- Pausa com Continuar, Salvar e Voltar ao menu (#18).
 
-**Fora do escopo:** tela de configurações (volume, velocidade do texto).
+**Fora do escopo:** tela de configurações (volume, velocidade do texto), Esc fechando as janelas do menu principal, "Sair do jogo" na pausa.
 
 ## Áudio
 
