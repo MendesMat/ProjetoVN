@@ -13,7 +13,7 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, pausa, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick`, o pacote Yarn Spinner e o Input System |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
 | `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: os seletores de variável de história e de nó do roteiro do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
-| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Core`, `Dialogue`, `GameFlow`, `Inventory`, `UI` e o pacote Yarn Spinner. PlayMode: `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
+| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Core`, `Dialogue`, `GameFlow`, `Inventory`, `UI` e o pacote Yarn Spinner. PlayMode: `Core`, `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
 
 ```
 Core ◄── Dialogue ◄──┐
