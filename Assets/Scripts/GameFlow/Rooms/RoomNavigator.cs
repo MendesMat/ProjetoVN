@@ -49,13 +49,22 @@ namespace ProjetoVN.GameFlow.Rooms
 
         public bool ChangeRoom(string roomName) => ChangeRoom(roomName, null);
 
-        public bool ChangeRoom(string roomName, string entryPointId)
+        public bool ChangeRoom(string roomName, string entryPointId) =>
+            StartRoomChange(roomName, entryPointId, saveOnArrival: true);
+
+        /// <summary>
+        /// Volta ao menu principal com as mesmas recusas e o mesmo fade do <see cref="ChangeRoom(string)"/>, mas sem
+        /// salvar na chegada: o menu não é uma sala, e o save que ele gravaria faria o Continuar abrir o menu (D-20).
+        /// </summary>
+        public bool GoToMainMenu(string menuScene) => StartRoomChange(menuScene, null, saveOnArrival: false);
+
+        private bool StartRoomChange(string roomName, string entryPointId, bool saveOnArrival)
         {
             if (!CanChangeRoom(roomName)) return false;
 
             _isChanging = true;
             _stateController.EnterRoomTransition();
-            _ = ChangeRoomAsync(roomName, entryPointId);
+            _ = ChangeRoomAsync(roomName, entryPointId, saveOnArrival);
             return true;
         }
 
@@ -104,7 +113,7 @@ namespace ProjetoVN.GameFlow.Rooms
             return "o jogo não está em exploração";
         }
 
-        private async Awaitable ChangeRoomAsync(string roomName, string entryPointId)
+        private async Awaitable ChangeRoomAsync(string roomName, string entryPointId, bool saveOnArrival)
         {
             try
             {
@@ -113,7 +122,7 @@ namespace ProjetoVN.GameFlow.Rooms
                 destroyCancellationToken.ThrowIfCancellationRequested();
                 ArriveAt(roomName, entryPointId);
                 CurrentEntryPointId = entryPointId;
-                SaveOnArrival();
+                if (saveOnArrival) SaveOnArrival();
                 await screenFader.FadeInAsync(fadeSeconds, destroyCancellationToken);
             }
             catch (OperationCanceledException)

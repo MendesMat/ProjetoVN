@@ -6,7 +6,7 @@ namespace ProjetoVN.UI.Framework
     {
         [SerializeField] private UIWindow startingWindow;
 
-        private UIWindow currentWindow;
+        private readonly WindowStack<UIWindow> _windows = new();
 
         private void Start()
         {
@@ -17,24 +17,35 @@ namespace ProjetoVN.UI.Framework
         {
             if (newWindow == null) return;
 
-            if (newWindow == currentWindow)
+            if (newWindow == _windows.Current)
             {
-                currentWindow.SelectDefault();
+                newWindow.SelectDefault();
                 return;
             }
 
-            if (currentWindow != null) currentWindow.Hide();
-
-            currentWindow = newWindow;
-            currentWindow.Show();
+            HideAll(_windows.Open(newWindow));
+            newWindow.Show();
         }
 
         public void CloseCurrentWindow()
         {
-            if (currentWindow == null) return;
+            UIWindow closed = _windows.Close();
+            if (closed == null) return;
 
-            currentWindow.Hide();
-            currentWindow = null;
+            closed.Hide();
+            ShowCurrent();
+        }
+
+        public void CloseAllWindows() => HideAll(_windows.CloseAll());
+
+        private void ShowCurrent()
+        {
+            if (_windows.Current != null) _windows.Current.Show();
+        }
+
+        private static void HideAll(UIWindow[] windows)
+        {
+            foreach (UIWindow window in windows) window.Hide();
         }
     }
 }

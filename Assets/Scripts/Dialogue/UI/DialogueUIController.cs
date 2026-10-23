@@ -90,6 +90,8 @@ namespace ProjetoVN.Dialogue.UI
         /// <summary>O histórico está aberto por cima do diálogo; avançar a fala e escolher opção ficam bloqueados.</summary>
         internal bool IsHistoryOpen => historyView != null && historyView.IsOpen;
 
+        private static bool IsGamePaused => DialogueManager.Instance != null && DialogueManager.Instance.IsPaused;
+
         private CharacterSO Protagonist => characterRegistry != null ? characterRegistry.Protagonist : null;
 
         private void Start()
@@ -189,7 +191,7 @@ namespace ProjetoVN.Dialogue.UI
             if (_selection == null) return;
             if (buttonIndex < 0 || buttonIndex >= _shownOptions.Count) return;
             if (!_shownOptions[buttonIndex].IsAvailable) return;
-            if (IsHistoryOpen) return;
+            if (IsHistoryOpen || IsGamePaused) return;
 
             RecordChosenOption(_shownOptions[buttonIndex]);
             _selection.TrySetResult(_shownOptions[buttonIndex]);
@@ -198,7 +200,7 @@ namespace ProjetoVN.Dialogue.UI
         /// <summary>Abre o histórico se há conversa e a fala já terminou de aparecer; do contrário, não faz nada.</summary>
         public void OpenHistory()
         {
-            if (historyView == null || IsHistoryOpen || IsRevealingLine) return;
+            if (historyView == null || IsHistoryOpen || IsRevealingLine || IsGamePaused) return;
             if (DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive()) return;
 
             historyView.Open(_history.Entries);

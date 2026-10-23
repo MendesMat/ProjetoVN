@@ -10,10 +10,10 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Adaptador do Yarn Spinner: iniciar, avançar e escolher; input e interface do diálogo | `Core` e o pacote Yarn Spinner |
 | `Inventory` | [Inventory/](../../Assets/Scripts/Inventory/README.md) | Itens do jogador, objeto coletável, registro de itens | `Core` |
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
-| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick` e o pacote Yarn Spinner |
+| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, pausa, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick`, o pacote Yarn Spinner e o Input System |
 | `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
 | `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: os seletores de variável de história e de nó do roteiro do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
-| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Core`, `Dialogue`, `GameFlow`, `Inventory` e o pacote Yarn Spinner. PlayMode: `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
+| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Core`, `Dialogue`, `GameFlow`, `Inventory`, `UI` e o pacote Yarn Spinner. PlayMode: `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
 
 ```
 Core ◄── Dialogue ◄──┐
@@ -42,7 +42,7 @@ O padrão se repete em todos os módulos (decisão D-03):
 ## Ciclo de vida
 
 - Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager` e `ItemScriptActions`.
-- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário, e o `GameUIVisibility` que o liga e desliga), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
+- O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário, e o `GameUIVisibility` que o liga e desliga), o `Canvas_Pause` (a janela de pausa e a de confirmação, com o `PauseMenu`, Sort Order 50, #18), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
 - A interface de jogo também só se liga aos managers no próprio `Start` (o `DialogueUIController` se registra no `DialogueManager`; o `InventoryPresenter` se reconstrói). Na primeira cena, os `Start` dos objetos de cena entram na fila **antes** dos `Start` do prefab, porque o prefab é instanciado depois. Consequência: **um componente de cena não inicia diálogo no próprio `Start`**; receberia "Nenhuma interface de diálogo registrada". Nada faz isso hoje. Outra consequência: **o `Start` da interface de jogo não pode desfazer o que o `Start` da cena fez**, por exemplo a seleção do `EventSystem` (o menu seleciona o Novo Jogo; #88).
@@ -72,15 +72,16 @@ Regras adicionais:
 
 ## Modos de jogo
 
-O `GameStateController` (em `GameFlow`) possui uma `StateMachine` (em `Core`). Hoje há três modos:
+O `GameStateController` (em `GameFlow`) possui uma `StateMachine` (em `Core`). Hoje há quatro modos:
 
 | Modo | Entra quando | Efeito ao entrar |
 |---|---|---|
 | `GameplayState` | o jogo começa; chega `DialogueEndedMessage` | libera o `PlayerInputGate` |
 | `DialogueState` | chega `DialogueStartedMessage` | bloqueia o `PlayerInputGate` |
 | `RoomTransitionState` | o `RoomNavigator` aceita uma troca de sala (chamada direta, não mensagem) | bloqueia o `PlayerInputGate` |
+| `PauseState` (sobreposto, `Push`) | o `PauseMenu` chama `GameStateController.TryEnterPause()`, que só aceita a partir de `GameplayState` ou `DialogueState` | bloqueia o `PlayerInputGate`, bloqueia a entrada do diálogo (`DialogueManager.SetPaused(true)`) e congela o tempo (`Time.timeScale = 0`); o `Exit` devolve o tempo e o diálogo |
 
-Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeitos no `Exit()`. Um modo sobreposto (pausa) usa `Push`/`Pop`. Estados são criados com `new`, sem fábrica nem registro.
+Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeitos no `Exit()`. Um modo sobreposto (a pausa) usa `Push`/`Pop`: o modo coberto recebe `Exit` e, ao voltar, `Enter`, então o `GameplayState` libera o input e o `DialogueState` o fecha de novo sem ninguém lembrar o que havia por baixo. Estados são criados com `new`, sem fábrica nem registro.
 
 ## Onde mora cada estado
 
@@ -90,7 +91,10 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Objetos de mundo já consumidos | `InventoryManager` (lugar definitivo, D-10) | Sim |
 | Estado da história (booleanos, números, textos) | `StoryState`, estático em `Core` | Sim, em três listas de pares nome e valor |
 | Input do mundo liberado ou não | `PlayerInputGate`, estático em `PointNClick` | Não |
-| Modo de jogo atual | `GameStateController` | Não |
+| Modo de jogo atual, inclusive "pausa aberta" (`IsPaused`) | `GameStateController` | Não |
+| Diálogo pausado (`DialogueManager.IsPaused`; avançar, escolher e abrir o histórico não fazem nada) | `DialogueManager`, escrito só pelo `PauseState` (D-28) | Não |
+| Tempo do jogo (`Time.timeScale`) | `PauseState`: zera ao entrar, devolve o valor de antes ao sair | Não |
+| Janelas abertas de um `UIWindowManager` (pilha) | `UIWindowManager`, por uma `WindowStack` | Não |
 | Troca de sala em curso | `RoomNavigator` | Não |
 | VSync e FPS de antes do limite sem foco | `UnfocusedFrameRateLimiter` | Não |
 | Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo é recusado pelo `GameSaveManager`, D-20) |
@@ -134,6 +138,17 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 3. Aceita a troca, restaura um `GameState` vazio (itens, objetos consumidos e `StoryState` zerados, pelo mesmo `Restore` do carregar) e retorna `true`. A cena da sala inicial ainda não está ativa, então seus objetos já leem o estado novo no `Start()`. A chegada salva o jogo novo e sobrescreve o arquivo (D-20); o `StartNewGame` não o apaga.
 4. CONTINUAR (`MainMenu.ContinueGame()`) é o `Load()` descrito acima; fica desabilitado sem save.
 
+**Pausa** (#18)
+1. A ação `UI/Pause` (Esc, Start do controle) chama `PauseMenu.TogglePause()`. Pausada, retoma; senão tenta pausar. A tentativa é recusada **em silêncio** com a interface de jogo escondida (o menu principal, `GameUIVisibility.IsShown`) e quando o `GameStateController` não aceita (`TryEnterPause()`: só a partir de exploração ou conversa, então não durante uma troca de sala nem com a pausa já aberta).
+2. Aceita, o `GameStateController` faz `Push` do `PauseState` (ver [modos de jogo](#modos-de-jogo)); o `PauseMenu` avisa `onSaveAvailabilityChecked(não há conversa)`, que habilita ou desabilita o botão SALVAR, e `onPaused`, que abre a `Pause Window` pelo `UIWindowManager` (`Canvas_Pause`). Nenhuma mensagem nova: pausar e retomar são comandos de um dono, e "está pausado" é propriedade (D-05).
+3. Com a pausa aberta, `DialogueManager.AdvanceDialogue` e `MakeChoice` e o `DialogueUIController` (`Choose`, `OpenHistory`) não fazem nada, e o tempo parado faz o texto e o `<<wait>>` do roteiro pararem. Uma conversa aberta continua aberta e o `DialogueState` volta a ser o modo de baixo.
+4. CONTINUAR e Esc chamam `PauseMenu.Resume()`: `onResumed` fecha todas as janelas (`UIWindowManager.CloseAllWindows`) e `LeavePause()` faz `Pop`. SALVAR chama `GameSaveManager.Save()` (recusado com conversa aberta) e, se salvou, mostra "Jogo salvo." até a janela fechar; a pausa continua aberta.
+
+**Voltar ao menu** (#18)
+1. VOLTAR AO MENU, na `Pause Window`, abre a `Confirm Return Window` (`UIWindowManager.OpenWindow`, empilhada sobre a pausa); o VOLTAR dela volta para a pausa (a pilha desce até a janela que já está nela). O VOLTAR AO MENU da confirmação chama `PauseMenu.ReturnToMainMenu()`.
+2. `ReturnToMainMenu()` **retoma a pausa primeiro**, encerra a conversa se houver (`DialogueManager.StopDialogue()`, síncrono: a `DialogueEndedMessage` sai no mesmo frame) e pede `RoomNavigator.GoToMainMenu(cena)`. A ordem importa: encerrar a conversa com a pausa ainda empilhada faria a `DialogueEndedMessage` trocar o modo de cima.
+3. `GoToMainMenu` tem as mesmas recusas e o mesmo fade do `ChangeRoom`, mas **não salva na chegada**: toda chegada do `ChangeRoom` salva e o `Save()` grava a cena ativa, então `ChangeRoom("Menu")` faria o Continuar abrir o menu (D-20). O progresso desde o último save se perde, e o Continuar abre a sala do último save. O Novo Jogo seguinte restaura um `GameState` vazio; o modo de jogo, a pausa e o histórico da conversa não entram no save e já estão limpos.
+
 **Coleta**
 1. `CollectableItemBehaviour.Collect()` chama `InventoryManager.Instance.Collect(item)`.
 2. Se o item entrou, o objeto é marcado como consumido e desativado, e `ItemCollectedMessage` é publicada. O registro é um só para o jogo inteiro, então o id persistente do coletável é único em **todas** as salas; o `OnValidate` avisa o repetido na mesma cena e o `CollectableIdsTests` reprova o vazio ou repetido em qualquer cena.
@@ -163,10 +178,4 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 
 ## O que vai mudar
 
-A arquitetura acima descreve o que está em `main`. As mudanças planejadas estão em [../planejamento/milestones.md](../planejamento/milestones.md); as que mais alteram este documento:
-
-| Mudança | Issue |
-|---|---|
-| Pausa com salvar manual | #18 |
-
-Quem implementa cada uma atualiza este documento no mesmo PR.
+A arquitetura acima descreve o que está em `main`. As mudanças planejadas estão em [../planejamento/milestones.md](../planejamento/milestones.md). Nenhuma delas muda hoje a estrutura descrita aqui; quem implementar uma que mude atualiza este documento no mesmo PR.
