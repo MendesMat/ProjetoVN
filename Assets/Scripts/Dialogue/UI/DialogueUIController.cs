@@ -311,7 +311,7 @@ namespace ProjetoVN.Dialogue.UI
             character == Protagonist ? ProtagonistName.ToDisplay(StoredProtagonistName()) : character.DisplayName;
 
         private static string StoredProtagonistName() =>
-            StoryState.TryGetText(ProtagonistName.VariableName, out string name) ? name : null;
+            StoryState.TryGetText(ProtagonistName.VariableName, out string storedName) ? storedName : null;
 
         private bool TryResolveCharacter(string scriptName, out CharacterSO character)
         {

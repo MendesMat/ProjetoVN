@@ -59,11 +59,12 @@ namespace ProjetoVN.Dialogue.UI
             signButton.onClick.RemoveListener(Sign);
         }
 
-        // A pausa leva a seleção para os botões dela e a deixa vazia ao fechar: sem devolver o foco, o teclado não digita mais.
+        // A pausa leva a seleção para os botões dela e a deixa vazia ao fechar, e um clique fora do campo também: sem devolver o foco,
+        // o teclado não digita mais. O foco devolvido não seleciona o texto todo, senão a próxima tecla apagaria o que o jogador escreveu.
         private void Update()
         {
             if (_signing == null || IsGamePaused) return;
-            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == null) FocusNameField();
+            if (EventSystem.current != null && EventSystem.current.currentSelectedGameObject == null) FocusNameField(selectAllText: false);
         }
 
         /// <returns>O nome normalizado, ou <c>null</c> se a folha foi cancelada (a conversa terminou).</returns>
@@ -79,7 +80,7 @@ namespace ProjetoVN.Dialogue.UI
             _signing = new YarnTaskCompletionSource<string>();
             gameObject.SetActive(true);
             nameField.text = ProtagonistName.TryNormalize(currentName, out string normalizedName) ? normalizedName : defaultName;
-            FocusNameField();
+            FocusNameField(selectAllText: true);
             return _signing.Task;
         }
 
@@ -97,7 +98,7 @@ namespace ProjetoVN.Dialogue.UI
 
             if (!ProtagonistName.TryNormalize(nameField.text, out string normalizedName))
             {
-                FocusNameField();
+                FocusNameField(selectAllText: false);
                 return;
             }
 
@@ -139,10 +140,11 @@ namespace ProjetoVN.Dialogue.UI
             return width <= nameplateText.rectTransform.rect.width;
         }
 
-        private void FocusNameField()
+        private void FocusNameField(bool selectAllText)
         {
             if (EventSystem.current == null) return;
 
+            nameField.onFocusSelectAll = selectAllText;
             EventSystem.current.SetSelectedGameObject(nameField.gameObject);
             nameField.ActivateInputField();
         }
