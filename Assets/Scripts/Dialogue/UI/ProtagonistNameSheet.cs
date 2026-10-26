@@ -78,7 +78,7 @@ namespace ProjetoVN.Dialogue.UI
 
             _signing = new YarnTaskCompletionSource<string>();
             gameObject.SetActive(true);
-            nameField.text = ProtagonistName.TryNormalize(currentName, out string name) ? name : defaultName;
+            nameField.text = ProtagonistName.TryNormalize(currentName, out string normalizedName) ? normalizedName : defaultName;
             FocusNameField();
             return _signing.Task;
         }
@@ -95,13 +95,13 @@ namespace ProjetoVN.Dialogue.UI
         {
             if (_signing == null) return;
 
-            if (!ProtagonistName.TryNormalize(nameField.text, out string name))
+            if (!ProtagonistName.TryNormalize(nameField.text, out string normalizedName))
             {
                 FocusNameField();
                 return;
             }
 
-            Finish(name);
+            Finish(normalizedName);
         }
 
         private void Finish(string result)
@@ -164,7 +164,13 @@ namespace ProjetoVN.Dialogue.UI
 
             if (!ProtagonistName.TryNormalize(defaultName, out _))
                 Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não é aceito pela regra do nome: use letras, espaço, hífen e apóstrofo.", this);
+
+            if (DefaultNameExceedsNameplate())
+                Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não cabe na placa de nome: ele apareceria cortado com \"…\". Use um nome mais curto.", this);
         }
+
+        private bool DefaultNameExceedsNameplate() =>
+            nameplateText != null && !FitsOnNameplate(defaultName);
 #endif
     }
 }

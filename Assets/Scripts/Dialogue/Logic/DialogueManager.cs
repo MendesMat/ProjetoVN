@@ -133,10 +133,10 @@ namespace ProjetoVN.Dialogue.Logic
                 return;
             }
 
-            string name = await _presenter.AskProtagonistNameAsync();
-            if (this == null || name == null) return;
+            string signedName = await _presenter.AskProtagonistNameAsync();
+            if (this == null || signedName == null) return;
 
-            StoryState.SetText(ProtagonistName.VariableName, name);
+            StoryState.SetText(ProtagonistName.VariableName, signedName);
         }
 
         /// <summary>Registra no histórico que o roteiro deu um item ao jogador. Sem conversa em curso, não faz nada.</summary>
