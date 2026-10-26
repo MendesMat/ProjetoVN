@@ -1,0 +1,9 @@
+title: teste_nome_protagonista
+---
+Protagonista: Antes de assinar.
+<<assinar_lista>>
+Protagonista: Depois de assinar.
+Motorista: Obrigado, {$nome_protagonista}.
+-> Responder
+    Protagonista: De nada.
+===

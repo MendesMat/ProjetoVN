@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using ProjetoVN.Core.Messaging;
+using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.Messaging;
@@ -62,6 +63,10 @@ namespace ProjetoVN.Dialogue.UI
 
         [Tooltip("O painel do histórico, desenhado por cima da caixa e das opções. Vazio: o jogador não consegue abrir o histórico.")]
         [SerializeField] private DialogueHistoryView historyView;
+
+        [Header("Nome do protagonista")]
+        [Tooltip("A folha em que o jogador escreve o nome do protagonista (<<assinar_lista>>). Vazio: o comando loga um erro e o nome continua '???'.")]
+        [SerializeField] private ProtagonistNameSheet protagonistNameSheet;
 
         [Header("Pensamento")]
         [Tooltip("Cor do texto do pensamento do protagonista (Pensamento: no roteiro), na caixa e no histórico. O pensamento aparece também em itálico, " +
@@ -206,6 +211,20 @@ namespace ProjetoVN.Dialogue.UI
             historyView.Open(_history.Entries);
         }
 
+        /// <summary>Esconde a caixa e abre a folha do nome. Devolve o nome escolhido, ou <c>null</c> se a folha foi cancelada.</summary>
+        internal YarnTask<string> AskProtagonistNameAsync()
+        {
+            if (protagonistNameSheet == null)
+            {
+                Debug.LogError("[DialogueUIController] Protagonist Name Sheet não está atribuída: o nome do protagonista continua '???'.", this);
+                return YarnTask<string>.FromResult(null);
+            }
+
+            dialogueBox.SetActive(false);
+            SetActiveIfAssigned(continueIndicator, false);
+            return protagonistNameSheet.AskAsync(StoredProtagonistName());
+        }
+
         internal void RecordItemReceived(string itemName) => _history.AddItemReceived(itemName);
 
         internal void RecordItemHandedOver(string itemName) => _history.AddItemHandedOver(itemName);
@@ -287,8 +306,12 @@ namespace ProjetoVN.Dialogue.UI
             else _history.AddSpokenLine(NameToDisplay(character), character.NameColor, text);
         }
 
-        // A troca do nome do protagonista pelo que o jogador escolheu (#26) entra aqui, sem mexer em nenhum roteiro.
-        private static string NameToDisplay(CharacterSO character) => character.DisplayName;
+        // O único lugar onde o nome escolhido pelo jogador troca o do protagonista (D-21): o roteiro continua escrevendo 'Protagonista:'.
+        private string NameToDisplay(CharacterSO character) =>
+            character == Protagonist ? ProtagonistName.ToDisplay(StoredProtagonistName()) : character.DisplayName;
+
+        private static string StoredProtagonistName() =>
+            StoryState.TryGetText(ProtagonistName.VariableName, out string name) ? name : null;
 
         private bool TryResolveCharacter(string scriptName, out CharacterSO character)
         {
@@ -426,6 +449,7 @@ namespace ProjetoVN.Dialogue.UI
             dialogueChoices.SetActive(false);
             SetActiveIfAssigned(continueIndicator, false);
             if (historyView != null) historyView.Close();
+            if (protagonistNameSheet != null) protagonistNameSheet.Cancel();
             ClearSelectionInsideDialogue();
             _stage.Clear();
             DrawStage();
@@ -464,6 +488,9 @@ namespace ProjetoVN.Dialogue.UI
 
             if (characterRegistry == null)
                 Debug.LogWarning("[DialogueUIController] Character Registry está vazio: todo nome aparece em texto puro, sem cor e sem sprite.", this);
+
+            if (protagonistNameSheet == null)
+                Debug.LogWarning("[DialogueUIController] Protagonist Name Sheet está vazia: <<assinar_lista>> não abre a folha e o nome do protagonista continua '???'.", this);
 
             if (openHistoryButton == null || historyView == null)
                 Debug.LogWarning("[DialogueUIController] Open History Button e History View estão vazios: o jogador não consegue abrir o histórico.", this);

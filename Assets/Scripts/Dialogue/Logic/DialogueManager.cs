@@ -1,3 +1,4 @@
+using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.UI;
 using UnityEngine;
 using UnityEngine.Events;
@@ -117,6 +118,25 @@ namespace ProjetoVN.Dialogue.Logic
             if (_runner == null || !_conversation.IsOpen) return;
 
             _runner.Stop().Forget();
+        }
+
+        /// <summary>
+        /// Abre a folha em que o jogador escreve o nome do protagonista, espera e grava o nome no <c>StoryState</c>
+        /// (<c>&lt;&lt;assinar_lista&gt;&gt;</c>). Se a conversa terminar com a folha aberta, nada é gravado.
+        /// Sem conversa em curso ou sem interface, loga um erro e volta.
+        /// </summary>
+        public async YarnTask AskProtagonistName()
+        {
+            if (!_conversation.IsOpen || _presenter == null)
+            {
+                Debug.LogError("[DialogueManager] <<assinar_lista>> só funciona durante uma conversa com a interface de diálogo registrada. O nome do protagonista não mudou.", this);
+                return;
+            }
+
+            string name = await _presenter.AskProtagonistNameAsync();
+            if (this == null || name == null) return;
+
+            StoryState.SetText(ProtagonistName.VariableName, name);
         }
 
         /// <summary>Registra no histórico que o roteiro deu um item ao jogador. Sem conversa em curso, não faz nada.</summary>

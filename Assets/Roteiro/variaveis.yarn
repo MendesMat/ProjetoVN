@@ -6,4 +6,6 @@ title: variaveis
 <<declare $afinidade_luna = 0>>
 /// A porta da cena de teste já foi destrancada.
 <<declare $porta_mecanicas_destrancada = false>>
+/// O nome do protagonista, escrito pelo jogador ao assinar a lista de passageiros (<<assinar_lista>>). "???" até lá.
+<<declare $nome_protagonista = "???">>
 ===
