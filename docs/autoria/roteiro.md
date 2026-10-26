@@ -245,8 +245,6 @@ Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a 
 
 ### O protagonista
 
-Provisório: a issue #26 (nome escolhido pelo jogador) revê esta parte do guia.
-
 O protagonista aparece no texto de quatro jeitos:
 
 | Situação | Como escrever | Exemplo |
@@ -283,7 +281,7 @@ Luna: Uma com um morcego no chaveiro. E aí?
 
 **`Pensamento` só vale escrito assim**, com a inicial maiúscula e os dois-pontos logo depois, como o nome de qualquer personagem (`pensamento:` e `PENSAMENTO:` são personagens que não existem, e a verificação do jogo reprova). Só o protagonista pensa: não há `Pensamento` de outra personagem. Um pensamento **não leva etiqueta de expressão** (`Pensamento: Que dia. #raiva` é reprovado), porque não há sprite para trocar.
 
-Hoje a placa mostra a palavra `Protagonista`, e ela aparece cortada (a placa é estreita; está registrado na issue #41). Quando o nome escolhido pelo jogador entrar, você **não precisa mudar nada** nos roteiros: o `Pensamento:` continua igual, e nenhum nome aparece nele.
+**O nome do protagonista é do jogador.** Ele o escreve dentro da história, na lista de passageiros do ônibus (`<<assinar_lista>>`, veja [Comandos disponíveis](#comandos-disponíveis)). **Você continua escrevendo `Protagonista:`**, sempre, em qualquer roteiro: o jogo troca a palavra pelo nome escolhido na placa de nome e no histórico, e nenhum roteiro precisa mudar. Até a assinatura, a placa e o histórico mostram `???` (o jogador ainda não deu o nome), então as falas do protagonista **antes** da lista aparecem com `???`. O `Pensamento:` não tem nome e continua igual. Para dizer o nome dentro de uma fala de outra personagem, use `{$nome_protagonista}` ([Mostrar um valor no texto](#mostrar-um-valor-no-texto)).
 
 ### Expressões
 
@@ -479,6 +477,7 @@ Para criar uma variável, acrescente duas linhas **no fim, antes do `===`**:
 - A linha com `///` (três barras) é a descrição. Ela é **obrigatória** e aparece para quem monta as cenas.
 - O valor depois do `=` é o valor inicial e define o tipo: `false` para sim/não, `0` para número.
 - Não declare uma variável em outro arquivo, e não use uma que não foi declarada: a verificação reprova os dois.
+- `$nome_protagonista` já está no arquivo e é **do jogo**: o jogador a grava ao assinar a lista de passageiros. Não a redeclare e não dê `<<set>>` nela ([Mostrar um valor no texto](#mostrar-um-valor-no-texto)).
 - Este é o único arquivo em que duas pessoas mexem ao mesmo tempo. Acrescentar sempre no fim evita que as mudanças se choquem. Se mesmo assim aparecer um aviso de **conflito**, pare e chame o programador.
 
 ### Mudar o valor
@@ -570,6 +569,14 @@ Luna: Vou ensaiar no auditório. A banda toca na sexta.
 
 `{$nome}` é trocado pelo valor atual: `Sua afinidade com a Luna é {$afinidade_luna}.` Serve para testar. Num roteiro de verdade, não mostre número para o jogador.
 
+A exceção é o nome do protagonista: `{$nome_protagonista}` mostra o nome que o jogador escreveu, e `???` se ele ainda não assinou a lista.
+
+```
+Motorista: Obrigado, {$nome_protagonista}.
+```
+
+`$nome_protagonista` é uma variável **do jogo**: já está declarada em `variaveis.yarn`, e quem a grava é o jogo, ao assinar. Não a declare de novo e não use `<<set>>` nela.
+
 ## Comandos disponíveis
 
 Um **comando** é uma ordem para o jogo, escrita entre `<<` e `>>`, em uma linha só dele. A lista cresce conforme as mecânicas entram: cada issue que cria um comando o acrescenta aqui.
@@ -602,6 +609,12 @@ As tabelas abaixo são a lista completa. Cada linha aponta para a seção que ex
 | `<<else>>` | Dentro de um `<<if>>`: o trecho que aparece se nenhuma condição valeu | [Condicionar uma fala](#condicionar-uma-fala) |
 | `<<endif>>` | Fecha o `<<if>>` | [Condicionar uma fala](#condicionar-uma-fala) |
 | `-> texto <<if condição>>` | No fim de uma opção: ela aparece bloqueada se a condição for falsa | [Condicionar uma opção](#condicionar-uma-opção) |
+
+**O protagonista**
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<assinar_lista>>` | Abre a folha da lista de passageiros por cima da conversa: o jogador escreve o nome do protagonista e assina, e a conversa segue. Um só por jogo, no prólogo | [O protagonista](#o-protagonista) |
 
 **Itens**
 

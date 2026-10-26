@@ -29,11 +29,11 @@ Estado global da história (decisão D-18): booleanos, números e textos por nom
 StoryState.IsTrue("$falou_com_luna");                 // booleano gravado e verdadeiro
 StoryState.TryGetBool("$falou_com_luna", out bool b); // distingue "falso gravado" de "nunca gravado"
 StoryState.TryGetNumber("$afinidade_luna", out float n);
-StoryState.TryGetText("$nome_jogador", out string t);
+StoryState.TryGetText("$nome_protagonista", out string t);
 
 StoryState.SetBool("$falou_com_luna", true);          // true se gravou
 StoryState.SetNumber("$afinidade_luna", 2.5f);
-StoryState.SetText("$nome_jogador", "Ana");             // null vira ""
+StoryState.SetText("$nome_protagonista", "Ana");         // null vira ""
 
 StoryState.Bools; StoryState.Numbers; StoryState.Texts; // IReadOnlyDictionary, usados pelo save
 StoryState.ReplaceAll(bools, numbers, texts);           // usado ao carregar um save; cada um aceita null
@@ -50,7 +50,7 @@ Regras:
 - É persistido pelo `GameSaveManager` (módulo `GameFlow`), nos campos `storyBools`, `storyNumbers` e `storyTexts` do `GameState`.
 - **Não existe mensagem de "variável mudou".** Nada a escutaria hoje, e uma mensagem sem assinante falha em silêncio. Quem precisa do valor consulta.
 
-Quem escreve hoje: o roteiro, pelo `StoryStateVariables` do módulo `Dialogue` (o armazenamento de variáveis do Yarn Spinner, que não guarda valor nenhum e vai direto ao `StoryState`, inclusive o contador de visitas `$Yarn.Internal.Visiting.<nó>`), e o `LockedActionBehaviour` (ao destrancar), do `GameFlow`.
+Quem escreve hoje: o roteiro, pelo `StoryStateVariables` do módulo `Dialogue` (o armazenamento de variáveis do Yarn Spinner, que não guarda valor nenhum e vai direto ao `StoryState`, inclusive o contador de visitas `$Yarn.Internal.Visiting.<nó>`), o `LockedActionBehaviour` (ao destrancar), do `GameFlow`, e o `DialogueManager` (`AskProtagonistName`, que grava `$nome_protagonista` quando o jogador assina a lista de passageiros, #26).
 
 ## `StoryVariableName`
 
