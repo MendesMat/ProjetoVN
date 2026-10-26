@@ -37,7 +37,7 @@ namespace ProjetoVN.Dialogue.Logic
 
         private void AddSpeech(string speakerName, Color speakerColor, string text, bool isProtagonist)
         {
-            bool showsName = !ContinuesSequenceOf(speakerName);
+            bool showsName = !ContinuesSequenceOf(speakerName, isProtagonist);
 
             _entries.Add(new ConversationEntry(ConversationEntryKind.Speech, speakerName, Opaque(speakerColor), text, isProtagonist, showsName));
         }
@@ -47,12 +47,15 @@ namespace ProjetoVN.Dialogue.Logic
         private void AddWithoutSpeaker(ConversationEntryKind kind, string text) =>
             _entries.Add(new ConversationEntry(kind, null, Color.clear, text, isProtagonist: false, showsName: false));
 
-        private bool ContinuesSequenceOf(string speakerName)
+        // O lado também conta: o jogador pode ter escolhido para o protagonista o nome de outro personagem (#26).
+        private bool ContinuesSequenceOf(string speakerName, bool isProtagonist)
         {
             if (_entries.Count == 0) return false;
 
             ConversationEntry previous = _entries[^1];
-            return previous.Kind == ConversationEntryKind.Speech && string.Equals(previous.SpeakerName, speakerName, StringComparison.Ordinal);
+            return previous.Kind == ConversationEntryKind.Speech
+                   && previous.IsProtagonist == isProtagonist
+                   && string.Equals(previous.SpeakerName, speakerName, StringComparison.Ordinal);
         }
     }
 }

@@ -114,6 +114,16 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void ProtagonistAndCharacter_WithTheSameName_BothShowTheName()
+        {
+            _log.AddProtagonistLine("Luna", ProtagonistColor, "Oi.");
+            _log.AddSpokenLine("Luna", LunaColor, "Oi, eu também.");
+
+            Assert.IsTrue(_log.Entries[0].ShowsName);
+            Assert.IsTrue(_log.Entries[1].ShowsName);
+        }
+
+        [Test]
         public void NarrationBetweenLinesOfTheSameSpeaker_ShowsTheNameAgain()
         {
             _log.AddSpokenLine("Luna", LunaColor, "Oi.");
