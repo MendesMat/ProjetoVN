@@ -26,6 +26,12 @@ namespace ProjetoVN.Tests.PlayMode
         private const float Tolerance = 1e-3f;
         private const float WaitTimeoutSeconds = 10f;
         private const float LongerThanTheCrossfadeSeconds = 2f;
+        private const float LongerThanAnAudioBlockSeconds = 0.1f;
+        private const float LoopStartMarginSeconds = 1f;
+        private const float LoopEndMarginSeconds = 3f;
+
+        private AudioClip _startRoomClip;
+        private AudioClip _stubMusic;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -38,6 +44,7 @@ namespace ProjetoVN.Tests.PlayMode
             yield return SceneManager.LoadSceneAsync(StartRoom);
             yield return null;
             yield return WaitUntil(() => HasSettledOn(StartRoomMusic), $"a música '{StartRoomMusic}' terminar de entrar");
+            _startRoomClip = AudioManager.Instance.CurrentMusic;
         }
 
         [UnityTearDown]
@@ -45,6 +52,7 @@ namespace ProjetoVN.Tests.PlayMode
         {
             Object.FindFirstObjectByType<PauseMenu>(FindObjectsInactive.Include).Resume();
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o fim de uma troca de sala pendente");
+            yield return DestroyStubMusic();
 
             Assert.AreEqual(1f, Time.timeScale, "O tempo do jogo ficou congelado depois do teste.");
             if (SceneManager.GetActiveScene().name == MenuScene)
@@ -79,6 +87,7 @@ namespace ProjetoVN.Tests.PlayMode
         public IEnumerator ReloadingTheRoom_DoesNotRestartTheMusic()
         {
             AudioSource source = PlayingSourceOf(StartRoomMusic);
+            yield return WaitUntilTimeIsAwayFromTheLoopEnds(source);
             float timeBefore = source.time;
 
             Assert.IsTrue(RoomNavigator.Instance.ChangeRoom(SceneManager.GetActiveScene().name), "O Reload foi recusado.");
@@ -95,11 +104,11 @@ namespace ProjetoVN.Tests.PlayMode
         public IEnumerator PlayMusic_WithTheCurrentClip_DoesNotRestartIt()
         {
             AudioSource source = PlayingSourceOf(StartRoomMusic);
+            yield return WaitUntilTimeIsAwayFromTheLoopEnds(source);
             float timeBefore = source.time;
-            yield return null;
 
             AudioManager.Instance.PlayMusic(AudioManager.Instance.CurrentMusic);
-            yield return null;
+            yield return new WaitForSecondsRealtime(LongerThanAnAudioBlockSeconds);
 
             Assert.AreSame(source, PlayingSourceOf(StartRoomMusic), "A música trocou de fonte.");
             Assert.Greater(source.time, timeBefore, "A música reiniciou.");
@@ -121,15 +130,14 @@ namespace ProjetoVN.Tests.PlayMode
         [UnityTest]
         public IEnumerator GoingBackDuringAChange_DoesNotRestartTheLeavingMusic()
         {
-            AudioClip stubMusic = NewStubMusic();
-            AudioClip startRoomClip = AudioManager.Instance.CurrentMusic;
             AudioSource leaving = PlayingSourceOf(StartRoomMusic);
-            AudioManager.Instance.PlayMusic(stubMusic);
+            yield return WaitUntilTimeIsAwayFromTheLoopEnds(leaving);
+            AudioManager.Instance.PlayMusic(NewStubMusic());
             yield return WaitUntil(() => leaving.volume < 0.8f && leaving.volume > 0.2f, "o meio do crossfade");
             float timeBefore = leaving.time;
 
-            AudioManager.Instance.PlayMusic(startRoomClip);
-            yield return null;
+            AudioManager.Instance.PlayMusic(_startRoomClip);
+            yield return new WaitForSecondsRealtime(LongerThanAnAudioBlockSeconds);
 
             Assert.IsTrue(leaving.isPlaying, "A música que voltou parou.");
             Assert.Greater(leaving.time, timeBefore, "A música que voltou reiniciou.");
@@ -142,8 +150,7 @@ namespace ProjetoVN.Tests.PlayMode
         public IEnumerator TheChangeDoesNotFreezeWhilePaused_AndTheMusicKeepsPlaying()
         {
             var pauseMenu = Object.FindFirstObjectByType<PauseMenu>(FindObjectsInactive.Include);
-            AudioClip stubMusic = NewStubMusic();
-            AudioManager.Instance.PlayMusic(stubMusic);
+            AudioManager.Instance.PlayMusic(NewStubMusic());
             yield return null;
             pauseMenu.TogglePause();
             Assert.AreEqual(0f, Time.timeScale, "A pausa não congelou o tempo.");
@@ -152,7 +159,7 @@ namespace ProjetoVN.Tests.PlayMode
 
             Assert.AreEqual(1, PlayingSources().Length, "A troca ficou parada no meio durante a pausa.");
             AudioSource source = PlayingSources().Single();
-            Assert.AreSame(stubMusic, source.clip);
+            Assert.AreSame(_stubMusic, source.clip);
             Assert.AreEqual(1f, source.volume, Tolerance);
         }
 
@@ -177,12 +184,26 @@ namespace ProjetoVN.Tests.PlayMode
             return playing.Length == 1 && Mathf.Approximately(playing[0].volume, 1f);
         }
 
-        private static AudioClip NewStubMusic()
+        private AudioClip NewStubMusic()
         {
-            var clip = AudioClip.Create("musica_provisoria_do_teste", (int)(SampleRate * StubMusicSeconds), 1, SampleRate, false);
-            clip.SetData(new float[(int)(SampleRate * StubMusicSeconds)], 0);
-            return clip;
+            _stubMusic = AudioClip.Create("musica_provisoria_do_teste", (int)(SampleRate * StubMusicSeconds), 1, SampleRate, false);
+            _stubMusic.SetData(new float[(int)(SampleRate * StubMusicSeconds)], 0);
+            return _stubMusic;
         }
+
+        private IEnumerator DestroyStubMusic()
+        {
+            if (_stubMusic == null) yield break;
+
+            AudioManager.Instance.PlayMusic(_startRoomClip);
+            yield return WaitUntil(() => HasSettledOn(StartRoomMusic), $"a música '{StartRoomMusic}' voltar a ser a única tocando");
+            Object.Destroy(_stubMusic);
+            _stubMusic = null;
+        }
+
+        private static IEnumerator WaitUntilTimeIsAwayFromTheLoopEnds(AudioSource source) =>
+            WaitUntil(() => source.time >= LoopStartMarginSeconds && source.time <= source.clip.length - LoopEndMarginSeconds,
+                "a música estar longe das pontas do loop");
 
         private static IEnumerator WaitUntil(Func<bool> condition, string expectation)
         {
