@@ -255,7 +255,7 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 ### `[Fatia] Posto` (com pan)
 
-- **Fundo e pan:** `Environment/ScrollingBackground` leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -40, **Max X** 40) e três painéis com o mesmo sprite, `LeftPanel` (x -20,9, escala -1,25 em X), `MiddlePanel` (x 0) e `RightPanel` (x 20,9). `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan.
+- **Fundo e pan:** `Environment/ScrollingBackground` leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -40, **Max X** 40) e três painéis com o mesmo sprite, `LeftPanel` (x -20,9, escala -1,25 em X), `MiddlePanel` (x 0) e `RightPanel` (x 20,9, escala -1,25 em X). `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan.
 - **`Room Music`:** `teste_musica_b`.
 - **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, no X do `Exit_Onibus` (20): é o lugar que fica no centro da tela quando o jogador chega do ônibus.
 - **`Interactables/NPC_Luna`:** o gatilho com `posto_luna`, em **On Interact**.
