@@ -19,7 +19,7 @@ O som do jogo: a música de cada sala, com troca suave (#19); o som de ambiente 
 
 O mixer do projeto é `Assets/Audio/ProjetoVN.mixer`, com os grupos `Music` e `SFX` sob o `Master`. As fontes da música saem no `Music`; as do ambiente e a dos efeitos, no `SFX` (nenhum grupo novo). O mixer e os grupos são criados à mão na janela Audio Mixer: não há API pública para isso.
 
-Os arquivos de som ficam em `Assets/Audio/`: `Musica/`, `Ambiente/` e `Efeitos/`. Importação: música e ambiente com `Load Type` = `Streaming`, `Vorbis`, `Preload Audio Data` desligado; efeitos com `Decompress On Load`, `Vorbis` e `Preload Audio Data` ligado. Os sons de hoje (`Efeitos/` e `Ambiente/`) são **provisórios**, gerados por script; trocar pelo definitivo é substituir o arquivo mantendo o nome e o `.meta`.
+Os arquivos de som ficam em `Assets/Audio/`: `Ambiente/` e `Efeitos/`. As músicas de teste (`teste_musica_a` e `teste_musica_b`) estão na raiz; a pasta `Musica/` nasce com a primeira música definitiva. Importação: música e ambiente com `Load Type` = `Streaming`, `Vorbis`, `Preload Audio Data` desligado; efeitos com `Decompress On Load`, `Vorbis` e `Preload Audio Data` ligado. Os sons de hoje (`Efeitos/` e `Ambiente/`) são **provisórios**, gerados por script; trocar pelo definitivo é substituir o arquivo mantendo o nome e o `.meta`.
 
 ## Como a música de uma sala é escolhida
 
