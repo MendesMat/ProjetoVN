@@ -87,6 +87,8 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.AreEqual(StartRoomMusic, AudioManager.Instance.CurrentMusic.name);
             Assert.IsTrue(source.isPlaying, "A música parou ao recarregar a sala.");
             Assert.Greater(source.time, timeBefore, "A música reiniciou ao recarregar a sala.");
+            Assert.AreEqual(1, PlayingSources().Length, "Uma segunda fonte começou a tocar a mesma música ao recarregar a sala.");
+            Assert.AreEqual(1f, source.volume, Tolerance, "A música baixou de volume ao recarregar a sala.");
         }
 
         [UnityTest]
