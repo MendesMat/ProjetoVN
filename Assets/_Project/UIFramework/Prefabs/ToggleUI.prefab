@@ -118,6 +118,7 @@ GameObject:
   - component: {fileID: 5059227612339062585}
   - component: {fileID: 3657984546213769653}
   - component: {fileID: 5515502505947077974}
+  - component: {fileID: 4228168442136381311}
   m_Layer: 5
   m_Name: ToggleUI
   m_TagString: Untagged
@@ -254,6 +255,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &4228168442136381311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4489789833126689045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &5309439769175583231
 GameObject:
   m_ObjectHideFlags: 0
@@ -342,6 +355,7 @@ GameObject:
   - component: {fileID: 3101583686012349151}
   - component: {fileID: 7552122662282402152}
   - component: {fileID: 1923654780173278991}
+  - component: {fileID: 4503227299086540881}
   m_Layer: 5
   m_Name: Btn Right Arrow
   m_TagString: Untagged
@@ -450,6 +464,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4503227299086540881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5336754939272811209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &5644327847941342428
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +762,7 @@ GameObject:
   - component: {fileID: 9056272088040390568}
   - component: {fileID: 1595174014048014560}
   - component: {fileID: 7052223448841746352}
+  - component: {fileID: 2200396248950045517}
   m_Layer: 5
   m_Name: Btn Left Arrow
   m_TagString: Untagged
@@ -844,3 +871,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &2200396248950045517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6753824370068723312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds

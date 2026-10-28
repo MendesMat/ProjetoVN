@@ -1385,6 +1385,7 @@ GameObject:
   - component: {fileID: 416742223}
   - component: {fileID: 416742222}
   - component: {fileID: 416742221}
+  - component: {fileID: 416742226}
   m_Layer: 5
   m_Name: Button Icon (3)
   m_TagString: Untagged
@@ -1552,6 +1553,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 416742219}
   m_CullTransparentMesh: 1
+--- !u!114 &416742226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 416742219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &478833506
 GameObject:
   m_ObjectHideFlags: 0
@@ -1958,6 +1971,7 @@ GameObject:
   - component: {fileID: 588167049}
   - component: {fileID: 588167048}
   - component: {fileID: 588167047}
+  - component: {fileID: 588167052}
   m_Layer: 5
   m_Name: Button Icon (1)
   m_TagString: Untagged
@@ -2125,6 +2139,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 588167045}
   m_CullTransparentMesh: 1
+--- !u!114 &588167052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588167045}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &593448626
 GameObject:
   m_ObjectHideFlags: 0
@@ -4279,6 +4305,7 @@ GameObject:
   - component: {fileID: 1170138564}
   - component: {fileID: 1170138563}
   - component: {fileID: 1170138562}
+  - component: {fileID: 1170138565}
   m_Layer: 5
   m_Name: Button (1)
   m_TagString: Untagged
@@ -4388,6 +4415,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1170138560}
   m_CullTransparentMesh: 1
+--- !u!114 &1170138565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1170138560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1170975854
 GameObject:
   m_ObjectHideFlags: 0
@@ -4686,6 +4725,7 @@ GameObject:
   - component: {fileID: 1243031494}
   - component: {fileID: 1243031493}
   - component: {fileID: 1243031492}
+  - component: {fileID: 1243031496}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -4822,6 +4862,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1243031490}
   m_CullTransparentMesh: 1
+--- !u!114 &1243031496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1243031490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1262972686
 GameObject:
   m_ObjectHideFlags: 0
@@ -5258,6 +5310,7 @@ GameObject:
   - component: {fileID: 1368388932}
   - component: {fileID: 1368388931}
   - component: {fileID: 1368388930}
+  - component: {fileID: 1368388935}
   m_Layer: 5
   m_Name: Button Icon (2)
   m_TagString: Untagged
@@ -5425,6 +5478,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1368388928}
   m_CullTransparentMesh: 1
+--- !u!114 &1368388935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368388928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1372729778
 GameObject:
   m_ObjectHideFlags: 0
@@ -6236,6 +6301,7 @@ GameObject:
   - component: {fileID: 1547179904}
   - component: {fileID: 1547179907}
   - component: {fileID: 1547179906}
+  - component: {fileID: 1547179910}
   m_Layer: 5
   m_Name: Button Icon
   m_TagString: Untagged
@@ -6403,6 +6469,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1547179910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1547179903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1589138778
 GameObject:
   m_ObjectHideFlags: 0
@@ -6854,6 +6932,7 @@ GameObject:
   - component: {fileID: 1612954908}
   - component: {fileID: 1612954907}
   - component: {fileID: 1612954906}
+  - component: {fileID: 1612954910}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -6975,6 +7054,18 @@ RectTransform:
   m_AnchoredPosition: {x: 1500, y: -50}
   m_SizeDelta: {x: 250, y: 70}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1612954910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612954905}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1695308487
 GameObject:
   m_ObjectHideFlags: 0
@@ -7276,6 +7367,7 @@ GameObject:
   - component: {fileID: 1756711927}
   - component: {fileID: 1756711926}
   - component: {fileID: 1756711930}
+  - component: {fileID: 1756711931}
   m_Layer: 5
   m_Name: Button Icon
   m_TagString: Untagged
@@ -7443,6 +7535,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1756711931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756711924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1757735968
 GameObject:
   m_ObjectHideFlags: 0
@@ -7948,6 +8052,7 @@ GameObject:
   - component: {fileID: 1918280108}
   - component: {fileID: 1918280107}
   - component: {fileID: 1918280106}
+  - component: {fileID: 1918280111}
   m_Layer: 5
   m_Name: Button Icon (1)
   m_TagString: Untagged
@@ -8115,6 +8220,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1918280104}
   m_CullTransparentMesh: 1
+--- !u!114 &1918280111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918280104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1921894227
 GameObject:
   m_ObjectHideFlags: 0

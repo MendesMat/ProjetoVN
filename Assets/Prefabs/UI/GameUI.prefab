@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 249843935115450491}
   - component: {fileID: 1527874899545831219}
   - component: {fileID: 8619832398131921197}
+  - component: {fileID: 8917520140124545569}
   m_Layer: 0
   m_Name: ChoiceButton0
   m_TagString: Untagged
@@ -222,6 +223,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8917520140124545569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 232789944221827683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &256036886173240185
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,6 +1107,7 @@ GameObject:
   - component: {fileID: 5972402242847687008}
   - component: {fileID: 4521044973813413537}
   - component: {fileID: 9148533268226340342}
+  - component: {fileID: 3435100603178810744}
   m_Layer: 0
   m_Name: ChoiceButton3
   m_TagString: Untagged
@@ -1228,6 +1242,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3435100603178810744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 695874996367025419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &839944298509811777
 GameObject:
   m_ObjectHideFlags: 0
@@ -1872,6 +1898,7 @@ GameObject:
   - component: {fileID: 7220707436026213868}
   - component: {fileID: 7044861953863084326}
   - component: {fileID: 7461518280887375903}
+  - component: {fileID: 1367023690328631289}
   m_Layer: 0
   m_Name: HistoryButton
   m_TagString: Untagged
@@ -1981,6 +2008,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1367023690328631289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291660648433285524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &1294982797873323558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2956,6 +2995,7 @@ GameObject:
   - component: {fileID: 1948829063858271798}
   - component: {fileID: 2218439114398032203}
   - component: {fileID: 3406678207218809631}
+  - component: {fileID: 6873171830923175857}
   m_Layer: 0
   m_Name: Button Continue
   m_TagString: Untagged
@@ -3143,6 +3183,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.922, b: 0.016, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &6873171830923175857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2341456491488765176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &2354794117889110244
 GameObject:
   m_ObjectHideFlags: 0
@@ -3155,6 +3207,7 @@ GameObject:
   - component: {fileID: 8437887262832040213}
   - component: {fileID: 4903862804155442478}
   - component: {fileID: 3091410001686494332}
+  - component: {fileID: 6746900938643091545}
   m_Layer: 0
   m_Name: CloseButton
   m_TagString: Untagged
@@ -3264,6 +3317,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6746900938643091545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2354794117889110244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &2386964037729365572
 GameObject:
   m_ObjectHideFlags: 0
@@ -5156,6 +5221,7 @@ GameObject:
   - component: {fileID: 4435714571477793354}
   - component: {fileID: 5082027606876191453}
   - component: {fileID: 992930517965129107}
+  - component: {fileID: 388144488705757014}
   m_Layer: 0
   m_Name: Button Save
   m_TagString: Untagged
@@ -5343,6 +5409,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.922, b: 0.016, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &388144488705757014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4831703197151321851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &5038323035253599958
 GameObject:
   m_ObjectHideFlags: 0
@@ -5571,6 +5649,7 @@ GameObject:
   - component: {fileID: 3054808193999514574}
   - component: {fileID: 5934304337958095266}
   - component: {fileID: 2971193738203465540}
+  - component: {fileID: 529222840340004188}
   m_Layer: 0
   m_Name: Button Return
   m_TagString: Untagged
@@ -5758,6 +5837,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.922, b: 0.016, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &529222840340004188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5202457732123805709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &5270046917170081927
 GameObject:
   m_ObjectHideFlags: 0
@@ -6879,6 +6970,7 @@ GameObject:
   - component: {fileID: 2165606566664054497}
   - component: {fileID: 4936759364979139326}
   - component: {fileID: 8352582461776101708}
+  - component: {fileID: 3506167443655493224}
   m_Layer: 0
   m_Name: ChoiceButton2
   m_TagString: Untagged
@@ -7013,6 +7105,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3506167443655493224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6046672126270423044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6167314499375613449
 GameObject:
   m_ObjectHideFlags: 0
@@ -7026,6 +7130,7 @@ GameObject:
   - component: {fileID: 8061415689151355905}
   - component: {fileID: 5557824704231011512}
   - component: {fileID: 2588906982308275655}
+  - component: {fileID: 5911801963228659207}
   m_Layer: 0
   m_Name: ChoiceButton1
   m_TagString: Untagged
@@ -7160,6 +7265,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5911801963228659207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6167314499375613449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6180079288295310315
 GameObject:
   m_ObjectHideFlags: 0
@@ -7474,7 +7591,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -7539,6 +7656,7 @@ GameObject:
   - component: {fileID: 522390475166791966}
   - component: {fileID: 3289601585250839900}
   - component: {fileID: 940462578413563085}
+  - component: {fileID: 7940306634768828552}
   m_Layer: 0
   m_Name: Button Return
   m_TagString: Untagged
@@ -7726,6 +7844,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.922, b: 0.016, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &7940306634768828552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6425310911110752783}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6538467251731469004
 GameObject:
   m_ObjectHideFlags: 0
@@ -7878,6 +8008,7 @@ GameObject:
   - component: {fileID: 1079971415577852362}
   - component: {fileID: 1609111452950396712}
   - component: {fileID: 2713493683128180982}
+  - component: {fileID: 7942424506099624646}
   m_Layer: 0
   m_Name: Button Back
   m_TagString: Untagged
@@ -8065,6 +8196,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.922, b: 0.016, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &7942424506099624646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6603366654640553214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6632728611532170100
 GameObject:
   m_ObjectHideFlags: 0
@@ -8169,6 +8312,7 @@ GameObject:
   - component: {fileID: 5391802029925536467}
   - component: {fileID: 5003632387391463787}
   - component: {fileID: 839302471206445323}
+  - component: {fileID: 517287854759773019}
   m_Layer: 0
   m_Name: SignButton
   m_TagString: Untagged
@@ -8278,6 +8422,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &517287854759773019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6953543823527555224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6962559121535910720
 GameObject:
   m_ObjectHideFlags: 0

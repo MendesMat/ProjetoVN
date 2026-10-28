@@ -544,6 +544,7 @@ GameObject:
   - component: {fileID: 8588726980179597952}
   - component: {fileID: 8278160413364730875}
   - component: {fileID: 4604910838610346957}
+  - component: {fileID: 5408951011621618596}
   m_Layer: 5
   m_Name: SliderUI
   m_TagString: Untagged
@@ -680,6 +681,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &5408951011621618596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5832202678550599145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &6104241631144376068
 GameObject:
   m_ObjectHideFlags: 0
