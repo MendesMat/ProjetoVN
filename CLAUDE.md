@@ -78,6 +78,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 [Dialogue](Assets/Scripts/Dialogue/README.md) ·
 [Inventory](Assets/Scripts/Inventory/README.md) ·
 [PointNClick](Assets/Scripts/PointNClick/README.md) ·
+[Audio](Assets/Scripts/Audio/README.md) ·
 [GameFlow](Assets/Scripts/GameFlow/README.md) ·
 [UI](Assets/Scripts/UI/README.md) ·
 [Editor](Assets/Scripts/Editor/README.md) ·
@@ -93,6 +94,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
+| `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e, depois, as músicas e os sons |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
 | `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte |
 | `.claude/skills/` | Os três comandos de trabalho |
