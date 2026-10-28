@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 2300017363255281629}
   - component: {fileID: 4215378421114216173}
   - component: {fileID: 5592923078025484969}
+  - component: {fileID: 4239739025935962119}
   m_Layer: 5
   m_Name: ButtonSemBorda
   m_TagString: Untagged
@@ -217,6 +218,18 @@ MonoBehaviour:
   normalTextColor: {r: 1, g: 1, b: 1, a: 1}
   highlightedTextColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   disabledTextColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+--- !u!114 &4239739025935962119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5785826711575484220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &7750462959148917380
 GameObject:
   m_ObjectHideFlags: 0

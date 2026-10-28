@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3873330766768869612}
   - component: {fileID: 5492517853837090673}
   - component: {fileID: 229290081683125348}
+  - component: {fileID: 4611718918947887225}
   m_Layer: 5
   m_Name: Btn Right Arrow
   m_TagString: Untagged
@@ -120,6 +121,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4611718918947887225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256545465936469366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &2707740567792717536
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,6 +145,7 @@ GameObject:
   - component: {fileID: 4996993377363538245}
   - component: {fileID: 931358545505152400}
   - component: {fileID: 2096810009514469095}
+  - component: {fileID: 8534510063090701133}
   m_Layer: 5
   m_Name: Btn Left Arrow
   m_TagString: Untagged
@@ -240,6 +254,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8534510063090701133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2707740567792717536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &2833379783629060546
 GameObject:
   m_ObjectHideFlags: 0
@@ -329,6 +355,7 @@ GameObject:
   - component: {fileID: 6488175919108720492}
   - component: {fileID: 1245158196281358864}
   - component: {fileID: 8984014840323322869}
+  - component: {fileID: 1063281556456107121}
   m_Layer: 5
   m_Name: DropDownUI
   m_TagString: Untagged
@@ -465,6 +492,18 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1063281556456107121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3276591919611565748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5181c3da09eb66747b8a86c288b0e125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.ButtonSounds
 --- !u!1 &4171687132720112267
 GameObject:
   m_ObjectHideFlags: 0

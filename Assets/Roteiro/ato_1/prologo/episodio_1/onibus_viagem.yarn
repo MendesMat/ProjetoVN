@@ -4,7 +4,7 @@ title: onibus_viagem
 ---
 // ----- NO ÔNIBUS -----
 // PEDIDO: começar com a tela preta e clarear aos poucos até o cenário do ônibus por dentro, à noite.
-// PEDIDO: tocar em loop, a partir daqui, o som do ônibus na estrada.
+<<tocar_ambiente onibus_estrada>>
 Pensamento: Em qualquer outro dia, esse cenário me deixaria mais calmo...
 Pensamento: Mas o lugar para onde este ônibus está me levando não me traz paz nenhuma...
 Pensamento: Agronomia... Outra cidade... Que ideia de merda.
@@ -12,7 +12,7 @@ Pensamento: Por que eu fui concordar com isso?
 
 // ----- A LEMBRANÇA -----
 // PEDIDO: tela preta, com uma fumaça ao redor e as silhuetas dos pais.
-// PEDIDO: o som do ônibus some enquanto dura a lembrança.
+<<parar_ambiente>>
 Pai: Veja só o seu primo, sustentando a família!
 Pai: Você acha que isso de computação, cineminha ou sei lá o quê vai te trazer futuro?
 Mãe: Não seja tão duro com ele, querido...
@@ -33,7 +33,7 @@ Mãe: ...então, por favor, faça isso por nós.
 
 // ----- DE VOLTA AO ÔNIBUS -----
 // PEDIDO: a lembrança some aos poucos e o cenário do ônibus volta.
-// PEDIDO: o som do ônibus na estrada volta.
+<<tocar_ambiente onibus_estrada>>
 Pensamento: Espero ter feito a escolha certa, mãe...
 Pensamento: Abandonar a minha cidade, os meus amigos... Foda...
 Pensamento: Mas vamos pensar pelo lado bom. Talvez eu goste do curso, do lugar, faça amigos...
@@ -43,7 +43,8 @@ Pensamento: Uma namorada...
 Pensamento: Eu posso sonhar, não pos—
 
 // ----- O ACIDENTE -----
-// PEDIDO: parar o som do ônibus e tocar uma freada forte seguida de uma batida.
+<<parar_ambiente>>
+<<tocar_efeito freada_batida>>
 Protagonista: Que porra é essa?!
 Instintivamente, olho para o corredor. Do meu lugar, não consigo ver nada além do vidro do motorista, quebrado.
 Homem: O que foi isso?!

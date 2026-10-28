@@ -6,7 +6,7 @@
 
 ## Regras que valem sempre
 
-- **Não coloque managers na cena.** `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `DialogueInputHandler`, `GameSaveManager` e `ItemScriptActions` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
+- **Não coloque managers na cena.** `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `InventoryManager`, `GameStateController`, `RoomNavigator`, `DialogueInputHandler`, `GameSaveManager`, `ItemScriptActions`, `AudioManager`, `SoundScriptActions` e `ItemCollectedSound` são criados sozinhos quando o jogo começa. Um deles dentro da cena quebra o jogo de forma difícil de perceber.
 - **Não coloque `Canvas` de jogo nem `EventSystem` na cena.** A caixa de diálogo, os botões de escolha, o painel de inventário, o fade de tela da troca de sala e o `EventSystem` também são criados sozinhos quando o jogo começa, e são os mesmos em todas as salas. Se o console mostrar `There are 2 event systems in the scene` sem parar, há um `EventSystem` sobrando na cena: apague-o.
 - **Não altere um asset durante o Play.** Itens são dados somente leitura.
 - **Leia os avisos do console ao salvar.** Os componentes avisam quando um campo obrigatório ficou vazio.
@@ -196,7 +196,31 @@ Regras:
 - **A mesma música em duas salas não reinicia.** Se a sala A e a sala B declaram a mesma faixa, quem passa de uma para a outra continua ouvindo a música de onde estava. Recarregar a mesma sala também não reinicia. Para duas salas soarem como a mesma música, arraste **o mesmo arquivo** nas duas.
 - **No máximo um `Room Music` por cena.** O componente se recusa a ser acrescentado duas vezes ao mesmo objeto, e um teste reprova uma cena com dois objetos.
 - **Música em loop:** a faixa toca em loop. Faça o final emendar com o começo, ou a emenda estala. Num WAV gerado por script, use duração e frequências inteiras.
-- **Não ponha `AudioListener`, `AudioSource` nem o `AudioManager` na cena.** O `AudioListener` já vem na câmera da sala, e o `AudioManager` e as fontes da música vivem no `Managers.prefab`.
+- **Não ponha `AudioListener`, `AudioSource` nem o `AudioManager` na cena.** O `AudioListener` já vem na câmera da sala, e o `AudioManager` e as fontes de música, ambiente e efeitos vivem no `Managers.prefab`. A cena leva só o `Room Music` e o `Sound Effect` (abaixo).
 - **A pausa não cala a música:** com a pausa aberta ela continua tocando.
 
-Efeitos sonoros e o comando de roteiro para tocar música (`<<tocar_musica>>`) chegam com a #20.
+### Som em um objeto ou em uma porta (#20)
+
+O componente **Sound Effect** toca um som quando um evento do objeto dispara, sem código (D-07):
+
+1. Importe o som em `Assets/Audio/Efeitos/` (WAV). No Inspector do arquivo: **Load Type** = `Decompress On Load`, **Preload Audio Data** ligado, **Compression Format** = `Vorbis`. Clique em **Apply**.
+2. No objeto (por exemplo, a porta), crie um **filho** vazio (`Som Trancada`) e acrescente o componente **Sound Effect**. Arraste o som para o campo **Clip**. Vazio = não toca nada, e o componente avisa.
+3. No evento que deve soar (**On Locked**, **On Unlocked**, **On Interact**...), ligue o filho e escolha **SoundEffect → Play**. `Door_PortaTrancada`, em `[Teste] Mecanicas`, tem dois filhos assim: `Som Trancada` (no **On Locked**) e `Som Abrindo` (no **On Unlocked**).
+
+Não renomeie nem mova o componente `SoundEffect` depois de ligar: a ligação do evento guarda o tipo pelo nome e quebra em silêncio.
+
+Dois sons já têm dono e **não** se ligam à mão: o de **coletar item** (toca a cada item que entra no inventário, inclusive o que o roteiro dá com `<<dar_item>>`) e o de **avançar fala**. Eles são campos do `AudioManager`, no `Managers.prefab` (**Button Hover Sound**, **Button Click Sound**, **Line Advance Sound**, **Item Collected Sound**). Trocar um som é substituir o arquivo, mantendo o nome e o `.meta`; um campo vazio deixa aquele som mudo.
+
+### Botões (#20)
+
+Todo `Button` do jogo leva o componente **Button Sounds**: ele toca o som de passar o mouse (só em botão habilitado) e o de clique. Os botões do `GameUI.prefab`, do `Menu.unity`, da cena de teste e dos prefabs do `UIFramework` já levam. **Um botão novo leva o componente**; o teste `ButtonSoundsTests` reprova o que esquecer e diz o caminho. Em um botão que vem de um prefab, ponha o componente **no prefab**, não na instância da cena (o componente não aceita duas cópias no mesmo botão).
+
+### Sons para o roteiro (#20)
+
+O roteiro cita o som por um **id** (`<<tocar_efeito freada_batida>>`; ver [roteiro.md](roteiro.md#música-e-sons)). Para um som novo ficar disponível:
+
+1. Importe o arquivo: efeitos em `Assets/Audio/Efeitos/` (como acima); sons de fundo em `Assets/Audio/Ambiente/` e músicas em `Assets/Audio/Musica/`, com **Load Type** = `Streaming`, **Compression Format** = `Vorbis` e **Preload Audio Data** desligado. O som de fundo toca em loop: faça o final emendar com o começo.
+2. Abra `Assets/Scripts/ScriptableObjects/Audio/SoundRegistry.asset` e acrescente uma linha na lista certa (**Music**, **Ambience** ou **Effects**): o **Id** (minúsculas sem acento, dígitos e `_`, único no registro inteiro) e o **Clip**. O registro avisa id vazio, fora do formato ou repetido, e clipe vazio.
+3. Acrescente uma linha à tabela [Sons que existem](roteiro.md#música-e-sons) do guia de roteiro.
+
+O teste `ScriptContentTests` reprova um id do roteiro que não esteja na lista certa, e um id repetido ou sem clipe no registro.

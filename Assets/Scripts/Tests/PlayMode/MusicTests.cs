@@ -18,6 +18,7 @@ namespace ProjetoVN.Tests.PlayMode
         private const string StartRoom = "[Teste] Mecanicas";
         private const string OtherRoom = "[Teste] Sala B";
         private const string MenuScene = "Menu";
+        private const string MusicChildName = "Music";
         private const string EntryPointId = "janela";
         private const string StartRoomMusic = "teste_musica_a";
         private const string OtherRoomMusic = "teste_musica_b";
@@ -163,7 +164,7 @@ namespace ProjetoVN.Tests.PlayMode
         }
 
         private static AudioSource[] MusicSources() =>
-            AudioManager.Instance.GetComponentsInChildren<AudioSource>(true);
+            AudioManager.Instance.transform.Find(MusicChildName).GetComponentsInChildren<AudioSource>(true);
 
         private static AudioSource[] PlayingSources() => MusicSources().Where(source => source.isPlaying).ToArray();
 

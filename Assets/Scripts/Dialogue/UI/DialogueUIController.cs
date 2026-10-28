@@ -92,6 +92,9 @@ namespace ProjetoVN.Dialogue.UI
         /// <summary>A fala está aparecendo aos poucos; um pedido de pressa a completa.</summary>
         internal bool IsRevealingLine { get; private set; }
 
+        /// <summary>A fala terminou de aparecer, o <c>&gt;&gt;</c> está ligado e o jogador decide quando passar para a seguinte.</summary>
+        internal bool IsAwaitingNextLine { get; private set; }
+
         /// <summary>O histórico está aberto por cima do diálogo; avançar a fala e escolher opção ficam bloqueados.</summary>
         internal bool IsHistoryOpen => historyView != null && historyView.IsOpen;
 
@@ -142,7 +145,15 @@ namespace ProjetoVN.Dialogue.UI
             if (IsFollowedByOptions(line)) return;
 
             SetActiveIfAssigned(continueIndicator, true);
-            await YarnTask.WaitUntilCanceled(token.NextContentToken).SuppressCancellationThrow();
+            IsAwaitingNextLine = true;
+            try
+            {
+                await YarnTask.WaitUntilCanceled(token.NextContentToken).SuppressCancellationThrow();
+            }
+            finally
+            {
+                IsAwaitingNextLine = false;
+            }
         }
 
         // Aguardada dentro do RunLineAsync de propósito: o runner só entrega a fala seguinte quando ele termina,
