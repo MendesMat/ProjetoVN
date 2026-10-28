@@ -8,4 +8,12 @@ title: variaveis
 <<declare $porta_mecanicas_destrancada = false>>
 /// O nome do protagonista, escrito pelo jogador ao assinar a lista de passageiros (<<assinar_lista>>). "???" até lá.
 <<declare $nome_protagonista = "???">>
+/// O prólogo (onibus_viagem) terminou com a assinatura da lista. Libera a porta do ônibus.
+<<declare $prologo_concluido = false>>
+/// A porta do ônibus da fatia vertical já foi aberta.
+<<declare $porta_onibus_aberta = false>>
+/// O protagonista já se apresentou à Luna no posto.
+<<declare $conheceu_luna = false>>
+/// A máquina de café do posto já recebeu a moeda.
+<<declare $cafe_do_posto = false>>
 ===

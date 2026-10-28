@@ -1,0 +1,58 @@
+title: onibus_poltrona
+---
+<<if $prologo_concluido>>
+    Pensamento: O motorista mandou todo mundo descer. Melhor ir até a porta.
+<<else>>
+    <<detour onibus_viagem>>
+    <<set $prologo_concluido to true>>
+<<endif>>
+===
+title: onibus_porta_fechada
+---
+A porta do ônibus está fechada. A viagem ainda não acabou.
+===
+title: onibus_moeda
+---
+Uma moeda perdida no chão do corredor. Vou guardar.
+===
+title: posto_luna
+---
+<<if $conheceu_luna>>
+    <<jump posto_luna_de_novo>>
+<<endif>>
+<<set $conheceu_luna to true>>
+Luna: Você também estava no ônibus, né?
+Protagonista: Estava. Que susto.
+Luna: Eu sou a Luna. E você?
+Protagonista: {$nome_protagonista}. Muito prazer.
+Luna: Prazer, {$nome_protagonista}. Será que o ônibus volta hoje?
+-> Volta, sim. Logo a gente segue viagem.
+    <<set $afinidade_luna to $afinidade_luna + 1>>
+    Luna: Tomara. Gostei do seu otimismo.
+-> Duvido. Vamos passar a noite aqui.
+    Luna: Que animador... #raiva
+<<if $afinidade_luna >= 1>>
+    Luna: Se precisar de alguma coisa, é só chamar.
+<<endif>>
+Luna: Vou esperar ali perto da bomba.
+===
+title: posto_luna_de_novo
+---
+Luna: E aí, {$nome_protagonista}? Alguma notícia do ônibus?
+-> Ainda não.
+    Luna: Paciência, então.
+-> Quer um café? <<if $afinidade_luna >= 1>>
+    Luna: Aceito. Mas a máquina só aceita moeda.
+===
+title: posto_maquina_sem_moeda
+---
+Pensamento: Um café cairia bem. Mas eu não tenho nenhuma moeda.
+===
+title: posto_maquina_cafe
+---
+A máquina engole a moeda e solta um copinho de café quente.
+===
+title: posto_maquina_vazia
+---
+Pensamento: Um café já basta por hoje.
+===

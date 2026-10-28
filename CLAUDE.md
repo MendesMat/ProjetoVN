@@ -93,6 +93,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Scripts/ScriptableObjects/` | Assets de conteúdo (itens, personagens) |
 | `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
+| `Assets/Scenes/[Fatia] Onibus.unity`, `[Fatia] Posto.unity` | As duas salas provisórias da fatia vertical; o Novo Jogo começa no ônibus |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
 | `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Ambiente/` e `Efeitos/` (as músicas de teste ficam na raiz; a pasta `Musica/` nasce com a primeira música definitiva) |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |

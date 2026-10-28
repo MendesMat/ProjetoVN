@@ -5656,7 +5656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11dfd113c3e34c54cbbb9b2ad0391953, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Menu.MainMenu
-  startRoom: '[Teste] Mecanicas'
+  startRoom: '[Fatia] Onibus'
   startEntryPointId: 
   onSaveChecked:
     m_PersistentCalls:

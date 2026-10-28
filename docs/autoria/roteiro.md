@@ -707,6 +707,7 @@ As regras:
 | Id | Nome no jogo | O que é |
 |---|---|---|
 | `chave_teste` | Chave Teste | Uma chave que abre alguma porta |
+| `moeda` | Moeda | Uma moeda achada no chão do ônibus; abre a máquina de café do posto |
 
 Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
 
@@ -778,8 +779,8 @@ As regras:
 
 | Id | O que é |
 |---|---|
-| `teste_musica_a` | Música provisória da sala de teste (`[Teste] Mecanicas`) |
-| `teste_musica_b` | Música provisória da `[Teste] Sala B` |
+| `teste_musica_a` | Música provisória da sala de teste (`[Teste] Mecanicas`) e do `[Fatia] Onibus` |
+| `teste_musica_b` | Música provisória da `[Teste] Sala B` e do `[Fatia] Posto` |
 
 *Sons de fundo* (`<<tocar_ambiente id>>`):
 

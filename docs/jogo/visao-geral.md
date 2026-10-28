@@ -23,10 +23,10 @@ Consequência para o código: o **Inspector e o arquivo de roteiro são as inter
 O planejamento atual termina quando este percurso funciona de ponta a ponta, em um build de desktop:
 
 1. O jogo abre no **menu principal**.
-2. **Novo Jogo** leva à primeira sala. O jogador escreve o **nome do protagonista** dentro da história, ao assinar a lista de passageiros no fim do prólogo (#26).
-3. O jogador explora **duas salas**, ligadas por uma porta.
+2. **Novo Jogo** leva à primeira sala (o ônibus). O jogador clica na poltrona, que abre o prólogo, e escreve o **nome do protagonista** dentro da história, ao assinar a lista de passageiros no fim dele (#26). Até a #71, o clique na poltrona é o que abre o prólogo.
+3. O jogador explora **duas salas**, ligadas por uma porta: o interior do ônibus e o pátio do posto, onde a porta do ônibus só abre depois do prólogo (#21).
 4. Conversa com personagens que aparecem como **sprites atrás da caixa de diálogo**, com destaque para quem fala, e texto revelado aos poucos; uma **escolha altera a afinidade** e um trecho do diálogo só aparece com afinidade suficiente. Durante a conversa, o jogador abre o **histórico** e relê o que foi dito.
-5. Resolve um **puzzle de item**: algo obtido numa sala abre algo na outra.
+5. Resolve um **puzzle de item**: algo obtido numa sala abre algo na outra (a moeda do ônibus abre a máquina de café do posto).
 6. O jogo **salva** ao trocar de sala; o jogador fecha o jogo.
 7. **Continuar** devolve o jogador à sala em que estava, com tudo como deixou.
 
