@@ -181,4 +181,22 @@ Os sprites aparecem atrás da caixa de diálogo, um de cada lado, e nada some ne
 
 ## Música e sons
 
-*A preencher pelas issues #19 e #20.*
+### Música da sala (#19)
+
+Cada sala declara a sua música, e a troca de uma sala para outra é suave: a música antiga baixa enquanto a nova sobe (1 segundo, o campo **Crossfade Seconds** do `AudioManager`, no `Managers.prefab`). Pôr música numa sala não exige código:
+
+1. Importe a faixa em `Assets/Audio/Musica/` (WAV, sem compressão prévia: o Unity comprime na importação).
+2. Selecione o arquivo e, no Inspector, ajuste a importação: **Load Type** = `Streaming`, **Compression Format** = `Vorbis` e **Preload Audio Data** desligado. Assim a cena guarda só a referência, e a faixa inteira não vai para a memória. Clique em **Apply**.
+3. Na cena da sala, crie um objeto vazio chamado `Room Music` e acrescente o componente **Room Music**. Arraste a faixa para o campo **Music**.
+4. Dê Play direto na cena: a música entra sozinha. `[Teste] Mecanicas` e `[Teste] Sala B` são os exemplos.
+
+Regras:
+
+- **Sala sem música:** não crie o objeto, ou deixe **Music** vazio. O jogo fica em silêncio nessa sala, sem erro. Um objeto `Room Music` desativado também conta como sem música. O `Menu.unity` é assim: não tem `Room Music`.
+- **A mesma música em duas salas não reinicia.** Se a sala A e a sala B declaram a mesma faixa, quem passa de uma para a outra continua ouvindo a música de onde estava. Recarregar a mesma sala também não reinicia. Para duas salas soarem como a mesma música, arraste **o mesmo arquivo** nas duas.
+- **No máximo um `Room Music` por cena.** O componente se recusa a ser acrescentado duas vezes ao mesmo objeto, e um teste reprova uma cena com dois objetos.
+- **Música em loop:** a faixa toca em loop. Faça o final emendar com o começo, ou a emenda estala. Num WAV gerado por script, use duração e frequências inteiras.
+- **Não ponha `AudioListener`, `AudioSource` nem o `AudioManager` na cena.** O `AudioListener` já vem na câmera da sala, e o `AudioManager` e as fontes da música vivem no `Managers.prefab`.
+- **A pausa não cala a música:** com a pausa aberta ela continua tocando.
+
+Efeitos sonoros e o comando de roteiro para tocar música (`<<tocar_musica>>`) chegam com a #20.

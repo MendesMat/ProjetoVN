@@ -16,7 +16,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
 | [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
-| [Áudio](#áudio) | planejada | — | #19, #20 |
+| [Áudio](#áudio) | parcial | `Audio` | #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
 
@@ -219,8 +219,13 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Para o jogador:** cada sala tem música; interface e interações têm som.
 
+**Existe (#19):**
+- **Música por sala.** Cada sala declara a sua música (um objeto `Room Music` na cena, sem código). Ao mudar de sala a música antiga baixa enquanto a nova sobe (1 segundo); a mesma música em duas salas, ou ao recarregar a sala, não reinicia; sala sem música fica em silêncio, sem erro. O menu principal fica sem música por enquanto.
+- Com a pausa aberta a música continua tocando, e uma troca em curso termina normalmente.
+- O mixer do projeto (`Assets/Audio/ProjetoVN.mixer`) tem os grupos `Music` e `SFX`. As músicas das salas de teste são provisórias (tons gerados por script).
+- Como pôr música numa sala: [salas.md](../autoria/salas.md#música-da-sala-19).
+
 **Planejada:**
-- Música por sala, com troca suave (#19).
 - Sons de interface e de interação; comandos de roteiro para tocar música e efeito (#20).
 
 **Fora do escopo:** voz, controle de volume pelo jogador.
