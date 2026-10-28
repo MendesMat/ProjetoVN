@@ -1,3 +1,4 @@
+using ProjetoVN.Audio;
 using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.UI;
 using UnityEngine;
@@ -75,7 +76,7 @@ namespace ProjetoVN.Dialogue.Logic
 
         /// <summary>
         /// Completa a fala que está aparecendo; com ela completa, avança. Com opções na tela, com o histórico
-        /// aberto ou com o diálogo pausado, não faz nada.
+        /// aberto ou com o diálogo pausado, não faz nada. Só o que completa ou avança a fala toca o som de avançar.
         /// </summary>
         public void AdvanceDialogue()
         {
@@ -84,14 +85,29 @@ namespace ProjetoVN.Dialogue.Logic
 
             if (IsRevealingLine)
             {
+                PlayLineAdvanceSound();
                 _runner.RequestHurryUpLine();
                 return;
             }
 
+            if (IsAwaitingNextLine) PlayLineAdvanceSound();
             _runner.RequestNextLine();
         }
 
+        private static void PlayLineAdvanceSound()
+        {
+            if (AudioManager.Instance == null)
+            {
+                Debug.LogError("[DialogueManager] Não há AudioManager (o prefab Managers não foi criado). O avanço da fala ficou sem som.");
+                return;
+            }
+
+            AudioManager.Instance.PlayInterfaceSound(InterfaceSound.LineAdvance);
+        }
+
         private bool IsRevealingLine => _presenter != null && _presenter.IsRevealingLine;
+
+        private bool IsAwaitingNextLine => _presenter != null && _presenter.IsAwaitingNextLine;
 
         private bool IsHistoryOpen => _presenter != null && _presenter.IsHistoryOpen;
 

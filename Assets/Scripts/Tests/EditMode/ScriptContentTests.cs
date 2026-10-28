@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using ProjetoVN.Audio;
 using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
@@ -75,6 +76,30 @@ namespace ProjetoVN.Tests.EditMode
                 "o id de um item é sempre literal: nada de variável, expressão, id ausente ou parâmetro a mais");
             Assert.IsEmpty(references.Literal.Where(reference => !registry.TryGetById(reference.Argument, out _)),
                 "todo id citado no roteiro precisa existir no ItemRegistry");
+        }
+
+        [Test]
+        public void ProjectScripts_CiteOnlySoundIdsThatExistInTheSoundRegistry()
+        {
+            SoundRegistry registry = LoadTheOnly<SoundRegistry>();
+            ScriptSoundReferences references = ScriptSoundReferences.In(ScriptRun.FromProjectFiles().Program);
+
+            Assert.IsEmpty(references.WithoutLiteralId.Select(reference => reference.ToString()),
+                "o id de um som é sempre literal e único: nada de variável, expressão, id ausente ou parâmetro a mais; <<parar_ambiente>> não tem parâmetro");
+            Assert.IsEmpty(references.Literal.Where(reference => !ExistsInItsList(registry, reference)).Select(reference => reference.ToString()),
+                "todo id citado no roteiro precisa existir na lista certa do SoundRegistry (músicas, ambientes ou efeitos)");
+        }
+
+        [Test]
+        public void SoundRegistry_HasUniqueIdsInTheConventionWithClips()
+        {
+            SoundRegistry registry = LoadTheOnly<SoundRegistry>();
+            SoundRegistry.SoundEntry[] entries = registry.Music.Concat(registry.Ambience).Concat(registry.Effects).ToArray();
+
+            Assert.IsEmpty(entries.Where(entry => !SoundId.FollowsConvention(entry.Id)).Select(entry => $"'{entry.Id}'"),
+                "o id é minúsculas sem acento, dígitos e _");
+            Assert.IsEmpty(Repeated(entries.Select(entry => entry.Id)), "ids únicos no registro inteiro");
+            Assert.IsEmpty(entries.Where(entry => entry.Clip == null).Select(entry => entry.Id), "todo som tem AudioClip");
         }
 
         [Test]
@@ -289,6 +314,14 @@ namespace ProjetoVN.Tests.EditMode
             problems.AddRange(character.Expressions.Where(p => p.Sprite == null).Select(p => $"{character.Id}: expressão '{p.Expression}' sem sprite"));
             return problems;
         }
+
+        private static bool ExistsInItsList(SoundRegistry registry, ScriptSoundReference reference) => reference.Command switch
+        {
+            "tocar_musica" => registry.TryGetMusic(reference.Argument, out _),
+            "tocar_ambiente" => registry.TryGetAmbience(reference.Argument, out _),
+            "tocar_efeito" => registry.TryGetEffect(reference.Argument, out _),
+            _ => false,
+        };
 
         private static IEnumerable<string> Repeated(IEnumerable<string> values) =>
             values.GroupBy(value => value).Where(group => group.Count() > 1).Select(group => group.Key);
