@@ -25,7 +25,6 @@ namespace ProjetoVN.Tests.PlayMode
         private const float StubMusicSeconds = 4f;
         private const float Tolerance = 1e-3f;
         private const float WaitTimeoutSeconds = 10f;
-        private const float LongerThanTheCrossfadeSeconds = 2f;
         private const float LongerThanAnAudioBlockSeconds = 0.1f;
         private const float LoopStartMarginSeconds = 1f;
         private const float LoopEndMarginSeconds = 3f;
@@ -155,9 +154,9 @@ namespace ProjetoVN.Tests.PlayMode
             pauseMenu.TogglePause();
             Assert.AreEqual(0f, Time.timeScale, "A pausa não congelou o tempo.");
 
-            yield return new WaitForSecondsRealtime(LongerThanTheCrossfadeSeconds);
+            yield return WaitUntil(() => PlayingSources().Length == 1, "a troca terminar com a pausa aberta");
 
-            Assert.AreEqual(1, PlayingSources().Length, "A troca ficou parada no meio durante a pausa.");
+            Assert.AreEqual(0f, Time.timeScale, "A pausa fechou antes de a troca terminar.");
             AudioSource source = PlayingSources().Single();
             Assert.AreSame(_stubMusic, source.clip);
             Assert.AreEqual(1f, source.volume, Tolerance);
