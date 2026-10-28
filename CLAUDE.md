@@ -95,7 +95,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Scenes/[Fatia] Onibus.unity`, `[Fatia] Posto.unity` | As duas salas provisórias da fatia vertical; o Novo Jogo começa no ônibus |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
-| `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Ambiente/` e `Efeitos/` (as músicas de teste ficam na raiz; a pasta `Musica/` nasce com a primeira música definitiva) |
+| `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Ambiente/` e `Efeitos/` (a pasta `Musica/` nasce com a primeira música definitiva; as músicas de teste, `teste_musica_a` e `teste_musica_b`, ficam em `Assets/_Tests/Audio/`) |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
 | `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte |
 | `.claude/skills/` | Os três comandos de trabalho |
