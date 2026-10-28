@@ -7,6 +7,7 @@ using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Inventory;
 using UnityEditor;
 using UnityEngine;
+using Yarn.Compiler;
 
 namespace ProjetoVN.Tests.EditMode
 {
@@ -25,6 +26,9 @@ namespace ProjetoVN.Tests.EditMode
         private const string ConditionalOption = "Posso sentar perto de você?";
         private const int ConditionalOptionIndex = 3;
         private const string ConditionalLine = "Luna: Gostei de você.";
+
+        private const string ProtagonistNameNode = "teste_nome_protagonista";
+        private const string SignatureCommand = "assinar_lista";
 
         private const string KeyItemId = "chave_teste";
         private const string LunaGivesTheKeyLine = "Luna: Toma, achei esta chave no corredor.";
@@ -111,6 +115,52 @@ namespace ProjetoVN.Tests.EditMode
             string[] declaredTypes = run.Declarations.Where(d => d.Name == variable).Select(d => d.Type.Name).ToArray();
 
             CollectionAssert.AreEqual(new[] { typeName }, declaredTypes);
+        }
+
+        [Test]
+        public void ProjectScripts_DeclareTheProtagonistName_AsTextStartingUnknown()
+        {
+            ScriptRun run = ScriptRun.FromProjectFiles();
+
+            Declaration[] declarations = run.Declarations.Where(d => d.Name == ProtagonistName.VariableName).ToArray();
+
+            Assert.AreEqual(1, declarations.Length, "o nome do protagonista é declarado uma vez, em variaveis.yarn");
+            Assert.AreEqual("String", declarations[0].Type.Name);
+            Assert.AreEqual(ProtagonistName.Unknown, declarations[0].DefaultValue,
+                "roteiro e placa de nome dizem a mesma coisa antes da assinatura");
+        }
+
+        [Test]
+        public void ProtagonistNameTest_AsksForTheSignature()
+        {
+            ScriptRun run = ScriptRun.FromProjectFiles();
+
+            run.Start(ProtagonistNameNode);
+
+            Assert.AreEqual("Protagonista: Antes de assinar.", run.Lines[0]);
+            CollectionAssert.AreEqual(new[] { SignatureCommand }, run.Commands);
+            Assert.AreEqual("Protagonista: Depois de assinar.", run.Lines[1]);
+        }
+
+        [Test]
+        public void ProtagonistNameTest_ShowsTheUnknownMarkInALine_BeforeTheSignature()
+        {
+            ScriptRun run = ScriptRun.FromProjectFiles();
+
+            run.Start(ProtagonistNameNode);
+
+            CollectionAssert.Contains(run.Lines, "Motorista: Obrigado, ???.");
+        }
+
+        [Test]
+        public void ProtagonistNameTest_ShowsTheChosenNameInALine()
+        {
+            StoryState.SetText(ProtagonistName.VariableName, "Conceição");
+            ScriptRun run = ScriptRun.FromProjectFiles();
+
+            run.Start(ProtagonistNameNode);
+
+            CollectionAssert.Contains(run.Lines, "Motorista: Obrigado, Conceição.");
         }
 
         [Test]

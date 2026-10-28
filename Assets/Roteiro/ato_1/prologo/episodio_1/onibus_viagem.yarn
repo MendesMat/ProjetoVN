@@ -60,5 +60,5 @@ Motorista: Só peço que quem for sair assine o papel aqui.
     Motorista: Sabe como é, né? A mata é perigosa...
 
 // Os dois caminhos chegam aqui: o protagonista assina a lista.
-// PEDIDO: o jogador escreve o nome do protagonista na lista de passageiros, numa folha de lista, com fonte de caneta (#26).
+<<assinar_lista>>
 ===

@@ -300,6 +300,19 @@ O `UnfocusedFrameRateLimiter` (`Managers.prefab`) limita o jogo a 30 FPS e desli
 - **Não chame `AssetDatabase.SaveAssets()` com o `vSyncCount` alterado** (como na #80): `QualitySettings` é um asset de `ProjectSettings/`. No Editor, o `vSyncCount` não manda (só o `targetFrameRate` limita a Game view), então a verificação confere a devolução do par, não o efeito do VSync.
 - **O que o CLI não faz:** trocar o foco de janela. O efeito real (alt-tab, minimizar, segundo monitor, uso de GPU no Gerenciador de Tarefas) fica para o programador, numa build de Windows.
 
+### Testar um campo de texto (`TMP_InputField`) por `eval` (#26)
+
+O CLI não digita nem clica, mas dá para exercitar o campo da folha do nome (`ProtagonistNameSheet`) de quatro jeitos. Ache o campo por `SerializedObject` no `DialogueUIController` (`protagonistNameSheet`) e no componente (`nameField`, `signButton`); com `$` no nome da variável, use `eval_file`.
+
+- **`field.text = "..."` não passa pelo `onValidateInput`.** Só o que o jogador digita ou cola é filtrado. Para testar o filtro, chame `field.onValidateInput(textoAtual, posição, caractere)` direto: devolve o caractere ou `'\0'` (recusado).
+- **`field.ProcessEvent(new UnityEngine.Event { type = UnityEngine.EventType.KeyDown, character = 'W' })` percorre o caminho real do `Append`** (filtro, posição, seleção) e **funciona**: com o campo focado e o cursor no fim (`caretPosition`, `selectionAnchorPosition` e `selectionFocusPosition`), um caractere permitido entra e um recusado não. Para o Escape, use `keyCode = UnityEngine.KeyCode.Escape` (e confira que o texto não voltou ao de antes).
+- **Enter e botão:** `field.onSubmit.Invoke(field.text)` e `button.onClick.Invoke()`.
+- **O Esc de verdade (`QueueStateEvent`, receita da pausa, #18) não dispara a ação `UI/Pause` se a Game view não tem o foco.** O estado da tecla chega (`Keyboard.current.escapeKey.isPressed` fica verdadeiro), mas o Input System deste projeto está em `editorInputBehaviorInPlayMode = PointersAndKeyboardsRespectGameViewFocus` e `Application.isFocused` é falso sob o CLI. Foi o que se viu na #26, com e sem a folha aberta; a receita da #18 registra que o Esc chegava, então a causa provável é o foco da Game view naquele momento (não isolada). Para pausar nesses casos, chame `PauseMenu.TogglePause()`; o `editor_focus` traz a janela para a frente, o que rouba o foco de quem está usando o computador, então só o use com o programador de acordo.
+
+### A captura de 1280×720 some com linha fina
+
+A Game view do Editor costuma ter 1280×720, abaixo dos 1920×1080 da interface, e a captura (`capture_game_view --source screen`) reduz tudo a 0,67×. Uma linha de 2 px vira uns 1,3 px e **desaparece em algumas posições** (na folha do nome, duas das cinco pautas sumiram). Use 3 px ou mais para linha fina, ou confira em Full HD.
+
 ### Contar o que está visível
 
 O painel de inventário reaproveita slots: um slot devolvido é desativado, não destruído. `transform.childCount` não diz quantos itens estão visíveis. Conte os filhos ativos.

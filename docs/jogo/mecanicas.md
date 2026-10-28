@@ -12,7 +12,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Diálogo](#diálogo) | existe | `Dialogue` | — |
 | [Histórico de falas](#histórico-de-falas) | existe | `Dialogue` | — |
 | [Estado da história e afinidade](#estado-da-história-e-afinidade) | existe | `Core`, `Editor` | — |
-| [Personagens](#personagens) | parcial | `Dialogue` | #26 |
+| [Personagens](#personagens) | existe | `Dialogue` | — |
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
 | [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
@@ -158,9 +158,16 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O sprite do lado esquerdo é desenhado por cima do painel de inventário, que fica no canto superior esquerdo. O painel só vai ficar visível em puzzle, e isso será tratado depois.
 - Se um roteiro emendar dois encontros com `<<jump>>` (a Luna se despede e o protagonista fala com um professor), a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Não há comando para tirar alguém de cena.
 
-**Planejada (#26):**
-- O nome do protagonista é escrito pelo jogador dentro da história, quando ele assina a lista de passageiros do ônibus no fim do prólogo (`onibus_viagem`), numa tela que imita a folha da lista. Há um nome padrão, e um nome vazio não é aceito. Até a assinatura, a placa de nome e o histórico mostram `???` nas falas do protagonista.
-- O nome é uma variável de texto do estado da história: entra no save, pode ser usado pelo roteiro e aparece na placa de nome e no histórico. O roteiro continua escrevendo `Protagonista:`; a troca pelo nome escolhido acontece na hora de mostrar a placa (ver D-21).
+**Existe (#26): o nome do protagonista.**
+- O jogador escolhe o nome dentro da história. No prólogo (`onibus_viagem`), quando o motorista pede que quem for sair assine o papel, o roteiro chama `<<assinar_lista>>` e abre por cima da conversa uma **folha de lista de passageiros**: três nomes já assinados por outros passageiros, o campo do jogador na quarta linha e o botão ASSINAR. A caixa de diálogo some enquanto a folha está aberta, e os personagens continuam na tela, escurecidos. Enter ou o botão ASSINAR assinam; a conversa só segue depois disso.
+- **Até a assinatura** a placa de nome e o histórico mostram `???` nas falas do protagonista (e `{$nome_protagonista}` mostra `???` no roteiro). **Depois**, mostram o nome escolhido, também no balão da opção escolhida. As falas que já estão no histórico ficam como foram escritas: a primeira continua `???`.
+- **O campo** abre com o nome padrão (`Lucas`, campo da folha no Inspector) selecionado, então digitar o substitui. Um nome vazio ou sem nenhuma letra não é aceito: o ASSINAR fica desabilitado e aparece `Escreva um nome.`. O campo aceita letras (com acento), espaço, hífen e apóstrofo, e **para de aceitar caracteres quando o nome deixaria de caber na placa de nome**: o caractere simplesmente não entra. Também não entram os que a fonte não tem nem os que quebrariam o texto ou o roteiro (`[ ] < > { } # : \`, dígitos, emoji). Os espaços das pontas somem e os repetidos viram um só.
+- O nome é a variável de texto `$nome_protagonista` do estado da história: entra no save (no próximo salvar: chegar a uma sala ou SALVAR da pausa; salvar fica bloqueado durante a conversa) e volta com o Continuar. O Novo Jogo o zera.
+- Se a conversa terminar com a folha aberta (voltar ao menu pela pausa, por exemplo), a folha fecha e nada é gravado. A pausa abre por cima da folha, e o campo volta a ter o foco ao retomar, com o texto que o jogador já tinha escrito.
+- O roteiro continua escrevendo `Protagonista:`; a troca pelo nome escolhido acontece só na hora de mostrar a placa e o histórico (D-21). O pensamento (`Pensamento:`) não tem nome e não muda.
+- Se o jogador escolher para o protagonista o nome de outro personagem (`Luna`), o histórico mostra o nome nas duas falas seguidas, uma de cada lado.
+
+**Limitações conhecidas do nome:** a folha usa a fonte padrão do projeto, tanto no nome escrito quanto nos três passageiros, até a arte definir a fonte de caneta (trocar é trocar o font asset no prefab, sem código); a arte da folha é provisória (um retângulo creme); não se troca o nome depois de assinar.
 
 **Fora do escopo:** mais de dois lugares na tela, o roteiro escolher a posição de alguém ou tirar alguém de cena, transição suave (entrada, saída e escurecer, depois da #11), ajuste de enquadramento por personagem, sprite de personagem parado no cenário fora de uma conversa, trocar o nome do protagonista depois de o jogo começar.
 
