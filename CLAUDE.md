@@ -94,7 +94,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
-| `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e, depois, as músicas e os sons |
+| `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Musica/`, `Ambiente/` e `Efeitos/` |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
 | `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte |
 | `.claude/skills/` | Os três comandos de trabalho |

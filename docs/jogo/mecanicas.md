@@ -16,7 +16,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
 | [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
-| [Áudio](#áudio) | parcial | `Audio` | #20 |
+| [Áudio](#áudio) | existe | `Audio` | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
 
@@ -225,7 +225,11 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - O mixer do projeto (`Assets/Audio/ProjetoVN.mixer`) tem os grupos `Music` e `SFX`. As músicas das salas de teste são provisórias (tons gerados por script).
 - Como pôr música numa sala: [salas.md](../autoria/salas.md#música-da-sala-19).
 
-**Planejada:**
-- Sons de interface e de interação; comandos de roteiro para tocar música e efeito (#20).
+**Existe (#20):**
+- **Sons de interface.** Passar o mouse sobre um botão habilitado, clicar (ou Enter) e completar ou passar uma fala têm som. A fala não soa quando o avanço é recusado (pausa, histórico, opções na tela). Os botões da pausa soam com o jogo congelado.
+- **Sons de interação.** Coletar um item (também o `<<dar_item>>` do roteiro), a porta trancada e a porta abrindo têm som; o som de objeto e de porta se monta na cena, sem código (`SoundEffect`).
+- **Comandos de roteiro.** `<<tocar_musica id>>`, `<<tocar_efeito id>>`, `<<tocar_ambiente id>>` e `<<parar_ambiente>>`. O som de ambiente é um canal próprio, em loop, que entra e sai em 1 segundo por baixo da música; a música e o ambiente pedidos duram até outro comando ou até a troca de sala. Os ids vêm do `SoundRegistry`, e um teste confere os ids dos roteiros.
+- Os quatro pedidos de som do prólogo ("A viagem": o ônibus na estrada, o som some na lembrança, volta, e a freada com a batida) viram comandos. Os sons de hoje são provisórios (gerados por script).
+- Como montar: [salas.md](../autoria/salas.md#som-em-um-objeto-ou-em-uma-porta-20) e [roteiro.md](../autoria/roteiro.md#música-e-sons).
 
-**Fora do escopo:** voz, controle de volume pelo jogador.
+**Fora do escopo:** voz, controle de volume pelo jogador, som de passar o mouse sobre objetos do mundo, som de navegação por teclado entre botões, `<<parar_musica>>`.

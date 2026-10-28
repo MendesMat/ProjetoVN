@@ -22,6 +22,11 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO`) resid
   - Um personagem que o roteiro cita precisa estar no `CharacterRegistry.asset`, e uma expressão que o roteiro pede precisa estar nas expressões dele. Um teste EditMode acusa os dois, com o nó e a linha.
   - **Quem cria um personagem ou uma expressão acrescenta a linha dele nas tabelas "Quem fala" e "Expressões" de [roteiro.md](../../../docs/autoria/roteiro.md#quem-fala).** É dali que o roteirista copia os nomes.
 
+- **`Audio/`** (#20): o `SoundRegistry.asset`, com três listas (`music`, `ambience`, `effects`) de `SoundEntry` (um **id** e um `AudioClip`). A classe mora no módulo `Audio`. O roteiro pede o som pelo id (`<<tocar_musica id>>`, `<<tocar_efeito id>>`, `<<tocar_ambiente id>>`).
+  - O **id** de um som é em minúsculas sem acento, com dígitos e `_` (`onibus_estrada`), único no registro inteiro (D-22). O registro avisa id vazio, fora do formato ou repetido, e clipe vazio, e um teste EditMode reprova os três.
+  - Um som que o roteiro cita precisa estar na lista certa do comando (um id de efeito não vale em `<<tocar_ambiente>>`). Um teste EditMode acusa o id que não está lá, com o nó.
+  - **Quem cria um som acrescenta a linha dele na tabela "Sons que existem" de [roteiro.md](../../../docs/autoria/roteiro.md#música-e-sons)** (id e uma frase). É dali que o roteirista copia o id. Passo a passo em [salas.md](../../../docs/autoria/salas.md#sons-para-o-roteiro-20).
+
 ---
 
 ## Fluxo e Boas Práticas (Para IAs e Game Designers)

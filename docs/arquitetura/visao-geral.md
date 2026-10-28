@@ -7,14 +7,14 @@ Unity 6000.3.9f1, URP 2D, Input System, uGUI com TextMeshPro, backend Mono. O c�
 | Módulo | Pasta | Responsabilidade | Enxerga |
 |---|---|---|---|
 | `Core` | [Core/](../../Assets/Scripts/Core/README.md) | Barramento de notificações, máquina de estados, estado da história | nada |
-| `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Adaptador do Yarn Spinner: iniciar, avançar e escolher; input e interface do diálogo | `Core` e o pacote Yarn Spinner |
+| `Dialogue` | [Dialogue/](../../Assets/Scripts/Dialogue/README.md) | Adaptador do Yarn Spinner: iniciar, avançar e escolher; input e interface do diálogo | `Core`, `Audio` (som de avançar fala, #20) e o pacote Yarn Spinner |
 | `Inventory` | [Inventory/](../../Assets/Scripts/Inventory/README.md) | Itens do jogador, objeto coletável, registro de itens | `Core` |
 | `PointNClick` | [PointNClick/](../../Assets/Scripts/PointNClick/README.md) | Clique e hover no mundo, pan de borda, trava de input | `Core` |
-| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, pausa, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick`, o pacote Yarn Spinner e o Input System |
-| `Audio` | [Audio/](../../Assets/Scripts/Audio/README.md) | A música do jogo: a de cada sala, com troca suave (#19) | nada |
-| `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário | `Core`, `Inventory` |
+| `GameFlow` | [GameFlow/](../../Assets/Scripts/GameFlow/README.md) | Orquestrador: modos de jogo, bootstrap, save, pausa, portões, gatilho de diálogo, comandos de roteiro | `Core`, `Dialogue`, `Inventory`, `PointNClick`, `Audio` (comandos de som e som da coleta, #20), o pacote Yarn Spinner e o Input System |
+| `Audio` | [Audio/](../../Assets/Scripts/Audio/README.md) | O som do jogo: a música de cada sala, com troca suave (#19), o som de ambiente em loop, os efeitos e os sons de interface (#20) | nada |
+| `UI` | [UI/](../../Assets/Scripts/UI/README.md) | Janelas de menu, painel de inventário, `ButtonSounds` | `Core`, `Inventory`, `Audio` (#20) |
 | `Editor` | [Editor/](../../Assets/Scripts/Editor/README.md) | Código que só existe no Editor: os seletores de variável de história e de nó do roteiro do Inspector | `Core` e o pacote Yarn Spinner (runtime e Editor) |
-| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Audio`, `Core`, `Dialogue`, `GameFlow`, `Inventory`, `UI` e o pacote Yarn Spinner. PlayMode: `Audio`, `Core`, `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
+| `Tests` | [Tests/](../../Assets/Scripts/Tests/README.md) | Testes EditMode (`Tests`) e PlayMode (`Tests.PlayMode`) | EditMode: `Audio`, `Core`, `Dialogue`, `GameFlow`, `Inventory`, `UI`, `UnityEngine.UI` e o pacote Yarn Spinner. PlayMode: `Audio`, `Core`, `Dialogue`, `GameFlow`, `Inventory`, `PointNClick`, `UnityEngine.UI` e o pacote Yarn Spinner |
 
 ```
 Core ◄── Dialogue ◄──┐
@@ -23,7 +23,7 @@ Core ◄── Dialogue ◄──┐
   ▲◄──── UI (enxerga também Inventory)
   ▲◄──── Editor (só Editor; enxerga também o Yarn Spinner)
 
-Audio (folha: não enxerga nenhum módulo; quem toca som é que o enxerga)
+Audio (folha: não enxerga nenhum módulo; quem toca som é que o enxerga: GameFlow, Dialogue e UI)
 ```
 
 Regras da estrutura:
@@ -44,7 +44,7 @@ O padrão se repete em todos os módulos (decisão D-03):
 
 ## Ciclo de vida
 
-- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions` e `AudioManager` (com o filho `Music`, que tem as duas `AudioSource` da música).
+- Todos os managers persistentes moram em um único prefab, `Assets/Prefabs/Resources/Managers.prefab`: `GameStateController`, `RoomNavigator`, `UnfocusedFrameRateLimiter`, `DialogueManager`, o `DialogueRunner` do Yarn Spinner, `StoryStateVariableStorage`, `DialogueInputHandler`, `InventoryManager`, `GameSaveManager`, `ItemScriptActions`, `SoundScriptActions`, `ItemCollectedSound` e `AudioManager` (com os filhos `Music`, `Ambience` e `Effects`, que têm as cinco `AudioSource`: duas da música, duas do ambiente e uma dos efeitos).
 - O mesmo prefab traz, como filho aninhado, a **interface de jogo**: `Assets/Prefabs/UI/GameUI.prefab`, com o `Canvas_Game` (diálogo e inventário, e o `GameUIVisibility` que o liga e desliga), o `Canvas_Pause` (a janela de pausa e a de confirmação, com o `PauseMenu`, Sort Order 50, #18), o `Canvas_Fade` (o fade da troca de sala, #12) e o `EventSystem` (D-19). O nome `Managers.prefab` ficou, mas ele carrega os managers **e** a interface.
 - O `ManagersBootstrap` cria esse prefab uma vez por sessão, em `RuntimeInitializeOnLoadMethod(AfterSceneLoad)`, e o marca `DontDestroyOnLoad`. **Nenhuma cena contém esses componentes, nem `Canvas` de jogo, nem `EventSystem`.** Um `EventSystem` a mais em uma cena faz o uGUI logar `There are 2 event systems in the scene` a cada frame; um `Canvas_Game` a mais duplica o apresentador do diálogo.
 - `AfterSceneLoad` roda depois do `Awake` e do `OnEnable` da primeira cena e antes do `Start`. Consequência prática: **um componente de cena só pode ler um manager a partir do `Start`**, nunca no `Awake` ou no `OnEnable` da primeira ativação.
@@ -102,6 +102,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Janelas abertas de um `UIWindowManager` (pilha) | `UIWindowManager`, por uma `WindowStack` | Não |
 | Troca de sala em curso | `RoomNavigator` | Não |
 | Música atual e a troca suave em curso (#19) | `AudioManager` (`CurrentMusic`; os volumes, as duas `AudioSource`) | Não; ao carregar, a sala carregada declara a sua (`RoomMusic`, D-20) |
+| Ambiente atual e o último efeito (#20) | `AudioManager` (`CurrentAmbience`; `LastEffect` e `EffectCount`, para a verificação) | Não; o ambiente silencia na troca de sala, e ao carregar a sala começa em silêncio (D-20) |
 | VSync e FPS de antes do limite sem foco | `UnfocusedFrameRateLimiter` | Não |
 | Posição do diálogo em curso | `DialogueRunner` (Yarn Spinner), dentro do `Managers.prefab` | Não (salvar em diálogo é recusado pelo `GameSaveManager`, D-20) |
 | Quem está na tela de personagens (lado, destaque, última expressão) | `DialogueUIController`, por um `ConversationStage` (D-21); só da conversa em curso | Não |
@@ -132,7 +133,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 1. Alguém chama `RoomNavigator.Instance.ChangeRoom(nomeDaCena, idDoPontoDeEntrada)`: uma `RoomExit` (por `UnityEvent`, #13) ou o **Reload Scene** do painel de debug, que usa a sobrecarga sem ponto de entrada.
 2. Nome vazio, sem `GameStateController`, sem `ScreenFader`, troca já em curso, conversa aberta ou sala inexistente (cena fora da lista do build): aviso ou erro no console, retorna `false`, nada muda.
 3. Caso contrário o `GameFlow` entra em `RoomTransitionState` **no mesmo frame** (o `PlayerInputGate` fecha), o `ScreenFader` escurece, a cena é carregada de forma assíncrona, o `RoomNavigator` acha o `RoomEntryPoint` pedido na cena nova e manda o `ScreenPanController` centralizar o cenário nele (chamada direta; sem ponto pedido, nada; ponto inexistente, erro no console), o `RoomNavigator` guarda o ponto de entrada (`CurrentEntryPointId`) e **salva o jogo** (`GameSaveManager.Save()`, chamada direta; recusado se houver conversa, o que a troca já impede), a tela clareia e o `GameFlow` volta a `GameplayState`. Managers e interface de jogo persistem: continua existindo uma instância de cada. O save é gravado com a tela ainda escura.
-   A música muda no meio disso, sem o `RoomNavigator` saber: o `AudioManager` assina o `SceneManager.sceneLoaded`, e quando a cena nova carrega (com a tela ainda escura) procura o `RoomMusic` dela e começa a troca suave de música (#19). A mesma música não reinicia; sala sem `RoomMusic` leva a música a silêncio. Não há mensagem no `MessageBroker` (D-05): ninguém precisa ser avisado de que a música trocou.
+   A música muda no meio disso, sem o `RoomNavigator` saber: o `AudioManager` assina o `SceneManager.sceneLoaded`, e quando a cena nova carrega (com a tela ainda escura) procura o `RoomMusic` dela e começa a troca suave de música (#19), e leva o som de ambiente pedido pelo roteiro a silêncio (#20). A mesma música não reinicia; sala sem `RoomMusic` leva a música a silêncio. Não há mensagem no `MessageBroker` (D-05): ninguém precisa ser avisado de que a música trocou.
 4. Uma exceção inesperada no meio da troca (inclusive uma falha de gravação do save) é registrada no console (`Debug.LogException`), a tela clareia na hora e o `GameFlow` volta a `GameplayState`, na sala que tiver ficado carregada: o jogo não fica preso na transição. A falha não salva.
 
 **Carregar** (#16)
@@ -182,6 +183,9 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um comando ou uma função de roteiro | Um método estático com `[YarnCommand("nome_em_portugues")]` ou `[YarnFunction]` em um componente do `GameFlow`, como o `ItemScriptActions`, ou em uma `static class` sem componente quando não precisa de campo de Inspector, como o `ProtagonistNameScriptActions` (#26). O comando entra na tabela de [roteiro.md](../autoria/roteiro.md#comandos-disponíveis) |
 | Uma saída ou um ponto de entrada de sala | Um `RoomExit` no objeto, ligado ao `OnInteract` (ou ao `OnAlreadyUnlocked` de uma porta), e um `RoomEntryPoint` na sala de destino, sem código. A sala precisa estar na lista de cenas do build. Passo a passo em [salas.md](../autoria/salas.md#saídas-e-pontos-de-entrada) |
 | A música de uma sala | Um objeto `Room Music` com o componente `RoomMusic` na cena da sala, com a faixa no campo **Music**, sem código. Sem o objeto, a sala fica em silêncio. Passo a passo em [salas.md](../autoria/salas.md#música-da-sala-19) |
+| Um som de roteiro | Uma linha no `SoundRegistry` (lista de músicas, ambientes ou efeitos) e uma linha na tabela "Sons que existem" de [roteiro.md](../autoria/roteiro.md#música-e-sons). O roteiro o pede por `<<tocar_musica id>>`, `<<tocar_efeito id>>` ou `<<tocar_ambiente id>>`; o teste de conteúdo confere o id (#20) |
+| Um som em um objeto ou em uma porta | Um filho com o componente `SoundEffect` ligado a um evento (`OnLocked`, `OnUnlocked`, `OnInteract`), sem código. Passo a passo em [salas.md](../autoria/salas.md#som-em-um-objeto-ou-em-uma-porta-20) (#20) |
+| Um botão | Um `Button` com o componente `ButtonSounds` (no prefab, se o botão vem de um); o `ButtonSoundsTests` reprova o que esquecer (#20) |
 | Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
 | Um elemento de interface de jogo | Um objeto dentro do `Canvas_Game` de `Assets/Prefabs/UI/GameUI.prefab`. Nunca em uma cena |
 

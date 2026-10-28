@@ -623,6 +623,15 @@ As tabelas abaixo são a lista completa. Cada linha aponta para a seção que ex
 | `<<dar_item id>>` | Coloca um item no inventário do jogador | [Itens](#itens) |
 | `<<remover_item id>>` | Tira um item do inventário | [Itens](#itens) |
 
+**Música e sons**
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<tocar_musica id>>` | Troca a música, com uma transição suave | [Música e sons](#música-e-sons) |
+| `<<tocar_efeito id>>` | Toca um som curto, uma vez, sem esperar ele acabar | [Música e sons](#música-e-sons) |
+| `<<tocar_ambiente id>>` | Começa um som de fundo que se repete, por baixo da música | [Música e sons](#música-e-sons) |
+| `<<parar_ambiente>>` | Faz o som de fundo sumir aos poucos | [Música e sons](#música-e-sons) |
+
 **Perguntas para usar em uma condição**
 
 Estas não são comandos: não levam `<<` `>>` e só valem dentro de um `<<if>>` ou `<<elseif>>`.
@@ -643,12 +652,7 @@ Não são comandos: não levam `<<` `>>`, e vão no fim de uma fala ou de uma op
 
 **Ainda não existem**
 
-Não escreva estes; enquanto a issue não entrar, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
-
-| Comando | O que vai fazer | Entra com |
-|---|---|---|
-| `<<tocar_musica id>>` | Trocar a música | issue #20 |
-| `<<tocar_efeito id>>` | Tocar um efeito sonoro | issue #20 |
+Nenhum comando está planejado e à espera. Se precisar de um que não está nas tabelas acima, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
 ### Itens
 
@@ -706,6 +710,91 @@ As regras:
 
 Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
 
+### Música e sons
+
+Quatro comandos mexem no som. Os três que tocam levam **um id**, escrito por extenso e sem aspas; o quarto não leva nada.
+
+**Trocar a música:**
+
+```
+Luna: Você não devia ter visto isso.
+<<tocar_musica teste_musica_b>>
+Luna: Vem comigo.
+```
+
+**Um efeito pontual**, como uma batida ou um toque de telefone:
+
+```
+O telefone tocou no meio da noite.
+<<tocar_efeito freada_batida>>
+Protagonista: Que barulho foi esse?!
+```
+
+**Um som de fundo que se repete**, como o ônibus na estrada. Ele entra e sai aos poucos, em cerca de um segundo, e toca **por baixo** da música, sem trocar nem calar ela:
+
+```
+<<tocar_ambiente onibus_estrada>>
+Pensamento: Em qualquer outro dia, esse cenário me deixaria mais calmo...
+```
+
+**Parar o som de fundo e voltar a ele depois**, como na lembrança do prólogo:
+
+```
+<<parar_ambiente>>
+Pai: Veja só o seu primo, sustentando a família!
+(...)
+<<tocar_ambiente onibus_estrada>>
+Pensamento: Espero ter feito a escolha certa, mãe...
+```
+
+**Parar um som e tocar outro no mesmo ponto:** escreva os comandos um abaixo do outro, na ordem em que devem acontecer. O ônibus sai aos poucos enquanto a freada já soa por cima:
+
+```
+<<parar_ambiente>>
+<<tocar_efeito freada_batida>>
+Protagonista: Que porra é essa?!
+```
+
+As regras:
+
+| Regra | Certo | Errado | O que acontece com o errado |
+|---|---|---|---|
+| O id vai **sem aspas** | `<<tocar_efeito freada_batida>>` | `<<tocar_efeito "freada_batida">>` | Funciona, mas escreva sempre sem aspas. |
+| Cada comando de tocar leva **um** id | `<<tocar_efeito freada_batida>>` | `<<tocar_efeito>>` ou `<<tocar_efeito freada_batida buzina>>` | O editor não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
+| `<<parar_ambiente>>` **não leva id** | `<<parar_ambiente>>` | `<<parar_ambiente onibus_estrada>>` | O mesmo: a verificação reprova e a conversa trava. |
+| O id é escrito por extenso | `<<tocar_ambiente onibus_estrada>>` | `<<tocar_ambiente {$qual}>>` | A verificação do jogo reprova. |
+| O id está na **tabela certa** abaixo | `<<tocar_ambiente onibus_estrada>>` | `<<tocar_efeito onibus_estrada>>` | A verificação reprova: cada id vale só no comando da sua tabela. |
+
+- **O efeito não espera acabar.** A fala seguinte já aparece enquanto ele toca. Para dois sons em sequência (uma freada e depois uma batida), peça **um som só** que já contenha os dois (veja [Como pedir](#como-pedir-o-que-ainda-não-existe)).
+- **A música e o som de fundo duram até outro comando ou até a troca de sala.** Na sala seguinte (inclusive ao voltar ao menu), a música volta a ser a da sala e o som de fundo some. Dentro da mesma sala, para voltar à música dela, escreva `<<tocar_musica id_dela>>` (a música da sala precisa estar na tabela de músicas).
+- **Pedir a mesma música ou o mesmo som de fundo que já toca não reinicia** o som.
+- **Não existe `<<parar_musica>>`.** Para calar a música, peça uma faixa de silêncio ou a troca de sala.
+- **O jogador não escuta o roteiro rodar no VS Code:** o som só toca no jogo. O programador confere com fone.
+- **Os sons de botão, de avançar fala, de coletar item e de porta são do jogo**: não se pede no roteiro.
+
+**Sons que existem:**
+
+*Músicas* (`<<tocar_musica id>>`):
+
+| Id | O que é |
+|---|---|
+| `teste_musica_a` | Música provisória da sala de teste (`[Teste] Mecanicas`) |
+| `teste_musica_b` | Música provisória da `[Teste] Sala B` |
+
+*Sons de fundo* (`<<tocar_ambiente id>>`):
+
+| Id | O que é |
+|---|---|
+| `onibus_estrada` | O ônibus rodando na estrada, em loop (provisório) |
+
+*Efeitos* (`<<tocar_efeito id>>`):
+
+| Id | O que é |
+|---|---|
+| `freada_batida` | Uma freada forte seguida de uma batida (provisório) |
+
+Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela da sua lista. Copie o id daqui, sempre igual.
+
 ## Convenções de nome
 
 | O quê | Formato | Exemplo |
@@ -717,6 +806,7 @@ Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta ta
 | Nó interno | o nome do nó de entrada + `_` + o assunto | `luna_chave_perdida_devolveu` |
 | Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_luna` |
 | Id de item | minúsculas, sem acento, dígitos e `_` | `chave_teste` |
+| Id de som | minúsculas, sem acento, dígitos e `_` | `onibus_estrada` |
 | Quem fala | como na tabela [Quem fala](#quem-fala), com a mesma letra maiúscula ou minúscula | `Luna` |
 | Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
 | Opção de ação | `#acao` no fim da opção, depois do `<<if>>` se houver | `-> Abrir a porta <<if $x>> #acao` |
@@ -795,6 +885,8 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 |---|---|---|
 | O id do item existe na [tabela de itens](#itens)? | `<<dar_item chave_da_sala>>` | A verificação do jogo reprova. |
 | O comando de item tem um id, e só um? | `<<dar_item>>`, `<<dar_item chave_teste mapa>>` | A verificação reprova; no jogo, a conversa **trava**. |
+| O id do som existe na [tabela de sons](#música-e-sons), na lista do comando? | `<<tocar_efeito chuva>>`, `<<tocar_efeito onibus_estrada>>` | A verificação do jogo reprova. |
+| Os comandos de som têm o que precisam? | `<<tocar_efeito>>`, `<<tocar_efeito a b>>`, `<<parar_ambiente x>>` | A verificação reprova; no jogo, a conversa **trava**. |
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
 | O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
