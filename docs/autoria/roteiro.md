@@ -707,6 +707,7 @@ As regras:
 | Id | Nome no jogo | O que é |
 |---|---|---|
 | `chave_teste` | Chave Teste | Uma chave que abre alguma porta |
+| `moeda` | Moeda | Uma moeda achada no chão do ônibus; abre a máquina de café do posto |
 
 Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
 

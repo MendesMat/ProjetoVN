@@ -18,7 +18,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
 | [Áudio](#áudio) | existe | `Audio` | #19, #20 |
 
-A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`.
+A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`. O percurso do jogador (as salas `[Fatia] Onibus` e `[Fatia] Posto`) é a fatia vertical, montada só com Inspector e roteiro (#21).
 
 ---
 
@@ -208,7 +208,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - **Sair** fecha o jogo (no Editor, encerra o Play Mode).
 - **Configurações** abre a janela de configurações, que ainda não faz nada além de abrir e voltar. O botão se chama CONFIGURAÇÕES, não "Opções".
 - Com o menu aberto, a interface de jogo (inventário e diálogo) fica escondida e não recebe clique.
-- A sala onde o Novo Jogo começa é um campo do `Main Menu` em `Menu.unity` (hoje `[Teste] Mecanicas`).
+- A sala onde o Novo Jogo começa é um campo do `Main Menu` em `Menu.unity` (hoje `[Fatia] Onibus`, #21). Nela o prólogo (`onibus_viagem`) abre por um clique na poltrona (`onibus_poltrona`) e termina pedindo o nome do protagonista; a abertura automática, sem clique, é parte da #71.
 - **Pausa** (#18): Esc (ou Start do controle) abre e fecha a pausa. Ela só abre na exploração e durante uma conversa; **no menu principal e durante a troca de sala o Esc não faz nada**. As opções são CONTINUAR, SALVAR e VOLTAR AO MENU.
 - Com a pausa aberta o jogo fica **congelado**: o input do mundo é bloqueado, o texto da fala para de aparecer, o roteiro não avança sozinho (`<<wait>>` incluído), e clique, Espaço e Enter não avançam a fala, não escolhem opção e não abrem o histórico. Ao retomar, a conversa segue do mesmo ponto. Com o histórico aberto, a pausa abre por cima e, ao retomar, ele continua aberto.
 - **Voltar ao menu** pede confirmação ("Voltar ao menu? O progresso desde o último save será perdido."), com VOLTAR selecionado; Esc com a confirmação aberta fecha tudo e retoma o jogo. Funciona também durante uma conversa, que é encerrada. O Novo Jogo iniciado depois não herda nada da sessão anterior.

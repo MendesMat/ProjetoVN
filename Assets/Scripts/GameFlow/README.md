@@ -188,7 +188,7 @@ Consequências, não bugs:
 
 | Campo (todos com tooltip) | O que é |
 |---|---|
-| `startRoom` | O nome da cena do Novo Jogo (`[Teste] Mecanicas` de partida). **O único lugar onde a sala inicial é configurada.** Precisa estar na lista de cenas do build |
+| `startRoom` | O nome da cena do Novo Jogo (hoje `[Fatia] Onibus`, #21). **O único lugar onde a sala inicial é configurada.** Precisa estar na lista de cenas do build |
 | `startEntryPointId` | O id do `RoomEntryPoint` da chegada. Vazio = a posição em que a cena foi salva |
 | `onSaveChecked` (`UnityEvent<bool>`) | Chamado no `Start` com `HasSave`. Ligado, **como método dinâmico**, ao `MenuButtonUI.SetInteractable` do CONTINUAR |
 | `onNewGameNeedsConfirmation` | Chamado pelo Novo Jogo quando há save. Ligado ao `UIWindowManager.OpenWindow` da `Confirm New Game Window` |
