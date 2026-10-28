@@ -21,8 +21,9 @@ Core ◄── Dialogue ◄──┐
   ▲◄──── Inventory ◄──┼── GameFlow
   ▲◄──── PointNClick ◄┘
   ▲◄──── UI (enxerga também Inventory)
-Audio (folha: não enxerga nenhum módulo; quem toca som é que o enxerga)
   ▲◄──── Editor (só Editor; enxerga também o Yarn Spinner)
+
+Audio (folha: não enxerga nenhum módulo; quem toca som é que o enxerga)
 ```
 
 Regras da estrutura:
