@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: ProjetoVN.Inventory::ProjetoVN.Inventory.ItemRegistry
   items:
   - {fileID: 11400000, guid: 66320ee0ac9cdda4bb59f1ee560d781c, type: 2}
+  - {fileID: 11400000, guid: f0247eae393591a4bba12d0f1e516c73, type: 2}
