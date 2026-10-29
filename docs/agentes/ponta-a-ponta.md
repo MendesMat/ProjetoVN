@@ -4,6 +4,8 @@ Roteiro para provar, numa **build de Windows** (não no Editor), o percurso desc
 
 Quem joga é o programador, com mouse, teclado e fone. O agente prepara e devolve o save, gera a build, faz o aquecimento, confere o `savegame.json` nos passos 9, 12 e 14 e lê os logs. O Unity CLI não alcança a build (o pacote Pipeline é desligado no Player), então não há `eval` dentro do jogo: o que se confere é a tela, o som, o `Player.log` e o `savegame.json`.
 
+Quando o programador não puder jogar, o agente pode percorrer o roteiro por script, com cliques, teclas e capturas da janela do jogo ([receita em unity-cli.md](unity-cli.md#jogar-a-build-por-script-22)). Isso cobre tudo menos o que exige ouvido ou o alt-tab real (os sons e a música dos passos 4 a 11, e o passo 8); o registro do resultado diz o que ficou sem verificar.
+
 Refaça o roteiro sempre que uma issue mudar a fatia (sala, conversa, puzzle, menu, save). O que muda de uma execução para a outra é o conteúdo provisório; o percurso é o mesmo.
 
 ## Onde ficam os arquivos
@@ -47,7 +49,7 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 - o som de estrada entra, some na lembrança, volta e some na freada com batida;
 - personagens atrás da caixa, quem fala em destaque; a placa do protagonista mostra `???`.
 
-**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa segue e a placa mostra o nome.
+**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo) e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com a Luna.
 
 **8. Alt-tab.** Troque para outra janela por alguns segundos e volte. Esperado: o jogo continua de onde estava, sem travar nem perder o input. Com a janela sem foco o jogo roda a 30 FPS (limite do jogo, não defeito).
 

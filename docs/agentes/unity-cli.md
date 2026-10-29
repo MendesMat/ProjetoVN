@@ -399,6 +399,17 @@ Repita o segundo até `completed` e confira `result: Succeeded` e `totalErrors: 
   **Esses argumentos ficam gravados** em `HKCU\Software\NoxStudios\ProjetoVN` (valores `Screenmanager …`) e valem para as aberturas seguintes, inclusive as sem argumento: a build passa a abrir em janela de 960×540. O passo 0 do roteiro apaga essas preferências (os valores `… Default_h…` ficam).
 - **O Esc da pausa funciona na build com foco de verdade.** A ressalva de "foco da Game view" da receita do campo de texto é só do Editor.
 
+#### Jogar a build por script (#22)
+
+Sem o programador e sem a ferramenta de controle do computador, dá para percorrer o roteiro com um script PowerShell que traz a janela do jogo para a frente, tira uma captura dela (`Graphics.CopyFromScreen` sobre a área cliente, depois `Read` no PNG) e envia cliques e teclas pelo `user32.dll`. Abra a build em janela (`-screen-fullscreen 0 -screen-width 1280 -screen-height 720`, ver acima) e chame `SetProcessDPIAware()` antes de medir coordenadas. O script e o resultado ficam fora do repositório. O que custou tempo:
+
+- **O pan por borda só reage a movimento relativo do mouse** (`mouse_event` com `MOUSEEVENTF_MOVE`). `SetCursorPos` sozinho leva o cursor, mas o `ScreenPanController` não desloca o cenário: um laço que alterna `-6` e `+3` px perto da borda (≈ 48 px de cenário por volta de 240 ms) faz o pan andar. Clique funciona com `SetCursorPos` seguido de `mouse_event` de botão.
+- **Esc:** `keybd_event` com o código virtual `0x1B` **e** o scancode `0x01`, segurando ~200 ms. Só o código virtual, ou `SendKeys` com `{ESC}`, não abriu a pausa. Para digitar na folha do nome, `SendKeys.SendWait("Nome")` funciona.
+- **Os objetos provisórios são quadrados pretos** (72×72 px a 1280×720); achá-los na captura (varrer a linha `y = 360` atrás de pixels `0,0,0`) é mais rápido que adivinhar o pan. Cada quadrado não diz o que é: clique e leia a fala.
+- **Uma fala a cada clique no botão de avançar** (`≈ (1024, 566)` a 1280×720), com ~2 s de espera entre cliques; o prólogo inteiro leva ~30 cliques.
+- **Fim do pan.** O pan chega ao vazio preto nas duas bordas (#110, #108): ao voltar, desloque o cenário para o lado oposto até a varredura achar um quadrado.
+- **O que não se verifica assim:** som e música, o alt-tab real e a sensação do pan. O `Player.log` e o `savegame.json` continuam sendo as provas de estado.
+
 ## Armadilhas de serialização
 
 Lições que custaram horas. Todas valem para cenas, prefabs e assets.
