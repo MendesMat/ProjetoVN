@@ -217,7 +217,7 @@ Para a troca ser observável, suba a duração só em runtime: em Play Mode, `Se
 
 ### Salvar e carregar por `eval` (#16)
 
-O arquivo do save é `Application.persistentDataPath/savegame.json` (no Windows, `%USERPROFILE%/AppData/LocalLow/DefaultCompany/ProjetoVN`). **Toda troca de sala salva**, então a suíte PlayMode e qualquer verificação em Play **sobrescrevem o save do Editor**: copie o arquivo antes, se quiser guardá-lo, e devolva depois.
+O arquivo do save é `Application.persistentDataPath/savegame.json` (no Windows, `%USERPROFILE%/AppData/LocalLow/NoxStudios/ProjetoVN`). **Toda troca de sala salva**, então a suíte PlayMode e qualquer verificação em Play **sobrescrevem o save do Editor**: copie o arquivo antes, se quiser guardá-lo, e devolva depois.
 
 - **O `Load()` é uma troca de sala:** devolve `true` na hora e leva vários frames. Dispare num `eval` e observe em outros (como em "Trocar de sala por `eval`"); no mesmo `eval` do `Load()` só o `PlayerInputGate.IsEnabled == false` já vale. O fim é o gate voltar a `true`.
 - **Ler o arquivo:** `System.IO.File.ReadAllText(System.IO.Path.Combine(UnityEngine.Application.persistentDataPath, "savegame.json"))`. A verificação escreve o arquivo por `eval` ou `eval_file`, o que é ferramenta de teste, não código do jogo.
@@ -363,6 +363,52 @@ A Game view do Editor costuma ter 1280×720, abaixo dos 1920×1080 da interface,
 ### Contar o que está visível
 
 O painel de inventário reaproveita slots: um slot devolvido é desativado, não destruído. `transform.childCount` não diz quantos itens estão visíveis. Conte os filhos ativos.
+
+### Gerar a build de Windows (#22)
+
+O roteiro de [ponta-a-ponta.md](ponta-a-ponta.md) roda numa build de Windows 64. Gere-a pelo **Editor aberto** (o `unity build` de linha de comando abre um segundo Editor em batch e não roda com o projeto aberto), fora do Play Mode e com a cena salva (a build usa as cenas do disco):
+
+```bash
+unity command build --target StandaloneWindows64 --outputPath "Builds/Windows/ProjetoVN.exe" --confirm true
+```
+
+```bash
+unity command build_status
+```
+
+Repita o segundo até `completed` e confira `result: Succeeded` e `totalErrors: 0` (medido: 13 s com o cache quente, 73 s do zero; ~165 MB). O único aviso do relatório é do pacote Pipeline: `No RuntimePipelineConfig asset found… Pipeline will be disabled in Player builds`. Por isso **o CLI não alcança a build**: nada de `eval` dentro do jogo.
+
+- **É uma build Release**, mesmo com `EditorUserBuildSettings.development = True` neste Editor: sem `--options`, o comando não liga `Development` (o `boot.config` fica sem `player-connection` e sem `profiler-enable`). O que se verifica é o que o jogador recebe.
+- **Sem `--scenes`** a build usa a lista do `EditorBuildSettings` (o menu, as salas `[Fatia]` e as cenas `[Teste]`). Não passe uma lista no comando: ela viraria uma segunda lista de salas, fora dos testes (`MainMenuTests` e `RoomLinksTests` guardam só o `EditorBuildSettings`).
+- **A build regrava quatro arquivos.** Depois de **cada** build, reverta e confira que o `git status` está limpo:
+
+  ```bash
+  git checkout -- ProjectSettings/ProjectSettings.asset ProjectSettings/UnityConnectSettings.asset Assets/Settings/UniversalRP.asset Assets/UniversalRenderPipelineGlobalSettings.asset
+  ```
+
+  O que muda neles: o `InputSystem_Actions` entra em `preloadedAssets` e nasce um `m_BuildTargetBatching` de Standalone (`ProjectSettings.asset`), `m_Enabled: 0 → 1` (`UnityConnectSettings.asset`), e os dois assets do URP. Nenhum entra no commit. Se o `companyName` ou outra mudança *desejada* estiver no `ProjectSettings.asset`, commite-a **antes** da build, para a reversão devolver o arquivo já com ela.
+- **`Builds/` está no `.gitignore`.** A `Builds/Development/` é uma build antiga e fica onde está.
+- **A pasta de dados é `%USERPROFILE%\AppData\LocalLow\NoxStudios\ProjetoVN`** (nome da empresa do Player Settings), a mesma do Editor: o `savegame.json` é um só para o Editor, a build e a suíte PlayMode. O `Player.log` fica ali também e **gira a cada abertura**: a sessão anterior vira `Player-prev.log` e a de antes dela se perde. Copie o log antes de abrir a build de novo.
+- **Ler os erros do `Player.log`.** Não há prefixo de nível; um `Debug.LogError` aparece como a mensagem seguida da pilha `UnityEngine.Debug:LogError (object)`. O filtro está no passo 16 do roteiro de ponta a ponta. A linha `d3d12: failed to query info queue interface (0x80004002).` aparece em toda execução (é do driver), e a `D3D12PipelineLibrary must be recreated due to invalid disk cache`, só na primeira abertura de uma build nova (por isso o aquecimento).
+- **A build abre em tela cheia sem borda.** Para abri-la por terminal sem tomar a tela:
+
+  ```powershell
+  Start-Process -FilePath Builds\Windows\ProjetoVN.exe -ArgumentList '-screen-fullscreen','0','-screen-width','960','-screen-height','540' -WindowStyle Minimized
+  ```
+
+  **Esses argumentos ficam gravados** em `HKCU\Software\NoxStudios\ProjetoVN` (valores `Screenmanager …`) e valem para as aberturas seguintes, inclusive as sem argumento: a build passa a abrir em janela de 960×540. O passo 0 do roteiro apaga essas preferências (os valores `… Default_h…` ficam).
+- **O Esc da pausa funciona na build com foco de verdade.** A ressalva de "foco da Game view" da receita do campo de texto é só do Editor.
+
+#### Jogar a build por script (#22)
+
+Sem o programador e sem a ferramenta de controle do computador, dá para percorrer o roteiro com um script PowerShell que traz a janela do jogo para a frente, tira uma captura dela (`Graphics.CopyFromScreen` sobre a área cliente, depois `Read` no PNG) e envia cliques e teclas pelo `user32.dll`. Abra a build em janela (`-screen-fullscreen 0 -screen-width 1280 -screen-height 720`, ver acima) e chame `SetProcessDPIAware()` antes de medir coordenadas. O script e o resultado ficam fora do repositório. O que custou tempo:
+
+- **O pan por borda só reage a movimento relativo do mouse** (`mouse_event` com `MOUSEEVENTF_MOVE`). `SetCursorPos` sozinho leva o cursor, mas o `ScreenPanController` não desloca o cenário: um laço que alterna `-6` e `+3` px perto da borda (≈ 48 px de cenário por volta de 240 ms) faz o pan andar. Clique funciona com `SetCursorPos` seguido de `mouse_event` de botão.
+- **Esc:** `keybd_event` com o código virtual `0x1B` **e** o scancode `0x01`, segurando ~200 ms. Só o código virtual, ou `SendKeys` com `{ESC}`, não abriu a pausa. Para digitar na folha do nome, `SendKeys.SendWait("Nome")` funciona.
+- **Os objetos provisórios são quadrados pretos** (72×72 px a 1280×720); achá-los na captura (varrer a linha `y = 360` atrás de pixels `0,0,0`) é mais rápido que adivinhar o pan. Cada quadrado não diz o que é: clique e leia a fala.
+- **Uma fala a cada clique no botão de avançar** (`≈ (1024, 566)` a 1280×720), com ~2 s de espera entre cliques; o prólogo inteiro leva ~30 cliques.
+- **Fim do pan.** O pan chega ao vazio preto nas duas bordas (#110, #108): ao voltar, desloque o cenário para o lado oposto até a varredura achar um quadrado.
+- **O que não se verifica assim:** som e música, o alt-tab real e a sensação do pan. O `Player.log` e o `savegame.json` continuam sendo as provas de estado.
 
 ## Armadilhas de serialização
 

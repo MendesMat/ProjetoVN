@@ -72,6 +72,7 @@ Verificação em Play Mode, receitas e armadilhas: [docs/agentes/unity-cli.md](d
 | A ordem das milestones e das issues | [docs/planejamento/milestones.md](docs/planejamento/milestones.md) |
 | Como se monta uma sala ou um objeto no Editor | [docs/autoria/salas.md](docs/autoria/salas.md) |
 | Como se escreve roteiro | [docs/autoria/roteiro.md](docs/autoria/roteiro.md) |
+| Como verificar a fatia vertical numa build | [docs/agentes/ponta-a-ponta.md](docs/agentes/ponta-a-ponta.md) |
 
 READMEs dos módulos, em `Assets/Scripts/`:
 [Core](Assets/Scripts/Core/README.md) ·

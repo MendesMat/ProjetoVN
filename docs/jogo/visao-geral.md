@@ -32,6 +32,8 @@ O planejamento atual termina quando este percurso funciona de ponta a ponta, em 
 
 O conteúdo da fatia é provisório. O que ela prova é que os sistemas funcionam juntos e que conteúdo novo se faz sem código.
 
+O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado na #22.
+
 ## Fora do escopo atual
 
 Localização, voz, mapa ou viagem rápida, vários slots de save, salvar no meio de um diálogo, sprite de personagem parado no cenário fora de uma conversa, tela de configurações, build para navegador e integração contínua.
