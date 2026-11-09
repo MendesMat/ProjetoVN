@@ -20,7 +20,7 @@ Consequência para o código: o **Inspector e o arquivo de roteiro são as inter
 
 ## O alvo: a fatia vertical
 
-O planejamento atual termina quando este percurso funciona de ponta a ponta, em um build de desktop:
+A fatia vertical é este percurso funcionando de ponta a ponta, em um build de desktop:
 
 1. O jogo abre no **menu principal**.
 2. **Novo Jogo** leva à primeira sala (o ônibus). O jogador clica na poltrona, que abre o prólogo, e escreve o **nome do protagonista** dentro da história, ao assinar a lista de passageiros no fim dele (#26). Até a #71, o clique na poltrona é o que abre o prólogo.
@@ -33,6 +33,8 @@ O planejamento atual termina quando este percurso funciona de ponta a ponta, em 
 O conteúdo da fatia é provisório. O que ela prova é que os sistemas funcionam juntos e que conteúdo novo se faz sem código.
 
 O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado na #22.
+
+Depois da fatia, a milestone M7 troca a arte provisória da interface (caixa de diálogo, botões de escolha, histórico e menu principal) pela entrega da arte, sem mudar o percurso. A sequência está em [milestones.md](../planejamento/milestones.md).
 
 ## Fora do escopo atual
 

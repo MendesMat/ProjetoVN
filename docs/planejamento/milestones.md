@@ -24,6 +24,7 @@ M0 Fundação
            └─► M3 Navegação entre salas
                 ├─► M4 Ciclo de jogo ─┐
                 └─► M5 Áudio ─────────┴─► M6 Fatia vertical
+                                               └─► M7 Interface nova
 ```
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
@@ -39,6 +40,7 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 - **A seleção inicial do menu (#88) vem antes do menu principal (#17).** Ao abrir `Menu.unity`, nenhum botão fica selecionado, porque o `Start` da interface de jogo limpa a seleção que o menu fez, e com a #17 o menu passa a ser a primeira cena do jogo: quem joga com teclado ou controle abriria o jogo sem conseguir navegar. Ela é de outro módulo (`Dialogue`) e cabe num PR pequeno, e feita antes deixa a verificação da #17 conferir o menu já selecionado. Encontrada no levantamento da #17 e priorizada pelo programador em 2026-10-22; atrasa a #17 pelo tempo de uma issue pequena.
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
+- **A interface nova (M7) vem depois da fatia vertical** porque troca a arte provisória da interface pela entrega da arte e não muda nenhum sistema. A posição e a organização da interface seguem a arte. A #113 vem primeiro porque leva a entrega para o repositório (ela está em `Adicionar/`, fora do git) e cria as fontes que as outras usam. A #114 vem antes da #115 porque o componente que muda a cor do texto por estado nasce nos botões de escolha e o histórico o reaproveita. O menu (#116) fecha a milestone. A camada de horror (#117) fica no backlog até um roteiro pedir (D-27). Priorizadas pelo programador em 2026-11-09.
 
 ## M0 — Fundação
 
@@ -112,6 +114,15 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 |---|---|---|
 | #21 | Conteúdo provisório da fatia vertical | #8, #11, #13, #14, #18, #20, #25, #26 |
 | #22 | Verificação de ponta a ponta e build de desktop | #21 |
+
+## M7 — Interface nova
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #113 | Entrega da arte no repositório, fontes Atkinson e Cinzel, e caixa de diálogo no tamanho da referência | — |
+| #114 | Botões de escolha com a arte nova | #113 |
+| #115 | Botão Histórico e painel do histórico com a arte nova | #113, #114 |
+| #116 | Menu principal com a arte nova | #113 |
 
 ## Riscos conhecidos
 
