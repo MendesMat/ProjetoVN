@@ -344,13 +344,13 @@ O texto que não cabe **vaza para fora da caixa**: não há rolagem, corte nem p
 
 | Onde | Escreva até | O limite real | Acima disso |
 |---|---|---|---|
-| **Fala** (a caixa de texto) | **200 caracteres** | cerca de 340 (5 linhas na tela) | o texto passa da caixa |
+| **Fala** (a caixa de texto) | **130 caracteres** | cerca de 170 (3 linhas na tela) | o texto passa da caixa |
 | **Opção** (o botão) | **50 caracteres** | cerca de 55 em duas linhas; 85 em três | o texto passa do botão |
-| **Nome** (a placa) | **8 letras** | `Fernanda` cabe; `Professora` e `Dona Marta` não | a placa corta e mostra "…" |
+| **Nome** (a placa) | **10 letras** | `Fernanda`, `Professora` e `Dona Marta` cabem (a última com folga pequena); `Maria Eduarda` não; seis `W` cabem e sete não | a placa corta e mostra "…" |
 
 A contagem inclui os espaços. Para ter uma ideia do tamanho:
 
-- Esta fala tem 66 caracteres: `Eu cheguei cedo porque o ônibus passa às seis. Depois, só às oito.`
+- Esta fala tem 66 caracteres: `Eu cheguei cedo porque o ônibus passa às seis. Depois, só às oito.` A mais longa do roteiro hoje tem 111 e ocupa duas linhas das três da caixa.
 - Esta opção tem 33: `Depende. O que eu ganho com isso?`
 
 Letras largas (`M`, `W`) ocupam mais espaço. Na dúvida, divida em duas falas.
