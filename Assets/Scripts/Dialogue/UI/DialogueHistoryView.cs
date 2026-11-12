@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using ProjetoVN.Dialogue.Logic;
 using TMPro;
 using UnityEngine;
@@ -49,6 +50,10 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Tamanho da fonte dos itens que o jogador recebeu ou entregou. Falas e narração usam o tamanho do modelo.")]
         [Min(1f)]
         [SerializeField] private float itemFontSize = 28f;
+
+        [Tooltip("Tamanho da fonte do nome do personagem dentro do balão. O texto da fala usa o tamanho do modelo.")]
+        [Min(1f)]
+        [SerializeField] private float nameFontSize = 30f;
 
         private readonly List<BubbleRow> _rows = new();
         private Canvas _panelCanvas;
@@ -166,8 +171,13 @@ namespace ProjetoVN.Dialogue.UI
             return entry.IsProtagonist ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
         }
 
-        private static string TextOf(ConversationEntry entry) =>
-            entry.ShowsName ? $"<b>{entry.SpeakerName}</b>\n{entry.Text}" : entry.Text;
+        private string TextOf(ConversationEntry entry)
+        {
+            if (!entry.ShowsName) return entry.Text;
+
+            var size = nameFontSize.ToString(CultureInfo.InvariantCulture);
+            return $"<b><size={size}>{entry.SpeakerName}</size></b>\n{entry.Text}";
+        }
 
         private float WidthOf(BubbleRow row)
         {
