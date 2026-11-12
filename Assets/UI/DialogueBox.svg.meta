@@ -29,9 +29,9 @@ ScriptedImporter:
   maxTangentAngleEnabled: 0
   maxTangentAngle: 5
   keepTextureAspectRatio: 1
-  textureSize: 1500
-  textureWidth: 1500
-  textureHeight: 368
+  textureSize: 1716
+  textureWidth: 1716
+  textureHeight: 421
   wrapMode: 0
   filterMode: 1
   sampleCount: 8
@@ -47,7 +47,7 @@ ScriptedImporter:
       serializedVersion: 2
       x: 0
       y: 0
-      width: 1500
-      height: 368
+      width: 1716
+      height: 421
     SpriteID: e0c7c0002de589e4ba7b579a4785dc74
     PhysicsOutlines: []
