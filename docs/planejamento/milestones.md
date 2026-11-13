@@ -26,15 +26,16 @@ M0 Fundação
                 └─► M5 Áudio ─────────┴─► M6 Fatia vertical
                                                └─► M7 Interface nova
                                                     └─► M8 Ferramentas e dívida interna
-                                                         └─► M9 Acabamento da fatia ──────────┐
-                                                              └─► M10 Efeitos de roteiro      │
-                                                                   └─► M11 Primeira entrega   │
-                                                                                              └╌► M12 Camada de horror (portão)
+                                                         └─► M9 Acabamento da fatia ──────────────┐
+                                                              └─► M10 Efeitos de roteiro          │
+                                                                   └─► M11 Prólogo do ato 1       │
+                                                                        └─► M12 Primeira entrega  │
+                                                                                                  └╌► M13 Camada de horror (portão)
 ```
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
 
-A M12 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camada de horror** (D-27). Se o pedido chegar antes de a M11 fechar, ela entra na fila na posição que o programador escolher.
+A M13 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camada de horror** (D-27). Se o pedido chegar antes de a M12 fechar, ela entra na fila na posição que o programador escolher.
 
 ## Por que esta ordem
 
@@ -48,7 +49,7 @@ A M12 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camad
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 - **A interface nova (M7) vem depois da fatia vertical** porque troca a arte provisória da interface pela entrega da arte e não muda nenhum sistema. A posição e a organização da interface seguem a arte. A #113 vem primeiro porque leva a entrega para o repositório (ela está em `Adicionar/`, fora do git) e cria as fontes que as outras usam. A #114 vem antes da #115 porque o componente que muda a cor do texto por estado nasce nos botões de escolha e o histórico o reaproveita. O menu (#116) fecha a milestone. A camada de horror (#117) fica no backlog até um roteiro pedir (D-27). Priorizadas pelo programador em 2026-11-09.
-- **Depois da interface nova, o backlog ficou só com achados das revisões.** Eles foram conferidos contra a `main` na triagem de 2026-11-13: os que tinham ficado datados foram fechados, e os pequenos foram juntados na #124 (só documentação) e na #125 (acabamentos de código e README). As 17 issues que sobraram se dividem da M8 à M12, pela ordem abaixo. Priorizadas pelo programador em 2026-11-13.
+- **Depois da interface nova, o backlog ficou só com achados das revisões.** Eles foram conferidos contra a `main` na triagem de 2026-11-13: os que tinham ficado datados foram fechados, e os pequenos foram juntados na #124 (só documentação) e na #125 (acabamentos de código e README). As 17 issues que sobraram se dividem entre a M8, a M9, a M10, a M12 e a M13, pela ordem abaixo. Priorizadas pelo programador em 2026-11-13.
 - **As ferramentas e a dívida interna (M8) vêm primeiro** porque custam tempo a cada sessão e nada do que vem depois funciona melhor com elas quebradas. Nenhuma muda o que o jogador vê.
   - **A #124 abre a milestone** porque corrige receitas que todas as sessões seguintes usam (o Esc da pausa, o kerning que a build grava, o mouse na build por script). **A #35 vem logo depois** pelo mesmo motivo: ela muda os próprios comandos de trabalho.
   - **A #36 e a #125** são pequenas e sem decisão pendente. A #125 vem depois da #124 porque as duas mexem no README do `Dialogue` (seções diferentes).
@@ -59,9 +60,15 @@ A M12 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camad
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 depende de uma decisão do programador (nome com ou sem cor), que o levantamento pergunta.
   - **A #52 vem depois da #108 e da #96:** ela valida `minX` < `maxX` no mesmo componente que a #108 ajusta, e a varredura de tooltips cobre também o que a #96 acrescentar.
   - **A #107 fecha a milestone** porque percorre o guia de `salas.md` no Inspector, e o percurso só vale com os limites certos (#108) e com os tooltips no lugar (#52).
-- **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 (M8). O levantamento dela decide se ela se divide (fade, cenário de tela cheia e abertura automática da conversa ao chegar na sala), e as partes novas entram nesta milestone.
-- **A primeira entrega (M11) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9) e com a abertura completa (M10). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
-- **A camada de horror (M12) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decide a cor do nome na placa normal.
+- **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
+  - **A #127 abre a milestone,** antes da #71. Ela é a abertura automática da conversa ao chegar na sala, que estava na #71 e saiu dela no planejamento de 2026-11-13: não depende do fade, e a M11 precisa dela duas vezes. A #71 passa a depender dela, porque abrir o prólogo com a tela preta só faz sentido com a conversa já abrindo sozinha na chegada.
+- **O prólogo do ato 1 (M11) vem depois dos efeitos e antes da entrega.** O roteirista mandou um texto novo do prólogo em 2026-11-13: a Cena 1 é a que já está no jogo, e a Cena 2 (o pátio do posto e a loja de conveniência) substitui o conteúdo provisório do posto (#21). Ela usa a conversa de chegada (#127), e a entrega sai melhor com o prólogo de verdade do que com a Luna e a moeda provisórias. Decisões do programador no planejamento: as opções do roteiro são objetos clicáveis no cenário, e não opções de diálogo (são cinco, e uma é secreta, o que a D-11 não permite); a compra na loja é um bloco de opções com `<<dar_item>>`, sem tela de loja; e **o roteiro é fiel ao texto**, então a fatia deixa de ter a escolha de afinidade e o puzzle de item, que os roteiristas vão tratar depois. Priorizadas pelo programador em 2026-11-13.
+  - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista.
+  - **A #129 tem portão:** o roteirista envia o texto final ao programador, que o passa ao agente, e o `.yarn` é organizado a partir dele (esse texto entra pela issue, não por um PR de roteiro). Ela cria também os personagens, os sons e os itens que o roteiro cita, porque os testes dos roteiros reprovam o que não existe.
+  - **A #130 fecha a milestone:** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
+  - **A fonte de caneta da lista de passageiros (#131)** fica no backlog, com `triagem`, até a arte entregar a fonte: ela não muda nada do percurso.
+- **A primeira entrega (M12) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9), com a abertura completa (M10) e com o prólogo de verdade (M11). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
+- **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decide a cor do nome na placa normal.
 
 ## M0 — Fundação
 
@@ -174,22 +181,33 @@ O que o jogador e quem monta sala veem de errado na fatia vertical. Nenhuma mec�
 
 ## M10 — Efeitos de roteiro
 
-Os efeitos de tela que o prólogo pede. As partes em que o levantamento da #71 a dividir entram aqui.
+Os efeitos de roteiro que o prólogo pede: a conversa que abre sozinha ao chegar na sala, o fade e a imagem de tela cheia. As partes em que o levantamento da #71 a dividir entram aqui.
 
 | Issue | Título | Depende de |
 |---|---|---|
-| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37 |
+| #127 | Conversa que abre sozinha ao chegar na sala | — |
+| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37, #127 |
 
-## M11 — Primeira entrega
+## M11 — Prólogo do ato 1
 
-A fatia vertical pronta para ir a alguém de fora, por download no itch.io (D-15).
+O prólogo do ato 1 no texto novo do roteirista: a Cena 1 conferida e a Cena 2, o pátio do posto e a loja de conveniência, no lugar do conteúdo provisório do posto.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #128 | Objeto de cena que aparece quando uma variável da história liga | — |
+| #129 | Prólogo do ato 1: o texto novo do roteirista em .yarn, com personagens, sons e itens | Portão: o texto final do roteirista |
+| #130 | Prólogo do ato 1: montar o pátio do posto e a loja de conveniência, e tirar o conteúdo provisório do posto | #127, #128, #129, #108 |
+
+## M12 — Primeira entrega
+
+A fatia vertical, já com o prólogo do ato 1, pronta para ir a alguém de fora, por download no itch.io (D-15).
 
 | Issue | Título | Depende de |
 |---|---|---|
 | #89 | Gravar o save sem risco de deixar o arquivo pela metade | #36 |
 | #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | #124, #108 |
 
-## M12 — Camada de horror
+## M13 — Camada de horror
 
 **Portão:** abre só quando um roteiro pedir (D-27). O guia da camada está em `docs/arte/interface/camada-de-horror.md`, e os arquivos de arte ficam em `Adicionar/horror/`, fora do git, até lá. A #117 lista o que decidir e sugere dividi-la quando for priorizada.
 
