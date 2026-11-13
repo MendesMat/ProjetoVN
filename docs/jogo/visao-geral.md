@@ -34,7 +34,7 @@ O conteúdo da fatia é provisório. O que ela prova é que os sistemas funciona
 
 O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado na #22.
 
-Depois da fatia, a milestone M7 troca a arte provisória da interface (caixa de diálogo, botões de escolha, histórico e menu principal) pela entrega da arte, sem mudar o percurso. A sequência está em [milestones.md](../planejamento/milestones.md).
+Depois da fatia, a milestone M7 troca a arte provisória da interface (caixa de diálogo, botões de escolha, histórico e menu principal) pela entrega da arte, sem mudar o percurso. Em seguida vêm as ferramentas e a dívida interna (M8), o acabamento da fatia (M9: o pan que mostra o vazio preto no posto, a navegação por teclado, a placa de nome, os tooltips), os efeitos de tela que o prólogo pede (M10) e a preparação da primeira entrega no itch.io (M11). A camada de horror da interface (M12) só abre quando um roteiro pedir. A sequência está em [milestones.md](../planejamento/milestones.md).
 
 ## Fora do escopo atual
 
