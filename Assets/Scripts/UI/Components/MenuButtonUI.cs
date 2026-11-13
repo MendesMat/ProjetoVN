@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace ProjetoVN.UI.Components
 {
@@ -7,6 +8,9 @@ namespace ProjetoVN.UI.Components
     {
         [Tooltip("O texto do botão, que muda de cor conforme o estado. Vazio: o texto fica sempre na cor que tiver.")]
         [SerializeField] private TMP_Text label;
+
+        [Tooltip("Ícone do botão, pintado com a mesma cor do texto em todo estado. Vazio: o botão não tem ícone.")]
+        [SerializeField] private Graphic icon;
 
         [Tooltip("Ornamento que aparece só com o botão destacado ou apertado. Vazio: o botão não tem ornamento.")]
         [SerializeField] private GameObject decorateImage;
@@ -43,9 +47,14 @@ namespace ProjetoVN.UI.Components
         protected override void RefreshVisual()
         {
             SelectableVisualState state = VisualState;
+            Color color = TextColorOf(state);
             if (label != null)
             {
-                label.color = TextColorOf(state);
+                label.color = color;
+            }
+            if (icon != null)
+            {
+                icon.color = color;
             }
             if (decorateImage != null)
             {
