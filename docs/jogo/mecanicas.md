@@ -198,14 +198,14 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 ## Menu e pausa
 
-**Para o jogador:** o jogo abre em um menu com Novo Jogo, Continuar e Sair. Esc pausa o jogo, e a pausa salva e volta ao menu.
+**Para o jogador:** o jogo abre em um menu com a arte do NOTURNA e os itens Novo Jogo, Continuar, Opções e Sair. O item destacado (mouse ou teclado) ganha a lua, o sublinhado e a sombra rosa; a pausa e as confirmações usam o mesmo estilo. Esc pausa o jogo, e a pausa salva e volta ao menu.
 
 **Existe:**
 - A cena `Menu.unity` é a **primeira cena** do jogo (cena 0 do build), com janelas de título e de configurações, navegação por mouse e teclado.
 - **Novo Jogo** zera o estado e abre a sala inicial (#17); se já existe um save, pede confirmação antes ("Já existe um jogo salvo. Começar um novo jogo vai substituí-lo."), com VOLTAR selecionado. O save antigo é substituído quando o jogador chega na sala.
 - **Continuar** fica desabilitado sem save (ou com o save corrompido) e, com save, carrega o jogo salvo.
 - **Sair** fecha o jogo (no Editor, encerra o Play Mode).
-- **Configurações** abre a janela de configurações, que ainda não faz nada além de abrir e voltar. O botão se chama CONFIGURAÇÕES, não "Opções".
+- **Opções** abre a janela de opções, que ainda não faz nada além de abrir e voltar, e que ainda não tem a arte nova. O botão se chama OPÇÕES (#116).
 - Com o menu aberto, a interface de jogo (inventário e diálogo) fica escondida e não recebe clique.
 - A sala onde o Novo Jogo começa é um campo do `Main Menu` em `Menu.unity` (hoje `[Fatia] Onibus`, #21). Nela o prólogo (`onibus_viagem`) abre por um clique na poltrona (`onibus_poltrona`) e termina pedindo o nome do protagonista; a abertura automática, sem clique, é parte da #71.
 - **Pausa** (#18): Esc (ou Start do controle) abre e fecha a pausa. Ela só abre na exploração e durante uma conversa; **no menu principal e durante a troca de sala o Esc não faz nada**. As opções são CONTINUAR, SALVAR e VOLTAR AO MENU.
