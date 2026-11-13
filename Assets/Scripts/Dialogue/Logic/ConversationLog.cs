@@ -26,8 +26,7 @@ namespace ProjetoVN.Dialogue.Logic
 
         public void AddNarration(string text) => AddWithoutSpeaker(ConversationEntryKind.Narration, text);
 
-        public void AddThought(string text, Color thoughtColor) =>
-            _entries.Add(new ConversationEntry(ConversationEntryKind.Thought, null, Opaque(thoughtColor), text, isProtagonist: false, showsName: false));
+        public void AddThought(string text) => AddWithoutSpeaker(ConversationEntryKind.Thought, text);
 
         public void AddItemReceived(string itemName) => AddWithoutSpeaker(ConversationEntryKind.Item, ItemReceivedPrefix + itemName);
 

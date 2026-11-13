@@ -9,8 +9,6 @@ namespace ProjetoVN.Tests.EditMode
         private static readonly Color LunaColor = new Color32(0xD9, 0xA6, 0xFF, 0xFF);
         private static readonly Color ProtagonistColor = new Color32(0xFF, 0xF3, 0xFB, 0xFF);
 
-        private static readonly Color ThoughtColor = new Color32(0xC9, 0xDC, 0xFF, 0xFF);
-
         private ConversationLog _log;
 
         [SetUp]
@@ -153,9 +151,9 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
-        public void AddThought_HasTextAndColorButNoName()
+        public void AddThought_HasOnlyText()
         {
-            _log.AddThought("Que dia.", ThoughtColor);
+            _log.AddThought("Que dia.");
 
             ConversationEntry entry = _log.Entries[0];
             Assert.AreEqual(ConversationEntryKind.Thought, entry.Kind);
@@ -163,22 +161,14 @@ namespace ProjetoVN.Tests.EditMode
             Assert.IsFalse(entry.ShowsName);
             Assert.IsFalse(entry.IsProtagonist);
             Assert.AreEqual("Que dia.", entry.Text);
-            Assert.AreEqual(ThoughtColor, entry.SpeakerColor);
-        }
-
-        [Test]
-        public void AddThought_StoresTheColorOpaque()
-        {
-            _log.AddThought("Que dia.", new Color32(0xC9, 0xDC, 0xFF, 0x40));
-
-            Assert.AreEqual(ThoughtColor, _log.Entries[0].SpeakerColor);
+            Assert.AreEqual(Color.clear, entry.SpeakerColor);
         }
 
         [Test]
         public void ProtagonistLineAfterAThought_ShowsTheName()
         {
             _log.AddProtagonistLine("Protagonista", ProtagonistColor, "Oi.");
-            _log.AddThought("Que dia.", ThoughtColor);
+            _log.AddThought("Que dia.");
             _log.AddProtagonistLine("Protagonista", ProtagonistColor, "Tudo bem?");
 
             Assert.IsTrue(_log.Entries[2].ShowsName);
@@ -187,7 +177,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ChosenOptionAfterAThought_ShowsTheName()
         {
-            _log.AddThought("Que dia.", ThoughtColor);
+            _log.AddThought("Que dia.");
             _log.AddProtagonistLine("Protagonista", ProtagonistColor, "Sim");
 
             Assert.IsTrue(_log.Entries[1].ShowsName);
@@ -196,8 +186,8 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ThoughtNeverShowsAName_EvenAfterAnotherThought()
         {
-            _log.AddThought("Que dia.", ThoughtColor);
-            _log.AddThought("Que calor.", ThoughtColor);
+            _log.AddThought("Que dia.");
+            _log.AddThought("Que calor.");
 
             Assert.IsFalse(_log.Entries[0].ShowsName);
             Assert.IsFalse(_log.Entries[1].ShowsName);

@@ -15,7 +15,7 @@ A entrega original (uma pasta com os arquivos abaixo) chegou fora do repositóri
 | As 3 telas montadas (menu, diálogo com escolhas, histórico aberto) | `docs/arte/interface/referencia_cena01_menu_4k.png`, `referencia_cena02_dialogo_escolhas_4k.png`, `referencia_cena03_historico_4k.png` |
 | As 3 referências de horror (diálogo no nível 2, menu no nível 4, componentes por nível) | `docs/arte/interface/horror_*.png` |
 | Fontes Atkinson Hyperlegible Next e Cinzel, com as licenças | `Assets/Fonts/AtkinsonHyperlegibleNext/` e `Assets/Fonts/Cinzel/` (#113) |
-| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: os quatro `escolha_*` já estão em `Assets/UI/` (#114); #115 (histórico) e #116 (menu) ainda não |
+| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: os quatro `escolha_*` já estão em `Assets/UI/` (#114), assim como os dez da #115 (`pilula_*`, `icone_folhinha`, `icone_fechar`, `painel_historico`, `rolagem_trilho`, `rolagem_alca` e `balao_branco_9slice`); os da #116 (menu) ainda não |
 | 9 sprites de horror, Special Elite e VT323 | entram com a issue da camada de horror (#117) |
 
 Até lá, os sprites e as fontes de horror ficam só na cópia local do programador.
@@ -155,11 +155,15 @@ Mesmo sprite para os dois (pílula 460×164 em 4K = 230×82 em 1080p; corpo 150 
 | Área de rolagem (`Scroll`) | — | 2440×1530 (1220×765) | — | (680, 390) → (340, 195) |
 | Trilho da barra | `rolagem_trilho.png` | 16×1500 (8×750) | 8 cima/baixo | x 3150 (1575) |
 | Alça da barra | `rolagem_alca.png` | 16×420 (8×210) | 8 cima/baixo | — |
-| Balão | `balao_branco_9slice.png` (branco, para o `Image.color` pintar) | 200×200 | **48** em todos (= 24 em 1080p, igual ao `ChatBubble.svg` atual) | — |
+| Balão | `balao_branco_9slice.png` (branco, para o `Image.color` pintar) | 200×200 | **48** em todos (= 24 em 1080p, igual ao antigo `ChatBubble.svg`, removido na #115) | — |
 
-Balões, como o código já faz: personagem à esquerda na `Name Color`, protagonista à direita, narração e item no centro no `neutralBubbleColor` (`#24111F` 82%) com contorno `#FFF0FB` 18% opcional. Padding do balão 56/56/32/32 em 4K = 28/28/16/16 (igual ao atual). Espaçamento entre balões 32 (16).
+Balões, como o código já faz: personagem à esquerda na `Name Color`, protagonista à direita, narração e item no centro no `neutralBubbleColor` com contorno `#FFF0FB` 18%. **No projeto (#115)** o neutro é `#2E1827` **opaco** (não `#24111F` 82%, que a referência não mostra e que deixaria o contorno aparecer através do balão), o pensamento é `#3E2641` opaco, e os dois levam o contorno. Padding do balão 56/56/32/32 em 4K = 28/28/16/16 (igual ao atual). Espaçamento entre balões 32 (16).
 
-O painel ficou um pouco maior que o `Scroll` atual para caber o título e a aba Fechar; se preferir manter 1240×860, é só encolher o painel (o 9-slice aguenta).
+O painel ficou um pouco maior que o `Scroll` atual para caber o título e a aba Fechar. **Correção da #115:** não encolha o painel para 1240×860. O 9-slice só preserva a arte no tamanho nativo (1320×927 em 1080p): a estrela do título (x 112–172 do PNG) atravessa a borda esquerda de 80, e os três pontinhos do canto de baixo atravessam a borda de baixo, então os dois se deformam fora do tamanho nativo.
+
+**A estrela do título já está desenhada no `painel_historico.png`**, junto com a faixa clara do título e os pontinhos: o `Title` do projeto é só o texto "HISTÓRICO", e o `icone_estrela.png` não é usado nesta tela.
+
+**Outra correção da #115:** a altura preferida de uma `Image` fatiada é a soma das bordas **sem** o multiplicador (96 com a borda 48 do balão), e isso vira piso de altura do balão no layout (balões de uma linha ficaram ~18 px mais altos que a referência). No projeto a `Image` do balão fica num filho `Background` que ignora o layout.
 
 ## 6. Menu principal (`Menu.unity`, `MenuButtonUI`)
 

@@ -25,23 +25,25 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O conteúdo da área de rolagem, onde os balões são criados, com um Vertical Layout Group. Vazio: o histórico não abre e o console avisa.")]
         [SerializeField] private RectTransform content;
 
-        [Tooltip("Modelo de um balão, desligado, dentro do conteúdo: uma linha com Horizontal Layout Group, e dentro dela o balão com Image, " +
-                 "Vertical Layout Group e Layout Element, e o texto. Os balões são cópias dele. Vazio ou incompleto: o histórico não abre e o console avisa.")]
+        [Tooltip("Modelo de um balão, desligado, dentro do conteúdo: uma linha com Horizontal Layout Group, e dentro dela o balão (Bubble) com " +
+                 "Vertical Layout Group e Layout Element, o texto, e um filho Background esticado com Layout Element em Ignore Layout, a Image e o Outline. " +
+                 "Os balões são cópias dele. Vazio ou incompleto: o histórico não abre e o console avisa.")]
         [SerializeField] private RectTransform bubbleTemplate;
 
         [Tooltip("Botão que fecha o histórico. Vazio: não há como fechar o histórico, e o console avisa.")]
         [SerializeField] private Button closeButton;
 
         [Header("Balões")]
-        [Tooltip("Cor do balão de narração e de item (uma cor translúcida e escura combina com a caixa de diálogo). " +
-                 "O balão de um personagem usa a Name Color dele. É também a base do balão do pensamento do protagonista, tingido pela cor de pensamento: " +
-                 "uma cor clara aqui tira o contraste do texto do pensamento.")]
-        [SerializeField] private Color neutralBubbleColor = new Color32(0x24, 0x11, 0x1F, 0xD1);
+        [Tooltip("Cor do balão de narração e de item. Opaca e escura: o contorno é desenhado por baixo do balão e apareceria através de uma cor translúcida, " +
+                 "e a cena clara atrás do painel tiraria o contraste do texto. O balão de um personagem usa a Name Color dele.")]
+        [SerializeField] private Color neutralBubbleColor = new Color32(0x2E, 0x18, 0x27, 0xFF);
 
-        [Tooltip("Quanto a cor de pensamento do Dialogue UI Controller tinge o balão do pensamento do protagonista, que parte da cor do balão neutro " +
-                 "(0 = igual ao neutro, 1 = a cor de pensamento). Acima de 0,3 o texto perde contraste com o balão (abaixo de ~5:1 sobre uma cena branca).")]
-        [Range(0.05f, 0.3f)]
-        [SerializeField] private float thoughtBubbleTint = 0.2f;
+        [Tooltip("Cor do balão do pensamento do protagonista: escura e opaca, com o texto claro em itálico. A mesma regra do balão neutro vale aqui.")]
+        [SerializeField] private Color thoughtBubbleColor = new Color32(0x3E, 0x26, 0x41, 0xFF);
+
+        [Tooltip("Contorno claro dos balões de narração, item e pensamento, misturado à cor do balão na proporção do alfa (0,18 de partida). " +
+                 "Os balões de personagem não têm contorno. Sem componente Outline no modelo do balão, os balões escuros ficam sem contorno.")]
+        [SerializeField] private Color bubbleOutlineColor = new Color(1f, 0.941f, 0.984f, 0.18f);
 
         [Tooltip("Largura máxima de um balão, como fração da largura do conteúdo. Um texto maior quebra em linhas.")]
         [Range(0.3f, 1f)]
@@ -133,7 +135,8 @@ namespace ProjetoVN.Dialogue.UI
 
             row.Layout.childAlignment = AlignmentOf(entry);
             row.Background.color = bubbleColor;
-            row.Text.color = TextColorOf(entry, bubbleColor);
+            ShowOutline(row, entry, bubbleColor);
+            row.Text.color = BubbleTextColor.For(bubbleColor);
             row.Text.fontSize = entry.Kind == ConversationEntryKind.Item ? itemFontSize : row.SpeechFontSize;
             row.Text.fontStyle = IsItalic(entry) ? FontStyles.Italic : FontStyles.Normal;
             row.Text.text = TextOf(entry);
@@ -144,21 +147,26 @@ namespace ProjetoVN.Dialogue.UI
         private Color BubbleColorOf(ConversationEntry entry)
         {
             if (entry.Kind == ConversationEntryKind.Speech) return entry.SpeakerColor;
-            if (entry.Kind == ConversationEntryKind.Thought) return TintedNeutralBubble(entry.SpeakerColor);
+            if (entry.Kind == ConversationEntryKind.Thought) return thoughtBubbleColor;
 
             return neutralBubbleColor;
         }
 
-        // Tingir o balão neutro, que é escuro, e não deixá-lo transparente: a transparência deixava a cena clara aparecer atrás do texto.
-        private Color TintedNeutralBubble(Color tint)
+        // O Outline desenha cópias por baixo do balão e a linha é reaproveitada (D-11): é reatribuído a cada fala, para um balão de personagem não herdar o contorno de uma narração.
+        private void ShowOutline(BubbleRow row, ConversationEntry entry, Color bubbleColor)
         {
-            Color tintWithNeutralAlpha = new Color(tint.r, tint.g, tint.b, neutralBubbleColor.a);
+            if (row.Outline == null) return;
 
-            return Color.Lerp(neutralBubbleColor, tintWithNeutralAlpha, thoughtBubbleTint);
+            row.Outline.enabled = entry.Kind != ConversationEntryKind.Speech;
+            row.Outline.effectColor = OutlineColorOf(bubbleColor);
         }
 
-        private static Color TextColorOf(ConversationEntry entry, Color bubbleColor) =>
-            entry.Kind == ConversationEntryKind.Thought ? entry.SpeakerColor : BubbleTextColor.For(bubbleColor);
+        private Color OutlineColorOf(Color bubbleColor)
+        {
+            var opaqueOutline = new Color(bubbleOutlineColor.r, bubbleOutlineColor.g, bubbleOutlineColor.b, 1f);
+
+            return Color.Lerp(bubbleColor, opaqueOutline, bubbleOutlineColor.a);
+        }
 
         private static bool IsItalic(ConversationEntry entry) =>
             entry.Kind == ConversationEntryKind.Narration || entry.Kind == ConversationEntryKind.Thought;
@@ -210,25 +218,50 @@ namespace ProjetoVN.Dialogue.UI
             return false;
         }
 
-        private bool TemplateIsComplete() =>
-            bubbleTemplate != null
-            && bubbleTemplate.GetComponent<HorizontalLayoutGroup>() != null
-            && bubbleTemplate.GetComponentInChildren<Image>(true) != null
-            && bubbleTemplate.GetComponentInChildren<VerticalLayoutGroup>(true) != null
-            && bubbleTemplate.GetComponentInChildren<LayoutElement>(true) != null
-            && bubbleTemplate.GetComponentInChildren<TMP_Text>(true) != null;
+        private bool TemplateIsComplete()
+        {
+            if (bubbleTemplate == null) return false;
+
+            var bubbleLayout = bubbleTemplate.GetComponentInChildren<VerticalLayoutGroup>(true);
+
+            return bubbleTemplate.GetComponent<HorizontalLayoutGroup>() != null
+                   && bubbleLayout != null
+                   && bubbleLayout.GetComponent<LayoutElement>() != null
+                   && bubbleTemplate.GetComponentInChildren<Image>(true) != null
+                   && bubbleTemplate.GetComponentInChildren<TMP_Text>(true) != null;
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
             if (scrollRect == null || content == null || !TemplateIsComplete())
-                Debug.LogWarning("[DialogueHistoryView] Scroll Rect, Content e Bubble Template precisam estar atribuídos, e o modelo precisa ter Horizontal Layout Group na raiz e, dentro, Image, Vertical Layout Group, Layout Element e TMP_Text: sem isso o histórico não abre.", this);
+                Debug.LogWarning("[DialogueHistoryView] Scroll Rect, Content e Bubble Template precisam estar atribuídos, e o modelo precisa ter Horizontal Layout Group na raiz e, dentro, o balão com Vertical Layout Group e Layout Element (no mesmo objeto), o TMP_Text e uma Image (no filho Background, esticado, com Layout Element em Ignore Layout): sem isso o histórico não abre.", this);
+
+            WarnAboutDarkBubbleColors();
 
             if (closeButton == null)
                 Debug.LogWarning("[DialogueHistoryView] Close Button está vazio: não há como fechar o histórico.", this);
 
             if (!gameObject.activeSelf)
                 Debug.LogWarning("[DialogueHistoryView] O objeto do painel está desligado: o histórico não abre. Deixe-o ativo; o painel se esconde sozinho (Canvas desligado).", this);
+        }
+
+        private void WarnAboutDarkBubbleColors()
+        {
+            WarnAboutDarkBubbleColor(neutralBubbleColor, "Neutral Bubble Color");
+            WarnAboutDarkBubbleColor(thoughtBubbleColor, "Thought Bubble Color");
+
+            if (bubbleTemplate != null && bubbleTemplate.GetComponentInChildren<Outline>(true) == null)
+                Debug.LogWarning("[DialogueHistoryView] O modelo do balão não tem um componente Outline: os balões de narração, item e pensamento ficam sem contorno.", this);
+        }
+
+        private void WarnAboutDarkBubbleColor(Color color, string fieldName)
+        {
+            if (color.a < 1f)
+                Debug.LogWarning($"[DialogueHistoryView] {fieldName} tem alfa menor que 1: o contorno apareceria através do balão. Use alfa 255.", this);
+
+            if (!BubbleTextColor.IsReadable(color))
+                Debug.LogWarning($"[DialogueHistoryView] {fieldName} não tem contraste de 4,5:1 com nenhuma cor de texto: o texto do balão não fica legível.", this);
         }
 #endif
 
@@ -240,10 +273,12 @@ namespace ProjetoVN.Dialogue.UI
                 GameObject = instance.gameObject;
                 Layout = instance.GetComponent<HorizontalLayoutGroup>();
                 Background = instance.GetComponentInChildren<Image>(true);
-                Size = instance.GetComponentInChildren<LayoutElement>(true);
+                var bubbleLayout = instance.GetComponentInChildren<VerticalLayoutGroup>(true);
+                Size = bubbleLayout.GetComponent<LayoutElement>();
                 Text = instance.GetComponentInChildren<TMP_Text>(true);
+                Outline = instance.GetComponentInChildren<Outline>(true);
                 SpeechFontSize = Text.fontSize;
-                HorizontalPadding = instance.GetComponentInChildren<VerticalLayoutGroup>(true).padding.horizontal;
+                HorizontalPadding = bubbleLayout.padding.horizontal;
             }
 
             public GameObject GameObject { get; }
@@ -251,6 +286,7 @@ namespace ProjetoVN.Dialogue.UI
             public Image Background { get; }
             public LayoutElement Size { get; }
             public TMP_Text Text { get; }
+            public Outline Outline { get; }
             public float SpeechFontSize { get; }
             public float HorizontalPadding { get; }
         }

@@ -8,6 +8,7 @@ using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.Dialogue.Messaging;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Yarn.Unity;
@@ -61,6 +62,10 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("Botão da caixa de diálogo que abre o histórico, desabilitado enquanto a fala é revelada. Vazio: o jogador não consegue abrir o histórico.")]
         [SerializeField] private Button openHistoryButton;
 
+        [Tooltip("Avisado com o novo valor de 'interactable' do botão Histórico, a cada fala: ligue aqui o componente que redesenha o botão, " +
+                 "como o MenuButtonUI.SetInteractable (dinâmico). Vazio: o botão desabilita e habilita, mas o texto e o ícone podem ficar na cor do estado anterior.")]
+        [SerializeField] private UnityEvent<bool> onHistoryButtonInteractableChanged;
+
         [Tooltip("O painel do histórico, desenhado por cima da caixa e das opções. Vazio: o jogador não consegue abrir o histórico.")]
         [SerializeField] private DialogueHistoryView historyView;
 
@@ -69,8 +74,8 @@ namespace ProjetoVN.Dialogue.UI
         [SerializeField] private ProtagonistNameSheet protagonistNameSheet;
 
         [Header("Pensamento")]
-        [Tooltip("Cor do texto do pensamento do protagonista (Pensamento: no roteiro), na caixa e no histórico. O pensamento aparece também em itálico, " +
-                 "sem placa de nome. Uma cor clara: o texto precisa de contraste com a caixa e com o balão do histórico.")]
+        [Tooltip("Cor do texto do pensamento do protagonista (Pensamento: no roteiro) na caixa de diálogo. O pensamento aparece também em itálico, " +
+                 "sem placa de nome. Uma cor clara: o texto precisa de contraste com a caixa. O histórico não usa esta cor: o balão do pensamento tem a própria (Thought Bubble Color).")]
         [SerializeField] private Color thoughtColor = new Color32(0xC9, 0xDC, 0xFF, 0xFF);
 
         [Header("Revelação do texto")]
@@ -177,6 +182,7 @@ namespace ProjetoVN.Dialogue.UI
         {
             IsRevealingLine = isRevealing;
             if (openHistoryButton != null) openHistoryButton.interactable = !isRevealing;
+            onHistoryButtonInteractableChanged?.Invoke(!isRevealing);
         }
 
         public override async YarnTask<DialogueOption> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken token)
@@ -285,7 +291,7 @@ namespace ProjetoVN.Dialogue.UI
             if (isThought)
             {
                 speakerNameText.text = "";
-                _history.AddThought(text, thoughtColor);
+                _history.AddThought(text);
                 DimStage();
                 return;
             }
@@ -506,9 +512,6 @@ namespace ProjetoVN.Dialogue.UI
 
             if (openHistoryButton == null || historyView == null)
                 Debug.LogWarning("[DialogueUIController] Open History Button e History View estão vazios: o jogador não consegue abrir o histórico.", this);
-
-            if (thoughtColor.a < 1f)
-                Debug.LogWarning("[DialogueUIController] Thought Color tem alfa menor que 1: o pensamento ficaria translúcido na caixa e opaco no histórico. Use alfa 255.", this);
 
             if (choiceButtonObjects == null || choiceButtonObjects.Length == 0)
                 Debug.LogWarning("[DialogueUIController] Choice Button Objects está vazio: as escolhas não aparecem.", this);
