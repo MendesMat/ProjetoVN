@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 251 75">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: rgba(255, 242, 251, .82);
+        stroke-width: 4px;
+      }
+
+      .cls-2 {
+        fill: rgba(216, 148, 196, .34);
+      }
+
+      .cls-3 {
+        fill: #2a1025;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g id="nameplate_Speaker" data-name="nameplate / Speaker">
+      <path class="cls-3" d="M37.5,0h176a37.5,37.5,0,0,1,0,75H37.5a37.5,37.5,0,0,1,0-75Z"/>
+      <path class="cls-2" d="M37.5,0h176a37.5,37.5,0,0,1,0,75H37.5a37.5,37.5,0,0,1,0-75Z"/>
+      <path class="cls-1" d="M37.5,2h176a35.5,35.5,0,0,1,0,71H37.5a35.5,35.5,0,0,1,0-71Z"/>
+    </g>
+  </g>
+</svg>

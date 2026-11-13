@@ -95,9 +95,10 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Scenes/[Fatia] Onibus.unity`, `[Fatia] Posto.unity` | As duas salas provisórias da fatia vertical; o Novo Jogo começa no ônibus |
+| `Assets/Fonts/<família>/` | Fontes `.ttf`, licenças e font assets do TextMeshPro (atlas dinâmico; Atkinson Hyperlegible Next e Cinzel) |
 | `Assets/Prefabs/Resources/Managers.prefab` | Managers persistentes |
 | `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Ambiente/` e `Efeitos/` (a pasta `Musica/` nasce com a primeira música definitiva; as músicas de teste, `teste_musica_a` e `teste_musica_b`, ficam em `Assets/_Tests/Audio/`) |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
-| `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte |
+| `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte e `docs/arte/interface/` o guia da interface nova, o da camada de horror e as referências em 4K |
 | `.claude/skills/` | Os três comandos de trabalho |
 | `.github/` | Modelos de issue e de PR |
