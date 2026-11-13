@@ -25,8 +25,9 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O conteúdo da área de rolagem, onde os balões são criados, com um Vertical Layout Group. Vazio: o histórico não abre e o console avisa.")]
         [SerializeField] private RectTransform content;
 
-        [Tooltip("Modelo de um balão, desligado, dentro do conteúdo: uma linha com Horizontal Layout Group, e dentro dela o balão com Image, " +
-                 "Vertical Layout Group e Layout Element, e o texto. Os balões são cópias dele. Vazio ou incompleto: o histórico não abre e o console avisa.")]
+        [Tooltip("Modelo de um balão, desligado, dentro do conteúdo: uma linha com Horizontal Layout Group, e dentro dela o balão (Bubble) com " +
+                 "Vertical Layout Group e Layout Element, o texto, e um filho Background esticado com Layout Element em Ignore Layout, a Image e o Outline. " +
+                 "Os balões são cópias dele. Vazio ou incompleto: o histórico não abre e o console avisa.")]
         [SerializeField] private RectTransform bubbleTemplate;
 
         [Tooltip("Botão que fecha o histórico. Vazio: não há como fechar o histórico, e o console avisa.")]
@@ -157,7 +158,14 @@ namespace ProjetoVN.Dialogue.UI
             if (row.Outline == null) return;
 
             row.Outline.enabled = entry.Kind != ConversationEntryKind.Speech;
-            row.Outline.effectColor = Color.Lerp(bubbleColor, new Color(bubbleOutlineColor.r, bubbleOutlineColor.g, bubbleOutlineColor.b, 1f), bubbleOutlineColor.a);
+            row.Outline.effectColor = OutlineColorOf(bubbleColor);
+        }
+
+        private Color OutlineColorOf(Color bubbleColor)
+        {
+            var opaqueOutline = new Color(bubbleOutlineColor.r, bubbleOutlineColor.g, bubbleOutlineColor.b, 1f);
+
+            return Color.Lerp(bubbleColor, opaqueOutline, bubbleOutlineColor.a);
         }
 
         private static bool IsItalic(ConversationEntry entry) =>
@@ -210,19 +218,24 @@ namespace ProjetoVN.Dialogue.UI
             return false;
         }
 
-        private bool TemplateIsComplete() =>
-            bubbleTemplate != null
-            && bubbleTemplate.GetComponent<HorizontalLayoutGroup>() != null
-            && bubbleTemplate.GetComponentInChildren<Image>(true) != null
-            && bubbleTemplate.GetComponentInChildren<VerticalLayoutGroup>(true) != null
-            && bubbleTemplate.GetComponentInChildren<LayoutElement>(true) != null
-            && bubbleTemplate.GetComponentInChildren<TMP_Text>(true) != null;
+        private bool TemplateIsComplete()
+        {
+            if (bubbleTemplate == null) return false;
+
+            var bubbleLayout = bubbleTemplate.GetComponentInChildren<VerticalLayoutGroup>(true);
+
+            return bubbleTemplate.GetComponent<HorizontalLayoutGroup>() != null
+                   && bubbleLayout != null
+                   && bubbleLayout.GetComponent<LayoutElement>() != null
+                   && bubbleTemplate.GetComponentInChildren<Image>(true) != null
+                   && bubbleTemplate.GetComponentInChildren<TMP_Text>(true) != null;
+        }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
             if (scrollRect == null || content == null || !TemplateIsComplete())
-                Debug.LogWarning("[DialogueHistoryView] Scroll Rect, Content e Bubble Template precisam estar atribuídos, e o modelo precisa ter Horizontal Layout Group na raiz e, dentro, Image, Vertical Layout Group, Layout Element e TMP_Text: sem isso o histórico não abre.", this);
+                Debug.LogWarning("[DialogueHistoryView] Scroll Rect, Content e Bubble Template precisam estar atribuídos, e o modelo precisa ter Horizontal Layout Group na raiz e, dentro, o balão com Vertical Layout Group e Layout Element (no mesmo objeto), o TMP_Text e uma Image (no filho Background, esticado, com Layout Element em Ignore Layout): sem isso o histórico não abre.", this);
 
             WarnAboutDarkBubbleColors();
 
@@ -260,11 +273,12 @@ namespace ProjetoVN.Dialogue.UI
                 GameObject = instance.gameObject;
                 Layout = instance.GetComponent<HorizontalLayoutGroup>();
                 Background = instance.GetComponentInChildren<Image>(true);
-                Size = instance.GetComponentInChildren<LayoutElement>(true);
+                var bubbleLayout = instance.GetComponentInChildren<VerticalLayoutGroup>(true);
+                Size = bubbleLayout.GetComponent<LayoutElement>();
                 Text = instance.GetComponentInChildren<TMP_Text>(true);
                 Outline = instance.GetComponentInChildren<Outline>(true);
                 SpeechFontSize = Text.fontSize;
-                HorizontalPadding = instance.GetComponentInChildren<VerticalLayoutGroup>(true).padding.horizontal;
+                HorizontalPadding = bubbleLayout.padding.horizontal;
             }
 
             public GameObject GameObject { get; }
