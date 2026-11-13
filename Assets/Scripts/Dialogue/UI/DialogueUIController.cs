@@ -198,6 +198,7 @@ namespace ProjetoVN.Dialogue.UI
             if (this == null) return null;
 
             _selection = null;
+            ClearSelectionInsideDialogue();
             dialogueChoices.SetActive(false);
             return chosen;
         }
@@ -466,7 +467,7 @@ namespace ProjetoVN.Dialogue.UI
             DrawStage();
         }
 
-        // A opção clicada continua selecionada, escondida, até o fim da conversa; uma seleção de fora (o menu) não é dela.
+        // Ao fechar as opções e ao fim da conversa: o bloco seguinte abre sem destaque. Uma seleção de fora (o menu) não é dela.
         private void ClearSelectionInsideDialogue()
         {
             EventSystem eventSystem = EventSystem.current;
