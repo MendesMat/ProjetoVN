@@ -155,7 +155,7 @@ Mesmo sprite para os dois (pílula 460×164 em 4K = 230×82 em 1080p; corpo 150 
 | Área de rolagem (`Scroll`) | — | 2440×1530 (1220×765) | — | (680, 390) → (340, 195) |
 | Trilho da barra | `rolagem_trilho.png` | 16×1500 (8×750) | 8 cima/baixo | x 3150 (1575) |
 | Alça da barra | `rolagem_alca.png` | 16×420 (8×210) | 8 cima/baixo | — |
-| Balão | `balao_branco_9slice.png` (branco, para o `Image.color` pintar) | 200×200 | **48** em todos (= 24 em 1080p, igual ao `ChatBubble.svg` atual) | — |
+| Balão | `balao_branco_9slice.png` (branco, para o `Image.color` pintar) | 200×200 | **48** em todos (= 24 em 1080p, igual ao antigo `ChatBubble.svg`, removido na #115) | — |
 
 Balões, como o código já faz: personagem à esquerda na `Name Color`, protagonista à direita, narração e item no centro no `neutralBubbleColor` com contorno `#FFF0FB` 18%. **No projeto (#115)** o neutro é `#2E1827` **opaco** (não `#24111F` 82%, que a referência não mostra e que deixaria o contorno aparecer através do balão), o pensamento é `#3E2641` opaco, e os dois levam o contorno. Padding do balão 56/56/32/32 em 4K = 28/28/16/16 (igual ao atual). Espaçamento entre balões 32 (16).
 
