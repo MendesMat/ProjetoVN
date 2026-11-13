@@ -25,6 +25,7 @@ M0 Fundação
                 ├─► M4 Ciclo de jogo ─┐
                 └─► M5 Áudio ─────────┴─► M6 Fatia vertical
                                                └─► M7 Interface nova
+                                                    └─► M8 Acabamento
 ```
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
@@ -41,6 +42,12 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 - **A interface nova (M7) vem depois da fatia vertical** porque troca a arte provisória da interface pela entrega da arte e não muda nenhum sistema. A posição e a organização da interface seguem a arte. A #113 vem primeiro porque leva a entrega para o repositório (ela está em `Adicionar/`, fora do git) e cria as fontes que as outras usam. A #114 vem antes da #115 porque o componente que muda a cor do texto por estado nasce nos botões de escolha e o histórico o reaproveita. O menu (#116) fecha a milestone. A camada de horror (#117) fica no backlog até um roteiro pedir (D-27). Priorizadas pelo programador em 2026-11-09.
+- **O acabamento (M8) vem depois da interface nova** porque, com as milestones fechadas, o backlog ficou só com achados das revisões. Eles foram conferidos contra a `main` na triagem de 2026-11-13: os que tinham ficado datados foram fechados, e os pequenos foram juntados na #124 (só documentação) e na #125 (acabamentos de código e README). A M8 limpa a casa antes de o conteúdo crescer: corrige o que a fatia vertical mostra de errado e o que custa tempo a cada sessão.
+  - **A #124 abre a milestone** porque corrige receitas que as sessões seguintes usam (o Esc da pausa, o kerning que a build grava, o mouse na build por script).
+  - **A #36 e a #125 vêm em seguida** por serem pequenas e sem decisão pendente.
+  - **A #108 vem antes da #107 e da #52:** ela corrige os limites do pan que o passo a passo de `salas.md` manda copiar, e a #107 percorre esse passo a passo; a #52 valida `minX` < `maxX` no mesmo componente.
+  - **As que dependem de uma decisão do programador** (a #56, sobre a cor do nome, e a #31, sobre o teste do `OnValidate`) vão para o levantamento como qualquer outra; o levantamento faz a pergunta.
+  - **Ficam fora da M8:** a #89 (save sem risco de arquivo pela metade) e a #109 (build de entrega), que só importam antes do primeiro lançamento e ficam para a milestone que preparar a entrega; a #71 (fade e cenário de tela cheia pelo roteiro), que é funcionalidade nova e pede arte; e a #117 (camada de horror), até um roteiro pedir (D-27).
 
 ## M0 — Fundação
 
@@ -123,6 +130,37 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #114 | Botões de escolha com a arte nova | #113 |
 | #115 | Botão Histórico e painel do histórico com a arte nova | #113, #114 |
 | #116 | Menu principal com a arte nova | #113 |
+
+## M8 — Acabamento
+
+Correções e dívida que as revisões deixaram, antes de o conteúdo crescer. Nenhuma mecânica nova.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #124 | Documentação dos agentes: armadilhas pendentes do unity-cli.md e do roteiro de ponta a ponta | — |
+| #36 | Managers com Instance estático não seguem a D-29 (reset em SubsystemRegistration) | — |
+| #125 | Acabamentos das revisões: mensagens, tooltip, README do Dialogue e struct repetido no Editor | — |
+| #108 | O pan da [Teste] Mecanicas e da [Fatia] Posto passa do fundo, e o guia não diz como calcular os limites | — |
+| #107 | Percorrer no Inspector o passo a passo de salas.md da fatia vertical | #108 |
+| #52 | Campos do Inspector sem tooltip (regra 8) | #108 |
+| #96 | Navegação por teclado pousa em botão desabilitado, sem destaque (menu principal e pausa) | — |
+| #56 | Nome colorido na placa de nome é difícil de ler | — |
+| #105 | Testes de sala quebram sem mensagem com duas cenas de mesmo nome no build | — |
+| #34 | Um .yarn novo não entra no Roteiro.yarnproject sem reimportar o projeto | — |
+| #37 | Comando de roteiro com número errado de parâmetros trava a conversa | — |
+| #35 | Comandos de trabalho trocam de branch com o Editor aberto, contra a armadilha dos pacotes | — |
+| #31 | Decidir se StoryVariableNameCheck precisa de teste (D-24) | — |
+
+## Backlog sem milestone
+
+Issues com `triagem` que ficam fora da sequência até o programador priorizá-las:
+
+| Issue | Título | Espera |
+|---|---|---|
+| #89 | Gravar o save sem risco de deixar o arquivo pela metade | a milestone que preparar a primeira entrega |
+| #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | a milestone que preparar a primeira entrega |
+| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | priorização; pede arte provisória |
+| #117 | Camada de horror da interface (quando o roteiro pedir) | um roteiro que a peça (D-27) |
 
 ## Riscos conhecidos
 
