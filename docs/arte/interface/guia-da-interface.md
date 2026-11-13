@@ -15,7 +15,7 @@ A entrega original (uma pasta com os arquivos abaixo) chegou fora do repositóri
 | As 3 telas montadas (menu, diálogo com escolhas, histórico aberto) | `docs/arte/interface/referencia_cena01_menu_4k.png`, `referencia_cena02_dialogo_escolhas_4k.png`, `referencia_cena03_historico_4k.png` |
 | As 3 referências de horror (diálogo no nível 2, menu no nível 4, componentes por nível) | `docs/arte/interface/horror_*.png` |
 | Fontes Atkinson Hyperlegible Next e Cinzel, com as licenças | `Assets/Fonts/AtkinsonHyperlegibleNext/` e `Assets/Fonts/Cinzel/` (#113) |
-| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: os quatro `escolha_*` já estão em `Assets/UI/` (#114), assim como os dez da #115 (`pilula_*`, `icone_folhinha`, `icone_fechar`, `painel_historico`, `rolagem_trilho`, `rolagem_alca` e `balao_branco_9slice`); os da #116 (menu) ainda não |
+| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: os quatro `escolha_*` já estão em `Assets/UI/` (#114), assim como os dez da #115 (`pilula_*`, `icone_folhinha`, `icone_fechar`, `painel_historico`, `rolagem_trilho`, `rolagem_alca` e `balao_branco_9slice`); os quatro da #116 (`fundo_menu_provisorio`, `logo_noturna_menu`, `menu_ornamento_lua` e `menu_sublinhado`) também; sobram em `Adicionar/` os de horror e os ainda sem tela |
 | 9 sprites de horror, Special Elite e VT323 | entram com a issue da camada de horror (#117) |
 
 Até lá, os sprites e as fontes de horror ficam só na cópia local do programador.
@@ -73,7 +73,8 @@ Até lá, os sprites e as fontes de horror ficam só na cópia local do programa
 | `DialogueHistory` fundo preto 85% | continua; por cima entra o `painel_historico.png` |
 | `Scrollbar` (cores chapadas) | `rolagem_trilho` e `rolagem_alca` (mesmas cores, agora com cantos) |
 | `choiceButtonObjects[0..3]` | `escolha_*` via Sprite Swap |
-| botões do `Menu.unity` (`MenuButtonUI`) | texto Cinzel + `decorateImage` = `menu_ornamento_lua` + `menu_sublinhado` |
+| botões do `Menu.unity` (`MenuButtonUI`) | texto Cinzel + `decorateImage` = objeto `Highlight` com `menu_ornamento_lua` + `menu_sublinhado` (#116) |
+| `Title Wallpaper B` e o logo de outro jogo no `Title Window` | `fundo_menu_provisorio` no `Canvas`, atrás das janelas, e `logo_noturna_menu` (#116) |
 
 ## 1. Fontes (todas gratuitas para uso comercial)
 
@@ -171,7 +172,7 @@ O painel ficou um pouco maior que o `Scroll` atual para caber o título e a aba 
 |---|---|---|
 | Fundo provisório | `fundo_menu_provisorio.png` 3840×2160 | tela cheia |
 | Logo | `logo_noturna_menu.png` 1760×487 (880×244) | (240, 250) → (120, 125) |
-| Coluna de botões | Novo Jogo · Continuar · Opções · Sair | x 300 (150), y 980 (490), espaçamento 36 (18) |
+| Coluna de botões | Novo Jogo · Continuar · Opções · Sair | **x 300 (150) é a borda da lua**; o texto começa em 396 (198). Topo das maiúsculas em y 1004, 1188, 1372 e 1556 (502, 594, 686, 778): **passo de 92** por item (botão de 74 + espaçamento 18) |
 | Versão | Atkinson Regular 40 (20), `#FFF3FB` 45% | (300, 2010) → (150, 1005) |
 
 **Cada item (`MenuButtonUI`):**
@@ -180,7 +181,8 @@ O painel ficou um pouco maior que o `Scroll` atual para caber o título e a aba 
 - `normalTextColor` `#FFF3FB` a 92% · `highlightedTextColor` `#FFF3FB` · `disabledTextColor` `#FFF3FB` a 32% (Continuar sem save).
 - `decorateImage` = `menu_ornamento_lua.png` (64×64 → 32), à esquerda do texto com 32 (16) de espaço, visível só no hover/seleção.
 - Hover também liga `menu_sublinhado.png` (638×64 → 319×32) logo abaixo do texto.
-- Sombra cel no hover: Underlay do material TMP em `#DE7EB8`, deslocamento 0/−8 em 4K (−4 em 1080p), **softness 0** (sombra dura, sem desfoque).
+- Sombra cel no hover: Underlay do material TMP em `#DE7EB8`, deslocamento 0/−8 em 4K (−4 em 1080p), **softness 0** (sombra dura, sem desfoque). **No projeto (#116)** é o *material preset* `Assets/Fonts/Cinzel/Cinzel Bold SDF - Menu Destaque.mat`, com `_UnderlayOffsetY` −0,87, Dilate 0, Softness 0 e **`_WeightBold = 0`**: com o 0,75 do material padrão do `Cinzel Bold SDF` o teto do underlay é 3,7 px em 46 pt, e os 4 px só saem com `_WeightBold = 0` (ver `unity-cli.md`). O `MenuButtonUI` o troca no destaque pelo campo `highlightedLabelMaterial`.
+- O sublinhado (319×32) tem o topo 44 abaixo do topo das maiúsculas (a linha rosa fica ~58 abaixo) e fica pendurado no texto; a lua é centrada na altura das maiúsculas.
 - Não precisa de sprite de fundo no botão (o `Image` pode ser transparente e servir só de área de clique).
 
 ## 7. Ícones extras
