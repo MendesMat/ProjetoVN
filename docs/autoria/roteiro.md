@@ -340,12 +340,12 @@ Dentro de uma fala o problema não existe: em `Luna: São 10:30, anda logo.`, s�
 
 ### Quanto cabe
 
-O texto que não cabe **vaza para fora da caixa**: não há rolagem, corte nem página nova. Medido no jogo em 1920×1080:
+A fala e o nome que não cabem **vazam para fora da caixa**: não há rolagem, corte nem página nova. A opção é a exceção: fica numa linha só, encolhe um pouco e, se ainda assim não couber, é cortada com "…". Medido no jogo em 1920×1080:
 
 | Onde | Escreva até | O limite real | Acima disso |
 |---|---|---|---|
 | **Fala** (a caixa de texto) | **130 caracteres** | cerca de 170 (3 linhas na tela) | o texto passa da caixa |
-| **Opção** (o botão) | **50 caracteres** | cerca de 55 em duas linhas; 85 em três | o texto passa do botão |
+| **Opção** (o botão) | **35 caracteres** | cerca de 37 no tamanho cheio; até cerca de 45 o texto encolhe sozinho (de 36 para 30 px) | passou de 45, o texto é cortado com "…" (a opção fica numa linha só) |
 | **Nome** (a placa) | **10 letras** | `Fernanda`, `Professora` e `Dona Marta` cabem (a última com folga pequena); `Maria Eduarda` não; seis `W` cabem e sete não | a placa corta e mostra "…" |
 
 A contagem inclui os espaços. Para ter uma ideia do tamanho:
@@ -436,7 +436,7 @@ Luna: O que você achou da escola?
 
 - **O botão mostra o texto em itálico**, e o jogador entende de relance que é um gesto, não uma fala. A etiqueta não aparece. Uma opção bloqueada pela condição também fica em itálico.
 - **No histórico, a opção de ação escolhida aparece no centro, em itálico, como a narração**, e não como balão do protagonista, à direita. A opção sem `#acao` continua sendo fala, do lado direito.
-- **Escreva o texto como o nome do gesto**, curto, como em qualquer botão (cabem cerca de 50 caracteres, veja [Quanto cabe](#quanto-cabe)): `Assinar e sair`, `Pegar a mochila e sair`.
+- **Escreva o texto como o nome do gesto**, curto, como em qualquer botão (escreva até cerca de 35 caracteres, veja [Quanto cabe](#quanto-cabe)): `Assinar e sair`, `Pegar a mochila e sair`.
 - **Um bloco pode misturar falas e ações**, mas cada opção é uma coisa ou outra. Uma opção que é gesto e fala ao mesmo tempo não existe: escolha uma, e ponha a outra logo abaixo da opção (`Protagonista: ...`).
 - **O protagonista entra na tela em destaque** quando o bloco abre, como em qualquer bloco de opções, haja ou não opção de ação.
 - **Com condição, a etiqueta vem depois do `<<if>>`:** `-> Abrir a porta <<if $porta_destrancada>> #acao`. Ao contrário, o editor acusa erro de sintaxe ([Deu erro, e agora?](#deu-erro-e-agora)).
@@ -559,7 +559,7 @@ Luna: Vou ensaiar no auditório. A banda toca na sexta.
     Luna: Pode. Senta no fundo e não bate palma fora de hora.
 ```
 
-- **O jogador vê a opção bloqueada**, esmaecida e sem clique. É de propósito: ele entende que existe um caminho fechado e que as escolhas têm peso.
+- **O jogador vê a opção bloqueada**, com borda tracejada, esmaecida e sem clique. É de propósito: ele entende que existe um caminho fechado e que as escolhas têm peso.
 - Por isso **o texto de uma opção bloqueada não pode entregar o que ela esconde**. "Posso assistir?" funciona; "Contar que eu sei quem roubou a chave" estraga a surpresa.
 - Uma opção bloqueada **conta** para o limite de quatro.
 - Numa [opção de ação](#opção-de-ação), a etiqueta vai **depois** da condição: `-> Abrir a porta <<if $x>> #acao`.

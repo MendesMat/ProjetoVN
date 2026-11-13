@@ -73,7 +73,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Existe (Yarn Spinner, D-17):**
 - Os roteiros são arquivos de texto `.yarn` em `Assets/Roteiro/`, escritos por quem não usa o Unity. Uma cena inicia um diálogo pelo nome de um nó, escolhido numa lista no Inspector; um teste automático acusa gatilho apontando para nó que não existe.
 - Falas em sequência, escolhas (até quatro opções por vez), saltos e desvios entre nós.
-- Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (esmaecida, sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
+- Falas e opções condicionais: uma opção cuja condição é falsa aparece **desabilitada** (com borda tracejada, texto esmaecido e sem clique), para o jogador ver que existe um caminho fechado, e ocupa um dos quatro botões. Um bloco em que nenhuma opção está disponível não é mostrado e a conversa segue pela fala depois dele.
 - **Opção de ação (#65):** uma opção com a etiqueta `#acao` no fim é um gesto do protagonista, não uma fala. O botão mostra o texto em **itálico** (também quando a condição a bloqueia), sem a etiqueta; sem `#acao`, a opção continua sendo fala e o botão não muda. O protagonista entra em destaque ao abrir o bloco, haja ou não opção de ação.
 - As variáveis do roteiro (`$falou_com_luna`) leem e gravam no estado da história.
 - Narração (fala sem nome de personagem) esconde a placa de nome e não traz ninguém para a tela de personagens.
@@ -154,7 +154,6 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Limitações conhecidas:**
 - A expressão `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho ao lado da cabeça, até a arte definitiva chegar.
-- Os personagens passam por baixo das bordas dos botões de opção: a cena de referência da arte não mostra as opções. Resolve-se quando a arte entregar a interface nova, com uma referência de opções abertas.
 - O sprite do lado esquerdo é desenhado por cima do painel de inventário, que fica no canto superior esquerdo. O painel só vai ficar visível em puzzle, e isso será tratado depois.
 - Se um roteiro emendar dois encontros com `<<jump>>` (a Luna se despede e o protagonista fala com um professor), a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Não há comando para tirar alguém de cena.
 
