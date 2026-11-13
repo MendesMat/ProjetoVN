@@ -15,7 +15,7 @@ A entrega original (uma pasta com os arquivos abaixo) chegou fora do repositóri
 | As 3 telas montadas (menu, diálogo com escolhas, histórico aberto) | `docs/arte/interface/referencia_cena01_menu_4k.png`, `referencia_cena02_dialogo_escolhas_4k.png`, `referencia_cena03_historico_4k.png` |
 | As 3 referências de horror (diálogo no nível 2, menu no nível 4, componentes por nível) | `docs/arte/interface/horror_*.png` |
 | Fontes Atkinson Hyperlegible Next e Cinzel, com as licenças | `Assets/Fonts/AtkinsonHyperlegibleNext/` e `Assets/Fonts/Cinzel/` (#113) |
-| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: #114 (escolhas), #115 (histórico), #116 (menu) |
+| 20 sprites da UI normal (`sprites_4k/`), sem texto | entram no repositório com a issue de cada tela: os quatro `escolha_*` já estão em `Assets/UI/` (#114); #115 (histórico) e #116 (menu) ainda não |
 | 9 sprites de horror, Special Elite e VT323 | entram com a issue da camada de horror (#117) |
 
 Até lá, os sprites e as fontes de horror ficam só na cópia local do programador.
