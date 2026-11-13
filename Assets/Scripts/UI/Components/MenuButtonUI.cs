@@ -15,6 +15,10 @@ namespace ProjetoVN.UI.Components
         [Tooltip("Ornamento que aparece só com o botão destacado ou apertado. Vazio: o botão não tem ornamento.")]
         [SerializeField] private GameObject decorateImage;
 
+        [Tooltip("Material do texto com o botão destacado ou apertado (a sombra rosa do menu). Vazio: o texto não troca de material. " +
+                 "Precisa ser um preset do mesmo font asset do texto.")]
+        [SerializeField] private Material highlightedLabelMaterial;
+
         [Header("Colors")]
         [Tooltip("Cor do texto em repouso.")]
         [SerializeField] private Color normalTextColor = Color.white;
@@ -28,12 +32,23 @@ namespace ProjetoVN.UI.Components
         [Tooltip("Cor do texto quando o botão está desabilitado.")]
         [SerializeField] private Color disabledTextColor = Color.gray;
 
+        private Material _defaultLabelMaterial;
+
         protected override void Reset()
         {
             base.Reset();
             if (decorateImage != null)
             {
                 decorateImage.SetActive(false);
+            }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (label != null)
+            {
+                _defaultLabelMaterial = label.fontSharedMaterial;
             }
         }
 
@@ -48,9 +63,11 @@ namespace ProjetoVN.UI.Components
         {
             SelectableVisualState state = VisualState;
             Color color = TextColorOf(state);
+            bool showsHighlight = ShowsHighlight(state);
             if (label != null)
             {
                 label.color = color;
+                RefreshLabelMaterial(showsHighlight);
             }
             if (icon != null)
             {
@@ -58,8 +75,18 @@ namespace ProjetoVN.UI.Components
             }
             if (decorateImage != null)
             {
-                decorateImage.SetActive(state == SelectableVisualState.Highlighted || state == SelectableVisualState.Pressed);
+                decorateImage.SetActive(showsHighlight);
             }
+        }
+
+        private static bool ShowsHighlight(SelectableVisualState state) =>
+            state == SelectableVisualState.Highlighted || state == SelectableVisualState.Pressed;
+
+        private void RefreshLabelMaterial(bool showsHighlight)
+        {
+            if (highlightedLabelMaterial == null || _defaultLabelMaterial == null) return;
+
+            label.fontSharedMaterial = showsHighlight ? highlightedLabelMaterial : _defaultLabelMaterial;
         }
 
         private Color TextColorOf(SelectableVisualState state) => state switch
@@ -75,6 +102,19 @@ namespace ProjetoVN.UI.Components
         {
             if (label == null)
                 Debug.LogWarning($"[MenuButtonUI] '{name}' está sem Label: o texto do botão não muda de cor com o estado.", this);
+
+            if (highlightedLabelMaterial == null) return;
+
+            if (label == null)
+            {
+                Debug.LogWarning($"[MenuButtonUI] '{name}' tem material de destaque, mas está sem Label: o material não é usado.", this);
+                return;
+            }
+
+            bool isFromOtherFont = label.font != null
+                && highlightedLabelMaterial.GetTexture(ShaderUtilities.ID_MainTex) != label.font.atlasTexture;
+            if (isFromOtherFont)
+                Debug.LogWarning($"[MenuButtonUI] '{name}': o material de destaque não é um preset da fonte do texto ('{label.font.name}'), e o texto sairia ilegível.", this);
         }
 #endif
     }
