@@ -25,10 +25,16 @@ M0 Fundação
                 ├─► M4 Ciclo de jogo ─┐
                 └─► M5 Áudio ─────────┴─► M6 Fatia vertical
                                                └─► M7 Interface nova
-                                                    └─► M8 Acabamento
+                                                    └─► M8 Ferramentas e dívida interna
+                                                         └─► M9 Acabamento da fatia ──────────┐
+                                                              └─► M10 Efeitos de roteiro      │
+                                                                   └─► M11 Primeira entrega   │
+                                                                                              └╌► M12 Camada de horror (portão)
 ```
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
+
+A M12 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camada de horror** (D-27). Se o pedido chegar antes de a M11 fechar, ela entra na fila na posição que o programador escolher.
 
 ## Por que esta ordem
 
@@ -42,12 +48,20 @@ M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone po
 - **O ciclo de jogo (M4) vem depois da navegação** porque menu, continuar e save não têm o que carregar sem troca de sala.
 - **O áudio (M5) vem por último entre os sistemas** porque depende de sala (música por sala) e de roteiro (comandos), e nada depende dele.
 - **A interface nova (M7) vem depois da fatia vertical** porque troca a arte provisória da interface pela entrega da arte e não muda nenhum sistema. A posição e a organização da interface seguem a arte. A #113 vem primeiro porque leva a entrega para o repositório (ela está em `Adicionar/`, fora do git) e cria as fontes que as outras usam. A #114 vem antes da #115 porque o componente que muda a cor do texto por estado nasce nos botões de escolha e o histórico o reaproveita. O menu (#116) fecha a milestone. A camada de horror (#117) fica no backlog até um roteiro pedir (D-27). Priorizadas pelo programador em 2026-11-09.
-- **O acabamento (M8) vem depois da interface nova** porque, com as milestones fechadas, o backlog ficou só com achados das revisões. Eles foram conferidos contra a `main` na triagem de 2026-11-13: os que tinham ficado datados foram fechados, e os pequenos foram juntados na #124 (só documentação) e na #125 (acabamentos de código e README). A M8 limpa a casa antes de o conteúdo crescer: corrige o que a fatia vertical mostra de errado e o que custa tempo a cada sessão.
-  - **A #124 abre a milestone** porque corrige receitas que as sessões seguintes usam (o Esc da pausa, o kerning que a build grava, o mouse na build por script).
-  - **A #36 e a #125 vêm em seguida** por serem pequenas e sem decisão pendente.
-  - **A #108 vem antes da #107 e da #52:** ela corrige os limites do pan que o passo a passo de `salas.md` manda copiar, e a #107 percorre esse passo a passo; a #52 valida `minX` < `maxX` no mesmo componente.
-  - **As que dependem de uma decisão do programador** (a #56, sobre a cor do nome, e a #31, sobre o teste do `OnValidate`) vão para o levantamento como qualquer outra; o levantamento faz a pergunta.
-  - **Ficam fora da M8:** a #89 (save sem risco de arquivo pela metade) e a #109 (build de entrega), que só importam antes do primeiro lançamento e ficam para a milestone que preparar a entrega; a #71 (fade e cenário de tela cheia pelo roteiro), que é funcionalidade nova e pede arte; e a #117 (camada de horror), até um roteiro pedir (D-27).
+- **Depois da interface nova, o backlog ficou só com achados das revisões.** Eles foram conferidos contra a `main` na triagem de 2026-11-13: os que tinham ficado datados foram fechados, e os pequenos foram juntados na #124 (só documentação) e na #125 (acabamentos de código e README). As 17 issues que sobraram se dividem da M8 à M12, pela ordem abaixo.
+- **As ferramentas e a dívida interna (M8) vêm primeiro** porque custam tempo a cada sessão e nada do que vem depois funciona melhor com elas quebradas. Nenhuma muda o que o jogador vê.
+  - **A #124 abre a milestone** porque corrige receitas que todas as sessões seguintes usam (o Esc da pausa, o kerning que a build grava, o mouse na build por script). **A #35 vem logo depois** pelo mesmo motivo: ela muda os próprios comandos de trabalho.
+  - **A #36 e a #125** são pequenas e sem decisão pendente. A #125 vem depois da #124 porque as duas mexem no README do `Dialogue` (seções diferentes).
+  - **A #105, a #37 e a #34 protegem quem produz conteúdo:** sala com nome repetido, comando com o número errado de parâmetros e `.yarn` novo que não entra no jogo. A #37 precisa fechar antes da #71 (M10), que cria comandos novos de roteiro: se ela escolher o teste genérico de parâmetros, os comandos da #71 já nascem protegidos.
+  - **A #31 fecha a milestone** porque é só uma decisão (vale ou não a D-24 para código chamado de `OnValidate`) e o resultado, um teste ou uma linha em `skills.md`.
+- **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
+  - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
+  - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 depende de uma decisão do programador (nome com ou sem cor), que o levantamento pergunta.
+  - **A #52 vem depois da #108 e da #96:** ela valida `minX` < `maxX` no mesmo componente que a #108 ajusta, e a varredura de tooltips cobre também o que a #96 acrescentar.
+  - **A #107 fecha a milestone** porque percorre o guia de `salas.md` no Inspector, e o percurso só vale com os limites certos (#108) e com os tooltips no lugar (#52).
+- **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 (M8). O levantamento dela decide se ela se divide (fade, cenário de tela cheia e abertura automática da conversa ao chegar na sala), e as partes novas entram nesta milestone.
+- **A primeira entrega (M11) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9) e com a abertura completa (M10). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
+- **A camada de horror (M12) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decide a cor do nome na placa normal.
 
 ## M0 — Fundação
 
@@ -131,36 +145,57 @@ Documentação, guia do agente, modelos e limpeza. Sem mudança de comportamento
 | #115 | Botão Histórico e painel do histórico com a arte nova | #113, #114 |
 | #116 | Menu principal com a arte nova | #113 |
 
-## M8 — Acabamento
+## M8 — Ferramentas e dívida interna
 
-Correções e dívida que as revisões deixaram, antes de o conteúdo crescer. Nenhuma mecânica nova.
+O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada muda para o jogador.
 
 | Issue | Título | Depende de |
 |---|---|---|
 | #124 | Documentação dos agentes: armadilhas pendentes do unity-cli.md e do roteiro de ponta a ponta | — |
-| #36 | Managers com Instance estático não seguem a D-29 (reset em SubsystemRegistration) | — |
-| #125 | Acabamentos das revisões: mensagens, tooltip, README do Dialogue e struct repetido no Editor | — |
-| #108 | O pan da [Teste] Mecanicas e da [Fatia] Posto passa do fundo, e o guia não diz como calcular os limites | — |
-| #107 | Percorrer no Inspector o passo a passo de salas.md da fatia vertical | #108 |
-| #52 | Campos do Inspector sem tooltip (regra 8) | #108 |
-| #96 | Navegação por teclado pousa em botão desabilitado, sem destaque (menu principal e pausa) | — |
-| #56 | Nome colorido na placa de nome é difícil de ler | — |
-| #105 | Testes de sala quebram sem mensagem com duas cenas de mesmo nome no build | — |
-| #34 | Um .yarn novo não entra no Roteiro.yarnproject sem reimportar o projeto | — |
-| #37 | Comando de roteiro com número errado de parâmetros trava a conversa | — |
 | #35 | Comandos de trabalho trocam de branch com o Editor aberto, contra a armadilha dos pacotes | — |
+| #36 | Managers com Instance estático não seguem a D-29 (reset em SubsystemRegistration) | — |
+| #125 | Acabamentos das revisões: mensagens, tooltip, README do Dialogue e struct repetido no Editor | #124 |
+| #105 | Testes de sala quebram sem mensagem com duas cenas de mesmo nome no build | — |
+| #37 | Comando de roteiro com número errado de parâmetros trava a conversa | — |
+| #34 | Um .yarn novo não entra no Roteiro.yarnproject sem reimportar o projeto | — |
 | #31 | Decidir se StoryVariableNameCheck precisa de teste (D-24) | — |
 
-## Backlog sem milestone
+## M9 — Acabamento da fatia
 
-Issues com `triagem` que ficam fora da sequência até o programador priorizá-las:
+O que o jogador e quem monta sala veem de errado na fatia vertical. Nenhuma mecânica nova.
 
-| Issue | Título | Espera |
+| Issue | Título | Depende de |
 |---|---|---|
-| #89 | Gravar o save sem risco de deixar o arquivo pela metade | a milestone que preparar a primeira entrega |
-| #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | a milestone que preparar a primeira entrega |
-| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | priorização; pede arte provisória |
-| #117 | Camada de horror da interface (quando o roteiro pedir) | um roteiro que a peça (D-27) |
+| #108 | O pan da [Teste] Mecanicas e da [Fatia] Posto passa do fundo, e o guia não diz como calcular os limites | — |
+| #96 | Navegação por teclado pousa em botão desabilitado, sem destaque (menu principal e pausa) | — |
+| #56 | Nome colorido na placa de nome é difícil de ler | — |
+| #52 | Campos do Inspector sem tooltip (regra 8) | #108, #96 |
+| #107 | Percorrer no Inspector o passo a passo de salas.md da fatia vertical | #108, #52 |
+
+## M10 — Efeitos de roteiro
+
+Os efeitos de tela que o prólogo pede. As partes em que o levantamento da #71 a dividir entram aqui.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37 |
+
+## M11 — Primeira entrega
+
+A fatia vertical pronta para ir a alguém de fora, por download no itch.io (D-15).
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #89 | Gravar o save sem risco de deixar o arquivo pela metade | #36 |
+| #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | #124, #108 |
+
+## M12 — Camada de horror
+
+**Portão:** abre só quando um roteiro pedir (D-27). O guia da camada está em `docs/arte/interface/camada-de-horror.md`, e os arquivos de arte ficam em `Adicionar/horror/`, fora do git, até lá. A #117 lista o que decidir e sugere dividi-la quando for priorizada.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #117 | Camada de horror da interface (quando o roteiro pedir) | #56 |
 
 ## Riscos conhecidos
 
