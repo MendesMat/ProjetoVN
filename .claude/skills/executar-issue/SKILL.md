@@ -60,7 +60,7 @@ git diff --quiet HEAD main -- Packages/
 git diff --quiet HEAD origin/main -- Packages/
 ```
 
-Saída `0` nas duas: siga. `1` em qualquer uma, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`). Qualquer outra saída: não é seguro, siga a receita.
+Saída `0` nas duas: siga. `1` em qualquer uma, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`); com o Editor fechado, siga. Qualquer outra saída: não é seguro, siga a receita.
 
 ```bash
 git checkout main

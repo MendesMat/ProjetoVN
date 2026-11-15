@@ -58,7 +58,7 @@ git fetch origin
 git diff --quiet HEAD origin/<headRefName do PR> -- Packages/
 ```
 
-Saída `0`: siga. `1`, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`). Qualquer outra saída: não é seguro, siga a receita.
+Saída `0`: siga. `1`, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`); com o Editor fechado, siga. Qualquer outra saída: não é seguro, siga a receita.
 
 Então faça checkout da branch do PR e rode de verdade:
 
@@ -170,7 +170,7 @@ Volte para `main` ao terminar, depois da mesma conferência:
 git diff --quiet HEAD main -- Packages/
 ```
 
-Saída `0`:
+Saída `0`, ou `1` com o Editor fechado:
 
 ```bash
 git checkout main

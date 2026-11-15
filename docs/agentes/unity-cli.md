@@ -207,7 +207,10 @@ Os comandos de trabalho (`/executar-issue`, `/revisar-issue`) fazem esta confer�
    git fetch origin
    ```
 
-2. Compare `Packages/` da branch atual (`HEAD`) com o destino. O destino é a branch (`main`, ou `origin/<branch>` quando ela ainda não existe localmente) para a troca, ou `origin/<branch atual>` para um `git pull`:
+2. Compare `Packages/` da branch atual (`HEAD`) com o destino, que é o commit que o comando vai pôr no disco:
+   - `main`, para um `git checkout main`;
+   - `origin/<branch>`, para um `gh pr checkout` (ele atualiza a branch local pela remota, mesmo quando ela já existe e está atrasada) ou para uma branch que ainda não existe localmente;
+   - `origin/<branch atual>`, para um `git pull`.
 
    ```bash
    git diff --quiet HEAD <destino> -- Packages/
@@ -525,7 +528,7 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 
 Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
 
-1. Faça checkout da branch `roteiro/<nome>-<assunto>`. Se o `Packages/manifest.json` da branch for igual ao da `main` (o normal num PR de roteiro), trocar de branch com o Editor aberto é seguro; se diferir, faça antes a conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/`).
+1. Faça checkout da branch `roteiro/<nome>-<assunto>`, depois da conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/`). Num PR de roteiro ela costuma dar `0`, porque o roteirista não mexe em `Packages/`, e então a troca com o Editor aberto é segura.
 2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
 
    ```bash
