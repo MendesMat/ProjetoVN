@@ -83,7 +83,7 @@ Select-String -Path <log> -Pattern 'Debug:LogError|Debug:LogWarning|Debug:LogExc
 
 Esperado: **nenhuma ocorrência** de erro, aviso ou exceção de script. No `Player.log` de uma build não há prefixo de nível: um `Debug.LogError` aparece como a mensagem seguida da pilha `UnityEngine.Debug:LogError (object)`, e uma exceção como `NullReferenceException: …`.
 
-Linhas do motor gráfico não contam como defeito do jogo, mas são registradas à parte no resultado: `d3d12: failed to query info queue interface (0x80004002).` aparece em toda execução (é do driver) e a `D3D12PipelineLibrary` só na primeira abertura de uma build nova.
+Linhas do motor gráfico não contam como defeito do jogo, mas são registradas à parte no resultado. Só a `D3D12PipelineLibrary must be recreated…` (que tem `ERROR`, na primeira abertura de uma build nova) aparece no filtro acima. A `d3d12: failed to query info queue interface (0x80004002).` aparece em toda execução (é do driver), mas não tem `ERROR` nem `Exception`: **só se vê lendo o log inteiro**, então registre-a depois de conferir o log, não pelo filtro.
 
 **17. Devolva o save.** Devolva o `savegame.json` copiado no passo 0 e confira que `git status` está limpo.
 
