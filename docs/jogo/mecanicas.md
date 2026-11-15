@@ -84,7 +84,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Texto revelado aos poucos (#11): o primeiro clique completa a fala, o segundo avança. O indicador de continuar e as opções só aparecem com a fala completa. A velocidade se ajusta em um único campo da interface.
 - Um botão **Histórico** na caixa abre a lista do que já foi dito na conversa em curso (#25), descrita em [Histórico de falas](#histórico-de-falas).
 
-**Limitação conhecida:** um comando com o número errado de parâmetros (`<<dar_item>>` sem id, ou com dois) trava a conversa (#37). Para os comandos de item, o teste automático dos roteiros reprova esse erro antes do Play.
+**Limitação conhecida:** um comando com o número errado de parâmetros (`<<dar_item>>` sem id, ou com dois) trava a conversa: o defeito é do pacote Yarn Spinner e o jogo não o corrige em runtime (#37). Para todo comando, o teste automático dos roteiros reprova esse erro, e também um comando que não existe, antes do Play.
 
 **Regras:**
 - Iniciar um diálogo é um comando direto ao dono.
