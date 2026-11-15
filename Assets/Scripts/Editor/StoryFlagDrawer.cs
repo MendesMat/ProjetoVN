@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using ProjetoVN.Core.State;
 using UnityEditor;
 using UnityEngine.UIElements;
@@ -20,11 +19,10 @@ namespace ProjetoVN.Editor
             if (property.propertyType != SerializedPropertyType.String)
                 return new HelpBox("[StoryFlag] só vale em um campo string.", HelpBoxMessageType.Error);
 
-            if (!DeclaredStoryFlags.TryLoad(out IReadOnlyList<StoryFlagDeclaration> flags, out string problem))
+            if (!DeclaredStoryFlags.TryLoad(out IReadOnlyList<NameChoice> flags, out string problem))
                 return NameChoiceField.PlainTextWithWarning(property, problem);
 
-            List<NameChoice> choices = flags.Select(flag => new NameChoice(flag.Name, flag.Description)).ToList();
-            return new NameChoiceField(property.Copy(), NoneLabel, choices, UndeclaredWarning);
+            return new NameChoiceField(property.Copy(), NoneLabel, flags, UndeclaredWarning);
         }
 
         private static string UndeclaredWarning(string name) =>

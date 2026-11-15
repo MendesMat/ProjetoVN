@@ -11,11 +11,11 @@ Código que **só existe no Editor do Unity** e não entra na build do jogo. Hoj
 | Classe | Papel |
 |---|---|
 | `StoryFlagDrawer` | `PropertyDrawer` do `[StoryFlag]` (do `Core`). Desenha o campo `string` como um dropdown de UI Toolkit |
-| `DeclaredStoryFlags` | Lê do Yarn Spinner as variáveis booleanas declaradas. Devolve a lista, ou o motivo de não ter conseguido |
+| `DeclaredStoryFlags` | Lê do Yarn Spinner as variáveis booleanas declaradas. Devolve a lista como `NameChoice` (nome e descrição), pronta para o `NameChoiceField`, ou o motivo de não ter conseguido |
 | `ScriptNodeDrawer` | `PropertyDrawer` do `[ScriptNode]` (do `Core`). Desenha o campo `string` como um dropdown de UI Toolkit com os nós do roteiro |
 | `ScriptNodes` | Lê do programa compilado do `YarnProject` os nomes dos nós. Devolve a lista, ou o motivo de não ter conseguido |
 | `TheYarnProject` | Acha o único `YarnProject` e confere que o roteiro foi importado sem erro. É o que `DeclaredStoryFlags` e `ScriptNodes` têm em comum |
-| `NameChoiceField` | O campo de UI Toolkit dos dois seletores: lista de nomes com o rótulo do vazio, descrição opcional e aviso de valor ausente. Traz também o texto comum com aviso, usado quando a lista não pode ser montada |
+| `NameChoiceField` | O campo de UI Toolkit dos dois seletores: lista de nomes com o rótulo do vazio, descrição opcional e aviso de valor ausente. Traz também o texto comum com aviso, usado quando a lista não pode ser montada, e o `NameChoice`, o par nome e descrição que os dois seletores entregam ao campo |
 
 ## O seletor de variável de história
 

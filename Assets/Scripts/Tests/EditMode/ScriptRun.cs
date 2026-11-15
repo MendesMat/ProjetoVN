@@ -32,6 +32,7 @@ namespace ProjetoVN.Tests.EditMode
 
         /// <summary>Os ids que <c>tem_item</c> considera no inventário do jogador.</summary>
         public HashSet<string> OwnedItems { get; } = new();
+
         public bool Completed { get; private set; }
 
         public IEnumerable<Diagnostic> ErrorsAndWarnings => _compilation.Diagnostics.Where(d =>

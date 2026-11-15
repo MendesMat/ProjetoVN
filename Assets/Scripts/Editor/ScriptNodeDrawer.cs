@@ -28,6 +28,6 @@ namespace ProjetoVN.Editor
         }
 
         private static string MissingWarning(string name) =>
-            $"O nó '{name}' não existe no roteiro (Assets/Roteiro/).";
+            $"O nó '{name}' não está na lista dos nós do roteiro (Assets/Roteiro/).";
     }
 }

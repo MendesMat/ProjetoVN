@@ -78,8 +78,8 @@ namespace ProjetoVN.GameFlow
             audio = AudioManager.Instance;
             if (audio != null) return true;
 
-            Debug.LogError($"[SoundScriptActions] {scriptCall}: não há AudioManager (o prefab Managers não foi criado) " +
-                           $"(nó '{CurrentNodeName()}'). Ignorado.", Instance);
+            Debug.LogError($"[SoundScriptActions] {scriptCall}: não há AudioManager " +
+                           $"(nó '{CurrentNodeName()}'; o prefab Managers não foi criado). Ignorado.", Instance);
             return false;
         }
 
@@ -89,7 +89,7 @@ namespace ProjetoVN.GameFlow
             if (registry != null) return true;
 
             Debug.LogError($"[SoundScriptActions] {scriptCall}: não há SoundScriptActions com o SoundRegistry atribuído " +
-                           $"(confira o Managers.prefab) (nó '{CurrentNodeName()}'). Ignorado.", Instance);
+                           $"(nó '{CurrentNodeName()}'; confira o Managers.prefab). Ignorado.", Instance);
             return false;
         }
 
