@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.GameFlow.Rooms;
@@ -16,7 +15,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ScenesAndPrefabs_ExitsNameARoomInTheBuildList()
         {
-            Dictionary<string, string> scenePathByRoom = EnabledRoomsOfTheBuild();
+            IReadOnlyDictionary<string, string> scenePathByRoom = BuildRooms.OfTheBuildSettings().ScenePathByRoom;
 
             IEnumerable<string> invalid = ProjectComponents
                 .ReadAll<RoomExit, string>(DestinationRoomOf)
@@ -30,7 +29,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void ScenesAndPrefabs_ExitsNameAnEntryPointOfTheDestination()
         {
-            Dictionary<string, string> scenePathByRoom = EnabledRoomsOfTheBuild();
+            IReadOnlyDictionary<string, string> scenePathByRoom = BuildRooms.OfTheBuildSettings().ScenePathByRoom;
             ILookup<string, string> entryPointIdsByScene = EntryPointIdsByScenePath();
 
             IEnumerable<string> missing = ProjectComponents
@@ -42,6 +41,15 @@ namespace ProjetoVN.Tests.EditMode
 
             CollectionAssert.IsEmpty(missing,
                 "saídas apontam para um ponto de entrada que a sala de destino não tem (ou deixaram o ponto vazio)");
+        }
+
+        [Test]
+        public void BuildList_RoomNamesAreUnique()
+        {
+            IEnumerable<string> repeated = BuildRooms.OfTheBuildSettings().Repeated.Select(room => room.ToString());
+
+            CollectionAssert.IsEmpty(repeated,
+                "duas cenas habilitadas na lista do build têm o mesmo nome; a sala é achada pelo nome, então só uma seria alcançável");
         }
 
         [Test]
@@ -64,11 +72,6 @@ namespace ProjetoVN.Tests.EditMode
             CollectionAssert.IsEmpty(problems,
                 "pontos de entrada sem id, ou com o mesmo id mais de uma vez na mesma cena");
         }
-
-        private static Dictionary<string, string> EnabledRoomsOfTheBuild() =>
-            EditorBuildSettings.scenes
-                .Where(scene => scene.enabled)
-                .ToDictionary(scene => Path.GetFileNameWithoutExtension(scene.path), scene => scene.path);
 
         private static ILookup<string, string> EntryPointIdsByScenePath() =>
             ProjectComponents.ReadAll<RoomEntryPoint, (string ScenePath, string Id)>(ScenePathAndIdOf)

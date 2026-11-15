@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.GameFlow.Menu;
@@ -42,7 +41,7 @@ namespace ProjetoVN.Tests.EditMode
         [Test]
         public void MainMenu_StartRoomIsARoomOfTheBuildList()
         {
-            Dictionary<string, string> scenePathByRoom = EnabledRoomsOfTheBuild();
+            IReadOnlyDictionary<string, string> scenePathByRoom = BuildRooms.OfTheBuildSettings().ScenePathByRoom;
             ILookup<string, string> entryPointIdsByScene = EntryPointIdsByScenePath();
 
             IEnumerable<string> problems = ProjectComponents
@@ -56,7 +55,7 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         private static string ProblemWithTheStart(ComponentReading<MenuStart> reading,
-            Dictionary<string, string> scenePathByRoom, ILookup<string, string> entryPointIdsByScene)
+            IReadOnlyDictionary<string, string> scenePathByRoom, ILookup<string, string> entryPointIdsByScene)
         {
             MenuStart start = reading.Value;
             bool isInTheBuildList = scenePathByRoom.TryGetValue(start.Room, out string roomScenePath);
@@ -72,11 +71,6 @@ namespace ProjetoVN.Tests.EditMode
 
             return null;
         }
-
-        private static Dictionary<string, string> EnabledRoomsOfTheBuild() =>
-            EditorBuildSettings.scenes
-                .Where(scene => scene.enabled)
-                .ToDictionary(scene => Path.GetFileNameWithoutExtension(scene.path), scene => scene.path);
 
         private static ILookup<string, string> EntryPointIdsByScenePath() =>
             ProjectComponents.ReadAll<RoomEntryPoint, (string ScenePath, string Id)>(ScenePathAndIdOf)
