@@ -48,7 +48,19 @@ Leia também os arquivos alterados por inteiro, não só o diff: um diff correto
 
 ## 3. Executar
 
-Faça checkout da branch do PR e rode de verdade:
+Antes de trocar de branch, confira os pacotes. Se `Packages/` mudar entre a branch atual e a do PR com o Editor deste projeto aberto, trocar pode travá-lo. Receita completa, com o que fazer em cada saída: seção "Antes de trocar de branch" de `docs/agentes/unity-cli.md`.
+
+```bash
+git fetch origin
+```
+
+```bash
+git diff --quiet HEAD origin/<headRefName do PR> -- Packages/
+```
+
+Saída `0`: siga. `1`, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`). Qualquer outra saída: não é seguro, siga a receita.
+
+Então faça checkout da branch do PR e rode de verdade:
 
 ```bash
 gh pr checkout <PR>
@@ -152,12 +164,20 @@ gh issue edit $ARGUMENTS --remove-label "estado:em-revisao" --add-label "estado:
 
 Crie uma issue com a label `triagem` para cada item de "Fora do escopo".
 
-Volte para `main` ao terminar:
+Volte para `main` ao terminar, depois da mesma conferência:
+
+```bash
+git diff --quiet HEAD main -- Packages/
+```
+
+Saída `0`:
 
 ```bash
 git checkout main
 ```
 
+Saída `1` com o Editor aberto (ou qualquer outra saída): **não troque**. Deixe a branch do PR em checkout e avise o programador no encerramento (passo 7) que a volta para a `main` ficou para ele, com o Unity fechado. Aqui a sessão já terminou o trabalho, e não vale parar esperando resposta: foi este checkout que travou a sessão seguinte na primeira revisão da #5.
+
 ## 7. Encerrar
 
-Diga ao programador, em poucas linhas: o veredito, o que bloqueia (se algo), e o próximo passo: o merge é dele se aprovado, ou `/executar-issue $ARGUMENTS` em uma conversa nova se há mudanças pedidas.
+Diga ao programador, em poucas linhas: o veredito, o que bloqueia (se algo), e o próximo passo: o merge é dele se aprovado, ou `/executar-issue $ARGUMENTS` em uma conversa nova se há mudanças pedidas. Se a volta para a `main` não foi feita por causa dos pacotes, diga qual branch ficou em checkout e peça para fechar o Unity antes de trocar.
