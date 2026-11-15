@@ -21,6 +21,9 @@ namespace ProjetoVN.Dialogue.Logic
         private DialogueRunner _runner;
         private DialogueUIController _presenter;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState() => Instance = null;
+
         private void Awake()
         {
             Instance = this;

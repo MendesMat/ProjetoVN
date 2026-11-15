@@ -19,6 +19,9 @@ namespace ProjetoVN.GameFlow.Persistence
 
         public bool HasSave => File.Exists(SavePath) && GameStateJson.TryRead(File.ReadAllText(SavePath), out _);
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState() => Instance = null;
+
         private void Awake()
         {
             Instance = this;

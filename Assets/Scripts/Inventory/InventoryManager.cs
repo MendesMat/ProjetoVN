@@ -10,6 +10,9 @@ namespace ProjetoVN.Inventory
         private InventoryService _service;
         private readonly HashSet<string> _consumedWorldObjectIds = new();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStaticState() => Instance = null;
+
         private void Awake()
         {
             Instance = this;
