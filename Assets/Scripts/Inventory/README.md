@@ -11,7 +11,7 @@ O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógic
 - **`ItemDataSO` (ScriptableObject)**: A representação autorada de um item (id, nome, ícone, descrição). Criado por Game Designers no Editor da Unity, e **somente leitura em runtime**.
 - **`InventoryModel`**: Guarda a lista de `ItemDataSO` que o jogador possui. Não copia os dados do item: guarda a referência ao próprio asset, então não existe uma segunda fonte de verdade para divergir.
 - **`InventoryService`**: As regras. Só publica uma notificação quando o estado realmente mudou.
-- **`InventoryManager` (MonoBehaviour)**: A API do inventário para o resto do jogo.
+- **`InventoryManager` (MonoBehaviour)**: A API do inventário para o resto do jogo. `Instance` zerado em `SubsystemRegistration` (D-29).
 - **`CollectableItemBehaviour`**: Utilitário de cena, ligado ao objeto pelo `UnityEvent` `OnInteract` do `InteractableItem`.
 
 > `LockedActionBehaviour` **não mora neste módulo**. Ele combina item (Inventory) com variável de história (`StoryState`, em Core) e lembra que já foi aberto, o que é progressão de história e não regra de inventário. Mora em [`GameFlow`](../GameFlow/README.md).

@@ -186,7 +186,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Um som de roteiro | Uma linha no `SoundRegistry` (lista de músicas, ambientes ou efeitos) e uma linha na tabela "Sons que existem" de [roteiro.md](../autoria/roteiro.md#música-e-sons). O roteiro o pede por `<<tocar_musica id>>`, `<<tocar_efeito id>>` ou `<<tocar_ambiente id>>`; o teste de conteúdo confere o id (#20) |
 | Um som em um objeto ou em uma porta | Um filho com o componente `SoundEffect` ligado a um evento (`OnLocked`, `OnUnlocked`, `OnInteract`), sem código. Passo a passo em [salas.md](../autoria/salas.md#som-em-um-objeto-ou-em-uma-porta-20) (#20) |
 | Um botão | Um `Button` com o componente `ButtonSounds` (no prefab, se o botão vem de um); o `ButtonSoundsTests` reprova o que esquecer (#20) |
-| Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake` e limpo no `OnDestroy` |
+| Um manager global | Um componente no `Managers.prefab`, com `Instance` atribuído no `Awake`, limpo no `OnDestroy` e zerado em `SubsystemRegistration` (D-29) |
 | Um elemento de interface de jogo | Um objeto dentro do `Canvas_Game` de `Assets/Prefabs/UI/GameUI.prefab`. Nunca em uma cena |
 
 ## O que vai mudar
