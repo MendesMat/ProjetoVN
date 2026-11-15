@@ -50,5 +50,5 @@ Como funciona:
 ## Limitações
 
 - Só cobre variáveis **booleanas**. Um seletor para número ou texto fica para quando uma issue pedir (D-27).
-- Renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado. O mesmo vale para um nó renomeado no `.yarn`: quem acusa, sem ninguém abrir o objeto, é o teste `DialogueTriggerNodesTests` (ver o [README dos testes](../Tests/README.md)).
+- Renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado; quem acusa, sem ninguém abrir o objeto, é o teste `StoryFlagFieldsTests`. O mesmo vale para um nó renomeado no `.yarn`, acusado pelo `DialogueTriggerNodesTests` (ver o [README dos testes](../Tests/README.md)).
 - É código de Editor: não tem teste automatizado (D-24). Foi verificado lendo o Inspector dos dois seletores por `eval`; o clique no dropdown e a aparência ficam para o programador.
