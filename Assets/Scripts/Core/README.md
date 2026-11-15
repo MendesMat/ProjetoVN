@@ -59,7 +59,7 @@ Duas regras de nome, de propósito diferentes:
 | Método | O que aceita | Quem usa |
 |---|---|---|
 | `IsValid(nome)` | Não vazio, começa com `$` e tem pelo menos um caractere depois | O `StoryState`, ao gravar. É frouxa porque o Yarn Spinner grava nomes internos fora da convenção (`$Yarn.Internal.Visiting.<nó>`, que sustenta `visited()`) |
-| `FollowsConvention(nome)` | `$`, depois minúscula ASCII ou `_`, depois minúsculas ASCII, dígitos e `_` (ex.: `$porta_biblioteca_destrancada`) | O `OnValidate` dos componentes de cena. Todo nome que passa aqui é uma variável válida no roteiro |
+| `FollowsConvention(nome)` | `$`, depois minúscula ASCII ou `_`, depois minúsculas ASCII, dígitos e `_` (ex.: `$porta_biblioteca_destrancada`) | O `OnValidate` do portão (`StoryVariableNameCheck`), o `ScriptContentTests` (as declarações do roteiro) e o `StoryFlagFieldsTests` (os campos `[StoryFlag]` de cena e prefab). Todo nome que passa aqui é uma variável válida no roteiro |
 
 O nome é guardado **com o `$`** em todo lugar: roteiro, Inspector e save.
 
@@ -71,7 +71,7 @@ Um `PropertyAttribute` sem parâmetros que marca um campo `string` com o nome de
 [SerializeField, StoryFlag] private string unlockedFlagId;
 ```
 
-O Core só guarda o marcador. Quem o desenha é o módulo [Editor](../Editor/README.md): o campo vira uma lista das variáveis `Bool` declaradas em `Assets/Roteiro/variaveis.yarn`, com a descrição da escolhida e um aviso para um valor que não está declarado. O atributo não muda nome nem tipo do campo, então cenas e prefabs já gravados continuam valendo. Hoje é usado pelo `LockedActionBehaviour`.
+O Core só guarda o marcador. Quem o desenha é o módulo [Editor](../Editor/README.md): o campo vira uma lista das variáveis `Bool` declaradas em `Assets/Roteiro/variaveis.yarn`, com a descrição da escolhida e um aviso para um valor que não está declarado. Em qualquer cena ou prefab, um valor fora do formato ou que não é uma variável `Bool` declarada é reprovado pelo `StoryFlagFieldsTests` (ver o [README dos testes](../Tests/README.md)). O atributo não muda nome nem tipo do campo, então cenas e prefabs já gravados continuam valendo. Hoje é usado pelo `LockedActionBehaviour`.
 
 ## O registro de variáveis
 

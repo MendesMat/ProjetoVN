@@ -57,9 +57,9 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 **Os dois campos de variável são listas.** Eles mostram as variáveis **booleanas** declaradas em `Assets/Roteiro/variaveis.yarn`, em ordem alfabética, mais **(nenhuma)** para deixar o campo vazio. Abaixo do campo aparece a descrição da variável escolhida. As variáveis numéricas (afinidade) e de texto não aparecem.
 
 - **Uma variável nova** (a do seu portão) entra primeiro em `variaveis.yarn`, com uma linha `///` de descrição e `<<declare $nome = false>>`; veja [roteiro.md](roteiro.md#variáveis-e-afinidade). Depois do Unity importar o arquivo, ela aparece na lista.
-- **Um valor que não está declarado** (a variável foi renomeada ou nunca existiu) continua no campo e aparece com um aviso amarelo logo abaixo. Escolha outra na lista ou declare a variável.
+- **Um valor que não está declarado** (a variável foi renomeada ou nunca existiu) continua no campo e aparece com um aviso amarelo logo abaixo. Escolha outra na lista ou declare a variável. Além do aviso, o teste de EditMode `StoryFlagFieldsTests` reprova o valor e diz a cena, o objeto e o campo; rode a suíte depois de renomear ou apagar uma variável do `variaveis.yarn`.
 - Se o roteiro não compila, ou o projeto não tem exatamente um `YarnProject`, a lista dá lugar a um aviso e a um campo de texto comum.
-- O formato do nome é `$` seguido de minúsculas sem acento, dígitos e `_`. O componente ainda avisa no console se um valor digitado por fora da lista fugir desse formato.
+- O formato do nome é `$` seguido de minúsculas sem acento, dígitos e `_`. O componente ainda avisa no console se um valor digitado por fora da lista fugir desse formato, e o `StoryFlagFieldsTests` o reprova.
 4. Em **On Interact**, ligue `LockedActionBehaviour.Interact`.
 5. Ligue os eventos:
 
