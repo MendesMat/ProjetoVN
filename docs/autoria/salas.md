@@ -140,7 +140,7 @@ Para ir e voltar entre duas salas, cada sala tem a sua saída e o seu ponto de e
 ### O que confere por você
 
 - O **Inspector** avisa destino vazio, ponto de entrada vazio e id vazio no ponto.
-- O teste `RoomLinksTests`, na suíte de EditMode, reprova saída com destino que não é uma cena do build, saída que cita um ponto que a sala de destino não tem, ponto sem id ou com id repetido na mesma sala, e duas cenas habilitadas do build com o mesmo nome. A mensagem diz a cena, o caminho do objeto e o nome. **Rode a suíte depois de montar ou renomear uma saída ou um ponto.**
+- O teste `RoomLinksTests`, na suíte de EditMode, reprova saída com destino que não é uma cena do build, saída que cita um ponto que a sala de destino não tem, ponto sem id ou com id repetido na mesma sala, e duas cenas habilitadas do build com o mesmo nome. A mensagem diz a cena, o caminho do objeto e o nome; no nome de cena repetido, ela diz o nome e os caminhos das cenas que o repetem. **Rode a suíte depois de montar ou renomear uma saída ou um ponto, e depois de acrescentar uma sala à lista do build.**
 - Se algo falhar de forma inesperada no meio da troca, o erro aparece no console e o jogo volta a ficar jogável na sala que ficou carregada, em vez de travar com a tela preta.
 
 ## Personagens
