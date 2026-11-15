@@ -27,10 +27,18 @@ namespace ProjetoVN.Tests.EditMode
         private static ScriptCommandCalls CallsInNodeBody(string body) =>
             CallsIn($"title: {Node}\n---\n{body}\n===\n");
 
-        private static ScriptCommandSignature OneParameterSignature(string commandName)
+        private static void OneNumber(float first) { }
+
+        private static ScriptCommandSignature OneParameterSignature(string commandName) =>
+            SignatureOf(commandName, nameof(OneParameter));
+
+        private static ScriptCommandSignature OneNumberSignature(string commandName) =>
+            SignatureOf(commandName, nameof(OneNumber));
+
+        private static ScriptCommandSignature SignatureOf(string commandName, string methodName)
         {
             MethodInfo method = typeof(ScriptCommandCallsTests).GetMethod(
-                nameof(OneParameter), BindingFlags.Static | BindingFlags.NonPublic);
+                methodName, BindingFlags.Static | BindingFlags.NonPublic);
             return ScriptCommandSignature.From(commandName, method);
         }
 
@@ -43,6 +51,13 @@ namespace ProjetoVN.Tests.EditMode
             Assert.AreEqual("dar_item", call.Name);
             Assert.AreEqual(1, call.WordCount);
             Assert.AreEqual("dar_item chave", call.Text);
+        }
+
+        [Test]
+        public void Command_KeepsItsWords()
+        {
+            CollectionAssert.AreEqual(new[] { "a b" }, CallsInNodeBody("<<dar_item \"a b\">>\nfim").All.Single().Words);
+            CollectionAssert.AreEqual(new[] { "a", "b" }, CallsInNodeBody("<<dar_item a b>>\nfim").All.Single().Words);
         }
 
         [Test]
@@ -121,6 +136,40 @@ namespace ProjetoVN.Tests.EditMode
             string[] problems = calls.Problems(new[] { OneParameterSignature("dar_item") }).ToArray();
 
             CollectionAssert.AreEqual(new[] { $"nó '{Node}': <<dar_iten chave>>: o comando 'dar_iten' não existe" }, problems);
+        }
+
+        [Test]
+        public void Problems_ListAWordOfTheWrongType()
+        {
+            ScriptCommandCalls calls = CallsInNodeBody("<<esperar abc>>\n<<esperar 1.5>>\nfim");
+
+            string[] problems = calls.Problems(new[] { OneNumberSignature("esperar") }).ToArray();
+
+            CollectionAssert.AreEqual(new[]
+            {
+                $"nó '{Node}': <<esperar abc>>: esperar pede um número no parâmetro 1, recebeu 'abc'",
+            }, problems);
+        }
+
+        [Test]
+        public void Problems_IgnoreAValueFromAnExpression()
+        {
+            ScriptCommandCalls calls = CallsInNodeBody("<<declare $x = 1>>\n<<esperar {$x}>>\nfim");
+
+            Assert.IsEmpty(calls.Problems(new[] { OneNumberSignature("esperar") }));
+        }
+
+        [Test]
+        public void Problems_ReportTheCountBeforeTheType()
+        {
+            ScriptCommandCalls calls = CallsInNodeBody("<<esperar abc def>>\nfim");
+
+            string[] problems = calls.Problems(new[] { OneNumberSignature("esperar") }).ToArray();
+
+            CollectionAssert.AreEqual(new[]
+            {
+                $"nó '{Node}': <<esperar abc def>>: esperar pede 1 parâmetro, recebeu 2",
+            }, problems);
         }
 
         [Test]

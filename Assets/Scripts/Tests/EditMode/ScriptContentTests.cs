@@ -104,13 +104,13 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
-        public void ProjectScripts_CallEveryCommandWithANumberOfParametersItAccepts()
+        public void ProjectScripts_CallEveryCommandWithParametersItAccepts()
         {
             ScriptCommandCalls calls = ScriptCommandCalls.In(ScriptRun.FromProjectFiles().Program);
 
             Assert.IsEmpty(calls.Problems(FirstSignatureOfEachName(CommandSignatures())),
-                "o comando leva exatamente os parâmetros da tabela de comandos de docs/autoria/roteiro.md, e um comando que não existe não roda: " +
-                "com o número errado de parâmetros o jogo trava a conversa (Yarn Spinner, #37)");
+                "o comando leva exatamente os parâmetros da tabela de comandos de docs/autoria/roteiro.md, cada um do tipo certo, e um comando que não existe não roda: " +
+                "com o número ou o tipo errado de parâmetros o jogo trava a conversa (Yarn Spinner, #37 e #142)");
         }
 
         [Test]

@@ -10,16 +10,18 @@ namespace ProjetoVN.Tests.EditMode
         public string NodeName { get; }
         public string Name { get; }
 
-        /// <summary>As palavras depois do nome do comando. Uma expressão <c>{$x}</c> conta como uma.</summary>
-        public int WordCount { get; }
+        /// <summary>As palavras depois do nome do comando. Uma expressão <c>{$x}</c> é uma, guardada como <c>{0}</c>.</summary>
+        public IReadOnlyList<string> Words { get; }
+
+        public int WordCount => Words.Count;
 
         public string Text { get; }
 
-        public ScriptCommandCall(string nodeName, string name, int wordCount, string text)
+        public ScriptCommandCall(string nodeName, string name, IReadOnlyList<string> words, string text)
         {
             NodeName = nodeName;
             Name = name;
-            WordCount = wordCount;
+            Words = words;
             Text = text;
         }
 
@@ -64,7 +66,7 @@ namespace ProjetoVN.Tests.EditMode
             string[] words = Yarn.Unity.DialogueRunner.SplitCommandText(commandText).ToArray();
             if (words.Length == 0) return;
 
-            _calls.Add(new ScriptCommandCall(nodeName, words[0], words.Length - 1, commandText));
+            _calls.Add(new ScriptCommandCall(nodeName, words[0], words.Skip(1).ToArray(), commandText));
         }
 
         private static string ProblemOf(ScriptCommandCall call, IReadOnlyDictionary<string, ScriptCommandSignature> byName)
@@ -72,9 +74,11 @@ namespace ProjetoVN.Tests.EditMode
             if (!byName.TryGetValue(call.Name, out ScriptCommandSignature signature))
                 return $"{call}: o comando '{call.Name}' não existe";
 
-            if (signature.Accepts(call.WordCount)) return null;
+            if (!signature.Accepts(call.WordCount))
+                return $"{call}: {call.Name} pede {signature.Describe()}, recebeu {call.WordCount}";
 
-            return $"{call}: {call.Name} pede {signature.Describe()}, recebeu {call.WordCount}";
+            string typeProblem = signature.TypeProblemOf(call.Words);
+            return typeProblem == null ? null : $"{call}: {call.Name} {typeProblem}";
         }
     }
 }

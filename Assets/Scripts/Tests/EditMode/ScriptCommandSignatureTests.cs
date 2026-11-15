@@ -16,9 +16,17 @@ namespace ProjetoVN.Tests.EditMode
 
         private static void RequiredAndParams(string first, params string[] rest) { }
 
+        private static void StringAndFloat(string first, float second) { }
+
+        private static void OneFloat(float first) { }
+
+        private static void StringAndParamsOfFloat(string first, params float[] rest) { }
+
         private sealed class ExampleBehaviour : MonoBehaviour
         {
             public void OneStringOnTheInstance(string first) { }
+
+            public void OneFloatOnTheInstance(float first) { }
         }
 
         private static ScriptCommandSignature SignatureOf(System.Type type, string methodName)
@@ -84,6 +92,66 @@ namespace ProjetoVN.Tests.EditMode
         public void Signature_KeepsTheCommandName()
         {
             Assert.AreEqual(CommandName, SignatureOfStatic(nameof(OneString)).Name);
+        }
+
+        [Test]
+        public void WordsOfTheRightType_HaveNoTypeProblem()
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(StringAndFloat));
+
+            Assert.IsNull(signature.TypeProblemOf(new[] { "a", "1.5" }));
+        }
+
+        [Test]
+        public void WordOfTheWrongType_IsReportedWithItsPosition()
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(StringAndFloat));
+
+            Assert.AreEqual("pede um número no parâmetro 2, recebeu 'abc'", signature.TypeProblemOf(new[] { "a", "abc" }));
+        }
+
+        [TestCase("{0}")]
+        [TestCase("a{0}b")]
+        public void WordFromAnExpression_IsNotChecked(string word)
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(OneFloat));
+
+            Assert.IsNull(signature.TypeProblemOf(new[] { word }));
+        }
+
+        [Test]
+        public void InstanceMethod_DoesNotCheckTheGameObjectName()
+        {
+            ScriptCommandSignature signature = SignatureOf(typeof(ExampleBehaviour), nameof(ExampleBehaviour.OneFloatOnTheInstance));
+
+            Assert.IsNull(signature.TypeProblemOf(new[] { "Porta", "1.5" }));
+            Assert.AreEqual("pede um número no parâmetro 1, recebeu 'abc'", signature.TypeProblemOf(new[] { "Porta", "abc" }));
+        }
+
+        [Test]
+        public void ParamsArray_ChecksEveryExtraWord()
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(StringAndParamsOfFloat));
+
+            Assert.IsNull(signature.TypeProblemOf(new[] { "a", "1", "2" }));
+            Assert.AreEqual("pede um número no parâmetro 2, recebeu 'abc'", signature.TypeProblemOf(new[] { "a", "1", "abc" }));
+        }
+
+        [Test]
+        public void DecimalComma_IsReportedAskingForADot()
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(OneFloat));
+
+            Assert.AreEqual("pede um número com ponto no parâmetro 1 (1.5, não 1,5), recebeu '1,5'",
+                signature.TypeProblemOf(new[] { "1,5" }));
+        }
+
+        [Test]
+        public void SeveralWrongWords_ReportTheFirst()
+        {
+            ScriptCommandSignature signature = SignatureOfStatic(nameof(StringAndParamsOfFloat));
+
+            Assert.AreEqual("pede um número no parâmetro 2, recebeu 'x'", signature.TypeProblemOf(new[] { "a", "x", "y" }));
         }
 
         [TestCase(nameof(NoParameters), "nenhum parâmetro")]
