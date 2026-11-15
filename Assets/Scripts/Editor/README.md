@@ -29,7 +29,7 @@ Código que **só existe no Editor do Unity** e não entra na build do jogo. Hoj
 Como funciona:
 
 - `DeclaredStoryFlags` acha o único `YarnProject` por `AssetDatabase.FindAssets("t:YarnProject")` e lê `YarnProjectImporter.ImportData.serializedDeclarations` **a cada vez que o Inspector é montado**. Não usa `YarnProject.InitialValues` nem `Program`, que guardam cache até o próximo `Awake`.
-- Depois de editar `variaveis.yarn`, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado (selecionar outro objeto e voltar basta).
+- Depois de editar `variaveis.yarn`, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado (selecionar outro objeto e voltar basta). Um **arquivo** `.yarn` novo é diferente: só entra no projeto com o Editor em foco, e com o Editor sem foco (sessão de agente pelo CLI) é preciso reimportar o `Roteiro.yarnproject` ([a armadilha, #34](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)).
 - `CreatePropertyGUI` só é usado quando o Inspector do componente é de UI Toolkit, que é o caso do `LockedActionBehaviour` (sem editor customizado). Não crie um `Editor` IMGUI para um componente que usa `[StoryFlag]`.
 
 ## O seletor de nó do roteiro
@@ -43,7 +43,7 @@ Como funciona:
 Como funciona:
 
 - `ScriptNodes` lê `Yarn.Program.Parser.ParseFrom(project.compiledYarnProgram).Nodes` **a cada vez que o Inspector é montado**, sem cache próprio. Não usa `YarnProject.Program` nem `YarnProject.NodeNames`, que guardam cache (o achado da #3). **Só chame `ParseFrom` depois de `TheYarnProject` conferir o `ImportStatus`:** com erro de compilação `compiledYarnProgram` é `null` e o parse lança. É por esse `ParseFrom` que o asmdef lista `Yarn.Google.Protobuf.dll`.
-- Depois de criar, renomear ou apagar um nó, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado.
+- Depois de criar, renomear ou apagar um nó, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado. Se o nó está num **arquivo** `.yarn` novo, a mesma ressalva do `[StoryFlag]` vale: com o Editor sem foco o arquivo não entra no projeto até ele ser reimportado ([#34](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)).
 - Como no `[StoryFlag]`, `CreatePropertyGUI` só roda em Inspector de UI Toolkit. O `InteractableDialogueTrigger` não tem `Editor` customizado; não crie um IMGUI.
 - A lista é plana, sem busca nem agrupamento por arquivo (D-27). Com o roteiro crescendo, uma lista com busca vira issue quando ficar difícil de usar.
 
