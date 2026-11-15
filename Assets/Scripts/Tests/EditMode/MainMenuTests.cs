@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.GameFlow.Menu;
-using ProjetoVN.GameFlow.Rooms;
 using UnityEditor;
 
 namespace ProjetoVN.Tests.EditMode
@@ -11,7 +10,6 @@ namespace ProjetoVN.Tests.EditMode
     {
         private const string StartRoomField = "startRoom";
         private const string StartEntryPointIdField = "startEntryPointId";
-        private const string IdField = "id";
 
         [Test]
         public void BuildList_StartsWithTheMainMenu()
@@ -42,7 +40,7 @@ namespace ProjetoVN.Tests.EditMode
         public void MainMenu_StartRoomIsARoomOfTheBuildList()
         {
             IReadOnlyDictionary<string, string> scenePathByRoom = BuildRooms.OfTheBuildSettings().ScenePathByRoom;
-            ILookup<string, string> entryPointIdsByScene = EntryPointIdsByScenePath();
+            ILookup<string, string> entryPointIdsByScene = SceneEntryPoints.IdsByScenePath();
 
             IEnumerable<string> problems = ProjectComponents
                 .ReadAll<MainMenu, MenuStart>(StartOf)
@@ -72,28 +70,11 @@ namespace ProjetoVN.Tests.EditMode
             return null;
         }
 
-        private static ILookup<string, string> EntryPointIdsByScenePath() =>
-            ProjectComponents.ReadAll<RoomEntryPoint, (string ScenePath, string Id)>(ScenePathAndIdOf)
-                .Where(reading => !string.IsNullOrEmpty(reading.Value.ScenePath))
-                .ToLookup(reading => reading.Value.ScenePath, reading => reading.Value.Id);
-
         private static MenuStart StartOf(MainMenu menu) =>
             new MenuStart(
                 menu.gameObject.scene.path,
-                StringField(menu, StartRoomField, nameof(MainMenu)),
-                StringField(menu, StartEntryPointIdField, nameof(MainMenu)));
-
-        private static (string ScenePath, string Id) ScenePathAndIdOf(RoomEntryPoint entryPoint) =>
-            (entryPoint.gameObject.scene.path, StringField(entryPoint, IdField, nameof(RoomEntryPoint)));
-
-        private static string StringField(UnityEngine.Object target, string fieldName, string typeName)
-        {
-            SerializedProperty field = new SerializedObject(target).FindProperty(fieldName);
-            if (field == null)
-                Assert.Fail($"O campo '{fieldName}' do {typeName} foi renomeado; atualize este teste.");
-
-            return field.stringValue;
-        }
+                SerializedFields.StringOf(menu, StartRoomField),
+                SerializedFields.StringOf(menu, StartEntryPointIdField));
 
         private readonly struct MenuStart
         {

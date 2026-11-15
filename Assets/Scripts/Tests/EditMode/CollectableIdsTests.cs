@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.Inventory;
-using UnityEditor;
 
 namespace ProjetoVN.Tests.EditMode
 {
@@ -33,15 +32,6 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         private static (string ScenePath, string Id) ScenePathAndIdOf(CollectableItemBehaviour collectable) =>
-            (collectable.gameObject.scene.path, PersistentIdOf(collectable));
-
-        private static string PersistentIdOf(CollectableItemBehaviour collectable)
-        {
-            SerializedProperty field = new SerializedObject(collectable).FindProperty(PersistentIdField);
-            if (field == null)
-                Assert.Fail($"O campo '{PersistentIdField}' do {nameof(CollectableItemBehaviour)} foi renomeado; atualize este teste.");
-
-            return field.stringValue;
-        }
+            (collectable.gameObject.scene.path, SerializedFields.StringOf(collectable, PersistentIdField));
     }
 }

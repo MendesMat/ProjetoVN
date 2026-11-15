@@ -38,21 +38,12 @@ namespace ProjetoVN.Tests.EditMode
             string menuScene = Path.GetFileNameWithoutExtension(firstScene.path);
 
             var wrongScenes = ProjectComponents
-                .ReadAll<PauseMenu, string>(MainMenuSceneOf)
+                .ReadAll<PauseMenu, string>(menu => SerializedFields.StringOf(menu, MainMenuSceneField))
                 .Where(reading => reading.Value != menuScene)
                 .Select(reading => $"{reading.Location}: cena '{reading.Value}'");
 
             CollectionAssert.IsEmpty(wrongScenes,
                 $"o Voltar ao menu precisa carregar '{menuScene}', a primeira cena do build, que tem o MainMenu");
-        }
-
-        private static string MainMenuSceneOf(PauseMenu menu)
-        {
-            SerializedProperty field = new SerializedObject(menu).FindProperty(MainMenuSceneField);
-            if (field == null)
-                Assert.Fail($"O campo '{MainMenuSceneField}' do PauseMenu foi renomeado; atualize este teste.");
-
-            return field.stringValue;
         }
     }
 }
