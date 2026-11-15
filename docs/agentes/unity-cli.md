@@ -190,12 +190,40 @@ Esse erro não vem do jogo. Espere uns dez segundos depois do `editor_play` ante
 
 ### Trocar de branch com o Editor aberto quando os pacotes mudam
 
-Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pacote que a outra não tem), **feche o Unity antes do `git checkout`** e reabra depois. Com o Editor aberto, ele pode ficar preso no diálogo "Package Manager (busy for …) Resolving packages…": a thread principal para, todo `eval` falha com `Main thread operation timed out`, o `run_tests` expira e a janela do Package Manager não lista nada. Aconteceu duas vezes na issue #5, entre `main` e a branch que instalava o Yarn Spinner.
+Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pacote que a outra não tem), **feche o Unity antes de trocar de branch** (`git checkout`, `gh pr checkout`) **ou de atualizar a atual** (`git pull`, quando o que chega muda os pacotes) e reabra depois. O que trava é o `manifest.json` mudar no disco com o Editor aberto, seja qual for o comando git. Com o Editor aberto, ele pode ficar preso no diálogo "Package Manager (busy for …) Resolving packages…": a thread principal para, todo `eval` falha com `Main thread operation timed out`, o `run_tests` expira e a janela do Package Manager não lista nada. Aconteceu duas vezes na issue #5, entre `main` e a branch que instalava o Yarn Spinner.
 
 - **Como reconhecer:** o arquivo `upm.log`, em `%LOCALAPPDATA%/Unity/Editor/`, mostra `project:resolve-packages --> 200` (a resolução terminou em segundos), mas o diálogo continua aberto. O Package Manager não está trabalhando; quem travou foi o Editor. O mecanismo exato não foi confirmado.
 - **Como sair:** finalize o `Unity.exe` pelo Gerenciador de Tarefas e reabra o projeto já na branch certa. Não é preciso reiniciar o computador. Ao reabrir, responda **No** ao diálogo "Recovering Scene Backups" (a cena válida é a do git) e apague `Assets/_Recovery/` se ela existir.
 - **Não chame `UnityEditor.PackageManager.Client.Resolve()` por `eval`** para forçar a resolução com o Editor aberto: foi logo depois disso, seguido de um `AssetDatabase.Refresh()`, que o Editor travou na segunda vez.
 - Enquanto o pacote não é resolvido, o console mostra erros de compilação que não são do código (`The type or namespace name 'Yarn' could not be found`), e um `run_tests` roda os assemblies antigos e devolve um resultado que não vale para a branch.
+
+#### Antes de trocar de branch
+
+Os comandos de trabalho (`/executar-issue`, `/revisar-issue`) fazem esta conferência antes de todo `git checkout`, `gh pr checkout` e `git pull`. O `git checkout -b` não precisa dela: ele cria a branch no commit em que se está, e nenhum arquivo muda no disco.
+
+1. Atualize as referências remotas, para que `origin/...` exista e esteja em dia:
+
+   ```bash
+   git fetch origin
+   ```
+
+2. Compare `Packages/` da branch atual (`HEAD`) com o destino, que é o commit que o comando vai pôr no disco:
+   - `main`, para um `git checkout main`;
+   - `origin/<branch>`, para um `gh pr checkout` (ele atualiza a branch local pela remota, mesmo quando ela já existe e está atrasada) ou para uma branch que ainda não existe localmente;
+   - `origin/<branch atual>`, para um `git pull`.
+
+   ```bash
+   git diff --quiet HEAD <destino> -- Packages/
+   ```
+
+3. Leia a saída (`echo $?` logo depois, no Git Bash):
+   - **`0`:** `Packages/` é igual nas duas pontas. Troque de branch normalmente, com o Editor aberto.
+   - **`1`:** os pacotes mudam. Se o `unity status` lista um Editor com este projeto, **pare**: diga ao programador qual troca vai fazer e por quê (citando esta seção) e peça para ele fechar o Unity. Continue quando ele confirmar e o `unity status` não listar mais o projeto. Troque de branch e reabra com `unity open .` (sem pipe, como em [O Editor está conectado?](#o-editor-está-conectado)), repetindo `unity status` até `ready`. Se o Editor já estava fechado, troque direto.
+   - **Qualquer outra saída (`128` é a mais comum, de uma referência que não existe):** não é seguro. Faça o `git fetch origin`, confira o nome do destino e repita; não troque de branch antes de ter `0` ou `1`.
+
+A comparação cobre a pasta `Packages/` inteira, não só o `manifest.json`: o `manifest.json` e o `packages-lock.json` mudam juntos (a #5 mexeu nos dois) e a pasta guarda também o pacote embutido `com.merry-yellow.code-assist`. Uma diferença só no lock é rara e custa, no máximo, um fechar e reabrir à toa.
+
+**A volta para a `main` no fim de uma revisão** é o caso que já travou uma sessão (a primeira revisão da #5). Se a conferência der `1` com o Editor aberto, a sessão **não troca**: deixa a branch do PR em checkout e avisa o programador, no encerramento, que a volta para a `main` ficou para ele, com o Unity fechado. A sessão já terminou o trabalho, então não vale parar esperando a resposta.
 
 ### O que não dá para simular
 
@@ -500,7 +528,7 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 
 Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
 
-1. Faça checkout da branch `roteiro/<nome>-<assunto>`. Se o `Packages/manifest.json` da branch for igual ao da `main` (o normal num PR de roteiro), trocar de branch com o Editor aberto é seguro; se diferir, veja a armadilha dos pacotes acima.
+1. Faça checkout da branch `roteiro/<nome>-<assunto>`, depois da conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/`). Num PR de roteiro ela costuma dar `0`, porque o roteirista não mexe em `Packages/`, e então a troca com o Editor aberto é segura.
 2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
 
    ```bash

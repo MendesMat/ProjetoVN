@@ -44,7 +44,23 @@ gh pr view <número do PR> --comments
 
 ## 3. Preparar
 
-Primeira execução:
+**Antes de trocar de branch, confira os pacotes.** Se `Packages/` mudar entre a branch atual e o destino com o Editor deste projeto aberto, trocar de branch pode travá-lo. Receita completa, com o que fazer em cada saída: seção "Antes de trocar de branch" de `docs/agentes/unity-cli.md`. Só `git checkout -b` dispensa a conferência.
+
+Primeira execução. Compare `HEAD` com a `main` local (cobre o `checkout`) e com a `origin/main` (cobre o `pull`; a `main` local pode estar atrasada):
+
+```bash
+git fetch origin
+```
+
+```bash
+git diff --quiet HEAD main -- Packages/
+```
+
+```bash
+git diff --quiet HEAD origin/main -- Packages/
+```
+
+Saída `0` nas duas: siga. `1` em qualquer uma, com `unity status` mostrando o Editor aberto: peça ao programador para fechar o Unity e espere (depois da troca, reabra com `unity open .`); com o Editor fechado, siga. Qualquer outra saída: não é seguro, siga a receita.
 
 ```bash
 git checkout main
@@ -62,7 +78,15 @@ git checkout -b issue-$ARGUMENTS-<resumo-curto>
 gh issue edit $ARGUMENTS --remove-label "estado:pronta" --add-label "estado:em-execucao"
 ```
 
-Reexecução: faça checkout da branch do PR existente e troque `estado:mudancas-pedidas` por `estado:em-execucao`.
+Reexecução: confira os pacotes contra a branch do PR (o nome sai do `gh pr list` do passo 2), com a mesma regra, e só então faça checkout dela e troque `estado:mudancas-pedidas` por `estado:em-execucao`:
+
+```bash
+git fetch origin
+```
+
+```bash
+git diff --quiet HEAD origin/issue-$ARGUMENTS-<resumo-curto> -- Packages/
+```
 
 Confirme a linha de base antes de mudar qualquer coisa:
 

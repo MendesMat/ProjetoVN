@@ -127,6 +127,7 @@ Uma issue pode conceder uma autorização específica no próprio texto (a #3 au
 - **PR:** um por issue, com o modelo de `.github/PULL_REQUEST_TEMPLATE.md`. O corpo cita `Closes #N`.
 - **Merge:** sempre **squash and merge**, com a branch apagada em seguida. Cada issue vira um único commit em `main`, com o título `#N: <título da issue> (#<número do PR>)`. Os commits intermediários (inclusive os da fase vermelha da TDD) ficam só no PR.
 - **Arquivos do Unity:** todo arquivo novo dentro de `Assets/` tem um `.meta` que precisa ser commitado junto. Antes de commitar, confira `git status` por `.meta` sem par e por arquivos que o Editor alterou sem relação com a issue (esses não entram no commit).
+- **Trocar de branch:** antes de um `git checkout`, `gh pr checkout` ou `git pull`, confira se `Packages/` difere entre as duas pontas. Se difere e o Unity está aberto, ele precisa ser fechado antes, senão o Editor pode travar. Receita em [unity-cli.md](unity-cli.md#antes-de-trocar-de-branch); `/executar-issue` e `/revisar-issue` já a seguem.
 - **Cenas:** arquivos `.unity` não se mesclam bem. Trabalhar uma issue por vez é o que evita o conflito.
 
 ## Documentação é parte da entrega
