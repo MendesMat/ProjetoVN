@@ -54,7 +54,8 @@ A M13 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camad
   - **A #124 abre a milestone** porque corrige receitas que todas as sessões seguintes usam (o Esc da pausa, o kerning que a build grava, o mouse na build por script). **A #35 vem logo depois** pelo mesmo motivo: ela muda os próprios comandos de trabalho.
   - **A #36 e a #125** são pequenas e sem decisão pendente. A #125 vem depois da #124 porque as duas mexem no README do `Dialogue` (seções diferentes).
   - **A #105, a #37 e a #34 protegem quem produz conteúdo:** sala com nome repetido, comando com o número errado de parâmetros e `.yarn` novo que não entra no jogo. A #37 precisa fechar antes da #71 (M10), que cria comandos novos de roteiro: se ela escolher o teste genérico de parâmetros, os comandos da #71 já nascem protegidos.
-  - **A #31 fecha a milestone** porque é só uma decisão (vale ou não a D-24 para código chamado de `OnValidate`) e o resultado, um teste ou uma linha em `skills.md`.
+  - **A #31** é só uma decisão (vale ou não a D-24 para código chamado de `OnValidate`) e o resultado, um teste ou uma linha em `skills.md`.
+  - **A #140 fecha a milestone,** depois das que só mexem em documentação e testes, e antes da M9. Ela decide se o Editor pula a recarga de domínio ao entrar no Play, para a D-29 valer na prática. A revisão da #36 mediu que hoje o domínio é recarregado a cada Play, então nenhum dos resets em `SubsystemRegistration` roda de verdade. É ferramenta que custa tempo a cada sessão (o Play e a suíte PlayMode), e muda como toda verificação em Play Mode se comporta: como a #79 na M4, é melhor mudar isso antes das milestones de conteúdo, e um estado estático esquecido aparece antes de a fatia crescer. Priorizada pelo programador em 2026-11-15.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 depende de uma decisão do programador (nome com ou sem cor), que o levantamento pergunta.
@@ -166,6 +167,7 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #37 | Comando de roteiro com número errado de parâmetros trava a conversa | — |
 | #34 | Um .yarn novo não entra no Roteiro.yarnproject sem reimportar o projeto | — |
 | #31 | Decidir se StoryVariableNameCheck precisa de teste (D-24) | — |
+| #140 | Pular a recarga de domínio ao entrar no Play, para a D-29 valer na prática | #36 |
 
 ## M9 — Acabamento da fatia
 
