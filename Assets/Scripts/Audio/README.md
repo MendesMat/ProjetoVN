@@ -85,5 +85,5 @@ A pausa zera o `Time.timeScale`, que **não** para uma `AudioSource`: com a paus
 - **Um `UnityEvent` guarda o tipo por nome:** não renomeie nem mova o `SoundEffect` depois de ligar (`ProjetoVN.Audio.SoundEffect, ProjetoVN.Audio`).
 - **Loop sem estalo:** as fontes da música e do ambiente têm `loop` ligado; a faixa precisa fechar num ciclo completo (sem corte no meio de uma onda) ou a emenda estala. Num WAV gerado por script, use duração e frequências inteiras (o ruído do ônibus fecha o ciclo por filtro circular).
 - **Os testes de música leem só o filho `Music`:** o `MusicTests.MusicSources()` restringe as fontes ao filho `Music`, senão um ambiente tocando quebraria o `PlayingSources().Single()`.
-- **Um id de som que não existe** loga erro com o comando, o id e o nó (`SoundScriptActions`) e a conversa segue. Um comando com o número errado de parâmetros trava a conversa; o `ScriptSoundReferences` (testes) o reprova.
+- **Um id de som que não existe** loga erro com o comando, o id e o nó (`SoundScriptActions`) e a conversa segue. Um comando com o número errado de parâmetros trava a conversa (#37); o `ProjectScripts_CallEveryCommandWithANumberOfParametersItAccepts` (testes), genérico para todo comando, e o `ScriptSoundReferences` o reprovam antes do Play.
 - **Com a janela sem foco** o som continua (D-31).

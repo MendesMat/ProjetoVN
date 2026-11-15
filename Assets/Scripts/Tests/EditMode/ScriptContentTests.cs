@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using ProjetoVN.Audio;
 using ProjetoVN.Core.State;
@@ -100,6 +101,32 @@ namespace ProjetoVN.Tests.EditMode
                 "o id é minúsculas sem acento, dígitos e _");
             Assert.IsEmpty(Repeated(entries.Select(entry => entry.Id)), "ids únicos no registro inteiro");
             Assert.IsEmpty(entries.Where(entry => entry.Clip == null).Select(entry => entry.Id), "todo som tem AudioClip");
+        }
+
+        [Test]
+        public void ProjectScripts_CallEveryCommandWithANumberOfParametersItAccepts()
+        {
+            ScriptCommandCalls calls = ScriptCommandCalls.In(ScriptRun.FromProjectFiles().Program);
+
+            Assert.IsEmpty(calls.Problems(FirstSignatureOfEachName(CommandSignatures())),
+                "o comando leva exatamente os parâmetros da tabela de comandos de docs/autoria/roteiro.md, e um comando que não existe não roda: " +
+                "com o número errado de parâmetros o jogo trava a conversa (Yarn Spinner, #37)");
+        }
+
+        [Test]
+        public void ProjectCommands_IncludeThePackageAndTheProjectCommands()
+        {
+            string[] names = CommandSignatures().Select(signature => signature.Name).ToArray();
+
+            CollectionAssert.IsSubsetOf(new[] { "wait", "dar_item", SignatureCommand }, names,
+                "o TypeCache só vê código compilado: rode depois de uma compilação limpa");
+        }
+
+        [Test]
+        public void ProjectCommands_HaveUniqueNames()
+        {
+            Assert.IsEmpty(Repeated(CommandSignatures().Select(signature => signature.Name)),
+                "dois [YarnCommand] com o mesmo nome: o Yarn Spinner não aceita");
         }
 
         [Test]
@@ -296,6 +323,17 @@ namespace ProjetoVN.Tests.EditMode
 
             return AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guids[0]));
         }
+
+        private static List<ScriptCommandSignature> CommandSignatures() =>
+            TypeCache.GetMethodsWithAttribute<Yarn.Unity.YarnCommandAttribute>()
+                .Select(method => ScriptCommandSignature.From(CommandNameOf(method), method))
+                .ToList();
+
+        private static string CommandNameOf(MethodInfo method) =>
+            method.GetCustomAttribute<Yarn.Unity.YarnCommandAttribute>().Name ?? method.Name;
+
+        private static IEnumerable<ScriptCommandSignature> FirstSignatureOfEachName(IEnumerable<ScriptCommandSignature> signatures) =>
+            signatures.GroupBy(signature => signature.Name).Select(group => group.First());
 
         private static IEnumerable<string> ExpressionsTheSpeakerLacks(CharacterRegistry registry, ScriptSpeakerLine line)
         {
