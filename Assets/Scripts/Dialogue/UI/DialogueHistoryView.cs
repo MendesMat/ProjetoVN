@@ -83,8 +83,9 @@ namespace ProjetoVN.Dialogue.UI
         {
             if (!HasRequiredReferences()) return;
 
-            bool layoutChanged = ShowNewEntries(entries) | HideSurplusRows(entries.Count);
-            ScrollToMostRecent(layoutChanged);
+            bool addedRows = ShowNewEntries(entries);
+            bool hidRows = HideSurplusRows(entries.Count);
+            ScrollToMostRecent(addedRows || hidRows);
             _panelCanvas.enabled = true;
             ClearUiSelection();
         }
