@@ -31,11 +31,17 @@ M0 Fundação
                                                                    └─► M11 Prólogo do ato 1       │
                                                                         └─► M12 Primeira entrega  │
                                                                                                   └╌► M13 Camada de horror (portão)
+
+                                                                               M14 Arte pendente (portão, sem dependência)
 ```
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
 
 A M13 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camada de horror** (D-27). Se o pedido chegar antes de a M12 fechar, ela entra na fila na posição que o programador escolher.
+
+A M14 não depende de nenhuma milestone e também tem portão: **abre quando a arte entregar o que as issues dela pedem.** Ela guarda o que espera arte e não exige código; quando a entrega chegar, entra na fila na posição que o programador escolher.
+
+A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloqueada por" entre as issues abertas: a página de cada issue mostra o que precisa fechar antes dela.
 
 ## Por que esta ordem
 
@@ -55,21 +61,27 @@ A M13 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camad
   - **A #36 e a #125** são pequenas e sem decisão pendente. A #125 vem depois da #124 porque as duas mexem no README do `Dialogue` (seções diferentes).
   - **A #105, a #37 e a #34 protegem quem produz conteúdo:** sala com nome repetido, comando com o número errado de parâmetros e `.yarn` novo que não entra no jogo. A #37 precisa fechar antes da #71 (M10), que cria comandos novos de roteiro: se ela escolher o teste genérico de parâmetros, os comandos da #71 já nascem protegidos.
   - **A #31** é só uma decisão (vale ou não a D-24 para código chamado de `OnValidate`) e o resultado, um teste ou uma linha em `skills.md`.
-  - **A #140 fecha a milestone,** depois das que só mexem em documentação e testes, e antes da M9. Ela decide se o Editor pula a recarga de domínio ao entrar no Play, para a D-29 valer na prática. A revisão da #36 mediu que hoje o domínio é recarregado a cada Play, então nenhum dos resets em `SubsystemRegistration` roda de verdade. É ferramenta que custa tempo a cada sessão (o Play e a suíte PlayMode), e muda como toda verificação em Play Mode se comporta: como a #79 na M4, é melhor mudar isso antes das milestones de conteúdo, e um estado estático esquecido aparece antes de a fatia crescer. Priorizada pelo programador em 2026-11-15.
+  - **A #140** vem depois das que só mexem em documentação e testes, e antes da M9. Ela decide se o Editor pula a recarga de domínio ao entrar no Play, para a D-29 valer na prática. A revisão da #36 mediu que hoje o domínio é recarregado a cada Play, então nenhum dos resets em `SubsystemRegistration` roda de verdade. É ferramenta que custa tempo a cada sessão (o Play e a suíte PlayMode), e muda como toda verificação em Play Mode se comporta: como a #79 na M4, é melhor mudar isso antes das milestones de conteúdo, e um estado estático esquecido aparece antes de a fatia crescer. Priorizada pelo programador em 2026-11-15.
+  - **A #144, a #146, a #134 e a #142 fecham a milestone.** São os achados das sessões da #31, da #37 e da #105, que estavam no backlog com `triagem`; o programador pediu, em 2026-11-15, que nenhuma issue ficasse sem milestone. Elas entram na M8, e não na M9, porque são do mesmo tipo da #105 e da #37: testes e proteções para quem produz conteúdo, sem nada que o jogador veja. A #135 foi fechada como duplicada da #144.
+    - **A #144 vem primeiro:** é só uma frase do `Tests/README.md`, e as três seguintes acrescentam testes ao mesmo README.
+    - **A #146 vem antes da #134:** ela decide se a leitura de campo por `SerializedObject` que o `RoomLinksTests` e o `MainMenuTests` copiam vira um auxiliar comum, e a #134 é um teste novo de conteúdo que lê campos do mesmo jeito. Feita antes, a #134 já nasce usando o auxiliar, em vez de criar a terceira cópia.
+    - **A #134 precisa fechar antes da #128 (M11),** que cria um componente novo com campo de variável de história. Se o teste conferir todo campo `[StoryFlag]`, e não só o do `LockedActionBehaviour`, o componente da #128 já nasce protegido contra nome de variável errado.
+    - **A #142 fecha a milestone e precisa fechar antes da #71 (M10),** pelo mesmo motivo da #37: o fade pelo roteiro pode criar o primeiro comando com parâmetro numérico (a duração), e é aí que um parâmetro do tipo errado passa a travar a conversa.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 depende de uma decisão do programador (nome com ou sem cor), que o levantamento pergunta.
   - **A #52 vem depois da #108 e da #96:** ela valida `minX` < `maxX` no mesmo componente que a #108 ajusta, e a varredura de tooltips cobre também o que a #96 acrescentar.
   - **A #107 fecha a milestone** porque percorre o guia de `salas.md` no Inspector, e o percurso só vale com os limites certos (#108) e com os tooltips no lugar (#52).
-- **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
+- **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 e da #142 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
   - **A #127 abre a milestone,** antes da #71. Ela é a abertura automática da conversa ao chegar na sala, que estava na #71 e saiu dela no planejamento de 2026-11-13: não depende do fade, e a M11 precisa dela duas vezes. A #71 passa a depender dela, porque abrir o prólogo com a tela preta só faz sentido com a conversa já abrindo sozinha na chegada.
 - **O prólogo do ato 1 (M11) vem depois dos efeitos e antes da entrega.** O roteirista mandou um texto novo do prólogo em 2026-11-13: a Cena 1 é a que já está no jogo, e a Cena 2 (o pátio do posto e a loja de conveniência) substitui o conteúdo provisório do posto (#21). Ela usa a conversa de chegada (#127), e a entrega sai melhor com o prólogo de verdade do que com a Luna e a moeda provisórias. Decisões do programador no planejamento: as opções do roteiro são objetos clicáveis no cenário, e não opções de diálogo (são cinco, e uma é secreta, o que a D-11 não permite); a compra na loja é um bloco de opções com `<<dar_item>>`, sem tela de loja; e **o roteiro é fiel ao texto**, então a fatia deixa de ter a escolha de afinidade e o puzzle de item, que os roteiristas vão tratar depois. Priorizadas pelo programador em 2026-11-13.
-  - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista.
+  - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista. Ela depende da #134 (M8), para o campo de variável dela nascer coberto pelo teste de conteúdo.
   - **A #129 tem portão:** o roteirista envia o texto final ao programador, que o passa ao agente, e o `.yarn` é organizado a partir dele (esse texto entra pela issue, não por um PR de roteiro). Ela cria também os personagens, os sons e os itens que o roteiro cita, porque os testes dos roteiros reprovam o que não existe.
   - **A #130 fecha a milestone:** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
-  - **A fonte de caneta da lista de passageiros (#131)** fica no backlog, com `triagem`, até a arte entregar a fonte: ela não muda nada do percurso.
+  - **A fonte de caneta da lista de passageiros (#131)** fica fora da M11, na M14, até a arte entregar a fonte: ela não muda nada do percurso, e a M11 não deve esperar uma entrega de fora para fechar.
 - **A primeira entrega (M12) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9), com a abertura completa (M10) e com o prólogo de verdade (M11). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
 - **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decide a cor do nome na placa normal.
+- **A arte pendente (M14) tem portão de arte,** e não de roteiro: ela guarda as issues que esperam um arquivo da arte e não exigem código. Nasceu na reorganização de 2026-11-15 para a #131, que antes era a única issue do backlog sem portão próprio.
 
 ## M0 — Fundação
 
@@ -168,6 +180,10 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #34 | Um .yarn novo não entra no Roteiro.yarnproject sem reimportar o projeto | — |
 | #31 | Decidir se StoryVariableNameCheck precisa de teste (D-24) | — |
 | #140 | Pular a recarga de domínio ao entrar no Play, para a D-29 valer na prática | #36 |
+| #144 | Tests/README.md diz que a suíte PlayMode roda 37 testes, mas ela roda 48 | — |
+| #146 | RoomLinksTests e MainMenuTests ainda copiam EntryPointIdsByScenePath, ScenePathAndIdOf e StringField | #105 |
+| #134 | Teste de conteúdo para os campos de variável de história das cenas | #31, #146 |
+| #142 | Comando de roteiro com parâmetro do tipo errado provavelmente trava a conversa | #37 |
 
 ## M9 — Acabamento da fatia
 
@@ -188,7 +204,7 @@ Os efeitos de roteiro que o prólogo pede: a conversa que abre sozinha ao chegar
 | Issue | Título | Depende de |
 |---|---|---|
 | #127 | Conversa que abre sozinha ao chegar na sala | — |
-| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37, #127 |
+| #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37, #142, #127 |
 
 ## M11 — Prólogo do ato 1
 
@@ -196,7 +212,7 @@ O prólogo do ato 1 no texto novo do roteirista: a Cena 1 conferida e a Cena 2, 
 
 | Issue | Título | Depende de |
 |---|---|---|
-| #128 | Objeto de cena que aparece quando uma variável da história liga | — |
+| #128 | Objeto de cena que aparece quando uma variável da história liga | #134 |
 | #129 | Prólogo do ato 1: o texto novo do roteirista em .yarn, com personagens, sons e itens | Portão: o texto final do roteirista |
 | #130 | Prólogo do ato 1: montar o pátio do posto e a loja de conveniência, e tirar o conteúdo provisório do posto | #127, #128, #129, #108 |
 
@@ -216,6 +232,14 @@ A fatia vertical, já com o prólogo do ato 1, pronta para ir a alguém de fora,
 | Issue | Título | Depende de |
 |---|---|---|
 | #117 | Camada de horror da interface (quando o roteiro pedir) | #56 |
+
+## M14 — Arte pendente
+
+**Portão:** abre quando a arte entregar o que a issue pede. O que espera arte e não exige código. As issues ficam com `triagem` até lá.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #131 | Fonte de caneta e arte da folha da lista de passageiros (quando a arte entregar) | Portão: a fonte de caneta e a arte da folha |
 
 ## Riscos conhecidos
 
