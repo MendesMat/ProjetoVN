@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.GameFlow.Rooms;
-using UnityEditor;
 
 namespace ProjetoVN.Tests.EditMode
 {
@@ -10,7 +9,6 @@ namespace ProjetoVN.Tests.EditMode
     {
         private const string DestinationRoomField = "destinationRoom";
         private const string EntryPointIdField = "entryPointId";
-        private const string IdField = "id";
 
         [Test]
         public void ScenesAndPrefabs_ExitsNameARoomInTheBuildList()
@@ -30,7 +28,7 @@ namespace ProjetoVN.Tests.EditMode
         public void ScenesAndPrefabs_ExitsNameAnEntryPointOfTheDestination()
         {
             IReadOnlyDictionary<string, string> scenePathByRoom = BuildRooms.OfTheBuildSettings().ScenePathByRoom;
-            ILookup<string, string> entryPointIdsByScene = EntryPointIdsByScenePath();
+            ILookup<string, string> entryPointIdsByScene = SceneEntryPoints.IdsByScenePath();
 
             IEnumerable<string> missing = ProjectComponents
                 .ReadAll<RoomExit, (string Room, string EntryPointId)>(DestinationAndEntryPointOf)
@@ -56,9 +54,7 @@ namespace ProjetoVN.Tests.EditMode
         public void Scenes_EntryPointIdsAreFilledAndUniquePerRoom()
         {
             var problems = new List<string>();
-            var readings = ProjectComponents.ReadAll<RoomEntryPoint, (string ScenePath, string Id)>(ScenePathAndIdOf)
-                .Where(reading => !string.IsNullOrEmpty(reading.Value.ScenePath))
-                .ToList();
+            List<ComponentReading<(string ScenePath, string Id)>> readings = SceneEntryPoints.ReadAll();
 
             problems.AddRange(readings
                 .Where(reading => string.IsNullOrWhiteSpace(reading.Value.Id))
@@ -73,28 +69,11 @@ namespace ProjetoVN.Tests.EditMode
                 "pontos de entrada sem id, ou com o mesmo id mais de uma vez na mesma cena");
         }
 
-        private static ILookup<string, string> EntryPointIdsByScenePath() =>
-            ProjectComponents.ReadAll<RoomEntryPoint, (string ScenePath, string Id)>(ScenePathAndIdOf)
-                .Where(reading => !string.IsNullOrEmpty(reading.Value.ScenePath))
-                .ToLookup(reading => reading.Value.ScenePath, reading => reading.Value.Id);
-
         private static string DestinationRoomOf(RoomExit exit) =>
-            StringField(exit, DestinationRoomField, nameof(RoomExit));
+            SerializedFields.StringOf(exit, DestinationRoomField);
 
         private static (string Room, string EntryPointId) DestinationAndEntryPointOf(RoomExit exit) =>
-            (StringField(exit, DestinationRoomField, nameof(RoomExit)),
-                StringField(exit, EntryPointIdField, nameof(RoomExit)));
-
-        private static (string ScenePath, string Id) ScenePathAndIdOf(RoomEntryPoint entryPoint) =>
-            (entryPoint.gameObject.scene.path, StringField(entryPoint, IdField, nameof(RoomEntryPoint)));
-
-        private static string StringField(UnityEngine.Object target, string fieldName, string typeName)
-        {
-            SerializedProperty field = new SerializedObject(target).FindProperty(fieldName);
-            if (field == null)
-                Assert.Fail($"O campo '{fieldName}' do {typeName} foi renomeado; atualize este teste.");
-
-            return field.stringValue;
-        }
+            (SerializedFields.StringOf(exit, DestinationRoomField),
+                SerializedFields.StringOf(exit, EntryPointIdField));
     }
 }
