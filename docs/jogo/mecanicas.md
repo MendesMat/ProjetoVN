@@ -58,13 +58,13 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Requisito por item (consumido), por flag (não consumida) ou pelos dois.
 - O portão lembra que foi aberto, inclusive depois de recarregar a cena ou carregar um save.
 - Quatro eventos para quem monta a cena: trancado, destrancou agora, está aberto (estado), jogador interagiu com portão aberto (ação).
-- Os dois campos de variável (a exigida e a que guarda a memória) escolhem de uma lista das variáveis booleanas declaradas em `Assets/Roteiro/variaveis.yarn`, mostram a descrição da escolhida e avisam de um valor que não está declarado.
+- Os dois campos de variável (a exigida e a que guarda a memória) escolhem de uma lista das variáveis booleanas declaradas em `Assets/Roteiro/variaveis.yarn`, mostram a descrição da escolhida e avisam de um valor que não está declarado, e a suíte de testes o reprova (`StoryFlagFieldsTests`).
 
 **Regras:**
 - A flag é conferida antes do item, para não gastar a chave à toa.
 - Uma ação iniciada pelo jogador (atravessar a porta) pertence ao evento de ação, nunca ao de estado, que também dispara sozinho ao carregar a cena.
 
-**Limitação conhecida:** renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado no Inspector.
+**Limitação conhecida:** renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava; o aviso só aparece com o objeto selecionado no Inspector, e quem pega o campo órfão sem abrir a cena é a suíte de testes (`StoryFlagFieldsTests`), só depois de rodá-la.
 
 ## Diálogo
 
