@@ -76,7 +76,16 @@ O componente `PlaceholderTint`, que pinta a porta de verde, é provisório: troq
 
 ## Pan do cenário
 
-O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda. **Min X** e **Max X** são os limites; ajuste conforme a largura do fundo.
+O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda. **Min X** e **Max X** são até onde o cenário anda. Para a tela nunca passar do fundo:
+
+- **Max X** = a borda esquerda do fundo, sem o sinal, menos a metade da largura da tela;
+- **Min X** = a metade da largura da tela menos a borda direita do fundo.
+
+A metade da largura da tela é o **Size** da câmera vezes 16/9: **8,89** com Size 5. As bordas do fundo são medidas com a câmera e o **Environment Container** em x 0, como as salas são salvas. O **Max X** é ligado à borda **esquerda** porque o cenário anda para a direita quando o jogador olha para a esquerda.
+
+Exemplo, a `[Teste] Mecanicas`: três painéis de 20,9 de largura (sprite de 16,72 em escala 1,25) em x -20,9, 0 e 20,9 cobrem de -31,35 a 31,35. Então **Max X** = 31,35 − 8,89 = 22,46 e **Min X** = 8,89 − 31,35 = -22,46; a cena usa **22,4** e **-22,4**, arredondados para dentro.
+
+A conta vale para telas 16:9. Uma tela mais larga mostra mais cenário e pode ver a borda (#157).
 
 ## Criar uma sala nova
 
@@ -255,7 +264,7 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 ### `[Fatia] Posto` (com pan)
 
-- **Fundo e pan:** `Environment/ScrollingBackground` leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -40, **Max X** 40) e três painéis com o mesmo sprite, `LeftPanel` (x -20,9, escala -1,25 em X), `MiddlePanel` (x 0) e `RightPanel` (x 20,9, escala -1,25 em X). `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan.
+- **Fundo e pan:** `Environment/ScrollingBackground` leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -22,4, **Max X** 22,4; a conta está em [Pan do cenário](#pan-do-cenário)) e três painéis com o mesmo sprite, `LeftPanel` (x -20,9, escala -1,25 em X), `MiddlePanel` (x 0) e `RightPanel` (x 20,9, escala -1,25 em X). `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan.
 - **`Room Music`:** `teste_musica_b`.
 - **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, no X do `Exit_Onibus` (20): é o lugar que fica no centro da tela quando o jogador chega do ônibus.
 - **`Interactables/NPC_Luna`:** o gatilho com `posto_luna`, em **On Interact**.

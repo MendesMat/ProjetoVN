@@ -471,7 +471,7 @@ Sem o programador e sem a ferramenta de controle do computador, dá para percorr
 - **Esc:** `keybd_event` com o código virtual `0x1B` **e** o scancode `0x01`, segurando ~200 ms. Só o código virtual, ou `SendKeys` com `{ESC}`, não abriu a pausa. Para digitar na folha do nome, `SendKeys.SendWait("Nome")` funciona.
 - **Os objetos provisórios são quadrados pretos** (72×72 px a 1280×720); achá-los na captura (varrer a linha `y = 360` atrás de pixels `0,0,0`) é mais rápido que adivinhar o pan. Cada quadrado não diz o que é: clique e leia a fala.
 - **Uma fala a cada clique no botão de avançar** (`≈ (1024, 566)` a 1280×720), com ~2 s de espera entre cliques; o prólogo inteiro leva ~30 cliques.
-- **Fim do pan.** O pan chega ao vazio preto nas duas bordas (#110, #108): ao voltar, desloque o cenário para o lado oposto até a varredura achar um quadrado.
+- **Fim do pan.** O pan para na borda do fundo (±22,4 no posto, #108). Na borda esquerda do cenário nenhum objeto do posto fica na tela: ao voltar, desloque o cenário para o lado oposto até a varredura achar um quadrado.
 - **O que não se verifica assim:** som e música, o alt-tab real e a sensação do pan. O `Player.log` e o `savegame.json` continuam sendo as provas de estado.
 
 ## Armadilhas de serialização
