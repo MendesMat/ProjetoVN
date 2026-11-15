@@ -72,7 +72,7 @@ unity command run_tests --mode playmode --async_tests true --timeout 300
 unity command test_status
 ```
 
-A PlayMode **não roda de forma síncrona** pelo CLI: `run_tests --mode playmode` sem `--async_tests` é recusado, porque entrar no Play recarrega o domínio e derruba a requisição. O comando volta na hora, sem esperar a execução: na saída em tabela (o padrão) ele mostra `0/0 aprovados (PlayMode, 0s)`, e isso é o esperado, não uma suíte vazia; o `running` só aparece com `--format json`. O resultado vem do `test_status`: repita-o a cada uns 5 s até ele dizer `completed: 3/3 aprovados` (o número cresce com as issues). Durante a recarga de domínio da entrada no Play o `test_status` pode falhar com `Network error`: repita. Para ver a mensagem de uma falha, use `unity command test_status --format json`: o campo `result` traz, por teste, `Status`, `Message` e `StackTrace`. `--mode all` roda a EditMode na hora e devolve a PlayMode como `playmode_running`.
+A PlayMode **não roda de forma síncrona** pelo CLI: `run_tests --mode playmode` sem `--async_tests` é recusado (`PlayMode tests cannot run synchronously over HTTP`). A recusa é do próprio CLI e **continua com o domínio sem recarga** (#140: medido, `success: false` e exit 6 em 2,5 s), então a forma assíncrona segue obrigatória. O comando volta na hora, sem esperar a execução: na saída em tabela (o padrão) ele mostra `0/0 aprovados (PlayMode, 0s)`, e isso é o esperado, não uma suíte vazia; o `running` só aparece com `--format json`. O resultado vem do `test_status`: repita-o a cada uns 5 s até ele dizer `completed: 3/3 aprovados` (o número cresce com as issues). O `test_status` já falhou com `Network error` durante a recarga de domínio da entrada no Play; com a recarga desligada (#140) ele não apareceu em duas execuções seguidas da suíte; se aparecer, repita. Para ver a mensagem de uma falha, use `unity command test_status --format json`: o campo `result` traz, por teste, `Status`, `Message` e `StackTrace`. `--mode all` roda a EditMode na hora e devolve a PlayMode como `playmode_running`.
 
 Para conferir quais testes cada suíte enxerga, `unity command list_tests --mode playmode` e `--mode editor` (um asmdef só de Editor faria um teste PlayMode aparecer na EditMode).
 
@@ -159,6 +159,24 @@ unity command eval 'return UnityEngine.Time.frameCount;'
 Se o número não mudou, o jogo está parado e qualquer conclusão sobre `Start()`, `Update()` ou corrotinas é falsa. O sintoma engana, porque `SceneManager.LoadScene` ainda conclui e os objetos são recriados, e parece que o código de restauração é que está quebrado. Esse congelamento foi visto com `runInBackground` desligado nas verificações da M3; na #79 ele **não se reproduziu** (com a opção desligada e o Editor sem foco, o `frameCount` avançou), então a condição exata que o provoca não está isolada. Por isso o diagnóstico fica, mesmo com a opção ligada.
 
 Asserções feitas só por chamada direta de método (`porta.Interact()`, `GameSaveManager.Instance.Save()`) não dependem de frames e valem mesmo com o jogo parado.
+
+### O Play Mode não recarrega o domínio (#140)
+
+O Editor deste projeto entra no Play em **Reload Scene only** (`EnterPlayModeOptions.DisableDomainReload`): a cena é recarregada, o domínio, não. "Recarregar o domínio" é o Unity descartar o código C# da memória e carregá-lo de novo, o que devolvia todo campo estático ao valor inicial. Sem isso, **o que um Play deixa na memória está lá no Play seguinte**, e os métodos `SubsystemRegistration` da D-29 são o que zera o estado do jogo.
+
+- **Como ler a opção:** `UnityEditor.EditorSettings.enterPlayModeOptions` devolve `DisableDomainReload`. O `m_EnterPlayModeOptionsEnabled: 1` do arquivo e o `enterPlayModeOptionsEnabled` **não dizem o que vale**: manda o `m_EnterPlayModeOptions` (`1` agora; era `0`). Para mudar, `eval` fora do Play com `enterPlayModeOptions = ...` e `AssetDatabase.SaveAssets()`, e confira que o `git diff ProjectSettings/` traz só essa linha.
+- **O que a medição da #140 viu** (`[Teste] Mecanicas`, cinco Plays de cada, o tempo entre `EnterPlaymode()` e o primeiro quadro, pela receita de `SessionState` e `Time.unscaledTimeAsDouble`):
+
+  | | Mínimo | Mediana | Máximo | `Domain Reload Profiling` no `Editor.log` |
+  |---|---|---|---|---|
+  | Antes (`None`) | 1656 ms | 1731 ms | 1821 ms | 5 em 5 Plays |
+  | Depois (`DisableDomainReload`) | 70 ms | 76 ms | 176 ms | 0 em 5 Plays |
+
+  A suíte PlayMode (48 testes) foi de 77,44 s para 74,75 s e 74,67 s: a entrada no Play é uma parte pequena dela. A EditMode (384 testes) não depende da opção.
+- **A recompilação ainda recarrega o domínio** (é a documentação da Unity, e é o que a seção seguinte descreve para `.cs` novo ou alterado). A prova de que "o segundo Play não recarrega" só vale se nenhum `.cs` for salvo entre os dois Plays.
+- **O que sobrevive entre Plays agora:** estático sem reset, `AppDomain.CurrentDomain.SetData`, `SessionState` e assinatura de evento estático. As receitas de FPS e de quadros desta página guardam dados com `AppDomain.CurrentDomain.SetData` (e um `Application.onBeforeRender` assinado por `eval`): **grave antes de ler**, ou o valor lido pode ser o de um Play anterior, e remova a assinatura ao terminar.
+- **Sintoma de um estático sem reset:** "funciona no primeiro Play e falha no segundo". Com a build não acontece, porque ela sempre começa do zero. Procure o campo estático que não tem método em `SubsystemRegistration` (D-29).
+- **Receita de prova (dois Plays seguidos, sem recompilar).** No primeiro Play, num `eval_file`, grave uma marca no domínio (`AppDomain.CurrentDomain.SetData("marca", "play1")`) e outra na história (`StoryState.SetBool("$marca", true)`); leia a contagem de assinantes do `MessageBroker` por reflexão (ferramenta de verificação, não código do jogo): `typeof(MessageBroker).GetNestedType("Handlers`1", BindingFlags.NonPublic).MakeGenericType(tipoDaMensagem).GetField("Snapshot").GetValue(null)` como `System.Array`, e o `Length`; e o `GetInstanceID()` de cada `Instance` de manager. Pare o Play no meio de uma troca de sala (com `fadeSeconds` em 3, `ChangeRoom` e `editor_stop` com o `PlayerInputGate.IsEnabled` em `false`). No segundo Play, espere ~10 s, confirme o `frameCount` e leia o mesmo: a marca do domínio **continua** (o domínio não foi recarregado), a da história **sumiu**, o gate é `true`, as contagens são as do primeiro Play, os `GetInstanceID()` são outros, e há um único `GameStateController`. O `$` e o shell: use `eval_file`.
 
 ### Comandos que falham com "Network error" logo depois de criar ou apagar scripts
 
