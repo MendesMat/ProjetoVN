@@ -216,7 +216,7 @@ A pausa é o primeiro modo **sobreposto** do jogo: `PauseState` entra por `Push`
 | Campo (todos com tooltip) | O que é |
 |---|---|
 | `pauseAction` (`InputActionReference`) | A ação `UI/Pause` (Esc e Start do controle). `OnEnable` habilita e assina `performed`, `OnDisable` desfaz (o padrão do `DialogueInputHandler`). Não é a `Cancel`: ela é `*/{Cancel}`, também o B do controle, e abrir a pausa com o "voltar" do controle é estranho |
-| `mainMenuScene` | O nome da cena do menu principal (`Menu` de partida). Vazio = o Voltar ao menu avisa e nada acontece |
+| `mainMenuScene` | O nome da cena do menu principal (`Menu` de partida). Vazio = o Voltar ao menu fecha a pausa, encerra a conversa e avisa no console, sem sair da sala |
 | `onPaused` | Chamado quando a pausa abre. Ligado a `UIWindowManager.OpenWindow(Pause Window)` e a `SetActive(false)` do `Saved Label` |
 | `onResumed` | Chamado ao retomar. Ligado a `UIWindowManager.CloseAllWindows` |
 | `onSaveAvailabilityChecked` (`UnityEvent<bool>`) | Chamado ao abrir, com `true` se não há conversa. Ligado, **como método dinâmico**, ao `MenuButtonUI.SetInteractable` do SALVAR |

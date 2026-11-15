@@ -69,14 +69,14 @@ namespace ProjetoVN.GameFlow
             if (Instance == null || Instance.itemRegistry == null)
             {
                 Debug.LogError($"[ItemScriptActions] {scriptCall}: não há ItemScriptActions com o ItemRegistry atribuído " +
-                               $"(confira o Managers.prefab) (nó '{CurrentNodeName()}'). Ignorado.", Instance);
+                               $"(nó '{CurrentNodeName()}'; confira o Managers.prefab). Ignorado.", Instance);
                 return false;
             }
 
             if (InventoryManager.Instance == null)
             {
-                Debug.LogError($"[ItemScriptActions] {scriptCall}: não há InventoryManager (o prefab Managers não foi criado) " +
-                               $"(nó '{CurrentNodeName()}'). Ignorado.", Instance);
+                Debug.LogError($"[ItemScriptActions] {scriptCall}: não há InventoryManager " +
+                               $"(nó '{CurrentNodeName()}'; o prefab Managers não foi criado). Ignorado.", Instance);
                 return false;
             }
 

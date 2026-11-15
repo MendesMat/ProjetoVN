@@ -18,7 +18,7 @@ namespace ProjetoVN.GameFlow.Menu
         [SerializeField] private InputActionReference pauseAction;
 
         [Tooltip("A cena do menu principal, exatamente como o arquivo (ex.: Menu). Precisa estar na lista de cenas do build. " +
-                 "Vazio = o Voltar ao menu avisa no console e nada acontece.")]
+                 "Vazio = o Voltar ao menu fecha a pausa, encerra a conversa e avisa no console, sem sair da sala.")]
         [SerializeField] private string mainMenuScene = "Menu";
 
         [Tooltip("Chamado quando a pausa abre. Ligue na abertura da Pause Window (UIWindowManager.OpenWindow) e no " +
