@@ -99,7 +99,7 @@ Uma cena só pode ser alvo de uma troca de sala se estiver na lista de cenas do 
 1. Salve a cena em `Assets/Scenes/`.
 2. Abra **File → Build Profiles → Scene List** e acrescente a cena (**Add Open Scenes** com ela aberta).
 
-**O nome da sala é o nome da cena** (`[Teste] Sala B`), exatamente como está no arquivo. **Ele é único no jogo inteiro:** guarde todas as cenas de sala direto em `Assets/Scenes/`, sem subpasta, porque duas cenas de mesmo nome em pastas diferentes derrubam o `RoomLinksTests` e o `MainMenuTests` sem dizer qual sala se repete (#105). Uma cena que existe no projeto mas não está na lista é uma sala inexistente para o jogo: o console mostra `A sala '…' não existe. A cena existe e está na lista de cenas do build?` e o jogo fica onde está. A sala de teste `[Teste] Sala B` é o exemplo mais enxuto: câmera, fundo e um objeto que abre `porta_trancada`.
+**O nome da sala é o nome da cena** (`[Teste] Sala B`), exatamente como está no arquivo. **Ele é único no jogo inteiro, mesmo em pastas diferentes:** o jogo e o save acham a sala só pelo nome, então `Capitulo1/Corredor` e `Capitulo2/Corredor` seriam a mesma sala para eles, e só uma seria alcançável. As cenas de sala podem ficar em subpastas de `Assets/Scenes/` (por capítulo, por exemplo), desde que nenhum nome se repita. O `RoomLinksTests` reprova duas cenas habilitadas com o mesmo nome e mostra os dois caminhos (#105). Uma cena que existe no projeto mas não está na lista é uma sala inexistente para o jogo: o console mostra `A sala '…' não existe. A cena existe e está na lista de cenas do build?` e o jogo fica onde está. A sala de teste `[Teste] Sala B` é o exemplo mais enxuto: câmera, fundo e um objeto que abre `porta_trancada`.
 
 Durante uma conversa aberta o jogo recusa a troca de sala.
 
@@ -140,7 +140,7 @@ Para ir e voltar entre duas salas, cada sala tem a sua saída e o seu ponto de e
 ### O que confere por você
 
 - O **Inspector** avisa destino vazio, ponto de entrada vazio e id vazio no ponto.
-- O teste `RoomLinksTests`, na suíte de EditMode, reprova saída com destino que não é uma cena do build, saída que cita um ponto que a sala de destino não tem, e ponto sem id ou com id repetido na mesma sala. A mensagem diz a cena, o caminho do objeto e o nome. **Rode a suíte depois de montar ou renomear uma saída ou um ponto.**
+- O teste `RoomLinksTests`, na suíte de EditMode, reprova saída com destino que não é uma cena do build, saída que cita um ponto que a sala de destino não tem, ponto sem id ou com id repetido na mesma sala, e duas cenas habilitadas do build com o mesmo nome. A mensagem diz a cena, o caminho do objeto e o nome. **Rode a suíte depois de montar ou renomear uma saída ou um ponto.**
 - Se algo falhar de forma inesperada no meio da troca, o erro aparece no console e o jogo volta a ficar jogável na sala que ficou carregada, em vez de travar com a tela preta.
 
 ## Personagens
