@@ -581,7 +581,7 @@ Motorista: Obrigado, {$nome_protagonista}.
 
 Um **comando** é uma ordem para o jogo, escrita entre `<<` e `>>`, em uma linha só dele. A lista cresce conforme as mecânicas entram: cada issue que cria um comando o acrescenta aqui.
 
-**Nunca escreva um comando que não esteja nestas tabelas.** Se precisar de um, veja [Como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe). Um comando que não está nas tabelas é reprovado pela verificação do jogo.
+**Nunca escreva um comando que não esteja nestas tabelas.** Se precisar de um, veja [Como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe). Um comando que o jogo não conhece é reprovado pela verificação.
 
 **Cada comando leva exatamente os parâmetros da tabela.** Com outro número, a verificação do jogo reprova, e a conversa travaria se ele chegasse ao jogo. Isso vale para todos os comandos, inclusive `<<assinar_lista>>`, que não leva parâmetro.
 
@@ -890,7 +890,7 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O comando de item tem um id, e só um? | `<<dar_item>>`, `<<dar_item chave_teste mapa>>` | A verificação reprova; no jogo, a conversa **trava**. |
 | O id do som existe na [tabela de sons](#música-e-sons), na lista do comando? | `<<tocar_efeito chuva>>`, `<<tocar_efeito onibus_estrada>>` | A verificação do jogo reprova. |
 | Os comandos de som têm o que precisam? | `<<tocar_efeito>>`, `<<tocar_efeito a b>>`, `<<parar_ambiente x>>` | A verificação reprova; no jogo, a conversa **trava**. |
-| Todo comando existe e tem o número certo de parâmetros? | `<<dar_iten chave_teste>>`, `<<assinar_lista x>>`, `<<wait>>` | A verificação reprova; com o número errado de parâmetros, no jogo a conversa **trava**. |
+| Todo comando existe e tem o número certo de parâmetros? | `<<dar_iten chave_teste>>`, `<<assinar_lista x>>`, `<<remover_item a b>>` | A verificação reprova; com o número errado de parâmetros, no jogo a conversa **trava**. |
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
 | O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |
 | O bloco tem no máximo quatro opções? | cinco linhas `->` seguidas | A quinta some. |
