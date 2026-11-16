@@ -71,7 +71,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
   - **A #52 vem depois da #108 e da #96:** ela valida `minX` < `maxX` no mesmo componente que a #108 ajusta, e a varredura de tooltips cobre também o que a #96 acrescentar.
-  - **A #107 fecha a milestone** porque percorre o guia de `salas.md` no Inspector, e o percurso só vale com os limites certos (#108) e com os tooltips no lugar (#52).
+  - **A #107 fecha a milestone** porque monta o `[Fatia] Posto` só a partir do passo a passo de `salas.md` e corrige o guia, e a montagem só vale com os limites certos (#108) e com os tooltips no lugar (#52).
 - **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 e da #142 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
   - **A #127 abre a milestone,** antes da #71. Ela é a abertura automática da conversa ao chegar na sala, que estava na #71 e saiu dela no planejamento de 2026-11-13: não depende do fade, e a M11 precisa dela duas vezes. A #71 passa a depender dela, porque abrir o prólogo com a tela preta só faz sentido com a conversa já abrindo sozinha na chegada.
 - **O prólogo do ato 1 (M11) vem depois dos efeitos e antes da entrega.** O roteirista mandou um texto novo do prólogo em 2026-11-13: a Cena 1 é a que já está no jogo, e a Cena 2 (o pátio do posto e a loja de conveniência) substitui o conteúdo provisório do posto (#21). Ela usa a conversa de chegada (#127), e a entrega sai melhor com o prólogo de verdade do que com a Luna e a moeda provisórias. Decisões do programador no planejamento: as opções do roteiro são objetos clicáveis no cenário, e não opções de diálogo (são cinco, e uma é secreta, o que a D-11 não permite); a compra na loja é um bloco de opções com `<<dar_item>>`, sem tela de loja; e **o roteiro é fiel ao texto**, então a fatia deixa de ter a escolha de afinidade e o puzzle de item, que os roteiristas vão tratar depois. Priorizadas pelo programador em 2026-11-13.
@@ -195,7 +195,7 @@ O que o jogador e quem monta sala veem de errado na fatia vertical. Nenhuma mec�
 | #96 | Navegação por teclado pousa em botão desabilitado, sem destaque (menu principal e pausa) | — |
 | #56 | Nome colorido na placa de nome é difícil de ler | — |
 | #52 | Campos do Inspector sem tooltip (regra 8) | #108, #96 |
-| #107 | Percorrer no Inspector o passo a passo de salas.md da fatia vertical | #108, #52 |
+| #107 | Montar o [Fatia] Posto só a partir do passo a passo de salas.md e corrigir o guia | #108, #52 |
 
 ## M10 — Efeitos de roteiro
 
