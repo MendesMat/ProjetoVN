@@ -672,6 +672,7 @@ GameObject:
   - component: {fileID: 8514717808334278749}
   - component: {fileID: 4319558014341780117}
   - component: {fileID: 7157336214106072210}
+  - component: {fileID: 8808046390659081121}
   m_Layer: 0
   m_Name: Panel
   m_TagString: Untagged
@@ -767,6 +768,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8808046390659081121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293894988232459670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aca024f09e524743bf37ccdff8b12bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.UI::ProjetoVN.UI.Components.VerticalButtonNavigation
+  items:
+  - {fileID: 3179444204589633724}
+  - {fileID: 4415999348634481839}
+  - {fileID: 6317737799230190714}
+  wrapAround: 1
 --- !u!1 &380118111452253919
 GameObject:
   m_ObjectHideFlags: 0
