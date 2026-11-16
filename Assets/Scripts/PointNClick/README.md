@@ -9,8 +9,8 @@ O módulo **PointNClick** é responsável pela mecânica central de interação 
 ## Estrutura Principal
 
 - **`PointNClickSelector`**: É o "motor" do clique. Ele dispara *Raycasts* a partir da posição do mouse na tela em direção à cena para detectar se o cursor está sobre algum objeto interativo (com *Colliders*). Ele gerencia os eventos de clique, repassando o comando para o objeto clicado.
-- **`ScreenPanController`**: Permite que o jogador desloque a visão da câmera para as laterais ao mover o mouse para as bordas da tela, algo clássico em Visual Novels de exploração.
-- **`InteractableItem`**: Componente anexado aos objetos da cena que diz ao sistema: "Eu posso ser clicado!".
+- **`ScreenPanController`**: Permite que o jogador desloque a visão da câmera para as laterais ao mover o mouse para as bordas da tela, algo clássico em Visual Novels de exploração. Todo campo tem tooltip (#52). `Pan Speed` e `Edge Threshold` não aceitam negativo (`[Min(0)]`), e o padrão de `Pan Speed` é **10**, o das salas (era 300, o que fazia um componente novo atravessar o pan da `[Teste] Mecanicas` em 0,15 s). O `OnValidate` avisa `Min X` maior que `Max X` (o pan pularia entre os dois limites; `Min X` igual a `Max X` vale, é a sala sem pan) e `Environment Container` vazio.
+- **`InteractableItem`**: Componente anexado aos objetos da cena que diz ao sistema: "Eu posso ser clicado!". Todo campo tem tooltip (#52). `Highlight Scale Multiplier` não aceita menos que 1 (`[Min(1)]`), e o `OnValidate` avisa `Outline Object` que é o próprio objeto ou um pai dele (o `Awake` o desligaria e o objeto sumiria da sala). `On Interact` vazio **não** avisa: o prefab `Interactable` vem assim de fábrica.
 - **`PlayerInputGate`**: Classe estática que guarda a **fonte única de verdade** sobre se o jogador pode interagir com o mundo agora.
 
 ---
