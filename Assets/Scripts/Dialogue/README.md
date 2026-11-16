@@ -18,7 +18,7 @@ O módulo enxerga só o `Core`, o `Audio` (desde a #20, só para o som de avanç
 | `DialogueManager` | `MonoBehaviour` com `Instance`, o dono do diálogo: a API pública e o adaptador do runner; `Instance` zerado em `SubsystemRegistration` (D-29) | `Managers.prefab` |
 | `ConversationNotifier` | C# puro: publica `DialogueStartedMessage` e `DialogueEndedMessage`, cada uma uma vez por conversa | `Logic/` |
 | `ScriptNodeName` | C# puro: o formato dos nomes de nó (`FollowsConvention`) | `Logic/` |
-| `CharacterSO` | ScriptableObject somente leitura (D-02): `Id`, `DisplayName`, `NameColor` e a lista de sprites por expressão (`CharacterExpression`: nome da expressão e `Sprite`). A primeira é a expressão padrão (`DefaultExpression`); `TryGetSprite` acha o sprite de uma expressão | `Characters/`; os assets em `Assets/Scripts/ScriptableObjects/Characters/` |
+| `CharacterSO` | ScriptableObject somente leitura (D-02): `Id`, `DisplayName`, `NameColor` (a cor do balão do personagem no histórico; a placa de nome não a usa, #56) e a lista de sprites por expressão (`CharacterExpression`: nome da expressão e `Sprite`). A primeira é a expressão padrão (`DefaultExpression`); `TryGetSprite` acha o sprite de uma expressão | `Characters/`; os assets em `Assets/Scripts/ScriptableObjects/Characters/` |
 | `CharacterRegistry` | ScriptableObject com a lista de `CharacterSO`. `TryGetByScriptName` acha o personagem pelo nome exibido (comparação exata). O campo `Protagonist` aponta quem o jogo trata como protagonista. Sem `Instance` (D-04): é referenciado pelo apresentador | `Characters/` |
 | `ExpressionTag` | C# puro: lê de `line.Metadata` a etiqueta de expressão, ignorando as do Yarn (`lastline`, `line:…`) e a `acao`, que é de opção e não é expressão | `Logic/` |
 | `ConversationStage` | C# puro, criado com `new` pelo apresentador: quem está em cada um dos dois lugares da tela de personagens, quem está em destaque e a última expressão de cada um. Estado só da conversa em curso, fora do save. Ver [Personagens na tela](#personagens-na-tela) | `Logic/` |
@@ -122,11 +122,11 @@ A cada fala, o `ShowLine` procura o nome de quem fala (`line.CharacterName`) no 
 |---|---|---|
 | **Narração** (sem nome) | desligada | ninguém entra; quem está na tela escurece (`DimEveryone`) |
 | **Pensamento** (`Pensamento:`, #61) | desligada | `DimEveryone`, **sem aviso** de personagem desconhecido: o nome reservado é reconhecido antes da busca no registro |
-| **Personagem conhecido**, sem etiqueta | o `DisplayName`, na `NameColor` do asset | ele fala (`Speak`) com a expressão padrão (a primeira da lista): em destaque, e os demais escurecem |
+| **Personagem conhecido**, sem etiqueta | o `DisplayName`, na cor única da placa | ele fala (`Speak`) com a expressão padrão (a primeira da lista): em destaque, e os demais escurecem |
 | Personagem conhecido, **com etiqueta** (`#raiva`) | idem | idem, com a expressão da etiqueta, **para esta fala** |
 | Personagem conhecido, **expressão que ele não tem** | idem | idem, com a expressão padrão e `LogWarning` (personagem, expressão e nó) |
 | Personagem conhecido **sem nenhuma expressão** | idem | `DimEveryone`, sem aviso |
-| **Personagem desconhecido** | o nome do roteiro, na cor padrão da placa | `DimEveryone`, com `LogWarning` (nome e nó) |
+| **Personagem desconhecido** | o nome do roteiro, na cor única da placa | `DimEveryone`, com `LogWarning` (nome e nó) |
 | **As opções de resposta abrem** | continua a da fala anterior (quem perguntou) | `GiveTurnToPlayer` com o `Protagonist` do registro: entra se não estava e fica em destaque, e quem estava escurece. Sem registro, sem `Protagonist` ou sem expressão: `DimEveryone` |
 | **A conversa termina** | some com a caixa | `Clear`: os dois lugares ficam vazios |
 
@@ -161,9 +161,9 @@ De onde vêm os números dos personagens: da **cena de referência** que a arte 
 O que isso exige de quem monta o prefab e o conteúdo:
 
 - **O nome mostrado sai de um único método privado** (`NameToDisplay`): o `DisplayName` do personagem e, para o `Protagonist` do `CharacterRegistry`, o nome que o jogador escolheu (`ProtagonistName.ToDisplay` sobre `$nome_protagonista` do `StoryState`), ou `???` enquanto ele não assinou (#26, D-21). O roteiro continua escrevendo `Protagonista:`. A placa e o histórico passam por ele; o pensamento, não.
-- **`characterRegistry` vazio:** todo nome aparece em texto puro, sem cor e sem sprite, as opções não trazem ninguém, com **um** erro no `Start` e um aviso no `OnValidate`. **`characterStage` vazio:** os personagens não aparecem na tela.
+- **`characterRegistry` vazio:** todo nome aparece sem sprite, as opções não trazem ninguém, com **um** erro no `Start` e um aviso no `OnValidate`. **`characterStage` vazio:** os personagens não aparecem na tela.
 - **`CharacterRegistry.Protagonist`** é o campo que diz quem é o protagonista. O `OnValidate` do registro avisa quando está vazio ou fora da lista, e o `ScriptContentTests` confere (`CharacterRegistry_NamesAProtagonistFromItsList`).
-- A cor padrão da placa é a que o `SpeakerName` tem no prefab, guardada no `Start`.
+- **A placa tem uma cor só (#56):** a que o `SpeakerName` tem no `GameUI.prefab` (`#FFF3FB`, o branco rosado do guia da interface). O `ShowSpeaker` não escreve em `speakerNameText.color`, então não há o que devolver entre falas. A `NameColor` do `CharacterSO` serve só ao balão do histórico. O `Start` guarda essa cor para o balão do personagem desconhecido no histórico.
 - O `ScriptContentTests` reprova nome fora do registro e expressão inexistente antes do Play; os avisos acima são a rede de segurança para o que chegar ao jogo.
 
 **Limitações conhecidas:** **os personagens passam por baixo das bordas dos botões de opção** (os botões ocupam x 680–1240; quem está à esquerda chega a x 775 e quem está à direita começa em x 1145), porque a cena de referência não mostra as opções; isso se resolve quando a arte entregar a interface nova, com uma referência de opções abertas; o sprite do lado esquerdo é desenhado por cima do painel de inventário (que só ficará visível em puzzle; será tratado depois); a `raiva` da Luna é uma cópia provisória da neutra com um quadrado vermelho; e não há comando para o roteiro tirar alguém da tela, então um `<<jump>>` que emenda dois encontros deixa o primeiro personagem na tela, escurecido, até alguém tomar o lugar dele.
@@ -195,7 +195,7 @@ O jogador relê a conversa em curso (D-30, #25), com a aparência de um app de m
 | Momento | Entrada | Lado e estilo |
 |---|---|---|
 | Fala do `Protagonist` do registro (`AddProtagonistLine`) | `Speech`, com o nome já resolvido por `NameToDisplay` (D-21: o nome escolhido pelo jogador troca em um lugar só e o histórico acompanha; as falas já gravadas ficam com o nome que tinham na hora, então a primeira continua `???` depois da assinatura) e a `NameColor` do `CharacterSO`, guardada com alfa 1 | **direita**; balão na `NameColor` |
-| Fala de outro personagem (`AddSpokenLine`) | `Speech`, idem. Personagem desconhecido: o nome do roteiro e a cor padrão da placa (branca) | **esquerda**; balão na `NameColor` |
+| Fala de outro personagem (`AddSpokenLine`) | `Speech`, idem. Personagem desconhecido: o nome do roteiro e a cor da placa (`#FFF3FB`) | **esquerda**; balão na `NameColor` |
 | Narração | `Narration`, só o texto, sem nome | **centro**; balão neutro (opaco, com contorno), texto em itálico |
 | Pensamento do protagonista (`AddThought`, #61) | `Thought`, só o texto, sem nome e sem cor (`SpeakerColor` é `Color.clear`, como na narração: o histórico não usa a cor de pensamento, #115) | **direita**; balão escuro e opaco (`thoughtBubbleColor`), com contorno; texto claro em itálico (`BubbleTextColor`). Não usa a `NameColor` do protagonista nem a cor de pensamento da caixa |
 | Opção escolhida (`Choose`, depois das guardas) | como fala do `Protagonist` do registro (`AddProtagonistLine`). Sem registro ou sem `Protagonist`, entra como narração. **Exceção, a opção de ação (#65):** entra sempre como narração (`AddNarration`), no centro e em itálico, e não como fala do protagonista. O `runSelectedOptionAsLine` do runner está **desligado** no `Managers.prefab`: ligá-lo duplicaria a opção no histórico | **direita** |
@@ -285,6 +285,8 @@ O jogador escolhe o nome (#26, D-21) ao assinar a lista de passageiros. O caminh
 ### Arte
 
 **A caixa (`DialogueBox.svg`) é opaca (#61):** o preenchimento escuro é `rgb(36,17,31)` sem transparência e a camada rosa tem 25%, para o texto ter contraste igual em qualquer cenário. Os valores medidos estão em [O pensamento do protagonista](#o-pensamento-do-protagonista).
+
+**A placa de nome (`SpeakerNameplate.svg`) mede `#895B7B` na tela (#56), não `#653D5B`.** O plum `#2A1025` com o véu rosa a 34% é misturado em espaço linear (o projeto está em `ColorSpace.Linear`); a conta em gama, a mesma armadilha da caixa na #61, dava `#653D5B`. Sobre `#895B7B` (luminância 0,142) o contraste é: `#FFF3FB` 5,06:1, `#FFFFFF` 5,46:1, e **6 dos 7 personagens com a `NameColor` ficam abaixo de 4,5:1** (a Luna, `#D9A6FF`, tem 2,82:1). Foi por isso que o nome deixou de usar a `NameColor`. Quem mexer na cor da placa, no véu ou na cor do nome refaz a conta com a medição na tela.
 
 A arte fica em `Assets/UI/` (SVGs importados como **Textured Sprite** e desenhados com `Image` comum do uGUI). `Exemplo.svg` é o mockup de layout, não é usado em cena.
 

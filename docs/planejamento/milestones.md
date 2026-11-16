@@ -80,7 +80,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #130 fecha a milestone:** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
   - **A fonte de caneta da lista de passageiros (#131)** fica fora da M11, na M14, até a arte entregar a fonte: ela não muda nada do percurso, e a M11 não deve esperar uma entrega de fora para fechar.
 - **A primeira entrega (M12) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9), com a abertura completa (M10) e com o prólogo de verdade (M11). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
-- **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decide a cor do nome na placa normal.
+- **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decidiu que o nome na placa normal tem uma cor só (`#FFF3FB`).
 - **A arte pendente (M14) tem portão de arte,** e não de roteiro: ela guarda as issues que esperam um arquivo da arte e não exigem código. Nasceu na reorganização de 2026-11-15 para a #131, que antes era a única issue do backlog sem portão próprio.
 
 ## M0 — Fundação
