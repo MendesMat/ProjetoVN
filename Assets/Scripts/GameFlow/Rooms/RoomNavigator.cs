@@ -10,8 +10,9 @@ namespace ProjetoVN.GameFlow.Rooms
 {
     /// <summary>
     /// O dono da troca de sala. <see cref="ChangeRoom"/> confere o pedido, fecha o input pelo estado de transição,
-    /// escurece a tela, carrega a cena e clareia. Vive no <c>Managers.prefab</c>; o nome da sala é o nome da cena,
-    /// que precisa estar na lista de cenas do build.
+    /// escurece a tela, carrega a cena e clareia. Numa troca bem-sucedida, depois de voltar à exploração, abre a
+    /// <see cref="RoomArrivalDialogue"/> da sala nova, se ela tiver uma. Vive no <c>Managers.prefab</c>; o nome da sala
+    /// é o nome da cena, que precisa estar na lista de cenas do build.
     /// </summary>
     public sealed class RoomNavigator : MonoBehaviour
     {
@@ -115,6 +116,8 @@ namespace ProjetoVN.GameFlow.Rooms
 
         private async Awaitable ChangeRoomAsync(string roomName, string entryPointId, bool saveOnArrival)
         {
+            bool hasArrived = false;
+
             try
             {
                 await screenFader.FadeOutAsync(fadeSeconds, destroyCancellationToken);
@@ -124,6 +127,7 @@ namespace ProjetoVN.GameFlow.Rooms
                 CurrentEntryPointId = entryPointId;
                 if (saveOnArrival) SaveOnArrival();
                 await screenFader.FadeInAsync(fadeSeconds, destroyCancellationToken);
+                hasArrived = true;
             }
             catch (OperationCanceledException)
             {
@@ -139,6 +143,17 @@ namespace ProjetoVN.GameFlow.Rooms
             }
 
             _stateController.LeaveRoomTransition();
+            if (hasArrived) OpenArrivalDialogue();
+        }
+
+        // Só depois do LeaveRoomTransition: uma conversa aberta durante a troca poria o jogo em DialogueState,
+        // e a saída da transição o devolveria à exploração com a conversa aberta (D-19).
+        private static void OpenArrivalDialogue()
+        {
+            RoomArrivalDialogue arrival = FindFirstObjectByType<RoomArrivalDialogue>();
+            if (arrival == null) return;
+
+            arrival.Open();
         }
 
         // Um Awaitable descartado engole a exceção sem log, e o jogo ficaria preso em RoomTransitionState com a tela escura.
