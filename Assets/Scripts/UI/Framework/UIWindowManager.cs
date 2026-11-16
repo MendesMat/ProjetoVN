@@ -4,6 +4,8 @@ namespace ProjetoVN.UI.Framework
 {
     public class UIWindowManager : MonoBehaviour
     {
+        [Tooltip("A janela aberta quando a cena começa (no Menu, a de título). " +
+                 "Vazio = nenhuma janela abre sozinha, que é o caso da pausa.")]
         [SerializeField] private UIWindow startingWindow;
 
         private readonly WindowStack<UIWindow> _windows = new();
