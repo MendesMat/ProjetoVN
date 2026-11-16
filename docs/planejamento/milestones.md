@@ -67,10 +67,11 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
     - **A #146 vem antes da #134:** ela decide se a leitura de campo por `SerializedObject` que o `RoomLinksTests` e o `MainMenuTests` copiam vira um auxiliar comum, e a #134 é um teste novo de conteúdo que lê campos do mesmo jeito. Feita antes, a #134 já nasce usando o auxiliar, em vez de criar a terceira cópia.
     - **A #134 precisa fechar antes da #128 (M11),** que cria um componente novo com campo de variável de história. Se o teste conferir todo campo `[StoryFlag]`, e não só o do `LockedActionBehaviour`, o componente da #128 já nasce protegido contra nome de variável errado.
     - **A #142 precisa fechar antes da #71 (M10),** pelo mesmo motivo da #37: o fade pelo roteiro pode criar o primeiro comando com parâmetro numérico (a duração), e é aí que um parâmetro do tipo errado passa a travar a conversa.
-  - **A #163, a #166 e a #162 fecham a milestone.** Vieram das sessões da #107 e da #52 e foram priorizadas pelo programador na triagem de 2026-11-16, quando a M8 e a M9 já não tinham nada aberto.
+  - **A #163, a #166 e a #162 vêm em seguida.** Vieram das sessões da #107 e da #52 e foram priorizadas pelo programador na triagem de 2026-11-16, quando a M8 e a M9 já não tinham nada aberto.
     - **A #163 vem primeiro** porque corrige uma premissa que toda sessão lê: `salas.md` e `CLAUDE.md` dizem que uma pessoa monta as salas no Inspector, e quem monta é o agente, pelo CLI. Ela esperava a #107, que reescreveu o passo a passo de `salas.md`. Feita agora, o levantamento da #130 (M11), que monta o pátio e a loja, já parte da premissa certa.
     - **A #166 vem logo depois,** pelo mesmo motivo: também é sobre a montagem de sala pelo agente. O `NewScene`, primeiro passo da montagem em `salas.md`, fecha a cena aberta sem perguntar, e `unity-cli.md` não avisa nem diz o que acontece com uma cena com alteração não salva (a alteração se perde ou abre um diálogo que trava o Editor). Ela mede o caso e escreve a receita antes de a #130 montar duas salas. Mexe em `unity-cli.md`, e a #163 em `salas.md` e `CLAUDE.md`, então não disputam arquivo.
     - **A #162** fecha os dois furos do teste de guarda da regra 8 (classe `[Serializable]` de outro módulo e a base dela). É do mesmo tipo da #105 e da #37, e a M10 e a M11 criam componentes novos que o teste deve cobrir por inteiro.
+  - **A #171 fecha a milestone,** pela triagem pedida pelo programador em 2026-11-16, depois do PR #172. Veio da revisão da #166: a receita da suíte em `unity-cli.md` confere só a cena ativa antes do `run_tests`, enquanto a receita de "Abrir e salvar cena", escrita pela #166, confere todas as cenas abertas. A receita da suíte é seguida em toda issue, e um diálogo do Test Runner trava o Editor dirigido pelo CLI. É só documentação, com uma medição antes, e não disputa arquivo com nada aberto.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
@@ -193,6 +194,7 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #163 | salas.md e CLAUDE.md dizem que uma pessoa monta as salas no Inspector; quem monta é o agente, pelo CLI | #107 |
 | #166 | unity-cli.md não avisa que NewScene fecha a cena aberta, mesmo com alteração não salva | #107 |
 | #162 | Teste de guarda dos tooltips não olha classe [Serializable] de outro módulo nem a base dela | #52 |
+| #171 | unity-cli.md: a conferência antes da suíte olha só a cena ativa, não as aditivas | #166 |
 
 ## M9 — Acabamento da fatia
 
