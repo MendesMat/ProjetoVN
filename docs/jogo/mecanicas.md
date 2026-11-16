@@ -201,7 +201,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 **Para o jogador:** o jogo abre em um menu com a arte do NOTURNA e os itens Novo Jogo, Continuar, Opções e Sair. O item destacado (mouse ou teclado) ganha a lua, o sublinhado e a sombra rosa; a pausa e as confirmações usam o mesmo estilo. Esc pausa o jogo, e a pausa salva e volta ao menu.
 
 **Existe:**
-- A cena `Menu.unity` é a **primeira cena** do jogo (cena 0 do build), com janelas de título e de configurações, navegação por mouse e teclado.
+- A cena `Menu.unity` é a **primeira cena** do jogo (cena 0 do build), com janelas de título e de configurações, navegação por mouse e teclado. O teclado e o controle **pulam o botão desabilitado** (o Continuar sem save, o Salvar durante uma conversa) e nunca pousam nele (#96).
 - **Novo Jogo** zera o estado e abre a sala inicial (#17); se já existe um save, pede confirmação antes ("Já existe um jogo salvo. Começar um novo jogo vai substituí-lo."), com VOLTAR selecionado. O save antigo é substituído quando o jogador chega na sala.
 - **Continuar** fica desabilitado sem save (ou com o save corrompido) e, com save, carrega o jogo salvo.
 - **Sair** fecha o jogo (no Editor, encerra o Play Mode).
