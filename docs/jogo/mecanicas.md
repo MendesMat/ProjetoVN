@@ -16,6 +16,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Navegação entre salas](#navegação-entre-salas) | existe | `GameFlow` | — |
 | [Salvar e carregar](#salvar-e-carregar) | existe | `GameFlow` | — |
 | [Menu e pausa](#menu-e-pausa) | existe | `UI`, `GameFlow` | — |
+| [Efeitos de tela do roteiro](#efeitos-de-tela-do-roteiro-71) | existe | `GameFlow` | #71 |
 | [Áudio](#áudio) | existe | `Audio` | #19, #20 |
 
 A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`. O percurso do jogador (as salas `[Fatia] Onibus` e `[Fatia] Posto`) é a fatia vertical, montada só com Inspector e roteiro (#21).
@@ -214,6 +215,20 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - **Voltar ao menu** pede confirmação ("Voltar ao menu? O progresso desde o último save será perdido."), com VOLTAR selecionado; Esc com a confirmação aberta fecha tudo e retoma o jogo. Funciona também durante uma conversa, que é encerrada. O Novo Jogo iniciado depois não herda nada da sessão anterior.
 
 **Fora do escopo:** tela de configurações (volume, velocidade do texto), Esc fechando as janelas do menu principal, "Sair do jogo" na pausa.
+
+## Efeitos de tela do roteiro (#71)
+
+**Para o jogador:** durante uma conversa a tela pode escurecer e clarear aos poucos, e uma imagem de tela cheia (uma lembrança, uma passagem de tempo) pode aparecer e sumir por cima da sala. O prólogo "A viagem" abre no preto, clareia até o ônibus por dentro, passa por uma lembrança dos pais e volta ao ônibus.
+
+**Existe (#71):**
+- **Quatro comandos de roteiro**, todos com a duração em segundos como último parâmetro, opcional (padrão 1 s; `0` na hora): `<<escurecer>>`, `<<clarear>>`, `<<mostrar_imagem id>>` e `<<esconder_imagem>>`. O roteiro espera o efeito terminar antes da linha seguinte; **clicar durante o efeito não faz nada**, como no `<<wait>>`, e a **pausa o congela**. Os ids de imagem vêm do `PictureRegistry`, e um teste confere os ids dos roteiros.
+- **Uma camada de tela própria**, dentro da interface de jogo: na frente da sala e do inventário, **atrás dos personagens e da caixa de diálogo**, então o roteiro pode pôr falas sobre o preto ou sobre a imagem. Duas camadas: a imagem embaixo e o escuro em cima.
+- **Sala que chega escura:** o campo **Starts Dark** do `Room Arrival Dialogue` liga o escuro antes de a tela clarear, e o nó da conversa de chegada clareia com `<<clarear>>`. A ordem da conversa de chegada (depois de clarear e de o jogo voltar à exploração, #127) não muda. Ao **voltar** à sala depois do prólogo, a tela chega preta, a conversa abre e fecha sem mostrar a caixa e o preto some em 0,4 s.
+- **Ao fim da conversa**, o escuro e a imagem que o roteiro deixou na tela somem aos poucos, em 0,4 s (na hora se a conversa de chegada não abre). Nada entra no save nem no histórico de falas.
+- **Os três pedidos de imagem do prólogo** (`onibus_viagem`: começar no preto e clarear, a lembrança com as silhuetas dos pais, e a lembrança sumindo) viram comandos. A imagem `lembranca_pais` é **provisória** (gerada por script: fundo escuro, fumaça cinza nas bordas, duas silhuetas); a arte definitiva da lembrança e do ônibus por dentro à noite é um pedido de arte à parte.
+- Como usar: [roteiro.md](../autoria/roteiro.md#tela-e-imagens) e [salas.md](../autoria/salas.md#imagens-para-o-roteiro-71).
+
+**Fora do escopo:** troca suave entre duas imagens (passe pelo preto), cor do escuro configurável, tirar um personagem de cena, mais de uma imagem ao mesmo tempo, comandar a tela **fora** de uma conversa, pular o efeito com um clique.
 
 ## Áudio
 

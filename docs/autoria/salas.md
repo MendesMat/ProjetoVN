@@ -52,6 +52,7 @@ Uma sala pode abrir uma conversa sozinha quando o jogador chega nela, sem clique
 
 1. Crie um objeto vazio **na raiz** da cena, chamado `Room Arrival` (ao lado do `Room Music`), e acrescente o componente **Room Arrival Dialogue**.
 2. Em **Node Name**, escolha na lista o nó do roteiro que a sala abre (por exemplo `onibus_chegada`). A lista é a mesma do gatilho de clique, e um nó novo aparece depois que o Unity reimporta o roteiro.
+3. Se a sala deve chegar **com a tela escura** (a conversa começa no preto e clareia, como o prólogo), ligue **Starts Dark**. Deixe desligado nas demais: a sala chega com a tela clara, como sempre.
 
 **(nenhum)** deixa o campo vazio: a sala não abre conversa, e o Inspector e o console avisam. Um nó que deixou de existir continua no campo, com aviso, e o teste `ScriptNodeFieldsTests` o reprova. **Uma conversa de chegada por sala:** o `RoomArrivalDialogueTests` reprova uma cena com dois.
 
@@ -60,6 +61,15 @@ Uma sala pode abrir uma conversa sozinha quando o jogador chega nela, sem clique
 - **Se repete?** A sala abre o nó a cada chegada, sem condição: quem decide se a conversa se repete é o **roteiro** (ver [roteiro.md](roteiro.md#conversa-de-chegada-a-sala-abre-o-nó-e-o-nó-decide)). O `onibus_chegada` é o exemplo: chama o prólogo só se `$prologo_concluido` ainda é falso. Um nó que, na segunda chegada, não tem nada a dizer abre e fecha a conversa sem mostrar a caixa.
 - **Uma conversa de chegada que termina** devolve o jogo à exploração, como qualquer outra; a pausa e o histórico funcionam nela. Quem sai no meio dela deixa o save de antes dela (salvar é recusado durante uma conversa), então no Continuar ela abre de novo.
 - **Uma sala sem objeto `Room Arrival`** não abre nada, sem aviso.
+
+### Chegar com a tela escura (#71)
+
+Com **Starts Dark** ligado, na troca de sala o jogo liga o escuro do roteiro **antes** de a tela clarear (a troca em si continua clareando em 0,4 s, agora **sobre o preto**, então o jogador não vê a sala). Quando a conversa de chegada abre, o nó clareia com `<<clarear>>` ([roteiro.md](roteiro.md#tela-e-imagens)). O escuro mora no `GameUI.prefab`, **não na cena**: você só liga o campo.
+
+- **Todo o resto da chegada não muda:** a conversa abre depois de a tela clarear e do jogo sair da transição, e o save da chegada acontece antes dela.
+- **O escuro vale em toda chegada naquela sala**, inclusive ao **voltar** a ela por uma saída (o ônibus, depois do prólogo): a tela chega preta, a conversa de chegada abre e fecha sem mostrar a caixa e o preto some em 0,4 s. É a chegada comum, 0,4 s mais longa.
+- **Se a conversa de chegada não abrir** (nó vazio ou ausente), o escuro é desfeito na hora, então a sala nunca fica presa no preto.
+- **Sem o campo ligado, ou sem `Room Arrival`,** nada muda para a sala.
 
 ## Portão (porta trancada)
 
@@ -261,13 +271,23 @@ O roteiro cita o som por um **id** (`<<tocar_efeito freada_batida>>`; ver [rotei
 
 O teste `ScriptContentTests` reprova um id do roteiro que não esteja na lista certa, e um id repetido ou sem clipe no registro.
 
+### Imagens para o roteiro (#71)
+
+O roteiro cita a imagem de tela cheia por um **id** (`<<mostrar_imagem lembranca_pais>>`; ver [roteiro.md](roteiro.md#tela-e-imagens)). Para uma imagem nova ficar disponível:
+
+1. Ponha o PNG em `Assets/Sprites/Imagens/<id>.png`, em **16:9** (3840×2160 é o tamanho da arte de referência; a imagem é esticada para a tela inteira). No Inspector do arquivo, **Texture Type** = `Sprite (2D and UI)` e **Sprite Mode** = `Single` (o padrão é `Multiple`, e sem fatias o Unity não gera sprite nenhum), **Generate Mip Maps** desligado. Clique em **Apply**.
+2. Abra `Assets/Scripts/ScriptableObjects/Pictures/PictureRegistry.asset` e acrescente uma linha: o **Id** (minúsculas sem acento, dígitos e `_`, único no registro) e o **Sprite**. O registro avisa id vazio, fora do formato ou repetido, e sprite vazio.
+3. Acrescente uma linha à tabela [Imagens que existem](roteiro.md#imagens-que-existem) do guia de roteiro.
+
+O teste `ScriptContentTests` reprova um id do roteiro que não esteja no registro, e um id repetido, fora do formato ou sem sprite no registro. A imagem aparece atrás dos personagens e da caixa de diálogo, e **sem** o `Canvas` da cena: ela vive no `GameUI.prefab` (`Canvas_Game/ScriptScreen`).
+
 ## Passo a passo: a fatia vertical
 
 A fatia vertical é o conteúdo provisório que exercita todos os sistemas juntos (#21): duas salas, `[Fatia] Onibus` e `[Fatia] Posto`, ligadas por uma porta que só abre depois do prólogo, e uma moeda achada no ônibus que abre a máquina de café do posto. O prefixo `[Fatia]` marca conteúdo provisório, como `[Teste]`. Nada disso exigiu código: é Inspector e um arquivo de roteiro. Os arquivos são `Assets/Scenes/[Fatia] Onibus.unity`, `Assets/Scenes/[Fatia] Posto.unity` e `Assets/Roteiro/Testes/fatia_vertical.yarn`; as variáveis novas estão em `variaveis.yarn` e o item é `Moeda.asset`.
 
 ### Ordem da montagem
 
-1. **O roteiro primeiro.** Escreva os nós em `fatia_vertical.yarn` e declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$conheceu_luna`, `$cafe_do_posto`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado**: o nó `onibus_chegada`, que o `Room Arrival` do ônibus abre na chegada, o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome, e o `<<if not $prologo_concluido>>` do nó deixa a conversa de chegada vazia nas chegadas seguintes. O `onibus_poltrona` é só o pensamento do protagonista.
+1. **O roteiro primeiro.** Escreva os nós em `fatia_vertical.yarn` e declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$conheceu_luna`, `$cafe_do_posto`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado por quem monta a sala** (é um roteiro; os efeitos de tela dele vieram na #71): o nó `onibus_chegada`, que o `Room Arrival` do ônibus abre na chegada, o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome, e o `<<if not $prologo_concluido>>` do nó deixa a conversa de chegada vazia nas chegadas seguintes. O `onibus_poltrona` é só o pensamento do protagonista.
 2. **O item.** `Create → Items → Item` (`moeda`) e uma linha no `ItemRegistry.asset`. O ícone é provisório.
 3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints`, `Room Music` e, se a sala abre uma conversa ao chegar, `Room Arrival` (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)). Onde `Interactables` e `EntryPoints` ficam depende do pan: **sem pan** são irmãos de `Environment`, na raiz (`[Fatia] Onibus`); **com pan** são filhos do `ScrollingBackground`, para andarem com ele (`[Fatia] Posto`).
    - **Comece pela cena vazia.** No Editor, **File → New Scene** com o modelo do projeto (**Lit 2D (URP)**) traz uma `Main Camera` com fundo azul, fora de `Systems`, e um **Global Light 2D**; nenhuma sala do projeto tem esse objeto de luz, então apague os dois e monte a câmera como em [Criar uma sala nova](#criar-uma-sala-nova). Por script, `EditorSceneManager.NewScene` com `NewSceneSetup.EmptyScene` já devolve a cena sem nada. Antes dele, confira que nenhuma cena aberta tem alteração não salva: o `NewScene` fecha todas e descarta o que não foi gravado, sem perguntar (receita em [unity-cli.md](../agentes/unity-cli.md#abrir-e-salvar-cena)).
@@ -281,7 +301,7 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **Câmera:** a descrita em [Criar uma sala nova](#criar-uma-sala-nova) (`Systems/Main Camera`, **Background Type** `Solid Color` preto, **Depth** 0). Não é a câmera da cena de teste.
 - **Fundo:** um objeto `Environment/Background` com um **Sprite Renderer**. O sprite é `testebckg_0`, o único sprite de `Assets/_Tests/Background/testebckg.png` (a textura está em `Sprite Mode: Multiple`: arraste o sprite, não a textura), em escala 1,25. Sem **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz da cena.
 - **`Room Music`:** um objeto na raiz com o componente **Room Music** e `teste_musica_a`.
-- **`Room Arrival`:** um objeto na raiz com o componente **Room Arrival Dialogue** e **Node Name** `onibus_chegada`. É ele que abre o prólogo sozinho no Novo Jogo (e a cada chegada no ônibus, com o nó decidindo se repete).
+- **`Room Arrival`:** um objeto na raiz com o componente **Room Arrival Dialogue**, **Node Name** `onibus_chegada` e **Starts Dark** ligado (#71: o prólogo começa no preto e clareia). É ele que abre o prólogo sozinho no Novo Jogo (e a cada chegada no ônibus, com o nó decidindo se repete).
 - **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`. Sem pan, o X dele não move nada; só precisa existir.
 - **`Interactables/Poltrona`:** o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). Depois da #127 ela só mostra o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta."; o prólogo abre pelo `Room Arrival`.
 - **`Interactables/Item_Moeda`:** acrescente **Collectable Item Behaviour** com **Item Data** `Moeda`, e confira que **Persistent Id** veio preenchido e é novo (**Regenerate Persistent Id** se o objeto nasceu de uma cópia). Em **On Interact**, ligue `Collect` e depois `TriggerDialogue` (nó `onibus_moeda`), como o `Item_Chave` da cena de teste.
