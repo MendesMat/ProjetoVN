@@ -420,6 +420,95 @@ As salas `[Fatia] Onibus` e `[Fatia] Posto` foram montadas por scripts de Editor
 - **Console:** `clear_console` depois de entrar no Play e leia os erros no fim: o esperado é zero erros e zero avisos.
 - **`EventSystem` e `InMemoryVariableStorage`:** um e zero, em cada sala.
 
+### Montar uma sala só a partir do guia e conferi-la com o despejo (#107)
+
+A `[Fatia] Posto` foi remontada por um agente que só tinha o `salas.md` e esta página, numa cena descartável, e conferida contra a real. O que a montagem por script precisa saber, e que o guia de salas não precisa repetir:
+
+- **Os tipos e os campos.** Um componente de sala se preenche por `SerializedObject` (o nome do campo é o do código, em `camelCase`, e não o rótulo do Inspector) e os eventos por `UnityEventTools.AddVoidPersistentListener(evento, alvo.Metodo)`, direto, sem reflexão (os eventos de sala são públicos). Os nomes completos:
+
+  | Componente (rótulo no Inspector) | Tipo | Campos |
+  |---|---|---|
+  | Point N Click Selector | `ProjetoVN.PointNClick.PointNClickSelector` | nenhum |
+  | Screen Pan Controller | `ProjetoVN.PointNClick.ScreenPanController` | `environmentContainer` (Transform), `panSpeed`, `edgeThreshold`, `minX`, `maxX` |
+  | Interactable Item | `ProjetoVN.PointNClick.InteractableItem` | evento público `OnInteract` |
+  | Interactable Dialogue Trigger | `ProjetoVN.GameFlow.InteractableDialogueTrigger` | `nodeName`; método `TriggerDialogue` |
+  | Locked Action Behaviour | `ProjetoVN.GameFlow.LockedActionBehaviour` | `requiredItem`, `requiredFlagId`, `unlockedFlagId`; eventos públicos `OnLocked`, `OnUnlocked`, `OnOpened`, `OnAlreadyUnlocked`; método `Interact` |
+  | Room Entry Point | `ProjetoVN.GameFlow.Rooms.RoomEntryPoint` | `id` |
+  | Room Exit | `ProjetoVN.GameFlow.Rooms.RoomExit` | `destinationRoom`, `entryPointId`; método `Leave` |
+  | Room Music | `ProjetoVN.Audio.RoomMusic` | `music` |
+  | Sound Effect | `ProjetoVN.Audio.SoundEffect` | `clip`; método `Play` |
+  | Collectable Item Behaviour | `ProjetoVN.Inventory.CollectableItemBehaviour` | `itemData`, `persistentId` (o componente gera o id; confira que veio preenchido e é novo, como em [Coletável](../autoria/salas.md#coletável)); método `Collect`. Não montado na #107: o nome dos campos vem do código |
+
+- **A câmera** não nasce com a tag: `go.tag = "MainCamera"` é do script. O **Universal Additional Camera Data** também precisa de `AddComponent` (o Inspector o acrescenta sozinho, o script não). O que o Inspector chama de **Background Type** é `Camera.clearFlags`.
+- **O console avisa de campo vazio durante a montagem.** Cada `AddComponent` dispara o `OnValidate` do componente antes de o script preenchê-lo, e o console enche de avisos amarelos (`Id` vazio, **Destination Room** vazio, **Clip** vazio). Eles somem quando o campo é preenchido e a cena é salva: `clear_console` no fim e releia, não conclua nada do console no meio.
+- **`NewScene` com `NewSceneSetup.EmptyScene`** devolve a cena sem câmera nem luz. Carregue os assets **depois** dela (ver a seção anterior).
+- **A suíte de EditMode vê a cena montada** mesmo fora da lista do build: com ela salva em `Assets/Scenes/`, um `nodeName` inexistente e um `entryPointId` inexistente fizeram o `DialogueTriggerNodesTests` e o `RoomLinksTests` falharem, citando a cena e o objeto.
+- **`ScreenPanController.CenterOn(worldX)` é relativo à posição atual do cenário** (o novo X é `containerX + cameraX - worldX`): volte o cenário a 0 antes de conferir o lugar de um `Room Entry Point`, senão a conta sai deslocada pelo X em que o pan o deixou.
+
+**Conferir a sala montada contra uma sala de referência: o despejo.** Percorre cada cena e escreve, por objeto, o caminho, a posição, a escala, o prefab de origem e todos os campos dos componentes (os alvos de evento levam o índice do componente entre os do mesmo tipo, `#0`, `#1`, `#2`). Grave o script num `.cs` **fora do repositório**, rode com `unity command eval_file --file <caminho> --timeout 30000` e compare com `diff Temp/referencia.txt Temp/montada.txt` (`Temp/` é ignorada pelo git). O `if (!wasLoaded)` importa: sem ele, despejar a cena que está aberta no Editor a fecha.
+
+```csharp
+var pairs = new[] {
+    ("Assets/Scenes/<cena de referência>.unity", "Temp/referencia.txt"),
+    ("Assets/Scenes/<cena montada>.unity", "Temp/montada.txt") };
+var skip = new System.Collections.Generic.HashSet<string> { "m_ObjectHideFlags", "m_CorrespondingSourceObject", "m_PrefabInstance", "m_PrefabAsset", "m_GameObject", "m_EditorHideFlags", "m_EditorClassIdentifier", "m_Script" };
+foreach (var (scenePath, outPath) in pairs)
+{
+    var already = UnityEngine.SceneManagement.SceneManager.GetSceneByPath(scenePath);
+    bool wasLoaded = already.isLoaded;
+    var scene = wasLoaded ? already : UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath, UnityEditor.SceneManagement.OpenSceneMode.Additive);
+    var sb = new System.Text.StringBuilder();
+    System.Action<UnityEngine.Transform, string> walk = null;
+    walk = (t, prefix) =>
+    {
+        string path = prefix + t.name;
+        var go = t.gameObject;
+        string prefab = UnityEditor.PrefabUtility.IsPartOfPrefabInstance(go) ? " [prefab:" + UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go) + "]" : "";
+        sb.AppendLine("GO " + path + " active=" + go.activeSelf + " tag=" + go.tag + " pos=" + t.localPosition.ToString("F2") + " scale=" + t.localScale.ToString("F2") + prefab);
+        foreach (var c in go.GetComponents<UnityEngine.Component>())
+        {
+            if (c == null) { sb.AppendLine("   MISSING SCRIPT"); continue; }
+            if (c is UnityEngine.Transform) continue;
+            sb.AppendLine("   C " + c.GetType().Name);
+            var it = new UnityEditor.SerializedObject(c).GetIterator();
+            bool enter = true;
+            while (it.NextVisible(enter))
+            {
+                enter = it.propertyType == UnityEditor.SerializedPropertyType.Generic;
+                if (skip.Contains(it.name)) continue;
+                string v;
+                switch (it.propertyType)
+                {
+                    case UnityEditor.SerializedPropertyType.ObjectReference:
+                        var o = it.objectReferenceValue;
+                        v = o ? o.name + "(" + o.GetType().Name + ")" : "null";
+                        if (o is UnityEngine.Component comp) v += "#" + System.Array.IndexOf(comp.GetComponents(comp.GetType()), comp);
+                        break;
+                    case UnityEditor.SerializedPropertyType.Float: v = it.floatValue.ToString("F2"); break;
+                    case UnityEditor.SerializedPropertyType.Integer: v = it.intValue.ToString(); break;
+                    case UnityEditor.SerializedPropertyType.Boolean: v = it.boolValue.ToString(); break;
+                    case UnityEditor.SerializedPropertyType.String: v = "\"" + it.stringValue + "\""; break;
+                    case UnityEditor.SerializedPropertyType.Enum: v = it.enumValueIndex >= 0 && it.enumValueIndex < it.enumDisplayNames.Length ? it.enumDisplayNames[it.enumValueIndex] : it.intValue.ToString(); break;
+                    case UnityEditor.SerializedPropertyType.Vector2: v = it.vector2Value.ToString("F2"); break;
+                    case UnityEditor.SerializedPropertyType.Vector3: v = it.vector3Value.ToString("F2"); break;
+                    case UnityEditor.SerializedPropertyType.Color: v = it.colorValue.ToString(); break;
+                    case UnityEditor.SerializedPropertyType.Generic: v = it.isArray ? "[" + it.arraySize + "]" : ""; break;
+                    default: v = it.propertyType.ToString(); break;
+                }
+                sb.AppendLine("      " + it.propertyPath + " = " + v);
+            }
+        }
+        foreach (UnityEngine.Transform child in t) walk(child, path + "/");
+    };
+    foreach (var root in scene.GetRootGameObjects()) walk(root.transform, "");
+    if (!wasLoaded) UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+    System.IO.File.WriteAllText(outPath, sb.ToString());
+}
+return "ok";
+```
+
+Toda diferença do `diff` é um achado (o guia não disse o valor), uma liberdade (nome de um objeto auxiliar) ou um erro de quem montou.
+
 ### A captura de 1280×720 some com linha fina
 
 A Game view do Editor costuma ter 1280×720, abaixo dos 1920×1080 da interface, e a captura (`capture_game_view --source screen`) reduz tudo a 0,67×. Uma linha de 2 px vira uns 1,3 px e **desaparece em algumas posições** (na folha do nome, duas das cinco pautas sumiram). Use 3 px ou mais para linha fina, ou confira em Full HD.

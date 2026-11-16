@@ -2,7 +2,7 @@
 
 **Para quem:** quem monta cenas no Unity Editor. Você não precisa ler código para seguir este guia.
 
-> **Este guia cobre o que existe hoje.** A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`. As duas salas do percurso do jogador, `[Fatia] Onibus` e `[Fatia] Posto`, foram montadas seguindo este guia, e o [passo a passo](#passo-a-passo-a-fatia-vertical) no fim registra a ordem e o que a montagem precisou além do que as seções diziam.
+> **Este guia cobre o que existe hoje.** A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`. As duas salas do percurso do jogador, `[Fatia] Onibus` e `[Fatia] Posto`, foram montadas por script de Editor na #21, e o [passo a passo](#passo-a-passo-a-fatia-vertical) no fim foi escrito depois, a partir dessa montagem. Na #107 o passo a passo foi conferido: a `[Fatia] Posto` foi remontada do zero, por um agente que só tinha este guia e as receitas de [unity-cli.md](../agentes/unity-cli.md), e o que a montagem não achou no texto foi corrigido aqui. O `[Fatia] Onibus` não foi remontado.
 
 ## Regras que valem sempre
 
@@ -95,7 +95,15 @@ Os valores das salas são **Pan Speed** 10 (unidades do mundo por segundo; tamb�
 
 Uma cena de sala contém **só o mundo**:
 
-- **Uma câmera** com a tag `MainCamera`, ortográfica, com o componente **Point N Click Selector** (é ele que transforma o clique em interação).
+- **Uma câmera**, no objeto `Systems/Main Camera` (`Systems` é um objeto vazio na raiz), com estes valores, que são os das salas `[Fatia]`:
+  - **Position** (0, 0, -10) e a tag `MainCamera`;
+  - **Projection** ortográfica, **Size** 5, **Depth** 0 (o padrão);
+  - **Background Type** `Solid Color`, preto. É o nome que a câmera do URP mostra em **Environment**; no código, e em quem monta por script, é `clearFlags` (**Clear Flags** no Inspector da câmera antiga);
+  - um `AudioListener` (um só na cena);
+  - o componente **Point N Click Selector**, que transforma o clique em interação e não tem campo para preencher;
+  - o **Universal Additional Camera Data**, que o Inspector da câmera do URP acrescenta sozinho ao mostrá-la. Quem monta por script precisa acrescentá-lo.
+
+  **Não copie a câmera da `[Teste] Mecanicas`:** ela usa **Depth** -1 e fundo azul (**Skybox**), e as salas da fatia não. Copiar a câmera de teste dá uma sala com o fundo e o **Depth** diferentes dos das outras salas.
 - **O fundo** (um ou mais sprites).
 - **Os objetos interativos**, montados como descrito em [Objeto interativo](#objeto-interativo).
 - Opcional: o **Screen Pan Controller**, se o fundo for mais largo que a tela.
@@ -246,15 +254,17 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 1. **O roteiro primeiro.** Escreva os nós em `fatia_vertical.yarn` e declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$conheceu_luna`, `$cafe_do_posto`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado**: o nó `onibus_poltrona` o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome.
 2. **O item.** `Create → Items → Item` (`moeda`) e uma linha no `ItemRegistry.asset`. O ícone é provisório.
-3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints` e `Room Music`.
-4. **Os objetos**, um a um, a partir do prefab `Interactable`: ele já traz o sprite, o collider, o realce e um **Interactable Dialogue Trigger** vazio.
+3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints` e `Room Music`. Onde `Interactables` e `EntryPoints` ficam depende do pan: **sem pan** são irmãos de `Environment`, na raiz (`[Fatia] Onibus`); **com pan** são filhos do `ScrollingBackground`, para andarem com ele (`[Fatia] Posto`).
+   - **Comece pela cena vazia.** No Editor, **File → New Scene** com o modelo do projeto (**Lit 2D (URP)**) traz uma `Main Camera` com fundo azul, fora de `Systems`, e um **Global Light 2D**; nenhuma sala do projeto tem esse objeto de luz, então apague os dois e monte a câmera como em [Criar uma sala nova](#criar-uma-sala-nova). Por script, `EditorSceneManager.NewScene` com `NewSceneSetup.EmptyScene` já devolve a cena sem nada.
+   - **Sem `Canvas`, sem `EventSystem`, sem manager:** o modelo não traz nenhum dos três, mas outro modelo pode trazer.
+4. **Os objetos**, um a um, a partir do prefab `Interactable`: ele já traz o sprite (um quadrado preto de 1 × 1, provisório), o **Box Collider 2D** de 0,8 × 0,8 marcado como trigger, o **Highlight Scale Multiplier** 1,15, o **Outline Object** (o filho `Highlight`) e um **Interactable Dialogue Trigger** vazio. Esses valores **ficam como estão**, e o objeto entra na cena com escala 1.
 5. **A lista de cenas do build** e, no `Menu.unity`, o **Start Room** do `Main Menu`.
-6. **Rodar a suíte de EditMode**: ela reprova gatilho com nó inexistente, saída para sala ou ponto que não existe, id de coletável repetido e mais de um `Room Music` por cena.
+6. **Rodar a suíte de EditMode**: ela reprova gatilho com nó inexistente, saída para sala ou ponto que não existe, id de coletável repetido e mais de um `Room Music` por cena. **A suíte lê toda cena e todo prefab de `Assets/`, esteja a cena na lista do build ou não** (a #107 provou: com a cena fora da lista, um nó e um ponto errados foram reprovados), então dá para conferir uma sala antes do passo 5. A lista do build continua necessária para a sala ser **destino** de uma troca, e o `RoomLinksTests` reprova a saída que cita uma sala fora dela.
 
 ### `[Fatia] Onibus` (sem pan)
 
-- **Câmera:** tag `MainCamera`, **Projection** ortográfica, **Size** 5, **Clear Flags** `Solid Color` preto, um `AudioListener`, o **Universal Additional Camera Data** e o **Point N Click Selector**. É a câmera das cenas de teste; copie os valores dela.
-- **Fundo:** um objeto `Environment/Background` com um **Sprite Renderer**. O sprite é `testebckg_0`, um dos sprites já fatiados de `Assets/_Tests/Background/testebckg.png` (a textura está em `Sprite Mode: Multiple`: arraste o sprite, não a textura), em escala 1,25. Sem **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz da cena.
+- **Câmera:** a descrita em [Criar uma sala nova](#criar-uma-sala-nova) (`Systems/Main Camera`, **Background Type** `Solid Color` preto, **Depth** 0). Não é a câmera da cena de teste.
+- **Fundo:** um objeto `Environment/Background` com um **Sprite Renderer**. O sprite é `testebckg_0`, o único sprite de `Assets/_Tests/Background/testebckg.png` (a textura está em `Sprite Mode: Multiple`: arraste o sprite, não a textura), em escala 1,25. Sem **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz da cena.
 - **`Room Music`:** um objeto na raiz com o componente **Room Music** e `teste_musica_a`.
 - **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`. Sem pan, o X dele não move nada; só precisa existir.
 - **`Interactables/Poltrona`:** o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). É por ela que o prólogo abre, até a #71 abrir a conversa sozinha ao chegar na sala.
@@ -268,12 +278,14 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 ### `[Fatia] Posto` (com pan)
 
-- **Fundo e pan:** `Environment/ScrollingBackground` leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -22,4, **Max X** 22,4; a conta está em [Pan do cenário](#pan-do-cenário)) e três painéis com o mesmo sprite, `LeftPanel` (x -20,9, escala -1,25 em X), `MiddlePanel` (x 0) e `RightPanel` (x 20,9, escala -1,25 em X). `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan.
-- **`Room Music`:** `teste_musica_b`.
-- **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, no X do `Exit_Onibus` (20): é o lugar que fica no centro da tela quando o jogador chega do ônibus.
-- **`Interactables/NPC_Luna`:** o gatilho com `posto_luna`, em **On Interact**.
-- **`Interactables/Maquina_Cafe`:** um portão **só de item**, **Required Item** `Moeda` (consumida ao abrir) e **Unlocked Flag Id** `$cafe_do_posto`. Ela tem **três** falas, uma para cada situação, então o objeto leva **três** **Interactable Dialogue Trigger**: o do prefab (`posto_maquina_sem_moeda`, ligado em **On Locked**), `posto_maquina_cafe` (em **On Unlocked**, com um `Sound Effect`) e `posto_maquina_vazia` (em **On Already Unlocked**).
-- **`Interactables/Exit_Onibus`:** uma saída comum (**Room Exit**, destino `[Fatia] Onibus`, ponto `porta`), com `RoomExit.Leave` em **On Interact**. É a porta do ônibus vista de fora, que já está aberta.
+- **Fundo e pan:** a hierarquia é `Environment/ScrollingBackground`, com `Backgrounds`, `Interactables` e `EntryPoints` como filhos. O `ScrollingBackground` fica em (0, 0, 0) e leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -22,4, **Max X** 22,4; a conta está em [Pan do cenário](#pan-do-cenário) e vale para estes três painéis de 20,9 de largura). `Backgrounds` é um objeto vazio só para agrupar os três painéis, que têm o mesmo sprite (`testebckg_0`) e escala Y 1,25: `LeftPanel` (x -20,9, escala X -1,25, o sprite espelhado), `MiddlePanel` (x 0, escala X 1,25) e `RightPanel` (x 20,9, escala X -1,25). O agrupamento em `Backgrounds` e a escala em Z são escolha de quem monta: nada depende deles. `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan, e as posições abaixo são **locais** a ele (como ele está em 0, valem também como posição no mundo).
+- **`Room Music`:** um objeto na raiz da cena (não dentro do `ScrollingBackground`), com **Room Music** e `teste_musica_b`.
+- **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, em x 20 (o mesmo X do `Exit_Onibus`), y 0: é o lugar que fica no centro da tela quando o jogador chega do ônibus.
+- **`Interactables/NPC_Luna`:** em x -3, y 0, escala 1. O gatilho com `posto_luna`, em **On Interact**.
+- **`Interactables/Maquina_Cafe`:** em x 3, y 0, escala 1. Um portão **só de item**: **Locked Action Behaviour** com **Required Item** `Moeda` (consumida ao abrir), **Required Flag Id** vazio e **Unlocked Flag Id** `$cafe_do_posto`, e **On Interact** → `LockedActionBehaviour.Interact`. Ela tem **três** falas, uma para cada situação, então o objeto leva **três** **Interactable Dialogue Trigger**, nesta ordem no Inspector: o do prefab (`posto_maquina_sem_moeda`, ligado em **On Locked**), `posto_maquina_cafe` e `posto_maquina_vazia` (em **On Already Unlocked**). Em **On Unlocked** ligue, nesta ordem, o `TriggerDialogue` do `posto_maquina_cafe` e o som: um filho `Som Cafe`, com **Sound Effect** e **Clip** `item_coletar` (de `Assets/Audio/Efeitos/`), ligado em `SoundEffect.Play` (como em [Som em um objeto ou em uma porta](#som-em-um-objeto-ou-em-uma-porta-20)).
+- **`Interactables/Exit_Onibus`:** em x 20, y 0, escala 1. Uma saída comum (**Room Exit**, destino `[Fatia] Onibus`, ponto `porta`), com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica. É a porta do ônibus vista de fora, que já está aberta.
+
+Os três objetos são o quadrado preto do prefab, na escala 1: pequenos porque a sala é provisória (a Cena 2 do prólogo a substitui na M11, ver [milestones.md](../planejamento/milestones.md)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
 
 ### O que a montagem precisou e o guia não dizia
 
@@ -282,7 +294,10 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **Um portão só de flag é aberto pelo roteiro:** quem liga `$prologo_concluido` é o `<<set>>` no fim do nó `onibus_poltrona`. O jogador clica na porta depois, e o portão confere a flag.
 - **Mais de uma fala no mesmo portão:** acrescente um **Interactable Dialogue Trigger** por fala no **mesmo objeto** (não em filhos). O menu do evento mostra os componentes **com o mesmo nome**, e o que vale é a **ordem deles no Inspector** (o primeiro da lista é o de cima). Confira em cada um o **Node Name**.
 - **O prefab `Interactable` traz um gatilho vazio** que não avisa. Em uma saída ou em um objeto sem fala, ele pode ficar.
-- **A câmera de uma cena vazia** precisa dos valores da câmera de teste (ortográfica, tamanho 5, fundo preto, um só `AudioListener`).
+- **A câmera de uma cena vazia** precisa dos valores de [Criar uma sala nova](#criar-uma-sala-nova) (ortográfica, tamanho 5, fundo preto em **Background Type**, **Depth** 0, posição (0, 0, -10), um só `AudioListener`), e **não** dos da câmera de teste (#107).
+- **Um portão tem de ser ligado ao próprio clique** (#107): **On Interact** do **Interactable Item** → `LockedActionBehaviour.Interact`, também no portão só de item (`Maquina_Cafe`). Sem isso o clique não chega ao portão.
+- **O que a remontagem da #107 achou** (despejo das duas cenas e `diff`): a `[Fatia] Posto` montada por script a partir só deste guia ficou igual à real em tudo o que o guia dizia. As diferenças que sobraram eram o que ele não dizia (**Depth** da câmera, posição e escala dos três objetos, ordem dos eventos do **On Unlocked** da máquina, o objeto `Backgrounds`), e agora diz. A remontagem foi por script: montar pelo Inspector não foi testado.
+- **Ao montar por script, o console avisa de campo vazio** (`Id`, **Destination Room**, **Clip**, **Environment Container**) a cada `AddComponent`, porque o componente se valida antes de o script preenchê-lo. Os avisos somem quando o campo é preenchido e a cena é salva; confira o console no fim, não no meio da montagem (receita em [unity-cli.md](../agentes/unity-cli.md)).
 - **Uma sala sem pan não precisa do `ScrollingBackground`**, mas o ponto de entrada precisa existir mesmo assim, com id.
 - **Item novo, flag nova e nó novo** têm uma ordem: o item no registro, a variável em `variaveis.yarn` e o nó no `.yarn` **antes** de preencher o campo que os usa, porque as listas do Inspector só mostram o que o Unity já importou.
 - **Salve as cenas antes de rodar a suíte.** Com uma cena suja, o Test Runner abre um diálogo e trava o Editor.
