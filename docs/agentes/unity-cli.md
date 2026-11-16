@@ -108,6 +108,27 @@ unity command open_scene --path "Assets/Scenes/[Teste] Mecanicas.unity"
 unity command save_scene
 ```
 
+**Trocar de cena descarta o que não foi salvo (#166).** `unity command open_scene` e `unity command create_scene` sem `--additive`, e `EditorSceneManager.NewScene` e `OpenScene` em modo `Single` por `eval`, **fecham todas as cenas abertas**, as aditivas inclusive, e descartam a alteração não salva **sem diálogo e sem erro**: o comando responde `success: true` e o `.unity` fica como estava. Medido no Editor 6000.3.9f1, fora do Play, marcando a cena suja com um objeto novo (`MarkSceneDirty`) e trocando de cena em seguida:
+
+| Situação antes | Chamada | Resultado |
+|---|---|---|
+| Cena sem título, suja | `NewScene(EmptyScene, Single)` por `eval_file` | Voltou em 122 ms, sem diálogo; a cena antiga deixou de existir |
+| `[Fatia] Posto` (ativa) e `[Fatia] Onibus` (aditiva), salvas e sujas | `NewScene(EmptyScene, Single)` por `eval_file` | Sem diálogo; `sceneCount` foi de 2 para 1 e as duas foram fechadas; os dois `.unity` não ganharam a marca, nem o backup de `Temp/__Backupscenes` (o `0.backup` era de meia hora antes) |
+| `[Fatia] Posto` salva e suja | `open_scene` de outra cena | `success: true`, exit 0, sem diálogo; a alteração se perdeu |
+| `[Fatia] Onibus` salva e suja | `create_scene` sem `--additive` | `success: true`, exit 0, sem diálogo; a alteração se perdeu |
+
+**Antes de trocar de cena**, rode `unity command list_open_scenes` e confira o `isDirty` de **cada** cena (a lista traz também as aditivas):
+
+```bash
+unity command list_open_scenes
+```
+
+- Todas com `isDirty: false`: pode trocar.
+- Alguma com `isDirty: true` e a alteração é **sua**, desta sessão: grave com `unity command save_scene --path <cena>` (ou `save_all`) e confira o `.unity` por `grep`, como no parágrafo "Gravar uma cena alterada por `eval_file`", em [Trocar de sala por `eval` (#12)](#trocar-de-sala-por-eval-12) (`SaveOpenScenes()` por `eval` não grava).
+- Alguma com `isDirty: true` e você **não sabe de quem é** (uma sala em ajuste pelo programador, o resto de outra sessão): **pare** e avise o programador. Gravar um trabalho que não é seu é tão ruim quanto perdê-lo.
+
+A ausência de diálogo não quer dizer que nada se perdeu: o diálogo "Scene(s) Have Been Modified" é do Test Runner (ver [Rodar a suíte PlayMode](#rodar-a-suíte-playmode)), um caso diferente. `OpenScene` em modo `Additive` não fecha nada; é por isso que o despejo da #107 (`if (!wasLoaded)`) não perde trabalho. A `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()` existe para mostrar esse diálogo ao usuário e não foi medida aqui: não a use para se proteger.
+
 ### Entrar e sair do Play Mode
 
 ```bash
@@ -402,7 +423,7 @@ Copie o `savegame.json` para fora do repositório antes (a verificação e a su�
 
 As salas `[Fatia] Onibus` e `[Fatia] Posto` foram montadas por scripts de Editor (`eval_file`), com o mesmo resultado serializado que o Inspector. Pontos que custaram tempo:
 
-- **`EditorSceneManager.NewScene` (modo `Single`) descarrega os assets que nenhuma cena usa.** Um `ScriptableObject` ou sprite carregado **antes** dele vira "nulo falso": `SerializedProperty.objectReferenceValue = asset` grava `{fileID: 0}` e nenhum erro aparece (aconteceu com `Moeda.asset` nas duas cenas). Carregue o asset **depois** de criar a cena, e depois de salvar confira por `grep` (`itemData`, `requiredItem`, `clip`, `music`).
+- **`EditorSceneManager.NewScene` (modo `Single`) descarrega os assets que nenhuma cena usa.** Um `ScriptableObject` ou sprite carregado **antes** dele vira "nulo falso": `SerializedProperty.objectReferenceValue = asset` grava `{fileID: 0}` e nenhum erro aparece (aconteceu com `Moeda.asset` nas duas cenas). Carregue o asset **depois** de criar a cena, e depois de salvar confira por `grep` (`itemData`, `requiredItem`, `clip`, `music`). **E fecha as cenas abertas, descartando o que não foi salvo:** confira antes (ver [Abrir e salvar cena](#abrir-e-salvar-cena)).
 - **Instancie o prefab com `PrefabUtility.InstantiatePrefab`**, nunca com `Instantiate`, para o objeto continuar sendo uma instância do `Interactable`. Os campos privados se escrevem por `SerializedObject` e as ligações de `UnityEvent` pela receita de [Ligar um `UnityEvent` por script de Editor](#ligar-um-unityevent-por-script-de-editor-17); aqui os eventos da `InteractableItem` (`OnInteract`) e do `LockedActionBehaviour` (`OnLocked`, `OnUnlocked`, `OnOpened`, `OnAlreadyUnlocked`) são campos **públicos** e se acessam direto no `eval_file`; a reflexão do Editor fica para o campo `[SerializeField] private`, como na receita da #17.
 - **Vários componentes do mesmo tipo no mesmo objeto** (os três `InteractableDialogueTrigger` da `Maquina_Cafe`): ligue cada evento à instância certa (a variável que guarda o `AddComponent`) e confira no `.unity` que os `m_Target` dos eventos são diferentes.
 - **Salvar:** `EditorSceneManager.SaveScene(cena, caminho)` gravou as cenas novas e `SaveScene(cena)` as alterações do `Menu.unity`; confira o retorno `True` e o `git status`.
@@ -441,7 +462,7 @@ A `[Fatia] Posto` foi remontada por um agente que só tinha o `salas.md` e esta 
 
 - **A câmera** não nasce com a tag: `go.tag = "MainCamera"` é do script. O **Universal Additional Camera Data** também precisa de `AddComponent` (o Inspector o acrescenta sozinho, o script não). O que o Inspector chama de **Background Type** é `Camera.clearFlags`.
 - **O console avisa de campo vazio durante a montagem.** Cada `AddComponent` dispara o `OnValidate` do componente antes de o script preenchê-lo, e o console enche de avisos amarelos (`Id` vazio, **Destination Room** vazio, **Clip** vazio). Eles somem quando o campo é preenchido e a cena é salva: `clear_console` no fim e releia, não conclua nada do console no meio.
-- **`NewScene` com `NewSceneSetup.EmptyScene`** devolve a cena sem câmera nem luz. Carregue os assets **depois** dela (ver a seção anterior).
+- **`NewScene` com `NewSceneSetup.EmptyScene`** devolve a cena sem câmera nem luz. Carregue os assets **depois** dela (ver a seção anterior). Ela também fecha as cenas abertas sem perguntar: confira o `isDirty` antes ([Abrir e salvar cena](#abrir-e-salvar-cena)).
 - **A suíte de EditMode vê a cena montada** mesmo fora da lista do build: com ela salva em `Assets/Scenes/`, um `nodeName` inexistente e um `entryPointId` inexistente fizeram o `DialogueTriggerNodesTests` e o `RoomLinksTests` falharem, citando a cena e o objeto.
 - **`ScreenPanController.CenterOn(worldX)` é relativo à posição atual do cenário** (o novo X é `containerX + cameraX - worldX`): volte o cenário a 0 antes de conferir o lugar de um `Room Entry Point`, senão a conta sai deslocada pelo X em que o pan o deixou.
 
