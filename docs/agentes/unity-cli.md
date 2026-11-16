@@ -54,6 +54,8 @@ unity command console --level error --tail 20
 unity command run_tests --mode EditMode --timeout 180
 ```
 
+Antes de rodar qualquer suíte, confira que nenhuma cena aberta, ativa ou aditiva, está suja: o Test Runner abre um diálogo que trava o Editor e o CLI (ver [Salve a cena antes de rodar os testes](#rodar-a-suíte-playmode), no fim da seção seguinte).
+
 O resultado esperado tem a forma `48/48 aprovados (EditMode, 3.87s)`. O número cresce a cada issue; o que importa é não haver falha. Para um subconjunto:
 
 ```bash
@@ -78,7 +80,13 @@ Para conferir quais testes cada suíte enxerga, `unity command list_tests --mode
 
 O Test Framework liga o `runInBackground` durante a execução e devolve o valor no fim (`PreparePlayModeRunTask.cs`, `RestoreProjectSettingsTask.cs`). Com a D-31 o valor já é `true`, então isso não muda nada: depois da suíte, `git diff ProjectSettings/ProjectSettings.asset` continua vazio.
 
-**Salve a cena antes de rodar os testes.** Com a cena aberta suja, o Test Runner abre o diálogo "Scene(s) Have Been Modified" e bloqueia a thread principal do Editor: `run_tests` e `eval` expiram sem erro claro, e só um clique no diálogo destrava (medido na execução da #3). Rode `save_scene` depois de qualquer alteração de cena e antes do `run_tests`, **só se a cena estiver suja** (`SceneManager.GetActiveScene().isDirty`) e confira o `git status` depois: na #15, uma sequência de execuções com `save_scene` antes de cada uma deixou o `[Teste] Mecanicas.unity` modificado, com `RectTransform` de filhos de um layout group do canvas gravados com valores calculados (a causa não foi isolada). Reverta a cena com `git checkout` se isso acontecer; ele não entra no commit.
+**Salve a cena antes de rodar os testes.** Com **qualquer cena aberta suja, a ativa ou uma aditiva**, o Test Runner abre o diálogo "Scene(s) Have Been Modified" e bloqueia a thread principal do Editor: `run_tests` e `eval` expiram sem erro claro (`EDITOR_TIMEOUT`, exit 14). Vale para **as duas suítes**: as duas chamam `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()`, que pergunta sobre todas as cenas modificadas da Hierarchy, não só a ativa (`SaveModifiedSceneTask.cs`, na `TaskList.cs` do `com.unity.test-framework` 1.6.0). Medido na execução da #3, com a cena ativa suja, e na #171, com a cena ativa limpa e só o `[Fatia] Onibus`, aditivo, sujo (suíte EditMode): o diálogo abriu do mesmo jeito.
+
+**Clicar em Cancel não destrava o CLI.** Na #171, depois do Cancel o Editor voltou ao normal (sem diálogo, sem barra de progresso, respondendo a cliques) e `unity status` dizia `ready`, mas todo comando (`eval_file`, `test_status`, `console`, `eval`, `list_open_scenes`) seguiu expirando até o Unity ser fechado e reaberto com `unity open .`. É o mesmo sintoma de "Gravar uma cena alterada por `eval_file`", em [Trocar de sala por `eval` (#12)](#trocar-de-sala-por-eval-12). Na #3 não se registrou qual botão foi clicado. **Don't Save** recarrega as cenas ainda sujas e descarta a alteração (`ReloadModifiedScenesTask.cs`; lido no código, não medido).
+
+**Antes de cada `run_tests`**, rode `unity command list_open_scenes` e confira o `isDirty` de **cada** cena, seguindo os três casos de [Abrir e salvar cena](#abrir-e-salvar-cena): todas limpas, rode a suíte; suja por alteração sua, grave e confira o `.unity` por `grep`; suja e você não sabe de quem é, **pare** e avise o programador. Uma cena sem título e suja (`path` vazio) cai no último caso, a não ser que a própria sessão a tenha criado e vá gravá-la com um caminho, como em [salas.md](../autoria/salas.md); `save_all` e `save_scene` com ela não foram medidos e podem abrir o "Salvar como", que também trava.
+
+Depois de gravar, confira o `git status`: na #15, uma sequência de execuções com a gravação da cena antes de cada uma deixou o `[Teste] Mecanicas.unity` modificado, com `RectTransform` de filhos de um layout group do canvas gravados com valores calculados (a causa não foi isolada). Reverta a cena com `git checkout` se isso acontecer; ele não entra no commit.
 
 ### Executar C# no Editor
 
@@ -127,7 +135,7 @@ unity command list_open_scenes
 - Alguma com `isDirty: true` e a alteração é **sua**, desta sessão: grave com `unity command save_scene --path <cena>` (ou `save_all`) e confira o `.unity` por `grep`, como no parágrafo "Gravar uma cena alterada por `eval_file`", em [Trocar de sala por `eval` (#12)](#trocar-de-sala-por-eval-12) (`SaveOpenScenes()` por `eval` não grava).
 - Alguma com `isDirty: true` e você **não sabe de quem é** (uma sala em ajuste pelo programador, o resto de outra sessão): **pare** e avise o programador. Gravar um trabalho que não é seu é tão ruim quanto perdê-lo.
 
-A ausência de diálogo não quer dizer que nada se perdeu: o diálogo "Scene(s) Have Been Modified" é do Test Runner (ver [Rodar a suíte PlayMode](#rodar-a-suíte-playmode)), um caso diferente. `OpenScene` em modo `Additive` não fecha nada; é por isso que o despejo da #107 (`if (!wasLoaded)`) não perde trabalho. A `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()` existe para mostrar esse diálogo ao usuário e não foi medida aqui: não a use para se proteger.
+A ausência de diálogo não quer dizer que nada se perdeu: o diálogo "Scene(s) Have Been Modified" é do Test Runner (ver [Rodar a suíte PlayMode](#rodar-a-suíte-playmode)), um caso diferente. `OpenScene` em modo `Additive` não fecha nada; é por isso que o despejo da #107 (`if (!wasLoaded)`) não perde trabalho. O diálogo é o da `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()`, que o Test Runner chama antes de toda suíte (#171): não a chame para se proteger, porque ela abre o mesmo diálogo.
 
 ### Entrar e sair do Play Mode
 
