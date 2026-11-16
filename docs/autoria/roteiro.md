@@ -565,6 +565,45 @@ Luna: Vou ensaiar no auditório. A banda toca na sexta.
 - Numa [opção de ação](#opção-de-ação), a etiqueta vai **depois** da condição: `-> Abrir a porta <<if $x>> #acao`.
 - Se **todas** as opções do bloco estiverem bloqueadas, o bloco não aparece e a conversa segue pela linha depois dele.
 
+### Conversa de chegada: a sala abre o nó e o nó decide
+
+Uma sala pode abrir uma conversa **sozinha** quando o jogador chega nela, sem clique (o prólogo no ônibus é assim). Quem liga a sala ao nó é quem monta a cena ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)); você escreve o nó e diz, no envio, qual é o nome dele e em que sala ele abre.
+
+**A sala abre o nó em toda chegada**: no Novo Jogo, ao atravessar uma saída e também ao continuar um jogo salvo. A sala não sabe se o jogador já viu a conversa. **Quem impede a repetição é o seu nó**, de um destes dois jeitos.
+
+**Por variável.** Declare uma variável em `variaveis.yarn` (ver [Onde se declara](#onde-se-declara)) e ligue-a no fim da conversa:
+
+```
+title: onibus_chegada
+---
+<<if not $prologo_concluido>>
+    <<detour onibus_viagem>>
+    <<set $prologo_concluido to true>>
+<<endif>>
+===
+```
+
+É o jeito certo quando outra parte da história também precisa saber se aquilo já aconteceu (uma porta que só abre depois do prólogo, por exemplo).
+
+**Por `visited()` do próprio nó.** Se só esse nó precisa lembrar, comece pela pergunta "já passei por aqui?" e pare:
+
+```
+title: posto_chegada
+---
+<<if visited("posto_chegada")>>
+    <<stop>>
+<<endif>>
+Pensamento: O frio daqui entra pelos ossos.
+===
+```
+
+Na primeira chegada o jogador lê o pensamento; nas seguintes o nó para na primeira linha. O contador só sobe **quando o nó termina**: se o jogador sair do jogo no meio da conversa e continuar depois, ela abre de novo desde o começo, porque o jogo guardou a sala no momento da chegada, antes da conversa (salvar durante uma conversa é recusado). Escreva a conversa de chegada de modo que repetir do começo não estrague nada.
+
+- **Um nó que não tem nada a dizer** na segunda chegada (todas as falas dentro de um `<<if>>` falso, ou o `<<stop>>` do exemplo) abre e fecha a conversa sem mostrar a caixa: o jogador não percebe.
+- **Quando a conversa de chegada termina**, o jogador volta a explorar a sala, como depois de qualquer conversa. A pausa e o histórico funcionam nela.
+- **Só a chegada abre.** Para abrir uma conversa por outro motivo (tempo, uma variável, um item), peça pela [seção de pedidos](#como-pedir-o-que-ainda-não-existe): hoje não existe.
+- Dar **Play direto** numa sala no Editor, sem passar por uma troca de sala, não conta como chegada.
+
 ### Mostrar um valor no texto
 
 `{$nome}` é trocado pelo valor atual: `Sua afinidade com a Luna é {$afinidade_luna}.` Serve para testar. Num roteiro de verdade, não mostre número para o jogador.

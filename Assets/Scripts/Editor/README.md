@@ -34,7 +34,7 @@ Como funciona:
 
 ## O seletor de nó do roteiro
 
-`[ScriptNode]` em um campo `string` o transforma, no Inspector, em uma lista dos nós de `Assets/Roteiro/` (hoje, o campo **Node Name** do `InteractableDialogueTrigger`):
+`[ScriptNode]` em um campo `string` o transforma, no Inspector, em uma lista dos nós de `Assets/Roteiro/` (hoje, o campo **Node Name** do `InteractableDialogueTrigger` e o do `RoomArrivalDialogue`, #127):
 
 - as opções são **(nenhum)** (grava texto vazio) e os nós do `Roteiro.yarnproject`, em ordem alfabética. A lista **não traz o nó `variaveis`**: ele só declara variáveis (`variaveis.yarn`) e não tem fala, então escolhê-lo abriria e fecharia uma conversa vazia;
 - um valor que **não está na lista** (nó renomeado, apagado, ou o próprio `variaveis`) continua no campo, entra no fim da lista e ganha um `HelpBox` de aviso;
@@ -44,11 +44,11 @@ Como funciona:
 
 - `ScriptNodes` lê `Yarn.Program.Parser.ParseFrom(project.compiledYarnProgram).Nodes` **a cada vez que o Inspector é montado**, sem cache próprio. Não usa `YarnProject.Program` nem `YarnProject.NodeNames`, que guardam cache (o achado da #3). **Só chame `ParseFrom` depois de `TheYarnProject` conferir o `ImportStatus`:** com erro de compilação `compiledYarnProgram` é `null` e o parse lança. É por esse `ParseFrom` que o asmdef lista `Yarn.Google.Protobuf.dll`.
 - Depois de criar, renomear ou apagar um nó, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado. Se o nó está num **arquivo** `.yarn` novo, a mesma ressalva do `[StoryFlag]` vale: com o Editor sem foco o arquivo não entra no projeto até ele ser reimportado ([#34](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)).
-- Como no `[StoryFlag]`, `CreatePropertyGUI` só roda em Inspector de UI Toolkit. O `InteractableDialogueTrigger` não tem `Editor` customizado; não crie um IMGUI.
+- Como no `[StoryFlag]`, `CreatePropertyGUI` só roda em Inspector de UI Toolkit. O `InteractableDialogueTrigger` e o `RoomArrivalDialogue` não têm `Editor` customizado; não crie um IMGUI.
 - A lista é plana, sem busca nem agrupamento por arquivo (D-27). Com o roteiro crescendo, uma lista com busca vira issue quando ficar difícil de usar.
 
 ## Limitações
 
 - Só cobre variáveis **booleanas**. Um seletor para número ou texto fica para quando uma issue pedir (D-27).
-- Renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado; quem acusa, sem ninguém abrir o objeto, é o teste `StoryFlagFieldsTests`. O mesmo vale para um nó renomeado no `.yarn`, acusado pelo `DialogueTriggerNodesTests` (ver o [README dos testes](../Tests/README.md)).
+- Renomear uma variável em `variaveis.yarn` deixa órfão o campo de uma cena que a usava, e o aviso só aparece com o objeto selecionado; quem acusa, sem ninguém abrir o objeto, é o teste `StoryFlagFieldsTests`. O mesmo vale para um nó renomeado no `.yarn`, acusado pelo `ScriptNodeFieldsTests`, que confere todo campo `[ScriptNode]` (ver o [README dos testes](../Tests/README.md)).
 - É código de Editor: não tem teste automatizado (D-24). Foi verificado lendo o Inspector dos dois seletores por `eval`; o clique no dropdown e a aparência ficam para o programador.
