@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using ProjetoVN.GameFlow.Persistence;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -89,6 +90,42 @@ namespace ProjetoVN.Tests.EditMode
             [SerializeField] private UnityEvent onSomething;
         }
 
+        private sealed class WithTypeFromAnotherProjectAssembly
+        {
+            [Tooltip("o save")]
+            [SerializeField] private GameState state;
+        }
+
+        [Serializable]
+        private class SerializableBase
+        {
+            [SerializeField] private int fromSerializableBase;
+        }
+
+        [Serializable]
+        private sealed class SerializableDerived : SerializableBase
+        {
+            [Tooltip("explica o campo")]
+            [SerializeField] private int own;
+        }
+
+        private sealed class WithSerializableDerived
+        {
+            [Tooltip("o filho")]
+            [SerializeField] private SerializableDerived child;
+        }
+
+        [Serializable]
+        private sealed class IntEvent : UnityEvent<int>
+        {
+        }
+
+        private sealed class WithEventSubclass
+        {
+            [Tooltip("o evento")]
+            [SerializeField] private IntEvent onNumber;
+        }
+
         [Test]
         public void WithoutTooltip_SerializeFieldWithoutTooltip_IsListed()
         {
@@ -156,6 +193,26 @@ namespace ProjetoVN.Tests.EditMode
         public void WithoutTooltip_UnityTypes_AreNotInspected()
         {
             CollectionAssert.IsEmpty(ExposedFields.WithoutTooltip(typeof(WithUnityTypes)));
+        }
+
+        [Test]
+        public void WithoutTooltip_SerializableTypeFromAnotherProjectAssembly_IsInspected()
+        {
+            Assert.That(ExposedFields.WithoutTooltip(typeof(WithTypeFromAnotherProjectAssembly)),
+                Has.Some.StartsWith("GameState."));
+        }
+
+        [Test]
+        public void WithoutTooltip_BaseOfASerializableFieldType_IsInspected()
+        {
+            CollectionAssert.AreEqual(new[] { "SerializableBase.fromSerializableBase" },
+                ExposedFields.WithoutTooltip(typeof(WithSerializableDerived)));
+        }
+
+        [Test]
+        public void WithoutTooltip_BaseOutsideTheProject_IsNotInspected()
+        {
+            CollectionAssert.IsEmpty(ExposedFields.WithoutTooltip(typeof(WithEventSubclass)));
         }
     }
 }
