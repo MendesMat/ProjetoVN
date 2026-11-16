@@ -108,12 +108,12 @@ unity command open_scene --path "Assets/Scenes/[Teste] Mecanicas.unity"
 unity command save_scene
 ```
 
-**Trocar de cena descarta o que não foi salvo (#166).** `unity command open_scene` e `unity command create_scene` sem `--additive`, e `EditorSceneManager.NewScene` e `OpenScene` em modo `Single` por `eval`, **fecham todas as cenas abertas**, as aditivas inclusive, e descartam a alteração não salva **sem diálogo e sem erro**: o comando responde `success: true`, o `.unity` fica como estava e o backup de `Temp/__Backupscenes` não guarda a alteração. Medido no Editor 6000.3.9f1, fora do Play, marcando a cena suja com um objeto novo (`MarkSceneDirty`) e trocando de cena em seguida:
+**Trocar de cena descarta o que não foi salvo (#166).** `unity command open_scene` e `unity command create_scene` sem `--additive`, e `EditorSceneManager.NewScene` e `OpenScene` em modo `Single` por `eval`, **fecham todas as cenas abertas**, as aditivas inclusive, e descartam a alteração não salva **sem diálogo e sem erro**: o comando responde `success: true` e o `.unity` fica como estava. Medido no Editor 6000.3.9f1, fora do Play, marcando a cena suja com um objeto novo (`MarkSceneDirty`) e trocando de cena em seguida:
 
 | Situação antes | Chamada | Resultado |
 |---|---|---|
 | Cena sem título, suja | `NewScene(EmptyScene, Single)` por `eval_file` | Voltou em 122 ms, sem diálogo; a cena antiga deixou de existir |
-| `[Fatia] Posto` (ativa) e `[Fatia] Onibus` (aditiva), salvas e sujas | `NewScene(EmptyScene, Single)` por `eval_file` | Sem diálogo; `sceneCount` foi de 2 para 1 e as duas foram fechadas; os dois `.unity` não ganharam a marca |
+| `[Fatia] Posto` (ativa) e `[Fatia] Onibus` (aditiva), salvas e sujas | `NewScene(EmptyScene, Single)` por `eval_file` | Sem diálogo; `sceneCount` foi de 2 para 1 e as duas foram fechadas; os dois `.unity` não ganharam a marca, nem o backup de `Temp/__Backupscenes` (o `0.backup` era de meia hora antes) |
 | `[Fatia] Posto` salva e suja | `open_scene` de outra cena | `success: true`, exit 0, sem diálogo; a alteração se perdeu |
 | `[Fatia] Onibus` salva e suja | `create_scene` sem `--additive` | `success: true`, exit 0, sem diálogo; a alteração se perdeu |
 
@@ -124,7 +124,7 @@ unity command list_open_scenes
 ```
 
 - Todas com `isDirty: false`: pode trocar.
-- Alguma com `isDirty: true` e a alteração é **sua**, desta sessão: grave com `unity command save_scene --path <cena>` (ou `save_all`) e confira o `.unity` por `grep`, como no parágrafo "Gravar uma cena alterada por `eval_file`" (`SaveOpenScenes()` por `eval` não grava).
+- Alguma com `isDirty: true` e a alteração é **sua**, desta sessão: grave com `unity command save_scene --path <cena>` (ou `save_all`) e confira o `.unity` por `grep`, como no parágrafo "Gravar uma cena alterada por `eval_file`", em [Trocar de sala por `eval` (#12)](#trocar-de-sala-por-eval-12) (`SaveOpenScenes()` por `eval` não grava).
 - Alguma com `isDirty: true` e você **não sabe de quem é** (uma sala em ajuste pelo programador, o resto de outra sessão): **pare** e avise o programador. Gravar um trabalho que não é seu é tão ruim quanto perdê-lo.
 
 A ausência de diálogo não quer dizer que nada se perdeu: o diálogo "Scene(s) Have Been Modified" é do Test Runner (ver [Rodar a suíte PlayMode](#rodar-a-suíte-playmode)), um caso diferente. `OpenScene` em modo `Additive` não fecha nada; é por isso que o despejo da #107 (`if (!wasLoaded)`) não perde trabalho. A `EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()` existe para mostrar esse diálogo ao usuário e não foi medida aqui: não a use para se proteger.
