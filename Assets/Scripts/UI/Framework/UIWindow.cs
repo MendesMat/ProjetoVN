@@ -6,8 +6,15 @@ namespace ProjetoVN.UI.Framework
     public class UIWindow : MonoBehaviour
     {
         [Header("Window")]
+        [Tooltip("O objeto ligado e desligado ao abrir e fechar a janela. Vazio = a janela usa o próprio objeto deste componente.")]
         [SerializeField] private GameObject root;
+
+        [Tooltip("O botão selecionado ao abrir a janela, para o teclado e o controle começarem por ele (na confirmação, o VOLTAR). " +
+                 "Vazio = a janela abre sem nada selecionado.")]
         [SerializeField] private GameObject firstSelected;
+
+        [Tooltip("Ligado = a janela reabre no último botão selecionado quando ela fechou, se ele continuar ativo. " +
+                 "Desligado = reabre sempre no First Selected.")]
         [SerializeField] private bool rememberLastSelected = true;
 
         private GameObject lastSelected;

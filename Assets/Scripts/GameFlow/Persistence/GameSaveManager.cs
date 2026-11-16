@@ -13,6 +13,8 @@ namespace ProjetoVN.GameFlow.Persistence
     {
         public static GameSaveManager Instance { get; private set; }
 
+        [Tooltip("O registro de itens (Assets/Scripts/ScriptableObjects/Items/ItemRegistry.asset), que traduz os ids gravados no save em itens. " +
+                 "Vazio = carregar o save dá erro e nada é restaurado.")]
         [SerializeField] private ItemRegistry itemRegistry;
 
         private static string SavePath => Path.Combine(Application.persistentDataPath, "savegame.json");
@@ -31,6 +33,14 @@ namespace ProjetoVN.GameFlow.Persistence
         {
             if (Instance == this) Instance = null;
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (itemRegistry == null)
+                Debug.LogWarning("[GameSaveManager] O campo 'Item Registry' está vazio: carregar o save dá erro e nada é restaurado. Atribua o ItemRegistry.", this);
+        }
+#endif
 
         public bool Save()
         {

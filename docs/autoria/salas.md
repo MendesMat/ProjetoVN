@@ -18,15 +18,17 @@ Qualquer objeto do cenário em que o jogador pode clicar.
 
 1. Use o prefab `Assets/Prefabs/Gameplay/Interactable.prefab`, ou acrescente a um objeto um `Collider2D` e o componente **Interactable Item**.
 2. Em **On Interact**, ligue o que deve acontecer no clique (veja as seções abaixo).
-3. **Outline Object** é opcional: um objeto filho que aparece quando o mouse passa por cima.
+3. **Outline Object** é opcional: um objeto filho que aparece quando o mouse passa por cima. Ele **não pode ser o próprio objeto nem um pai dele**: o objeto se desligaria ao entrar na sala e sumiria (o Inspector avisa).
 
-O objeto cresce um pouco no hover (**Highlight Scale Multiplier**).
+O objeto cresce um pouco no hover (**Highlight Scale Multiplier**: 1 = não cresce, 1,15 = 15% maior, o valor do prefab; o campo não aceita menos que 1).
+
+Todo campo do componente tem tooltip: passe o mouse sobre o nome do campo no Inspector para ver o que ele é, um exemplo e o que acontece vazio.
 
 ## Coletável
 
 Um objeto que vira item do inventário ao ser clicado.
 
-1. Crie o item: botão direito no Project → **Create → Items → Item**. Preencha **Id** (único, sem espaços), **Item Name**, **Description** e **Icon**.
+1. Crie o item: botão direito no Project → **Create → Items → Item**. Preencha **Id** (único, sem espaços), **Item Name**, **Description** e **Icon**. A **Description** ainda não aparece no jogo (examinar um item pelo painel está fora do escopo); o **Item Name** vazio é avisado no Inspector.
 2. Acrescente o item à lista do asset `Assets/Scripts/ScriptableObjects/Items/ItemRegistry.asset`. Sem isso, o item não é restaurado ao carregar um save. O registro avisa se dois itens têm o mesmo id.
 3. No objeto interativo, acrescente o componente **Collectable Item Behaviour** e aponte **Item Data** para o item.
 4. Em **On Interact**, ligue `CollectableItemBehaviour.Collect`.
@@ -86,6 +88,8 @@ A metade da largura da tela é o **Size** da câmera vezes 16/9: **8,89** com Si
 Exemplo, a `[Teste] Mecanicas`: três painéis de 20,9 de largura (sprite de 16,72 em escala 1,25) em x -20,9, 0 e 20,9 cobrem de -31,35 a 31,35. Então **Max X** = 31,35 − 8,89 = 22,46 e **Min X** = 8,89 − 31,35 = -22,46; a cena usa **22,4** e **-22,4**, arredondados para dentro.
 
 A conta vale para telas 16:9. Uma tela mais larga mostra mais cenário e pode ver a borda (#157).
+
+Os valores das salas são **Pan Speed** 10 (unidades do mundo por segundo; também é o padrão de um componente novo) e **Edge Threshold** 80 (pixels da faixa junto à borda). Nenhum dos dois aceita negativo. O componente avisa no Inspector quando **Min X** é maior que **Max X** (o pan pularia entre os dois limites) e quando **Environment Container** está vazio; **Min X** igual a **Max X** vale e é a sala sem pan.
 
 ## Criar uma sala nova
 

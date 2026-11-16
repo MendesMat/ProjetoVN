@@ -9,7 +9,7 @@ O módulo **UI** agrupa os elementos visuais de tela (HUDs, menus, janelas e pai
 ## Estrutura Principal
 
 - **`Framework/`**: A base estrutural de qualquer tela.
-  - **`UIWindow`**: Classe base para um painel que abre, fecha e define qual elemento recebe o foco. `Hide()` guarda a seleção e **a solta do `EventSystem`** quando ela é de dentro da janela (#18): sem isso o botão escondido continuaria selecionado e um Enter o acionaria.
+  - **`UIWindow`**: Classe base para um painel que abre, fecha e define qual elemento recebe o foco. Os três campos (`root`, `firstSelected`, `rememberLastSelected`) têm tooltip e são opcionais por desenho, então não há aviso (#52, D-27). `Hide()` guarda a seleção e **a solta do `EventSystem`** quando ela é de dentro da janela (#18): sem isso o botão escondido continuaria selecionado e um Enter o acionaria.
   - **`UIWindowManager`**: Coordena as janelas abertas por uma **pilha simples** (#18), cuja regra é a classe pura `WindowStack<TWindow>` (testada em EditMode). Só a janela de cima fica visível.
     - `OpenWindow(janela)`: empilha a janela e esconde a de baixo. Se a janela **já está na pilha**, a pilha volta até ela (as de cima fecham) em vez de crescer: é por isso que o VOLTAR da `Settings Window` e o da `Confirm New Game Window` (que chamam `OpenWindow(Title Window)`) e o VOLTAR da confirmação da pausa continuam funcionando sem religar nada. Abrir a janela que já é a do topo só refaz a seleção.
     - `CloseCurrentWindow()`: desempilha e reabre a de baixo. `CloseAllWindows()`: fecha todas (a pausa o usa ao retomar).
@@ -73,7 +73,7 @@ Armadilhas: o texto da confirmação precisa de `Text Wrapping Mode` = Normal (u
 
 ### O prefab do slot
 
-`Assets/Prefabs/UI/SlotUI.prefab`: raiz com `Image` de fundo, `LayoutElement` (140×140) e `ItemSlotUI`; filhos `Icon` (`Image`, escondido quando o item não tem ícone) e `Name` (TMP). As referências `iconImage` e `nameLabel` do `ItemSlotUI` precisam estar ligadas no prefab. Slots devolvidos ao pool são **desativados, não destruídos**, então `transform.childCount` do painel não diz quantos itens estão visíveis — conte os filhos ativos.
+`Assets/Prefabs/UI/SlotUI.prefab`: raiz com `Image` de fundo, `LayoutElement` (140×140) e `ItemSlotUI`; filhos `Icon` (`Image`, escondido quando o item não tem ícone) e `Name` (TMP). As referências `iconImage` e `nameLabel` do `ItemSlotUI` precisam estar ligadas no prefab; o código já trata as duas como opcionais (vazia, o slot só não mostra o ícone ou o nome), então não há aviso, só o tooltip (#52). O `InventoryPresenter` avisa no `OnValidate` (#52) `Slots Container` vazio, `Item Slot Game Object` vazio e um prefab de slot **sem** `ItemSlotUI`. Slots devolvidos ao pool são **desativados, não destruídos**, então `transform.childCount` do painel não diz quantos itens estão visíveis — conte os filhos ativos.
 
 As mensagens carregam o próprio `ItemDataSO`, então o slot lê nome e ícone direto do asset. **Não** mantenha uma lista de itens no Inspector da UI para procurar ícones: isso seria uma segunda fonte de verdade, e foi justamente o que essa estrutura eliminou.
 

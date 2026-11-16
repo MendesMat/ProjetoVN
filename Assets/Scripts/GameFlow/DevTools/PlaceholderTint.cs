@@ -18,6 +18,8 @@ namespace ProjetoVN.GameFlow.DevTools
         [Tooltip("Vazio = usa o SpriteRenderer deste próprio GameObject.")]
         [SerializeField] private SpriteRenderer target;
 
+        [Tooltip("A cor aplicada ao SpriteRenderer quando o evento ligado dispara (ex.: verde, para uma porta aberta). " +
+                 "O alfa conta: transparente apaga o sprite.")]
         [SerializeField] private Color tint = Color.green;
 
         private Color _originalColor;
