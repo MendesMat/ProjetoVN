@@ -224,7 +224,7 @@ Linhas em branco entre as falas não fazem diferença para o jogo: use para orga
 | `LUNA: Oi.` | Uma personagem "LUNA", que não existe. |
 | `Luna : Oi.` | Uma personagem "Luna " (com um espaço no fim), que não existe. |
 
-O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, sem a cor, a personagem não apareceria na tela e a conversa não travaria.
+O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, a personagem não apareceria na tela e a conversa não travaria.
 
 Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 
@@ -239,7 +239,7 @@ Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 | `Homem` | Um passageiro do ônibus (ainda sem arte) |
 | `Mulher` | Uma passageira do ônibus (ainda sem arte) |
 
-Uma personagem pode existir **antes da arte**, como as cinco últimas da tabela: o nome aparece na placa, na cor dela, e a fala entra no histórico num balão dessa cor, mas **nenhum sprite aparece** e quem está na tela escurece, como na narração. Você escreve as falas normalmente; quando a arte chegar, nada muda no roteiro.
+Uma personagem pode existir **antes da arte**, como as cinco últimas da tabela: o nome aparece na placa, e a fala entra no histórico num balão na cor dela, mas **nenhum sprite aparece** e quem está na tela escurece, como na narração. Você escreve as falas normalmente; quando a arte chegar, nada muda no roteiro.
 
 Quando uma personagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Se precisar de uma antes, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 

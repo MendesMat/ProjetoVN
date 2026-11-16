@@ -88,7 +88,7 @@ namespace ProjetoVN.Dialogue.UI
         private readonly ConversationLog _history = new();
         private Button[] _choiceButtons;
         private YarnTaskCompletionSource<DialogueOption> _selection;
-        private Color _defaultNameColor;
+        private Color _unknownSpeakerBubbleColor;
         private Color _defaultTextColor;
         private FontStyles _defaultTextStyle;
         private FontStyles[] _defaultChoiceStyles;
@@ -110,7 +110,7 @@ namespace ProjetoVN.Dialogue.UI
         private void Start()
         {
             _typewriter = new LetterTypewriter { TextElement = dialogueText };
-            _defaultNameColor = speakerNameText.color;
+            _unknownSpeakerBubbleColor = speakerNameText.color;
             _defaultTextColor = dialogueText.color;
             _defaultTextStyle = dialogueText.fontStyle;
             CacheChoiceButtons();
@@ -299,7 +299,7 @@ namespace ProjetoVN.Dialogue.UI
             if (!TryResolveCharacter(speaker, out CharacterSO character))
             {
                 speakerNameText.text = speaker;
-                _history.AddSpokenLine(speaker, _defaultNameColor, text);
+                _history.AddSpokenLine(speaker, _unknownSpeakerBubbleColor, text);
                 DimStage();
                 return;
             }

@@ -69,7 +69,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
     - **A #142 fecha a milestone e precisa fechar antes da #71 (M10),** pelo mesmo motivo da #37: o fade pelo roteiro pode criar o primeiro comando com parâmetro numérico (a duração), e é aí que um parâmetro do tipo errado passa a travar a conversa.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
-  - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 depende de uma decisão do programador (nome com ou sem cor), que o levantamento pergunta.
+  - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
   - **A #52 vem depois da #108 e da #96:** ela valida `minX` < `maxX` no mesmo componente que a #108 ajusta, e a varredura de tooltips cobre também o que a #96 acrescentar.
   - **A #107 fecha a milestone** porque percorre o guia de `salas.md` no Inspector, e o percurso só vale com os limites certos (#108) e com os tooltips no lugar (#52).
 - **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 e da #142 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
