@@ -62,11 +62,14 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #105, a #37 e a #34 protegem quem produz conteúdo:** sala com nome repetido, comando com o número errado de parâmetros e `.yarn` novo que não entra no jogo. A #37 precisa fechar antes da #71 (M10), que cria comandos novos de roteiro: se ela escolher o teste genérico de parâmetros, os comandos da #71 já nascem protegidos.
   - **A #31** é só uma decisão (vale ou não a D-24 para código chamado de `OnValidate`) e o resultado, um teste ou uma linha em `skills.md`.
   - **A #140** vem depois das que só mexem em documentação e testes, e antes da M9. Ela decide se o Editor pula a recarga de domínio ao entrar no Play, para a D-29 valer na prática. A revisão da #36 mediu que hoje o domínio é recarregado a cada Play, então nenhum dos resets em `SubsystemRegistration` roda de verdade. É ferramenta que custa tempo a cada sessão (o Play e a suíte PlayMode), e muda como toda verificação em Play Mode se comporta: como a #79 na M4, é melhor mudar isso antes das milestones de conteúdo, e um estado estático esquecido aparece antes de a fatia crescer. Priorizada pelo programador em 2026-11-15.
-  - **A #144, a #146, a #134 e a #142 fecham a milestone.** São os achados das sessões da #31, da #37 e da #105, que estavam no backlog com `triagem`; o programador pediu, em 2026-11-15, que nenhuma issue ficasse sem milestone. Elas entram na M8, e não na M9, porque são do mesmo tipo da #105 e da #37: testes e proteções para quem produz conteúdo, sem nada que o jogador veja. A #135 foi fechada como duplicada da #144.
+  - **A #144, a #146, a #134 e a #142 vêm depois da #140.** São os achados das sessões da #31, da #37 e da #105, que estavam no backlog com `triagem`; o programador pediu, em 2026-11-15, que nenhuma issue ficasse sem milestone. Elas entram na M8, e não na M9, porque são do mesmo tipo da #105 e da #37: testes e proteções para quem produz conteúdo, sem nada que o jogador veja. A #135 foi fechada como duplicada da #144.
     - **A #144 vem primeiro:** é só uma frase do `Tests/README.md`, e as três seguintes acrescentam testes ao mesmo README.
     - **A #146 vem antes da #134:** ela decide se a leitura de campo por `SerializedObject` que o `RoomLinksTests` e o `MainMenuTests` copiam vira um auxiliar comum, e a #134 é um teste novo de conteúdo que lê campos do mesmo jeito. Feita antes, a #134 já nasce usando o auxiliar, em vez de criar a terceira cópia.
     - **A #134 precisa fechar antes da #128 (M11),** que cria um componente novo com campo de variável de história. Se o teste conferir todo campo `[StoryFlag]`, e não só o do `LockedActionBehaviour`, o componente da #128 já nasce protegido contra nome de variável errado.
-    - **A #142 fecha a milestone e precisa fechar antes da #71 (M10),** pelo mesmo motivo da #37: o fade pelo roteiro pode criar o primeiro comando com parâmetro numérico (a duração), e é aí que um parâmetro do tipo errado passa a travar a conversa.
+    - **A #142 precisa fechar antes da #71 (M10),** pelo mesmo motivo da #37: o fade pelo roteiro pode criar o primeiro comando com parâmetro numérico (a duração), e é aí que um parâmetro do tipo errado passa a travar a conversa.
+  - **A #163 e a #162 fecham a milestone.** Vieram das sessões da #107 e da #52 e foram priorizadas pelo programador na triagem de 2026-11-16, quando a M8 e a M9 já não tinham nada aberto.
+    - **A #163 vem primeiro** porque corrige uma premissa que toda sessão lê: `salas.md` e `CLAUDE.md` dizem que uma pessoa monta as salas no Inspector, e quem monta é o agente, pelo CLI. Ela esperava a #107, que reescreveu o passo a passo de `salas.md`. Feita agora, o levantamento da #130 (M11), que monta o pátio e a loja, já parte da premissa certa.
+    - **A #162** fecha os dois furos do teste de guarda da regra 8 (classe `[Serializable]` de outro módulo e a base dela). É do mesmo tipo da #105 e da #37, e a M10 e a M11 criam componentes novos que o teste deve cobrir por inteiro.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
@@ -74,12 +77,14 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #107 fecha a milestone** porque monta o `[Fatia] Posto` só a partir do passo a passo de `salas.md` e corrige o guia, e a montagem só vale com os limites certos (#108) e com os tooltips no lugar (#52).
 - **Os efeitos de roteiro (M10) vêm antes da entrega** porque o prólogo é a abertura do jogo: sem fade nem imagem de tela cheia, a lembrança dos pais aparece por cima do ônibus, sem corte. A #71 depende da #37 e da #142 (M8). O levantamento dela decide se ela se divide (fade e cenário de tela cheia), e as partes novas entram nesta milestone.
   - **A #127 abre a milestone,** antes da #71. Ela é a abertura automática da conversa ao chegar na sala, que estava na #71 e saiu dela no planejamento de 2026-11-13: não depende do fade, e a M11 precisa dela duas vezes. A #71 passa a depender dela, porque abrir o prólogo com a tela preta só faz sentido com a conversa já abrindo sozinha na chegada.
+  - **A #155 e a #156 têm portão (D-27),** e entram na M10 pela triagem de 2026-11-16. As duas mexem no teste dos comandos de roteiro (`ScriptCommandSignature` e `ScriptCommandParameter`): a #155 corrige a posição citada na mensagem de erro de um comando com `params`, e a #156 junta a condição da vírgula decimal que está escrita duas vezes. A #155 só importa quando existir um comando com `params` de tipo diferente de `string`, e a #156 cabe no mesmo PR que mexer nesse arquivo. **O levantamento da #71 decide:** se o fade ou o cenário de tela cheia criarem um comando assim, as duas vêm antes da #71, nessa ordem; se não, saem da M10 e voltam ao backlog com o portão. Ficam com `triagem` até lá.
 - **O prólogo do ato 1 (M11) vem depois dos efeitos e antes da entrega.** O roteirista mandou um texto novo do prólogo em 2026-11-13: a Cena 1 é a que já está no jogo, e a Cena 2 (o pátio do posto e a loja de conveniência) substitui o conteúdo provisório do posto (#21). Ela usa a conversa de chegada (#127), e a entrega sai melhor com o prólogo de verdade do que com a Luna e a moeda provisórias. Decisões do programador no planejamento: as opções do roteiro são objetos clicáveis no cenário, e não opções de diálogo (são cinco, e uma é secreta, o que a D-11 não permite); a compra na loja é um bloco de opções com `<<dar_item>>`, sem tela de loja; e **o roteiro é fiel ao texto**, então a fatia deixa de ter a escolha de afinidade e o puzzle de item, que os roteiristas vão tratar depois. Priorizadas pelo programador em 2026-11-13.
   - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista. Ela depende da #134 (M8), para o campo de variável dela nascer coberto pelo teste de conteúdo.
   - **A #129 tem portão:** o roteirista envia o texto final ao programador, que o passa ao agente, e o `.yarn` é organizado a partir dele (esse texto entra pela issue, não por um PR de roteiro). Ela cria também os personagens, os sons e os itens que o roteiro cita, porque os testes dos roteiros reprovam o que não existe.
   - **A #130 fecha a milestone:** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
   - **A fonte de caneta da lista de passageiros (#131)** fica fora da M11, na M14, até a arte entregar a fonte: ela não muda nada do percurso, e a M11 não deve esperar uma entrega de fora para fechar.
 - **A primeira entrega (M12) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9), com a abertura completa (M10) e com o prólogo de verdade (M11). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
+  - **A #157 abre a milestone,** pela triagem de 2026-11-16. Em telas mais largas que 16:9 (um monitor 21:9, comum no desktop) o fundo das salas não cobre a tela, e o jogador vê o vazio preto que a #108 corrigiu só para 16:9. Ela começa por uma decisão de política do programador (aceitar só 16:9, tarjas fixas ou arte para 21:9) e pode mudar a câmera de todas as salas. Por isso vem antes da #109: a build entregue já sai com a política escolhida.
 - **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decidiu que o nome na placa normal tem uma cor só (`#FFF3FB`).
 - **A arte pendente (M14) tem portão de arte,** e não de roteiro: ela guarda as issues que esperam um arquivo da arte e não exigem código. Nasceu na reorganização de 2026-11-15 para a #131, que antes era a única issue do backlog sem portão próprio.
 
@@ -184,6 +189,8 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #146 | RoomLinksTests e MainMenuTests ainda copiam EntryPointIdsByScenePath, ScenePathAndIdOf e StringField | #105 |
 | #134 | Teste de conteúdo para os campos de variável de história das cenas | #31, #146 |
 | #142 | Comando de roteiro com parâmetro do tipo errado provavelmente trava a conversa | #37 |
+| #163 | salas.md e CLAUDE.md dizem que uma pessoa monta as salas no Inspector; quem monta é o agente, pelo CLI | #107 |
+| #162 | Teste de guarda dos tooltips não olha classe [Serializable] de outro módulo nem a base dela | #52 |
 
 ## M9 — Acabamento da fatia
 
@@ -204,6 +211,8 @@ Os efeitos de roteiro que o prólogo pede: a conversa que abre sozinha ao chegar
 | Issue | Título | Depende de |
 |---|---|---|
 | #127 | Conversa que abre sozinha ao chegar na sala | — |
+| #155 | Teste dos comandos: num params, o problema de tipo cita o número do parâmetro, não a posição da palavra | Portão: o levantamento da #71 pedir um comando com `params` que não seja `string` |
+| #156 | ScriptCommandParameter: a condição da vírgula decimal está escrita duas vezes | #155 |
 | #71 | Fade e cenário de tela cheia comandados pelo roteiro (pedidos do prólogo) | #37, #142, #127 |
 
 ## M11 — Prólogo do ato 1
@@ -222,8 +231,9 @@ A fatia vertical, já com o prólogo do ato 1, pronta para ir a alguém de fora,
 
 | Issue | Título | Depende de |
 |---|---|---|
+| #157 | Em telas mais largas que 16:9 o fundo das salas não cobre a tela | #108 |
 | #89 | Gravar o save sem risco de deixar o arquivo pela metade | #36 |
-| #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | #124, #108 |
+| #109 | Preparar a build de Windows para entrega: identificador, cenas de teste e pasta DoNotShip | #124, #108, #157 |
 
 ## M13 — Camada de horror
 
