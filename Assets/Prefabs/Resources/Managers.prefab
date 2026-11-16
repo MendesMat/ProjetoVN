@@ -378,6 +378,7 @@ GameObject:
   - component: {fileID: 8031801616078432902}
   - component: {fileID: 7657928945130930655}
   - component: {fileID: 3913230307073274361}
+  - component: {fileID: 5235012625117827949}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -553,6 +554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Rooms.RoomNavigator
   screenFader: {fileID: 3964921294727139080}
+  scriptScreen: {fileID: 84438258188197642}
   fadeSeconds: 0.4
 --- !u!114 &2680055250336085806
 MonoBehaviour:
@@ -615,6 +617,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa207fab5f109b44bbc772456387490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.ItemCollectedSound
+--- !u!114 &5235012625117827949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8151544206894508824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b3e5687a773ee04f9d9fd4167875193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.ScreenScriptActions
+  scriptScreen: {fileID: 84438258188197642}
+  pictureRegistry: {fileID: 11400000, guid: e2b6290cf035c324480557e1e0796368, type: 2}
 --- !u!1 &8645984204380223986
 GameObject:
   m_ObjectHideFlags: 0
@@ -915,6 +931,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fefda108de350bc468d1b84fa65972a2, type: 3}
+--- !u!114 &84438258188197642 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1307596687151908280, guid: fefda108de350bc468d1b84fa65972a2, type: 3}
+  m_PrefabInstance: {fileID: 1373167308627270322}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ea96e2edf1a2854d9ffe860f12daefa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.ScreenEffects.ScriptScreen
 --- !u!114 &3964921294727139080 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2596398360038446522, guid: fefda108de350bc468d1b84fa65972a2, type: 3}

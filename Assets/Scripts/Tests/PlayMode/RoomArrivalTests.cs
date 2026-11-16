@@ -8,6 +8,7 @@ using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.GameFlow.Persistence;
 using ProjetoVN.GameFlow.Rooms;
+using ProjetoVN.GameFlow.ScreenEffects;
 using ProjetoVN.Inventory;
 using ProjetoVN.PointNClick;
 using UnityEngine;
@@ -27,6 +28,9 @@ namespace ProjetoVN.Tests.PlayMode
         private const string ArrivalRoom = "[Fatia] Onibus";
         private const string ArrivalConversation = "onibus_viagem";
         private const string PrologueDone = "$prologo_concluido";
+        private const string DarknessLayer = "Darkness";
+        private const string PictureLayer = "Picture";
+        private const float MostlyOpaque = 0.9f;
         private const float WaitTimeoutSeconds = 10f;
         private const int FramesWatchedAfterOpening = 5;
 
@@ -72,6 +76,38 @@ namespace ProjetoVN.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator NewGame_OpensThePrologueWithTheScriptScreenDark()
+        {
+            CanvasGroup fade = Object.FindFirstObjectByType<ScreenFader>().GetComponent<CanvasGroup>();
+            CanvasGroup darkness = FindScriptScreenLayer(DarknessLayer).GetComponent<CanvasGroup>();
+
+            Assert.IsTrue(GameSaveManager.Instance.StartNewGame(ArrivalRoom, null), "O StartNewGame foi recusado.");
+            yield return WaitUntil(
+                () => DialogueManager.Instance.IsDialogueActive(), "a conversa de chegada abrir",
+                () => Assert.GreaterOrEqual(ScreenOpacityInTheArrivalRoom(fade, darkness), MostlyOpaque,
+                    "A sala do ônibus apareceu antes de o roteiro clarear a tela."));
+
+            Assert.GreaterOrEqual(darkness.alpha, MostlyOpaque, "A conversa abriu sem o escuro do roteiro.");
+            Assert.AreEqual(0f, fade.alpha, "O fade da troca de sala ainda cobria a tela quando a conversa abriu.");
+        }
+
+        [UnityTest]
+        public IEnumerator StoppingTheArrivalConversation_LeavesTheScriptScreenClear()
+        {
+            CanvasGroup darkness = FindScriptScreenLayer(DarknessLayer).GetComponent<CanvasGroup>();
+            GameObject picture = FindScriptScreenLayer(PictureLayer).gameObject;
+
+            Assert.IsTrue(GameSaveManager.Instance.StartNewGame(ArrivalRoom, null), "O StartNewGame foi recusado.");
+            yield return WaitUntil(() => DialogueManager.Instance.IsDialogueActive(), "a conversa de chegada abrir");
+            Assert.Greater(darkness.alpha, 0f, "A chegada não ligou o escuro: o teste não provaria a limpeza.");
+
+            DialogueManager.Instance.StopDialogue();
+            yield return WaitUntil(() => darkness.alpha == 0f, "o escuro sumir depois do fim da conversa");
+
+            Assert.IsFalse(picture.activeSelf, "A imagem do roteiro continuou ativa depois do fim da conversa.");
+        }
+
+        [UnityTest]
         public IEnumerator NewGame_SavesTheArrivalBeforeTheConversation_AndRefusesToSaveDuringIt()
         {
             Assert.IsTrue(GameSaveManager.Instance.StartNewGame(ArrivalRoom, null), "O StartNewGame foi recusado.");
@@ -110,6 +146,16 @@ namespace ProjetoVN.Tests.PlayMode
         }
 
         private static bool IsFading(CanvasGroup fade) => fade.alpha > 0f || fade.blocksRaycasts;
+
+        private static float ScreenOpacityInTheArrivalRoom(CanvasGroup fade, CanvasGroup darkness) =>
+            SceneManager.GetActiveScene().name == ArrivalRoom ? Mathf.Max(fade.alpha, darkness.alpha) : 1f;
+
+        private static Transform FindScriptScreenLayer(string layerName)
+        {
+            ScriptScreen screen = Object.FindFirstObjectByType<ScriptScreen>(FindObjectsInactive.Include);
+            Assert.IsNotNull(screen, "Não há ScriptScreen: o GameUI.prefab não a traz ou o Managers.prefab não foi criado.");
+            return screen.transform.Find(layerName);
+        }
 
         private static GameState ReadTheSaveFile()
         {

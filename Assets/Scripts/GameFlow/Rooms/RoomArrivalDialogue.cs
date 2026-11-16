@@ -18,21 +18,29 @@ namespace ProjetoVN.GameFlow.Rooms
         [ScriptNode]
         [SerializeField] private string nodeName;
 
-        internal void Open()
+        [Tooltip("Ligado = a sala chega com a tela escura: o escuro do roteiro é ligado antes de a tela clarear, " +
+                 "e o nó da conversa clareia com <<clarear>>. Se a conversa não clarear, o escuro some quando ela termina. " +
+                 "Desligado = a sala chega com a tela clara, como sempre.")]
+        [SerializeField] private bool startsDark;
+
+        internal bool StartsDark => startsDark;
+
+        /// <returns><c>true</c> se a conversa abriu.</returns>
+        internal bool Open()
         {
             if (string.IsNullOrWhiteSpace(nodeName))
             {
                 Debug.LogWarning("[RoomArrivalDialogue] Nenhum nó de roteiro atribuído (campo Node Name). A sala não abriu conversa.", this);
-                return;
+                return false;
             }
 
             if (DialogueManager.Instance == null)
             {
                 Debug.LogError("[RoomArrivalDialogue] Não há DialogueManager (o prefab Managers não foi criado). Conversa de chegada ignorada.", this);
-                return;
+                return false;
             }
 
-            DialogueManager.Instance.StartDialogue(nodeName);
+            return DialogueManager.Instance.StartDialogue(nodeName);
         }
 
 #if UNITY_EDITOR

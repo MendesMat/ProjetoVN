@@ -6,6 +6,7 @@ using ProjetoVN.Audio;
 using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Characters;
 using ProjetoVN.Dialogue.Logic;
+using ProjetoVN.GameFlow.ScreenEffects;
 using ProjetoVN.Inventory;
 using UnityEditor;
 using UnityEngine;
@@ -31,6 +32,8 @@ namespace ProjetoVN.Tests.EditMode
 
         private const string ProtagonistNameNode = "teste_nome_protagonista";
         private const string SignatureCommand = "assinar_lista";
+
+        private const string ShowPictureCommand = "mostrar_imagem";
 
         private const string KeyItemId = "chave_teste";
         private const string LunaGivesTheKeyLine = "Luna: Toma, achei esta chave no corredor.";
@@ -101,6 +104,32 @@ namespace ProjetoVN.Tests.EditMode
                 "o id é minúsculas sem acento, dígitos e _");
             Assert.IsEmpty(Repeated(entries.Select(entry => entry.Id)), "ids únicos no registro inteiro");
             Assert.IsEmpty(entries.Where(entry => entry.Clip == null).Select(entry => entry.Id), "todo som tem AudioClip");
+        }
+
+        [Test]
+        public void ProjectScripts_CiteOnlyPictureIdsThatExistInThePictureRegistry()
+        {
+            PictureRegistry registry = LoadTheOnly<PictureRegistry>();
+            ScriptCommandCall[] calls = ScriptCommandCalls.In(ScriptRun.FromProjectFiles().Program).All
+                .Where(call => call.Name == ShowPictureCommand).ToArray();
+
+            Assert.IsEmpty(calls.Where(call => call.WordCount == 0 || call.Words[0].StartsWith("{")).Select(call => call.ToString()),
+                "o id de uma imagem é sempre literal: nada de variável nem expressão");
+            Assert.IsEmpty(calls.Where(call => call.WordCount > 0 && !call.Words[0].StartsWith("{") && !registry.TryGet(call.Words[0], out _))
+                    .Select(call => call.ToString()),
+                "todo id citado no roteiro precisa existir no PictureRegistry");
+        }
+
+        [Test]
+        public void PictureRegistry_HasUniqueIdsInTheConventionWithSprites()
+        {
+            PictureRegistry registry = LoadTheOnly<PictureRegistry>();
+
+            Assert.IsEmpty(registry.Pictures.Where(entry => entry == null).Select(_ => "(vazio)"), "o registro não pode ter elemento vazio");
+            Assert.IsEmpty(registry.Pictures.Where(entry => !ScriptNodeName.FollowsConvention(entry.Id)).Select(entry => $"'{entry.Id}'"),
+                "o id é minúsculas sem acento, dígitos e _");
+            Assert.IsEmpty(Repeated(registry.Pictures.Select(entry => entry.Id)), "ids únicos");
+            Assert.IsEmpty(registry.Pictures.Where(entry => entry.Sprite == null).Select(entry => entry.Id), "toda imagem tem Sprite");
         }
 
         [Test]

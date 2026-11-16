@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using ProjetoVN.Dialogue.Logic;
 using ProjetoVN.GameFlow.Persistence;
+using ProjetoVN.GameFlow.ScreenEffects;
 using ProjetoVN.PointNClick;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,6 +24,10 @@ namespace ProjetoVN.GameFlow.Rooms
         [Tooltip("O fade de tela (Canvas_Fade, dentro do GameUI.prefab). " +
                  "Vazio = nenhuma troca de sala é aceita: ChangeRoom loga um erro e devolve false.")]
         [SerializeField] private ScreenFader screenFader;
+
+        [Tooltip("A camada de tela do roteiro (objeto ScriptScreen, dentro do GameUI.prefab). " +
+                 "Vazio = uma sala com Starts Dark ligado no Room Arrival Dialogue chega com a tela clara e loga um erro.")]
+        [SerializeField] private ScriptScreen scriptScreen;
 
         [Tooltip("Duração de cada metade da troca de sala: escurecer e clarear. 0 = troca sem fade.")]
         [Min(0f)]
@@ -117,6 +122,7 @@ namespace ProjetoVN.GameFlow.Rooms
         private async Awaitable ChangeRoomAsync(string roomName, string entryPointId, bool saveOnArrival)
         {
             bool hasArrived = false;
+            RoomArrivalDialogue arrival = null;
 
             try
             {
@@ -126,6 +132,8 @@ namespace ProjetoVN.GameFlow.Rooms
                 ArriveAt(roomName, entryPointId);
                 CurrentEntryPointId = entryPointId;
                 if (saveOnArrival) SaveOnArrival();
+                arrival = FindFirstObjectByType<RoomArrivalDialogue>();
+                DarkenScriptScreenIfArrivalStartsDark(arrival);
                 await screenFader.FadeInAsync(fadeSeconds, destroyCancellationToken);
                 hasArrived = true;
             }
@@ -143,17 +151,36 @@ namespace ProjetoVN.GameFlow.Rooms
             }
 
             _stateController.LeaveRoomTransition();
-            if (hasArrived) OpenArrivalDialogue();
+            if (hasArrived) OpenArrivalDialogue(arrival);
         }
 
         // Só depois do LeaveRoomTransition: uma conversa aberta durante a troca poria o jogo em DialogueState,
         // e a saída da transição o devolveria à exploração com a conversa aberta (D-19).
-        private static void OpenArrivalDialogue()
+        private void OpenArrivalDialogue(RoomArrivalDialogue arrival)
         {
-            RoomArrivalDialogue arrival = FindFirstObjectByType<RoomArrivalDialogue>();
             if (arrival == null) return;
 
-            arrival.Open();
+            if (!arrival.Open()) ClearScriptScreen();
+        }
+
+        // O escuro vai antes do clarear e numa camada que o ScreenFader não controla: a sala nunca aparece antes do roteiro (D-19).
+        private void DarkenScriptScreenIfArrivalStartsDark(RoomArrivalDialogue arrival)
+        {
+            if (arrival == null || !arrival.StartsDark) return;
+
+            if (scriptScreen == null)
+            {
+                Debug.LogError("[RoomNavigator] A conversa de chegada pede a tela escura (Starts Dark), mas falta o ScriptScreen " +
+                               "(campo Script Screen). A sala chega com a tela clara.", this);
+                return;
+            }
+
+            scriptScreen.DarkenImmediately();
+        }
+
+        private void ClearScriptScreen()
+        {
+            if (scriptScreen != null) scriptScreen.ClearImmediately();
         }
 
         // Um Awaitable descartado engole a exceção sem log, e o jogo ficaria preso em RoomTransitionState com a tela escura.
@@ -162,6 +189,7 @@ namespace ProjetoVN.GameFlow.Rooms
             Debug.LogException(exception, this);
 
             if (screenFader != null) screenFader.HideImmediately();
+            ClearScriptScreen();
         }
 
         private void SaveOnArrival()
@@ -209,6 +237,9 @@ namespace ProjetoVN.GameFlow.Rooms
         {
             if (screenFader == null)
                 Debug.LogWarning("[RoomNavigator] O campo Screen Fader está vazio: nenhuma troca de sala será aceita.", this);
+
+            if (scriptScreen == null)
+                Debug.LogWarning("[RoomNavigator] O campo Script Screen está vazio: uma sala com Starts Dark ligado chegará com a tela clara.", this);
         }
 #endif
     }
