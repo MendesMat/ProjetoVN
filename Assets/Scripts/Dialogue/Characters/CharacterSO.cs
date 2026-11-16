@@ -20,8 +20,8 @@ namespace ProjetoVN.Dialogue.Characters
                  "Vazio: o roteiro não consegue citar o personagem e o console avisa.")]
         [SerializeField] private string displayName = "";
 
-        [Tooltip("Cor do nome na placa de nome e do balão do personagem no histórico de falas. O texto do balão fica escuro " +
-                 "ou claro conforme a cor, e a cor precisa permitir contraste de 4,5:1 com um dos dois: um cinza médio " +
+        [Tooltip("Cor do balão do personagem no histórico de falas (a placa de nome não usa esta cor). O texto do balão fica " +
+                 "escuro ou claro conforme a cor, e a cor precisa permitir contraste de 4,5:1 com um dos dois: um cinza médio " +
                  "não permite, e o console avisa.")]
         [SerializeField] private Color nameColor = Color.white;
 

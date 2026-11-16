@@ -299,14 +299,12 @@ namespace ProjetoVN.Dialogue.UI
             if (!TryResolveCharacter(speaker, out CharacterSO character))
             {
                 speakerNameText.text = speaker;
-                speakerNameText.color = _defaultNameColor;
                 _history.AddSpokenLine(speaker, _defaultNameColor, text);
                 DimStage();
                 return;
             }
 
             speakerNameText.text = NameToDisplay(character);
-            speakerNameText.color = character.NameColor;
             RecordCharacterLine(character, text);
             PutOnStage(character, line);
         }
@@ -338,7 +336,7 @@ namespace ProjetoVN.Dialogue.UI
             if (characterRegistry.TryGetByScriptName(scriptName, out character)) return true;
 
             Debug.LogWarning($"[DialogueUIController] Personagem desconhecido no roteiro: '{scriptName}' (nó '{CurrentNodeName()}'). " +
-                             "O nome aparece em texto puro, sem cor e sem sprite.", this);
+                             "O nome aparece sem sprite, e o balão do histórico, na cor padrão.", this);
             return false;
         }
 
