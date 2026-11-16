@@ -8,13 +8,20 @@ namespace ProjetoVN.Tests.EditMode
 {
     /// <summary>
     /// Acha os campos que o Inspector mostra e que não têm <see cref="TooltipAttribute"/> (regra 8 do CLAUDE.md).
-    /// Só vale para o que o projeto escreve: um tipo <c>[Serializable]</c> de outro assembly (<c>Vector3</c>,
-    /// <c>UnityEvent</c>) não é percorrido, e um campo herdado é cobrado do tipo que o declara.
+    /// Só vale para o que o projeto escreve: um tipo <c>[Serializable]</c> que não é do assembly de quem o declara
+    /// nem de um assembly <c>ProjetoVN.*</c> (<c>Vector3</c>, <c>UnityEvent</c>) não é percorrido. O campo herdado
+    /// de um componente ou <c>ScriptableObject</c> é cobrado do tipo que o declara; já a base de uma classe
+    /// <c>[Serializable]</c> aninhada é percorrida junto com ela, enquanto for do projeto.
     /// </summary>
     public static class ExposedFields
     {
+        private const string ProjectAssemblyPrefix = "ProjetoVN.";
+
         private const BindingFlags DeclaredInstanceFields =
             BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
+        public static bool IsProjectAssembly(Assembly assembly) =>
+            assembly.GetName().Name.StartsWith(ProjectAssemblyPrefix, StringComparison.Ordinal);
 
         public static IReadOnlyList<string> WithoutTooltip(Type type)
         {
@@ -33,8 +40,14 @@ namespace ProjetoVN.Tests.EditMode
                     withoutTooltip.Add($"{type.Name}.{field.Name}");
 
                 Type nested = SerializableTypeDeclaredNextTo(field);
-                if (nested != null) Collect(nested, visited, withoutTooltip);
+                if (nested != null) CollectWithProjectBases(nested, visited, withoutTooltip);
             }
+        }
+
+        private static void CollectWithProjectBases(Type nested, HashSet<Type> visited, List<string> withoutTooltip)
+        {
+            for (Type type = nested; type != null && IsWrittenByProject(type, nested); type = type.BaseType)
+                Collect(type, visited, withoutTooltip);
         }
 
         private static bool IsShownByInspector(FieldInfo field)
@@ -50,12 +63,15 @@ namespace ProjetoVN.Tests.EditMode
         {
             Type type = ElementTypeOf(field.FieldType);
 
-            if (type.Assembly != field.DeclaringType.Assembly) return null;
+            if (!IsWrittenByProject(type, field.DeclaringType)) return null;
             if (type.IsEnum || !type.IsSerializable) return null;
             if (typeof(UnityEngine.Object).IsAssignableFrom(type)) return null;
 
             return type;
         }
+
+        private static bool IsWrittenByProject(Type type, Type nextTo) =>
+            type.Assembly == nextTo.Assembly || IsProjectAssembly(type.Assembly);
 
         private static Type ElementTypeOf(Type fieldType)
         {

@@ -9,8 +9,6 @@ namespace ProjetoVN.Tests.EditMode
 {
     public sealed class ExposedFieldTooltipsTests
     {
-        private const string ProjectAssemblyPrefix = "ProjetoVN.";
-
         [Test]
         public void ProjectTypes_AreFound()
         {
@@ -33,7 +31,7 @@ namespace ProjetoVN.Tests.EditMode
         private static List<Type> ProjectTypes() =>
             TypeCache.GetTypesDerivedFrom<MonoBehaviour>()
                 .Concat(TypeCache.GetTypesDerivedFrom<ScriptableObject>())
-                .Where(type => type.Assembly.GetName().Name.StartsWith(ProjectAssemblyPrefix, StringComparison.Ordinal))
+                .Where(type => ExposedFields.IsProjectAssembly(type.Assembly))
                 .ToList();
     }
 }
