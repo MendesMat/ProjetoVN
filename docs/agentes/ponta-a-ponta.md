@@ -38,18 +38,18 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 
 **3. Menu.** Abra a build. Esperado: tela cheia sem borda; menu principal com o primeiro botão selecionado; **CONTINUAR desabilitado** (não há save); interface de jogo escondida.
 
-**4. Novo jogo.** Clique em NOVO JOGO. Esperado: sem confirmação (não há save); fade para `[Fatia] Onibus`; música da sala.
+**4. Novo jogo.** Clique em NOVO JOGO. Esperado: sem confirmação (não há save); fade para `[Fatia] Onibus`; música da sala; **depois de a tela clarear**, o prólogo abre sozinho (a conversa de chegada, #127), sem clique no mundo.
 
-**5. Porta trancada.** Clique na porta do ônibus. Esperado: som de porta trancada e a fala "A porta do ônibus está fechada. A viagem ainda não acabou."; continua no ônibus.
-
-**6. A moeda.** Clique na moeda do corredor. Esperado: som de coleta, moeda no inventário, o objeto some, fala "Uma moeda perdida no chão do corredor. Vou guardar."
-
-**7. O prólogo.** Clique na poltrona. Esperado:
+**5. O prólogo.** Esperado:
 - texto revelado aos poucos (um clique completa a fala, o seguinte avança);
 - o som de estrada entra, some na lembrança, volta e some na freada com batida;
 - personagens atrás da caixa, quem fala em destaque; a placa do protagonista mostra `???`.
 
-**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo) e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com a Luna.
+**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com a Luna.
+
+**6. A moeda.** Clique na moeda do corredor. Esperado: som de coleta, moeda no inventário, o objeto some, fala "Uma moeda perdida no chão do corredor. Vou guardar."
+
+**7. A poltrona.** Clique na poltrona. Esperado: só o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta.", sem repetir o prólogo. (A fala "A porta do ônibus está fechada" deixou de ser alcançável na fatia: antes de o prólogo acabar o jogador está na conversa e não pode clicar na porta, e depois a porta já abre. O portão trancado continua coberto na `[Teste] Mecanicas`.)
 
 **8. Alt-tab.** Troque para outra janela por alguns segundos e volte. Esperado: o jogo continua de onde estava, sem travar nem perder o input. Com a janela sem foco o jogo roda a 30 FPS (limite do jogo, não defeito).
 

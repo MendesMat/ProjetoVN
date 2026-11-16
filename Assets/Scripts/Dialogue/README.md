@@ -48,7 +48,7 @@ Iniciar é um **comando** com um dono, então vai por chamada direta (D-05):
 DialogueManager.Instance.StartDialogue("porta_trancada");
 ```
 
-Em objetos de cena, o caminho pronto é o `InteractableDialogueTrigger` (módulo `GameFlow`): o campo **Node Name** é uma lista dos nós do roteiro, e o método `TriggerDialogue()` é ligado ao `UnityEvent` `OnInteract` do `InteractableItem`. O seletor é do módulo `Editor` (marcado por `[ScriptNode]`, do `Core`), e um teste de EditMode reprova gatilho que aponte para nó inexistente (#32).
+Em objetos de cena, o caminho pronto é o `InteractableDialogueTrigger` (módulo `GameFlow`): o campo **Node Name** é uma lista dos nós do roteiro, e o método `TriggerDialogue()` é ligado ao `UnityEvent` `OnInteract` do `InteractableItem`. O seletor é do módulo `Editor` (marcado por `[ScriptNode]`, do `Core`), e um teste de EditMode reprova gatilho que aponte para nó inexistente (#32, hoje o `ScriptNodeFieldsTests`). O segundo caminho de cena para abrir uma conversa é a **conversa de chegada** (#127): o `RoomArrivalDialogue` (módulo `GameFlow`) guarda o nó que a sala abre sozinha quando o jogador chega nela, por chamada do `RoomNavigator` ao `StartDialogue`, depois de a tela clarear (ver o [README do GameFlow](../GameFlow/README.md)).
 
 `StartDialogue` confere, nesta ordem, e devolve `false` sem publicar nada em cada caso:
 
