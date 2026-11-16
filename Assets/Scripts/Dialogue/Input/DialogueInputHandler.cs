@@ -9,6 +9,8 @@ namespace ProjetoVN.Dialogue.Input
 {
     public class DialogueInputHandler : MonoBehaviour
     {
+        [Tooltip("A ação do Input System que completa a fala em curso ou avança para a próxima (UI/AdvanceDialogue: botão esquerdo, Espaço, Enter, botão sul). " +
+                 "Vazio = o diálogo não avança, e o console mostra erro.")]
         [SerializeField] private InputActionReference advanceDialogueAction;
 
         private readonly List<RaycastResult> _pointerHits = new();
@@ -33,6 +35,14 @@ namespace ProjetoVN.Dialogue.Input
             advanceDialogueAction.action.performed -= OnAdvanceDialogue;
             advanceDialogueAction.action.Disable();
         }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (advanceDialogueAction == null)
+                Debug.LogWarning("[DialogueInputHandler] O campo 'Advance Dialogue Action' está vazio: o diálogo não avança. Atribua a ação UI/AdvanceDialogue.", this);
+        }
+#endif
         #endregion
 
         #region Input Callbacks
