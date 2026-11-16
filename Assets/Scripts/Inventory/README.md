@@ -8,7 +8,7 @@ O módulo **Inventory** gerencia os itens coletáveis do jogo, mantendo a lógic
 
 ## Estrutura Principal
 
-- **`ItemDataSO` (ScriptableObject)**: A representação autorada de um item (id, nome, ícone, descrição). Criado por Game Designers no Editor da Unity, e **somente leitura em runtime**. Todo campo tem tooltip (#52). O `OnValidate` avisa `Id` vazio e `Item Name` vazio; o **formato** do id não é validado (D-22), só descrito no tooltip. A `Description` **ainda não aparece no jogo**: examinar um item pelo painel está fora do escopo (`docs/jogo/mecanicas.md`), e o tooltip diz isso.
+- **`ItemDataSO` (ScriptableObject)**: A representação autorada de um item (id, nome, ícone, descrição). Criado no Editor pelo agente, com o material do programador (`docs/autoria/salas.md`), e **somente leitura em runtime**. Todo campo tem tooltip (#52). O `OnValidate` avisa `Id` vazio e `Item Name` vazio; o **formato** do id não é validado (D-22), só descrito no tooltip. A `Description` **ainda não aparece no jogo**: examinar um item pelo painel está fora do escopo (`docs/jogo/mecanicas.md`), e o tooltip diz isso.
 - **`ItemRegistry` (ScriptableObject)**: A lista de todos os itens do jogo, por onde o roteiro e o save acham um item pelo id. O `OnValidate` avisa id repetido (erro) e posição vazia da lista, com o índice (#52).
 - **`InventoryModel`**: Guarda a lista de `ItemDataSO` que o jogador possui. Não copia os dados do item: guarda a referência ao próprio asset, então não existe uma segunda fonte de verdade para divergir.
 - **`InventoryService`**: As regras. Só publica uma notificação quando o estado realmente mudou.

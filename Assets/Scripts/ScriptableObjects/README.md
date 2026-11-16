@@ -2,7 +2,7 @@
 
 Este diretório funciona como o banco de dados principal do jogo, mas com uma peculiaridade: aqui estão guardados as **instâncias** (os arquivos `.asset`) e não os códigos (C#) dos ScriptableObjects.
 
-As definições das classes e a lógica desses objetos (como `ItemDataSO`) residem dentro de seus respectivos módulos lógicos (`Inventory`, `Dialogue`, etc). Esta pasta centraliza as instâncias criadas pelos Game Designers para facilitar a organização.
+As definições das classes e a lógica desses objetos (como `ItemDataSO`) residem dentro de seus respectivos módulos lógicos (`Inventory`, `Dialogue`, etc). Esta pasta centraliza as instâncias criadas no Editor para facilitar a organização.
 
 > **Antes de mudar qualquer coisa aqui:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisões](../../../docs/arquitetura/decisoes.md) · [guia de autoria](../../../docs/autoria/salas.md)
 
@@ -29,7 +29,7 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO`) resid
 
 ---
 
-## Fluxo e Boas Práticas (Para IAs e Game Designers)
+## Fluxo e Boas Práticas
 
 A regra de uso de ScriptableObjects neste projeto é focada no princípio de ser uma **base de dados somente leitura (Read-Only) em Runtime**.
 

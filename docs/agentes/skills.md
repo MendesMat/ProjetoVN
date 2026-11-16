@@ -64,7 +64,7 @@ A skill é um conjunto de heurísticas, e ela mesma diz que a convenção do pro
 ### Onde a skill e o projeto concordam, com detalhe local
 
 - **Comentários.** O padrão é não comentar. Fica o comentário que explica **por que** uma ordem ou escolha não óbvia existe, como o de `LockedActionBehaviour` sobre conferir a flag antes do item. Comentários são em português.
-- **`[Tooltip]` e `[Header]` não são comentários.** São a interface de autoria de quem monta a cena, e todo campo exposto no Inspector deve ter um tooltip que diga o que acontece quando o campo fica vazio. O `ExposedFieldTooltipsTests` reprova o campo exposto sem tooltip (#52).
+- **`[Tooltip]` e `[Header]` não são comentários.** São o que o programador lê ao conferir uma sala pelo Inspector, e todo campo exposto no Inspector deve ter um tooltip que diga o que acontece quando o campo fica vazio. O `ExposedFieldTooltipsTests` reprova o campo exposto sem tooltip (#52).
 - **`#region`.** O código antigo usa bastante. Não criar novos; remover os existentes só no arquivo que a issue já estiver tocando.
 - **Escopo.** A regra do escoteiro vale para o trecho tocado, não para o arquivo todo. Um problema fora do escopo vira issue com a label `triagem`.
 - **Cláusulas de guarda.** É o estilo do projeto: validar e sair cedo, sem `else`.
