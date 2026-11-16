@@ -1,6 +1,6 @@
 # Guia de autoria: salas e objetos
 
-**Para quem:** quem monta cenas no Unity Editor. Você não precisa ler código para seguir este guia.
+**Para quem:** o agente que monta as salas, os itens e os personagens pelo Unity CLI, com o material que o programador fornece, e o programador, que confere o resultado pelo Inspector. O guia dá os campos e os menus pelo nome que o Inspector mostra (**Pan Speed**, **Create → Items → Item**). O nome do campo no código, o tipo de cada componente e o que a montagem por script precisa saber estão em [unity-cli.md](../agentes/unity-cli.md#montar-uma-sala-só-a-partir-do-guia-e-conferi-la-com-o-despejo-107); onde um nome não se deduz do outro, o guia dá os dois (**Background Type**, `clearFlags`).
 
 > **Este guia cobre o que existe hoje.** A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`. As duas salas do percurso do jogador, `[Fatia] Onibus` e `[Fatia] Posto`, foram montadas por script de Editor na #21, e o [passo a passo](#passo-a-passo-a-fatia-vertical) no fim foi escrito depois, a partir dessa montagem. Na #107 o passo a passo foi conferido: a `[Fatia] Posto` foi remontada do zero, por um agente que só tinha este guia e as receitas de [unity-cli.md](../agentes/unity-cli.md), e o que a montagem não achou no texto foi corrigido aqui. O `[Fatia] Onibus` não foi remontado.
 

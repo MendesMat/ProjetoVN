@@ -14,9 +14,10 @@ Um híbrido de **visual novel** e **point-and-click** em 2D, de tema escolar. O 
 |---|---|---|---|
 | Programação | Programador, com agentes de IA | Unity, Claude Code | Sistemas e ferramentas de autoria |
 | Roteiro | Roteiristas (não usam o Unity) | VS Code com a extensão do Yarn Spinner, GitHub Desktop | Arquivos `.yarn` em `Assets/Roteiro/` |
-| Design de jogo e montagem de salas | Game designer | Unity Editor (Inspector) | Cenas, itens, personagens |
+| Design de jogo | Game designer (não usa o Unity) | — | O desenho das salas, dos puzzles, dos itens e dos personagens, entregue ao programador |
+| Montagem de salas, itens e personagens | Agentes de IA, com o material do programador | Unity CLI; o programador confere pelo Inspector | Cenas, itens, personagens, sons |
 
-Consequência para o código: o **Inspector e o arquivo de roteiro são as interfaces de autoria**. Um campo exposto precisa de nome claro, tooltip e validação, porque quem o preenche não lê o código.
+Consequência para o código: o **Inspector e o arquivo de roteiro são as interfaces de autoria**. Um campo exposto precisa de nome claro, tooltip e validação: o programador confere as salas pelo Inspector, e o aviso do `OnValidate` no console é o que mostra a quem monta por script um campo esquecido.
 
 ## O alvo: a fatia vertical
 

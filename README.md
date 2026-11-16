@@ -13,7 +13,7 @@ Cada função da equipe tem um ponto de entrada próprio. Não é preciso ler o 
 | Você é… | Comece por | Ferramentas |
 |---|---|---|
 | **Roteirista** | [Guia de autoria: roteiro](docs/autoria/roteiro.md), a partir de [Na primeira vez: prepare o computador](docs/autoria/roteiro.md#na-primeira-vez-prepare-o-computador) | VS Code com a extensão Yarn Spinner, GitHub Desktop. Não precisa do Unity |
-| **Game designer** (monta salas, itens e personagens) | [Guia de autoria: salas e objetos](docs/autoria/salas.md) | Unity Editor, pelo Inspector |
+| **Game designer** | [O jogo: visão geral](docs/jogo/visao-geral.md) e [Mecânicas](docs/jogo/mecanicas.md) | Não precisa do Unity: as salas são montadas pelo agente, com o desenho que você entrega ao programador |
 | **Programador** | [Arquitetura: visão geral](docs/arquitetura/visao-geral.md) e [Decisões](docs/arquitetura/decisoes.md) | Unity, Claude Code |
 | **Agente de IA** | [CLAUDE.md](CLAUDE.md), depois o [fluxo de trabalho](docs/agentes/fluxo-de-trabalho.md) | Claude Code, Unity CLI |
 

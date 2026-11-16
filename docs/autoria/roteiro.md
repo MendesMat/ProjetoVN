@@ -127,7 +127,7 @@ Duas regras de digitação que valem para o arquivo inteiro:
 
 ### O nome do nó
 
-Quem monta a cena no jogo digita o nome do nó em um campo de texto, letra por letra. Por isso o nome precisa ser simples e **exato**.
+O nome do nó é o que liga a conversa ao jogo: o objeto da sala abre a conversa por esse nome, escrito exatamente igual. Por isso o nome precisa ser simples e **exato**.
 
 - **Formato:** `<quem_ou_onde>_<assunto>`, em minúsculas, sem acento, com `_` entre as palavras.
 - **O nome é único no projeto inteiro**, não só no arquivo. Dois nós com o mesmo nome dão o erro `Duplicate node title`.

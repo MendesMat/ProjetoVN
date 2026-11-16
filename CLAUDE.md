@@ -1,6 +1,6 @@
 # ProjetoVN
 
-Híbrido de visual novel e point-and-click 2D em Unity 6 (6000.3.9f1, URP 2D, uGUI, Input System, Mono). Você trabalha aqui em par com o programador, o único do projeto; roteiristas e game designer produzem o conteúdo.
+Híbrido de visual novel e point-and-click 2D em Unity 6 (6000.3.9f1, URP 2D, uGUI, Input System, Mono). Você trabalha aqui em par com o programador, o único do projeto; roteiristas e game designer produzem o conteúdo. Quem monta as salas, os itens e os personagens no Editor é você, pelo Unity CLI, com o material que o programador fornece; ele confere o resultado pelo Inspector.
 
 Toda a documentação é em português brasileiro. Identificadores de C# são em inglês.
 
