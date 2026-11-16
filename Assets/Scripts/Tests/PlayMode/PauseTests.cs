@@ -34,6 +34,8 @@ namespace ProjetoVN.Tests.PlayMode
         private const string BackButtonPath = "Confirm Return Window/Panel/Button Back";
         private const string ContinueButtonName = "Button Continue";
         private const string BackButtonName = "Button Back";
+        private const string SaveButtonName = "Button Save";
+        private const string ReturnButtonName = "Button Return";
         private const float WaitTimeoutSeconds = 10f;
 
         private PauseMenu _pauseMenu;
@@ -301,6 +303,43 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.AreEqual(1f, Time.timeScale, "A pausa abriu no menu principal.");
             Assert.IsFalse(PauseWindow().activeSelf);
             Assert.IsFalse(DialogueManager.Instance.IsPaused);
+        }
+
+        [UnityTest]
+        public IEnumerator Navigation_DuringAConversation_SkipsTheDisabledSave()
+        {
+            Assert.IsTrue(DialogueManager.Instance.StartDialogue(OneLineConversation));
+            yield return null;
+            _pauseMenu.TogglePause();
+            Assert.IsFalse(SaveButton().interactable, "O Salvar está habilitado durante a conversa.");
+
+            Assert.AreEqual(ReturnButtonName, SelectionAfterMoving(MoveDirection.Down),
+                "Para baixo, a partir do Continuar, não pulou o Salvar desabilitado.");
+            Assert.AreEqual(ContinueButtonName, SelectionAfterMoving(MoveDirection.Down),
+                "Para baixo, a partir do Voltar ao menu, não voltou ao Continuar.");
+            Assert.AreEqual(ReturnButtonName, SelectionAfterMoving(MoveDirection.Up),
+                "Para cima, a partir do Continuar, não foi ao Voltar ao menu.");
+        }
+
+        [UnityTest]
+        public IEnumerator Navigation_InExploration_GoesThroughSave()
+        {
+            _pauseMenu.TogglePause();
+
+            Assert.AreEqual(SaveButtonName, SelectionAfterMoving(MoveDirection.Down),
+                "Para baixo, a partir do Continuar, não foi ao Salvar habilitado.");
+            Assert.AreEqual(ReturnButtonName, SelectionAfterMoving(MoveDirection.Down));
+            yield return null;
+        }
+
+        private static string SelectionAfterMoving(MoveDirection direction)
+        {
+            EventSystem eventSystem = EventSystem.current;
+            var movement = new AxisEventData(eventSystem) { moveDir = direction };
+
+            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, movement, ExecuteEvents.moveHandler);
+
+            return eventSystem.currentSelectedGameObject.name;
         }
 
         private GameObject PauseWindow() => WindowNamed(PauseWindowName);

@@ -57,6 +57,13 @@ namespace ProjetoVN.UI.Components
             if (button == null) { return; }
             button.interactable = interactable;
             RefreshVisual();
+            RebuildColumnNavigation();
+        }
+
+        private void RebuildColumnNavigation()
+        {
+            VerticalButtonNavigation column = GetComponentInParent<VerticalButtonNavigation>(true);
+            if (column != null) column.Rebuild();
         }
 
         protected override void RefreshVisual()
