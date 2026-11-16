@@ -1,11 +1,13 @@
-title: onibus_poltrona
+title: onibus_chegada
 ---
-<<if $prologo_concluido>>
-    Pensamento: O motorista mandou todo mundo descer. Melhor ir até a porta.
-<<else>>
+<<if not $prologo_concluido>>
     <<detour onibus_viagem>>
     <<set $prologo_concluido to true>>
 <<endif>>
+===
+title: onibus_poltrona
+---
+Pensamento: O motorista mandou todo mundo descer. Melhor ir até a porta.
 ===
 title: onibus_porta_fechada
 ---
