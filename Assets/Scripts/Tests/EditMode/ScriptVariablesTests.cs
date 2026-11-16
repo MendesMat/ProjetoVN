@@ -95,6 +95,18 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
+        public void VisitedOfTheOwnNode_LetsAnArrivalNodeSpeakOnlyTheFirstTime()
+        {
+            ScriptRun run = Compile(
+                "title: chegada\n---\n<<if visited(\"chegada\")>>\n<<stop>>\n<<endif>>\nprimeira_chegada\n===\n");
+
+            run.Start("chegada");
+            run.Start("chegada");
+
+            CollectionAssert.AreEqual(new[] { "primeira_chegada" }, run.Lines);
+        }
+
+        [Test]
         public void TextVariable_IsInterpolatedFromTheStoryState()
         {
             ScriptRun run = Compile("title: no\n---\n<<declare $nome_jogador = \"\">>\nOi, {$nome_jogador}!\n===\n");
