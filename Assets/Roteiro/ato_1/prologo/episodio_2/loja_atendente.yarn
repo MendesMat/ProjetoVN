@@ -1,0 +1,26 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 2 · O posto
+
+title: loja_atendente
+---
+// PEDIDO: o roteirista confirma os produtos à venda (provisórios: salgadinho, refrigerante e chocolate).
+Atendente: Boa noite, quer o quê?
+-> Comprar um salgadinho <<if not tem_item("salgadinho")>> #acao
+    <<dar_item salgadinho>>
+-> Comprar um refrigerante <<if not tem_item("refrigerante")>> #acao
+    <<dar_item refrigerante>>
+-> Comprar um chocolate <<if not tem_item("chocolate")>> #acao
+    <<dar_item chocolate>>
+-> Não comprar nada #acao
+// A pergunta sobre o acidente acontece só na primeira conversa com a atendente.
+<<if visited("loja_atendente")>>
+    <<stop>>
+<<endif>>
+Atendente: Vem cá, o que tá acontecendo lá fora?
+<<if $falou_com_motorista>>
+    Protagonista: O cara atropelou uma anta.
+    Atendente: Caraca... Que papelão, hein...
+<<else>>
+    Protagonista: Um acidente que teve. Ninguém se machucou.
+    Atendente: Menos mal.
+<<endif>>
+===

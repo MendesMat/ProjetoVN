@@ -1,0 +1,20 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 2 · O posto
+
+title: loja_banheiro
+---
+<<tocar_efeito porta_trancada>>
+<<set $tentativas_banheiro to $tentativas_banheiro + 1>>
+// Cada nova tentativa mostra a fala seguinte; depois da última, ela se repete.
+<<if $tentativas_banheiro <= 1>>
+    ???: Tem gente...
+    Protagonista: Ah, desculpa.
+<<elseif $tentativas_banheiro <= 2>>
+    ???: Pô, cara, já falei que tem gente!
+<<elseif $tentativas_banheiro <= 3>>
+    ???: Quando eu acabar aqui, vou te pegar!
+<<elseif $tentativas_banheiro <= 4>>
+    ???: Coé, cara... Faz favor aí, me deixa em paz...
+<<else>>
+    ???: ...
+<<endif>>
+===

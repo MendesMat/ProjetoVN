@@ -1,0 +1,12 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 2 · O posto
+
+title: loja_chegada
+---
+// Conversa de chegada da loja (#127): só a primeira entrada mostra a narração e o sininho.
+<<if visited("loja_chegada")>>
+    <<stop>>
+<<endif>>
+Indo até a loja, consigo perceber pelo caminho o quão sujo é esse lugar.
+<<tocar_efeito porta_sininho>>
+Só consigo ver um homem em frente à máquina de café, a atendente e alguns produtos postos de qualquer jeito.
+===
