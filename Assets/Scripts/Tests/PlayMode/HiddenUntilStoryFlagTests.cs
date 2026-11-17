@@ -26,6 +26,8 @@ namespace ProjetoVN.Tests.PlayMode
         private const string LunaConversation = "luna_cheguei_cedo";
         private const float WaitTimeoutSeconds = 10f;
 
+        private Renderer[] _renderersLeftOnByTheArt;
+
         [UnitySetUp]
         public IEnumerator SetUp()
         {
@@ -37,6 +39,7 @@ namespace ProjetoVN.Tests.PlayMode
             InventoryManager.Instance.ReplaceConsumedWorldObjectIds(Array.Empty<string>());
             StoryState.ClearAll();
 
+            SceneManager.sceneLoaded += RememberTheRenderersLeftOn;
             yield return SceneManager.LoadSceneAsync(Room);
             yield return null;
         }
@@ -44,6 +47,8 @@ namespace ProjetoVN.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown()
         {
+            SceneManager.sceneLoaded -= RememberTheRenderersLeftOn;
+
             if (DialogueManager.Instance.IsDialogueActive()) DialogueManager.Instance.StopDialogue();
 
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "o jogo voltar à exploração");
@@ -55,9 +60,9 @@ namespace ProjetoVN.Tests.PlayMode
         {
             GameObject hidden = FindTheHiddenObject();
 
-            Assert.IsTrue(hidden.GetComponentsInChildren<MeshRenderer>(true).Any(),
+            Assert.IsTrue(_renderersLeftOnByTheArt.OfType<MeshRenderer>().Any(),
                 "O objeto não tem o rótulo (um MeshRenderer filho): o teste não cobriria o rótulo escondido.");
-            Assert.IsTrue(AllRenderersAre(hidden, enabled: false), "Um renderer do objeto, o do rótulo incluso, continuou visível com a variável falsa.");
+            Assert.IsTrue(AllRenderersLeftOnByTheArtAre(enabled: false), "Um renderer do objeto, o do rótulo incluso, continuou visível com a variável falsa.");
             Assert.IsFalse(hidden.GetComponent<BoxCollider2D>().enabled, "O objeto continuou com collider com a variável falsa.");
             Assert.IsNull(Physics2D.OverlapPoint(hidden.transform.position),
                 "O seletor ainda acharia o objeto escondido: haveria destaque e clique.");
@@ -74,13 +79,13 @@ namespace ProjetoVN.Tests.PlayMode
 
             StoryState.SetBool(TalkedToLuna, true);
             yield return null;
-            Assert.IsTrue(AllRenderersAre(hidden, enabled: false),
+            Assert.IsTrue(AllRenderersLeftOnByTheArtAre(enabled: false),
                 "O objeto apareceu no meio da conversa, atrás da caixa de diálogo.");
 
             DialogueManager.Instance.StopDialogue();
             yield return null;
 
-            Assert.IsTrue(AllRenderersAre(hidden, enabled: true), "Um renderer do objeto, o do rótulo incluso, continuou invisível depois da conversa.");
+            Assert.IsTrue(AllRenderersLeftOnByTheArtAre(enabled: true), "Um renderer do objeto, o do rótulo incluso, continuou invisível depois da conversa.");
             Assert.IsTrue(hidden.GetComponent<BoxCollider2D>().enabled, "O objeto continuou sem collider depois da conversa.");
             Assert.AreSame(hidden.GetComponent<BoxCollider2D>(), Physics2D.OverlapPoint(hidden.transform.position),
                 "O seletor não acha o objeto revelado.");
@@ -95,7 +100,7 @@ namespace ProjetoVN.Tests.PlayMode
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "a troca de sala terminar");
 
             GameObject revealed = FindTheHiddenObject();
-            Assert.IsTrue(AllRenderersAre(revealed, enabled: true), "Um renderer do objeto, o do rótulo incluso, chegou invisível com a variável ligada.");
+            Assert.IsTrue(AllRenderersLeftOnByTheArtAre(enabled: true), "Um renderer do objeto, o do rótulo incluso, chegou invisível com a variável ligada.");
             Assert.IsTrue(revealed.GetComponent<BoxCollider2D>().enabled, "O objeto chegou sem collider com a variável ligada.");
         }
 
@@ -106,8 +111,23 @@ namespace ProjetoVN.Tests.PlayMode
             return hidden;
         }
 
-        private static bool AllRenderersAre(GameObject target, bool enabled) =>
-            target.GetComponentsInChildren<Renderer>(true).All(renderer => renderer.enabled == enabled);
+        // Mesma regra do componente: só os Renderer ligados quando a cena carrega (depois do Awake, antes do Start)
+        // são dele; um que a arte deixou desligado de propósito não conta como "ainda invisível".
+        private void RememberTheRenderersLeftOn(Scene scene, LoadSceneMode mode)
+        {
+            Transform hidden = scene.GetRootGameObjects()
+                .SelectMany(root => root.GetComponentsInChildren<Transform>(true))
+                .FirstOrDefault(candidate => candidate.name == HiddenObject);
+            if (hidden == null) return;
+
+            _renderersLeftOnByTheArt = hidden.GetComponentsInChildren<Renderer>(true).Where(renderer => renderer.enabled).ToArray();
+        }
+
+        private bool AllRenderersLeftOnByTheArtAre(bool enabled)
+        {
+            Assert.IsNotNull(_renderersLeftOnByTheArt, $"A cena '{Room}' não carregou com o objeto '{HiddenObject}'.");
+            return _renderersLeftOnByTheArt.All(renderer => renderer.enabled == enabled);
+        }
 
         private static IEnumerator WaitUntil(Func<bool> condition, string expectation)
         {
