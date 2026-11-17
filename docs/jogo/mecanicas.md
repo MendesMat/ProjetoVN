@@ -31,10 +31,12 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Detecção por `Physics2D.OverlapPoint` sob o cursor; destaque por escala e contorno.
 - Pan de borda com limites mínimo e máximo.
 - Cliques e pan param durante diálogos, e um clique sobre a interface não atinge o mundo.
+- Um objeto pode ficar escondido (invisível e sem resposta) até uma variável booleana da história ligar (#128): ele aparece ao fim da conversa que a liga e continua visível depois de sair, salvar e carregar.
 
 **Regras:**
 - O clique que encerra um diálogo não aciona o objeto que está sob o cursor.
 - O módulo não sabe o que o objeto faz. O comportamento é ligado no Inspector (D-07).
+- Um objeto escondido por variável só aparece, nunca some de novo.
 
 **Limitação conhecida:** o destaque ainda aparece em um objeto que esteja atrás de um painel de interface; só o clique é barrado.
 

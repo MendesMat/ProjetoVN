@@ -71,7 +71,7 @@ Um `PropertyAttribute` sem parâmetros que marca um campo `string` com o nome de
 [SerializeField, StoryFlag] private string unlockedFlagId;
 ```
 
-O Core só guarda o marcador. Quem o desenha é o módulo [Editor](../Editor/README.md): o campo vira uma lista das variáveis `Bool` declaradas em `Assets/Roteiro/variaveis.yarn`, com a descrição da escolhida e um aviso para um valor que não está declarado. Em qualquer cena ou prefab, um valor fora do formato ou que não é uma variável `Bool` declarada é reprovado pelo `StoryFlagFieldsTests` (ver o [README dos testes](../Tests/README.md)). O atributo não muda nome nem tipo do campo, então cenas e prefabs já gravados continuam valendo. Hoje é usado pelo `LockedActionBehaviour`.
+O Core só guarda o marcador. Quem o desenha é o módulo [Editor](../Editor/README.md): o campo vira uma lista das variáveis `Bool` declaradas em `Assets/Roteiro/variaveis.yarn`, com a descrição da escolhida e um aviso para um valor que não está declarado. Em qualquer cena ou prefab, um valor fora do formato ou que não é uma variável `Bool` declarada é reprovado pelo `StoryFlagFieldsTests` (ver o [README dos testes](../Tests/README.md)). O atributo não muda nome nem tipo do campo, então cenas e prefabs já gravados continuam valendo. Hoje é usado pelo `LockedActionBehaviour` e pelo `HiddenUntilStoryFlag` (#128), do `GameFlow`.
 
 ## O registro de variáveis
 
