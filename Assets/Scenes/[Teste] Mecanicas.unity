@@ -1884,10 +1884,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
       value: Exit_Passagem
@@ -2092,10 +2088,6 @@ PrefabInstance:
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Mesh
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
@@ -2400,7 +2392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: displayName
-      value: Porta da Sala B
+      value: Porta Sala B
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
@@ -2445,10 +2437,6 @@ PrefabInstance:
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Mesh
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
