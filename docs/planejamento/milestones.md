@@ -37,7 +37,7 @@ M0 Fundação
                                                                                M16 Roteiro pendente (portão, sem dependência)
 ```
 
-**A M8 foi reaberta duas vezes em 2026-11-17,** primeiro para a #175 e depois para a #187, e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua (com a #186) quando a M8 fechar de novo.
+**A M8 foi reaberta duas vezes em 2026-11-17,** primeiro para a #175 e depois para a #187, e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua (com a #191 e a #186) quando a M8 fechar de novo.
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
 
@@ -95,6 +95,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista. Ela depende da #134 (M8), para o campo de variável dela nascer coberto pelo teste de conteúdo.
   - **A #129 tem portão:** o roteirista envia o texto final ao programador, que o passa ao agente, e o `.yarn` é organizado a partir dele (esse texto entra pela issue, não por um PR de roteiro). Ela cria também os personagens, os sons e os itens que o roteiro cita, porque os testes dos roteiros reprovam o que não existe.
   - **A #130** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
+  - **A #191 vem antes da #186,** pedida pelo programador em 2026-11-17. Os 12 objetos interativos da fatia são quadrados coloridos iguais, e quem joga a build não sabe o que é cada um nem o que o clique faz. A issue põe sobre cada quadrado um rótulo provisório com o tipo do objeto (conversa, saída, item, porta trancada) e um nome legível. Fica na M11, e não na M12, porque a #186 joga a build achando os quadrados nas capturas, e a build que ela verifica deve ser a que vai a outras pessoas. O nome ao passar o mouse, como mecânica definitiva, fica fora: é decisão do game designer.
   - **A #186 fecha a milestone.** Veio da revisão da #130 (PR #185), que pediu mudanças porque o percurso novo foi medido só no Editor, por `eval`, e não foi jogado numa build. Nela, um agente gera a build de Windows e joga o roteiro de `ponta-a-ponta.md` inteiro por script. Fica na M11, e não na M12, porque é a verificação que fecha o prólogo: o que ela achar vira issue antes de a primeira entrega começar.
   - **O texto que o roteirista ainda não mandou (#182 e #183)** fica fora da M11, na M16, pelo mesmo motivo da #131: a #129 entregou nós provisórios com `// PEDIDO` no lugar das três conversas do pátio e dos produtos da loja, o percurso funciona com eles, e a M11 não deve esperar uma entrega de fora para fechar.
   - **A fonte de caneta da lista de passageiros (#131)** fica fora da M11, na M14, até a arte entregar a fonte: ela não muda nada do percurso, e a M11 não deve esperar uma entrega de fora para fechar.
@@ -246,6 +247,7 @@ O prólogo do ato 1 no texto novo do roteirista: a Cena 1 conferida e a Cena 2, 
 | #128 | Objeto de cena que aparece quando uma variável da história liga | #134 |
 | #129 | Prólogo do ato 1: o texto novo do roteirista em .yarn, com personagens, sons e itens | Portão: o texto final do roteirista |
 | #130 | Prólogo do ato 1: montar o pátio do posto e a loja de conveniência, e tirar o conteúdo provisório do posto | #127, #128, #129, #108 |
+| #191 | Rótulo de placeholder nos objetos interativos: tipo e nome sobre cada quadrado | — |
 | #186 | Jogar a fatia vertical numa build de Windows com um agente, por script | #130 |
 
 ## M12 — Primeira entrega
