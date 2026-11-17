@@ -37,7 +37,7 @@ M0 Fundação
                                                                                M16 Roteiro pendente (portão, sem dependência)
 ```
 
-**A M8 foi reaberta duas vezes em 2026-11-17,** primeiro para a #175 e depois para a #187, e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua (com a #191 e a #186) quando a M8 fechar de novo.
+**A M8 foi reaberta três vezes em 2026-11-17,** para a #175, para a #187 e para a #189, e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua (com a #191 e a #186) quando a M8 fechar de novo.
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
 
@@ -82,6 +82,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
   - **A #171 fecha a milestone,** pela triagem pedida pelo programador em 2026-11-16, depois do PR #172. Veio da revisão da #166: a receita da suíte em `unity-cli.md` confere só a cena ativa antes do `run_tests`, enquanto a receita de "Abrir e salvar cena", escrita pela #166, confere todas as cenas abertas. A receita da suíte é seguida em toda issue, e um diálogo do Test Runner trava o Editor dirigido pelo CLI. É só documentação, com uma medição antes, e não disputa arquivo com nada aberto.
   - **A #175 reabre a milestone,** pela reorganização de 2026-11-17, em que o programador pediu de novo que nenhuma issue ficasse sem milestone. Veio da revisão da #171: a conferência das cenas abertas antes da suíte está só em `unity-cli.md`, e as portas de entrada que mandam rodar o `run_tests` (`CLAUDE.md` e as skills `executar-issue` e `revisar-issue`) não falam dela. A suíte roda duas vezes por sessão, e um diálogo do Test Runner obriga a reiniciar o Unity: é o tipo de ferramenta que custa tempo a cada sessão, por isso entra na M8 e vem antes do resto da M11. O levantamento começa por uma decisão do programador: pôr a conferência nas três portas de entrada ou só apontar para `unity-cli.md`, como hoje.
   - **A #187 reabre a milestone de novo,** pela reorganização pedida pelo programador em 2026-11-17, depois do PR #185. Veio da revisão da #130: trocar de branch com uma cena aberta que muda entre as duas pontas abre o diálogo "reload the scene(s)" do Editor, que trava o CLI até o programador clicar, e a receita "Antes de trocar de branch" de `unity-cli.md` só confere `Packages/`. Toda revisão termina trocando de branch e toda issue que monta sala muda uma cena, então é o mesmo tipo da #175: custa uma ida e volta com o programador a cada vez que acontece. Vem antes da #186 (M11), cuja revisão também troca de branch. As duas mexem em `unity-cli.md`, em seções diferentes ("Antes de trocar de branch" e "Jogar a build por script"), e a ordem das milestones já as põe uma depois da outra.
+  - **A #189 fecha a milestone,** pela reorganização pedida pelo programador em 2026-11-17, depois do PR #190. Veio do levantamento da #187: o projeto usa o `com.unity.pipeline` 0.7.0-exp.1, e o Unity CLI documenta, a partir da 1.0.0, comandos que leem e respondem a um diálogo modal do Editor (`editor dialog`, saída `18`, `AWAITING_INPUT`). As três travas recentes (#171, #175 e #187) foram um diálogo que o agente não vê, e hoje cada uma custa uma ida e volta com o programador ou um reinício do Unity: é o mesmo tipo da #175 e da #187. Vem antes da #191 e da #186 (M11) para que o resto do prólogo e a M12 já corram com o pacote novo, e as receitas de `unity-cli.md` que mudarem com ele sejam as que a #186 segue. Atualizar o pacote mexe em `Packages/` e pede o aval do programador (regra 10); depois do merge, toda troca entre uma branch anterior e a `main` passa pela receita dos pacotes ("Antes de trocar de branch").
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
@@ -216,6 +217,7 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #171 | unity-cli.md: a conferência antes da suíte olha só a cena ativa, não as aditivas | #166 |
 | #175 | CLAUDE.md e as skills de trabalho rodam a suíte sem conferir as cenas abertas antes | #171 |
 | #187 | Trocar de branch com uma cena aberta que muda trava o CLI no diálogo de recarregar a cena | — |
+| #189 | Atualizar o com.unity.pipeline para o agente enxergar e responder diálogos modais do Editor | #187 |
 
 ## M9 — Acabamento da fatia
 
