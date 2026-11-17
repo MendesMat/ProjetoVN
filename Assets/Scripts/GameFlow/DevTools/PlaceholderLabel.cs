@@ -87,9 +87,10 @@ namespace ProjetoVN.GameFlow.DevTools
             UnityEditor.EditorApplication.delayCall += RefreshInEditor;
         }
 
+        // Em Play o Awake já aplicou o rótulo; repintar depois do Start apagaria o verde do PlaceholderTint.
         private void RefreshInEditor()
         {
-            if (this == null) return;
+            if (this == null || Application.isPlaying) return;
 
             Refresh();
         }

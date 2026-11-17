@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using ProjetoVN.Core.State;
 using ProjetoVN.Dialogue.Logic;
@@ -54,7 +55,9 @@ namespace ProjetoVN.Tests.PlayMode
         {
             GameObject hidden = FindTheHiddenObject();
 
-            Assert.IsFalse(hidden.GetComponent<SpriteRenderer>().enabled, "O objeto continuou visível com a variável falsa.");
+            Assert.IsTrue(hidden.GetComponentsInChildren<MeshRenderer>(true).Any(),
+                "O objeto não tem o rótulo (um MeshRenderer filho): o teste não cobriria o rótulo escondido.");
+            Assert.IsTrue(AllRenderersAre(hidden, enabled: false), "Um renderer do objeto, o do rótulo incluso, continuou visível com a variável falsa.");
             Assert.IsFalse(hidden.GetComponent<BoxCollider2D>().enabled, "O objeto continuou com collider com a variável falsa.");
             Assert.IsNull(Physics2D.OverlapPoint(hidden.transform.position),
                 "O seletor ainda acharia o objeto escondido: haveria destaque e clique.");
@@ -71,13 +74,13 @@ namespace ProjetoVN.Tests.PlayMode
 
             StoryState.SetBool(TalkedToLuna, true);
             yield return null;
-            Assert.IsFalse(hidden.GetComponent<SpriteRenderer>().enabled,
+            Assert.IsTrue(AllRenderersAre(hidden, enabled: false),
                 "O objeto apareceu no meio da conversa, atrás da caixa de diálogo.");
 
             DialogueManager.Instance.StopDialogue();
             yield return null;
 
-            Assert.IsTrue(hidden.GetComponent<SpriteRenderer>().enabled, "O objeto continuou invisível depois da conversa.");
+            Assert.IsTrue(AllRenderersAre(hidden, enabled: true), "Um renderer do objeto, o do rótulo incluso, continuou invisível depois da conversa.");
             Assert.IsTrue(hidden.GetComponent<BoxCollider2D>().enabled, "O objeto continuou sem collider depois da conversa.");
             Assert.AreSame(hidden.GetComponent<BoxCollider2D>(), Physics2D.OverlapPoint(hidden.transform.position),
                 "O seletor não acha o objeto revelado.");
@@ -92,7 +95,7 @@ namespace ProjetoVN.Tests.PlayMode
             yield return WaitUntil(() => PlayerInputGate.IsEnabled, "a troca de sala terminar");
 
             GameObject revealed = FindTheHiddenObject();
-            Assert.IsTrue(revealed.GetComponent<SpriteRenderer>().enabled, "O objeto chegou invisível com a variável ligada.");
+            Assert.IsTrue(AllRenderersAre(revealed, enabled: true), "Um renderer do objeto, o do rótulo incluso, chegou invisível com a variável ligada.");
             Assert.IsTrue(revealed.GetComponent<BoxCollider2D>().enabled, "O objeto chegou sem collider com a variável ligada.");
         }
 
@@ -102,6 +105,9 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.IsNotNull(hidden, $"A cena '{Room}' não tem o objeto '{HiddenObject}', ou ele está desativado.");
             return hidden;
         }
+
+        private static bool AllRenderersAre(GameObject target, bool enabled) =>
+            target.GetComponentsInChildren<Renderer>(true).All(renderer => renderer.enabled == enabled);
 
         private static IEnumerator WaitUntil(Func<bool> condition, string expectation)
         {
