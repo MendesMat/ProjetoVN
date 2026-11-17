@@ -1,0 +1,11 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 2 · O posto
+
+title: posto_chegada
+---
+// Conversa de chegada do pátio (#127): a sala abre este nó em toda chegada, e só a primeira mostra a narração.
+<<if visited("posto_chegada")>>
+    <<stop>>
+<<endif>>
+Descendo os degraus, sinto o frio daquele lugar no meio do nada. Logo à frente, uma loja de conveniência, bem vazia, por sinal.
+Pensamento: Nossa... Que lugar deserto...
+===

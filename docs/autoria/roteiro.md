@@ -35,6 +35,9 @@ Assets/Roteiro/
     prologo/
       episodio_1/
         onibus_viagem.yarn
+      episodio_2/
+        posto_motorista.yarn
+        loja_atendente.yarn
     capitulo_1/
       episodio_1/
         luna_primeiro_oi.yarn
@@ -236,8 +239,10 @@ Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 | `Mãe` | A mãe do protagonista (ainda sem arte) |
 | `Pai` | O pai do protagonista (ainda sem arte) |
 | `Motorista` | O motorista do ônibus (ainda sem arte) |
-| `Homem` | Um passageiro do ônibus (ainda sem arte) |
-| `Mulher` | Uma passageira do ônibus (ainda sem arte) |
+| `???` | Uma pessoa aleatória, sem nome: passageiros do ônibus, gente da loja do posto (ainda sem arte) |
+| `Atendente` | A atendente da loja de conveniência do posto (ainda sem arte) |
+
+O `???` é **um personagem só**, o mesmo para toda pessoa aleatória: para o jogo, o nome na fala é o que identifica quem fala, e ele não aceita dois personagens com o mesmo nome na placa. Duas falas seguidas do `???` aparecem no histórico como uma sequência só, com o nome só na primeira. O protagonista, que também aparece como `???` até assinar a lista, fica do outro lado do histórico e não se mistura com elas.
 
 Uma personagem pode existir **antes da arte**, como as cinco últimas da tabela: o nome aparece na placa, e a fala entra no histórico num balão na cor dela, mas **nenhum sprite aparece** e quem está na tela escurece, como na narração. Você escreve as falas normalmente; quando a arte chegar, nada muda no roteiro.
 
@@ -311,7 +316,7 @@ As expressões que existem hoje (a primeira de cada personagem é a padrão):
 |---|---|
 | `Luna` | `neutra` (padrão), `raiva` |
 | `Protagonista` | `neutra` (padrão) |
-| `Mãe`, `Pai`, `Motorista`, `Homem`, `Mulher` | nenhuma (ainda sem arte): **não use etiqueta** nessas falas |
+| `Mãe`, `Pai`, `Motorista`, `???`, `Atendente` | nenhuma (ainda sem arte): **não use etiqueta** nessas falas |
 
 Uma etiqueta em uma personagem sem expressões é reprovada pela verificação do jogo. Quando a arte dela chegar, o programador acrescenta as expressões e a linha desta tabela passa a listá-las.
 
@@ -761,6 +766,9 @@ As regras:
 |---|---|---|
 | `chave_teste` | Chave Teste | Uma chave que abre alguma porta |
 | `moeda` | Moeda | Uma moeda achada no chão do ônibus; abre a máquina de café do posto |
+| `salgadinho` | Salgadinho | Provisório: comprado da atendente da loja do posto |
+| `refrigerante` | Refrigerante | Provisório: comprado da atendente da loja do posto |
+| `chocolate` | Chocolate | Provisório: comprado da atendente da loja do posto |
 
 Quando um item novo entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual.
 
@@ -846,6 +854,9 @@ As regras:
 | Id | O que é |
 |---|---|
 | `freada_batida` | Uma freada forte seguida de uma batida (provisório) |
+| `passos_cascalho` | Passos no cascalho do pátio do posto (provisório) |
+| `porta_sininho` | A porta da loja do posto abrindo, com um sininho (provisório) |
+| `porta_trancada` | A maçaneta de uma porta trancada, sem abrir |
 
 Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela da sua lista. Copie o id daqui, sempre igual.
 

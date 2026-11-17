@@ -23,3 +23,9 @@ MonoBehaviour:
   effects:
   - id: freada_batida
     clip: {fileID: 8300000, guid: aad6657a8e6e71f4588e54eb57876836, type: 3}
+  - id: passos_cascalho
+    clip: {fileID: 8300000, guid: c70e831fa80d9834f9948fdd83450adf, type: 3}
+  - id: porta_sininho
+    clip: {fileID: 8300000, guid: a192120c868d4a94d9770c2126805305, type: 3}
+  - id: porta_trancada
+    clip: {fileID: 8300000, guid: 7e1a3c559e647e343b1d151db18f703b, type: 3}

@@ -1,0 +1,16 @@
+// ATO 1 · PRÓLOGO · EPISÓDIO 2 · O posto
+
+title: posto_motorista
+---
+<<tocar_efeito passos_cascalho>>
+Protagonista: E aí, que que houve?
+Motorista: Uma anta apareceu do nada. Acho que fodeu a frente do ônibus todinha.
+Protagonista: Que problemão, hein...
+Motorista: Pois é, acho que vai tomar um tempinho... Depende da mecânica...
+Protagonista: ...
+Motorista: ...
+Motorista: Mas geralmente eles vêm rápido.
+Protagonista: Ah, tudo bem, então.
+// Libera a ida a pé até a cidade (o objeto da estrada aparece, #128) e muda a resposta da atendente.
+<<set $falou_com_motorista to true>>
+===

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5048805560e1c1a488097d0871428c1b, type: 3}
-  m_Name: Mulher
+  m_Name: Atendente
   m_EditorClassIdentifier: ProjetoVN.Dialogue::ProjetoVN.Dialogue.Characters.CharacterSO
-  id: mulher
-  displayName: Mulher
-  nameColor: {r: 0.56078434, g: 0.8392157, b: 0.8, a: 1}
+  id: atendente
+  displayName: Atendente
+  nameColor: {r: 0.9098, g: 0.7059, b: 0.7843, a: 1}
   expressions: []
