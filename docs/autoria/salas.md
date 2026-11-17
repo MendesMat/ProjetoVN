@@ -41,6 +41,7 @@ Enquanto um objeto interativo ainda é o quadrado do prefab `Interactable`, ele 
 
   O gatilho só conta **com nó**, porque todo objeto feito do prefab traz um gatilho vazio (sem isso, toda saída e todo objeto novo seriam `CONVERSA`). Uma saída que leva a outra sala por uma porta trancada (`Porta_Onibus`) é `PORTA TRANCADA`; um item com fala de reação (`Item_Chave`) é `ITEM`.
 - **O quadrado muda para a cor do tipo** quando a sala carrega, e a cor que estiver gravada na instância não conta (o `Item_Chave`, a `Door_PortaTrancada` e o `Exit_Passagem` da `[Teste] Mecanicas` tinham cor própria e voltaram à do prefab). **O verde é do `PlaceholderTint`** e quer dizer "porta aberta": nenhum tipo usa verde, e a porta aberta continua mostrando `PORTA TRANCADA` (quem diz que abriu é o verde; o tipo não muda com o estado). Para quem não distingue vermelho de verde, a diferença entre trancada e aberta fica fraca: aceito por ser provisório.
+- **A Scene view mostra o rótulo sem apertar Play.** O **Placeholder Label** é `[ExecuteAlways]`: ao abrir a sala, ou ao criar o objeto, ele já escreve o texto e a cor do tipo, e ao digitar o **Display Name** o texto se atualiza em seguida. Isso fica só na memória do Editor: a cena não fica suja por abrir (o texto e a cor da instância não viram *override*), e um quadrado preto com `OBJETO / (sem nome)` na Scene view quer dizer que o componente ou o campo **Label** está faltando.
 - **Sem seta no nome.** `→` e `←` **não existem** na Atkinson Hyperlegible Next (têm `› » · •` e os acentos). Um caractere que a fonte não tem faria o TextMeshPro criar, em tempo de execução, um filho de reserva que o **Hidden Until Story Flag** não esconde. O `PlaceholderLabelsTests` reprova o nome com um caractere assim.
 - **Objeto escondido e coletável recolhido:** nada a fazer. O rótulo é um **filho do prefab**, não criado em tempo de execução: o **Hidden Until Story Flag** o esconde e o mostra junto com o quadrado, e o coletável recolhido desativa o objeto inteiro, rótulo incluso.
 - **Hover:** o objeto cresce 15% e o rótulo cresce junto; o destaque (`Highlight`) continua atrás do quadrado e o rótulo na frente (ordem de desenho 0, 1 e 2).
@@ -53,7 +54,7 @@ Os nomes das salas de teste (as da fatia estão nas tabelas de [Passo a passo: a
 |---|---|---|---|
 | `[Teste] Mecanicas` | `NPC_Luna` | `CONVERSA` | `Luna` |
 | | `Item_Chave` | `ITEM` | `Chave` |
-| | `Door_PortaTrancada` | `PORTA TRANCADA` | `Porta da Sala B` |
+| | `Door_PortaTrancada` | `PORTA TRANCADA` | `Porta Sala B` |
 | | `Exit_Passagem` | `SAÍDA` | `Sala B (passagem)` |
 | | `Exit_Janela` | `SAÍDA` | `Sala B (janela)` |
 | `[Teste] Sala B` | `Porta_Trancada` | `CONVERSA` | `Porta` |
