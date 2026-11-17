@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/[Fatia] Posto.unity
     guid: f23cd5db5aa56d642a5e4973a90c307e
+  - enabled: 1
+    path: Assets/Scenes/[Fatia] Loja.unity
+    guid: bf2a5671f9f85b14dbcc19f4e32db319
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

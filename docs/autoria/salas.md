@@ -2,7 +2,7 @@
 
 **Para quem:** o agente que monta as salas, os itens e os personagens pelo Unity CLI, com o material que o programador fornece, e o programador, que confere o resultado pelo Inspector. O guia dá os campos e os menus pelo nome que o Inspector mostra (**Pan Speed**, **Create → Items → Item**). O nome do campo no código, o tipo de cada componente e o que a montagem por script precisa saber estão em [unity-cli.md](../agentes/unity-cli.md#montar-uma-sala-só-a-partir-do-guia-e-conferi-la-com-o-despejo-107); onde um nome não se deduz do outro, o guia dá os dois (**Background Type**, `clearFlags`).
 
-> **Este guia cobre o que existe hoje.** A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`. As duas salas do percurso do jogador, `[Fatia] Onibus` e `[Fatia] Posto`, foram montadas por script de Editor na #21, e o [passo a passo](#passo-a-passo-a-fatia-vertical) no fim foi escrito depois, a partir dessa montagem. Na #107 o passo a passo foi conferido: a `[Fatia] Posto` foi remontada do zero, por um agente que só tinha este guia e as receitas de [unity-cli.md](../agentes/unity-cli.md), e o que a montagem não achou no texto foi corrigido aqui. O `[Fatia] Onibus` não foi remontado.
+> **Este guia cobre o que existe hoje.** A cena de referência, com um exemplo de cada coisa descrita aqui, é `Assets/Scenes/[Teste] Mecanicas.unity`. As salas do percurso do jogador, `[Fatia] Onibus`, `[Fatia] Posto` e `[Fatia] Loja`, foram montadas por script de Editor (as duas primeiras na #21; o pátio da Cena 2 do prólogo e a loja, na #130), e o [passo a passo](#passo-a-passo-a-fatia-vertical) no fim foi escrito a partir dessa montagem. Na #107 o passo a passo foi conferido: a `[Fatia] Posto` foi remontada do zero, por um agente que só tinha este guia e as receitas de [unity-cli.md](../agentes/unity-cli.md), e o que a montagem não achou no texto foi corrigido aqui. O `[Fatia] Onibus` não foi remontado.
 
 ## Regras que valem sempre
 
@@ -120,7 +120,7 @@ Um objeto interativo que **não existe para o jogador** até uma variável de hi
 - Um coletável já recolhido continua sumido: o componente de coleta desativa o objeto, e isso vence.
 - O componente esconde o `Sprite Renderer` e o `Box Collider 2D` (e os dos filhos) **que estão ligados**; o que a arte deixou desligado de propósito continua desligado.
 
-Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo, à direita da porta) só aparece depois de falar com a Luna e escolher "Sim" (`$falou_com_luna`); clicar nele leva à `[Teste] Sala B`.
+Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo, à direita da porta) só aparece depois de falar com a Luna e escolher "Sim" (`$falou_com_luna`); clicar nele leva à `[Teste] Sala B`. Outro exemplo é a `Estrada` do pátio, em `[Fatia] Posto`: só aparece ao fim da conversa com o motorista (`$falou_com_motorista`, ligada pelo roteiro), e clicar nela abre a narração `posto_ir_andando`.
 
 ## Pan do cenário
 
@@ -304,12 +304,12 @@ O teste `ScriptContentTests` reprova um id do roteiro que não esteja no registr
 
 ## Passo a passo: a fatia vertical
 
-A fatia vertical é o conteúdo provisório que exercita todos os sistemas juntos (#21): duas salas, `[Fatia] Onibus` e `[Fatia] Posto`, ligadas por uma porta que só abre depois do prólogo, e uma moeda achada no ônibus que abre a máquina de café do posto. O prefixo `[Fatia]` marca conteúdo provisório, como `[Teste]`. Nada disso exigiu código: é Inspector e um arquivo de roteiro. Os arquivos são `Assets/Scenes/[Fatia] Onibus.unity`, `Assets/Scenes/[Fatia] Posto.unity` e `Assets/Roteiro/Testes/fatia_vertical.yarn`; as variáveis novas estão em `variaveis.yarn` e o item é `Moeda.asset`.
+A fatia vertical é o conteúdo provisório que exercita todos os sistemas juntos (#21, refeita na #130 com a Cena 2 do prólogo): três salas, `[Fatia] Onibus`, `[Fatia] Posto` (o pátio) e `[Fatia] Loja`, ligadas por saídas, com a porta do ônibus abrindo só depois do prólogo. No pátio, cada opção da Cena 2 é um objeto clicável (a estrada, só depois de falar com o motorista), e a loja tem o atendente, a máquina de café e o banheiro. O prefixo `[Fatia]` marca conteúdo provisório, como `[Teste]`. Nada disso exigiu código: é Inspector e roteiro. Os arquivos são `Assets/Scenes/[Fatia] Onibus.unity`, `Assets/Scenes/[Fatia] Posto.unity`, `Assets/Scenes/[Fatia] Loja.unity` e `Assets/Roteiro/Testes/fatia_vertical.yarn` (só os nós do ônibus); os nós do pátio e da loja são o texto do roteirista, em `Assets/Roteiro/ato_1/prologo/episodio_2/` (#129). Não há mais a Luna do posto, a moeda nem a máquina de café com moeda (saíram na #130): a `[Teste] Mecanicas` guarda os exemplos de afinidade, item e portão.
 
 ### Ordem da montagem
 
-1. **O roteiro primeiro.** Escreva os nós em `fatia_vertical.yarn` e declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$conheceu_luna`, `$cafe_do_posto`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado por quem monta a sala** (é um roteiro; os efeitos de tela dele vieram na #71): o nó `onibus_chegada`, que o `Room Arrival` do ônibus abre na chegada, o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome, e o `<<if not $prologo_concluido>>` do nó deixa a conversa de chegada vazia nas chegadas seguintes. O `onibus_poltrona` é só o pensamento do protagonista.
-2. **O item.** `Create → Items → Item` (`moeda`) e uma linha no `ItemRegistry.asset`. O ícone é provisório.
+1. **O roteiro primeiro.** Os nós vêm de `ato_1/prologo/episodio_2/` (o pátio e a loja) e de `fatia_vertical.yarn` (o ônibus); declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$falou_com_motorista`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado por quem monta a sala** (é um roteiro; os efeitos de tela dele vieram na #71): o nó `onibus_chegada`, que o `Room Arrival` do ônibus abre na chegada, o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome, e o `<<if not $prologo_concluido>>` do nó deixa a conversa de chegada vazia nas chegadas seguintes. O `onibus_poltrona` é só o pensamento do protagonista.
+2. **O item, só se a sala tem um coletável.** `Create → Items → Item` e uma linha no `ItemRegistry.asset` (ver [Coletável](#coletável)). A fatia não tem nenhum: o `salgadinho` que a atendente dá vem do roteiro (`<<dar_item>>`), e o item já está no registro.
 3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints`, `Room Music` e, se a sala abre uma conversa ao chegar, `Room Arrival` (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)). Onde `Interactables` e `EntryPoints` ficam depende do pan: **sem pan** são irmãos de `Environment`, na raiz (`[Fatia] Onibus`); **com pan** são filhos do `ScrollingBackground`, para andarem com ele (`[Fatia] Posto`).
    - **Comece pela cena vazia.** No Editor, **File → New Scene** com o modelo do projeto (**Lit 2D (URP)**) traz uma `Main Camera` com fundo azul, fora de `Systems`, e um **Global Light 2D**; nenhuma sala do projeto tem esse objeto de luz, então apague os dois e monte a câmera como em [Criar uma sala nova](#criar-uma-sala-nova). Por script, `EditorSceneManager.NewScene` com `NewSceneSetup.EmptyScene` já devolve a cena sem nada. Antes dele, confira que nenhuma cena aberta tem alteração não salva: o `NewScene` fecha todas e descarta o que não foi gravado, sem perguntar (receita em [unity-cli.md](../agentes/unity-cli.md#abrir-e-salvar-cena)).
    - **Sem `Canvas`, sem `EventSystem`, sem manager:** o modelo não traz nenhum dos três, mas outro modelo pode trazer.
@@ -325,7 +325,6 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **`Room Arrival`:** um objeto na raiz com o componente **Room Arrival Dialogue**, **Node Name** `onibus_chegada` e **Starts Dark** ligado (#71: o prólogo começa no preto e clareia). É ele que abre o prólogo sozinho no Novo Jogo (e a cada chegada no ônibus, com o nó decidindo se repete).
 - **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`. Sem pan, o X dele não move nada; só precisa existir.
 - **`Interactables/Poltrona`:** o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). Depois da #127 ela só mostra o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta."; o prólogo abre pelo `Room Arrival`.
-- **`Interactables/Item_Moeda`:** acrescente **Collectable Item Behaviour** com **Item Data** `Moeda`, e confira que **Persistent Id** veio preenchido e é novo (**Regenerate Persistent Id** se o objeto nasceu de uma cópia). Em **On Interact**, ligue `Collect` e depois `TriggerDialogue` (nó `onibus_moeda`), como o `Item_Chave` da cena de teste.
 - **`Interactables/Porta_Onibus`:** um portão **só de flag**, com **Locked Action Behaviour** e **Room Exit**:
   - **Required Flag Id** `$prologo_concluido` e **Unlocked Flag Id** `$porta_onibus_aberta`, **sem item**. As duas variáveis precisam ser **diferentes**, senão o **On Unlocked** nunca dispara.
   - **Room Exit:** destino `[Fatia] Posto`, ponto `onibus`.
@@ -338,11 +337,41 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **Fundo e pan:** a hierarquia é `Environment/ScrollingBackground`, com `Backgrounds`, `Interactables` e `EntryPoints` como filhos. O `ScrollingBackground` fica em (0, 0, 0) e leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -22,4, **Max X** 22,4; a conta está em [Pan do cenário](#pan-do-cenário) e vale para estes três painéis de 20,9 de largura). `Backgrounds` é um objeto vazio só para agrupar os três painéis, que têm o mesmo sprite (`testebckg_0`) e escala Y 1,25: `LeftPanel` (x -20,9, escala X -1,25, o sprite espelhado), `MiddlePanel` (x 0, escala X 1,25) e `RightPanel` (x 20,9, escala X -1,25). O agrupamento em `Backgrounds` e a escala em Z são escolha de quem monta: nada depende deles. `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan, e as posições abaixo são **locais** a ele (como ele está em 0, valem também como posição no mundo).
 - **`Room Music`:** um objeto na raiz da cena (não dentro do `ScrollingBackground`), com **Room Music** e `teste_musica_b`.
 - **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, em x 20 (o mesmo X do `Exit_Onibus`), y 0: é o lugar que fica no centro da tela quando o jogador chega do ônibus.
-- **`Interactables/NPC_Luna`:** em x -3, y 0, escala 1. O gatilho com `posto_luna`, em **On Interact**.
-- **`Interactables/Maquina_Cafe`:** em x 3, y 0, escala 1. Um portão **só de item**: **Locked Action Behaviour** com **Required Item** `Moeda` (consumida ao abrir), **Required Flag Id** vazio e **Unlocked Flag Id** `$cafe_do_posto`, e **On Interact** → `LockedActionBehaviour.Interact`. Ela tem **três** falas, uma para cada situação, então o objeto leva **três** **Interactable Dialogue Trigger**, nesta ordem no Inspector: o do prefab (`posto_maquina_sem_moeda`, ligado em **On Locked**), `posto_maquina_cafe` e `posto_maquina_vazia` (em **On Already Unlocked**). Em **On Unlocked** ligue, nesta ordem, o `TriggerDialogue` do `posto_maquina_cafe` e o som: um filho `Som Cafe`, com **Sound Effect** e **Clip** `item_coletar` (de `Assets/Audio/Efeitos/`), ligado em `SoundEffect.Play` (como em [Som em um objeto ou em uma porta](#som-em-um-objeto-ou-em-uma-porta-20)).
 - **`Interactables/Exit_Onibus`:** em x 20, y 0, escala 1. Uma saída comum (**Room Exit**, destino `[Fatia] Onibus`, ponto `porta`), com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica. É a porta do ônibus vista de fora, que já está aberta.
+- **`EntryPoints/EntryPoint_Loja`:** id `loja`, em x 4 (o mesmo X do `Exit_Loja`): é o lugar que fica no centro da tela quando o jogador volta da loja.
+- **`Room Arrival`:** um objeto na raiz da cena, ao lado do `Room Music`, com **Room Arrival Dialogue**, **Node Name** `posto_chegada` e **Starts Dark** **desligado** (a sala chega com a tela clara). É a narração da chegada; o nó decide se se repete (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)).
+- **Os objetos da Cena 2** (#130) nascem do prefab `Interactable`, como filhos de `Interactables`, em y 0 e escala 1, e cada um liga o próprio nó em **On Interact**. As posições são locais ao `ScrollingBackground`, na ordem da estrada (esquerda) até o ônibus (direita):
 
-Os três objetos são o quadrado preto do prefab, na escala 1: pequenos porque a sala é provisória (a Cena 2 do prólogo a substitui na M11, ver [milestones.md](../planejamento/milestones.md)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
+  | Objeto | X | Componentes e ligação |
+  |---|---|---|
+  | `Estrada` | -24 | **Interactable Dialogue Trigger** `posto_ir_andando` (`TriggerDialogue`); **Hidden Until Story Flag** com **Required Flag Id** `$falou_com_motorista`: só aparece ao fim da conversa com o motorista |
+  | `Cadeira` | -14 | gatilho `posto_esperar_mecanico` |
+  | `Caminhoneiros` | -6 | gatilho `posto_caminhoneiros` |
+  | `Exit_Loja` | 4 | **Room Exit**, destino `[Fatia] Loja`, ponto `patio`, com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica |
+  | `Motorista` | 12 | gatilho `posto_motorista` |
+  | `Exit_Onibus` | 20 | a saída descrita acima |
+
+  Por que essas posições: chegando do ônibus (centro em 20) a tela mostra de 11,1 a 28,9, então o motorista e a porta do ônibus aparecem juntos; chegando da loja (centro em 4), a porta da loja e os caminhoneiros; com o pan no limite (+22,4) a tela mostra de -31,3 a -13,5, e a estrada (-24) e a cadeira (-14) cabem. **O pan não mudou:** os três painéis continuam e os limites ±22,4 também.
+
+Os objetos são o quadrado preto do prefab, na escala 1: o motorista, os caminhoneiros e o atendente são só a área clicável sobre o fundo provisório, sem sprite de personagem (fora do escopo, [visao-geral.md](../jogo/visao-geral.md#fora-do-escopo-atual)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
+
+### `[Fatia] Loja` (sem pan)
+
+Uma sala só de objetos, como o ônibus: o fundo é o mesmo `testebckg_0`, em escala 1,25 (cobre de -10,45 a 10,45, mais largo que a tela de 17,78), então não há **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz. Câmera e fundo como em [`[Fatia] Onibus`](#fatia-onibus-sem-pan).
+
+- **`Room Music`:** `teste_musica_b`, **a mesma do pátio**: entre as duas salas a música não reinicia, o que se espera de entrar numa loja do mesmo posto.
+- **`Room Arrival`:** **Node Name** `loja_chegada`, **Starts Dark** desligado.
+- **`EntryPoints/EntryPoint_Patio`:** id `patio`, em x -7. Sem pan não move nada, mas precisa existir.
+- **`Interactables`**, do prefab, y 0, escala 1:
+
+  | Objeto | X | Ligação |
+  |---|---|---|
+  | `Exit_Patio` | -7 | **Room Exit**, destino `[Fatia] Posto`, ponto `loja`, com `RoomExit.Leave` em **On Interact** |
+  | `Atendente` | -3 | gatilho `loja_atendente` |
+  | `Maquina_Cafe` | 1 | gatilho `loja_maquina_cafe` |
+  | `Banheiro` | 5 | gatilho `loja_banheiro` (o som da porta trancada vem do roteiro, `<<tocar_efeito porta_trancada>>`: nenhum **Sound Effect** na cena) |
+
+A `[Fatia] Loja` está na lista de cenas do build, depois do `[Fatia] Posto`.
 
 ### O que a montagem precisou e o guia não dizia
 
@@ -352,7 +381,7 @@ Os três objetos são o quadrado preto do prefab, na escala 1: pequenos porque a
 - **Mais de uma fala no mesmo portão:** acrescente um **Interactable Dialogue Trigger** por fala no **mesmo objeto** (não em filhos). O menu do evento mostra os componentes **com o mesmo nome**, e o que vale é a **ordem deles no Inspector** (o primeiro da lista é o de cima). Confira em cada um o **Node Name**.
 - **O prefab `Interactable` traz um gatilho vazio** que não avisa. Em uma saída ou em um objeto sem fala, ele pode ficar.
 - **A câmera de uma cena vazia** precisa dos valores de [Criar uma sala nova](#criar-uma-sala-nova) (ortográfica, tamanho 5, fundo preto em **Background Type**, **Depth** 0, posição (0, 0, -10), um só `AudioListener`), e **não** dos da câmera de teste (#107).
-- **Um portão tem de ser ligado ao próprio clique** (#107): **On Interact** do **Interactable Item** → `LockedActionBehaviour.Interact`, também no portão só de item (`Maquina_Cafe`). Sem isso o clique não chega ao portão.
+- **Um portão tem de ser ligado ao próprio clique** (#107): **On Interact** do **Interactable Item** → `LockedActionBehaviour.Interact`, também no portão só de item (o `Door_PortaTrancada` da `[Teste] Mecanicas`, que tem dois gatilhos e é portão). Sem isso o clique não chega ao portão.
 - **O que a remontagem da #107 achou** (despejo das duas cenas e `diff`): a `[Fatia] Posto` montada por script a partir só deste guia ficou igual à real em tudo o que o guia dizia. As diferenças que sobraram eram o que ele não dizia (**Depth** da câmera, posição e escala dos três objetos, ordem dos eventos do **On Unlocked** da máquina, o objeto `Backgrounds`), e agora diz. A remontagem foi por script: montar pelo Inspector não foi testado.
 - **Ao montar por script, o console avisa de campo vazio** (`Id`, **Destination Room**, **Clip**, **Environment Container**) a cada `AddComponent`, porque o componente se valida antes de o script preenchê-lo. Os avisos somem quando o campo é preenchido e a cena é salva; confira o console no fim, não no meio da montagem (receita em [unity-cli.md](../agentes/unity-cli.md)).
 - **Uma sala sem pan não precisa do `ScrollingBackground`**, mas o ponto de entrada precisa existir mesmo assim, com id.

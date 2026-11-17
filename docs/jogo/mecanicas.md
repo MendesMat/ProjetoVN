@@ -19,7 +19,7 @@ Cada seção descreve o que a mecânica faz para o jogador, o que já existe em 
 | [Efeitos de tela do roteiro](#efeitos-de-tela-do-roteiro-71) | existe | `GameFlow` | #71 |
 | [Áudio](#áudio) | existe | `Audio` | #19, #20 |
 
-A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`. O percurso do jogador (as salas `[Fatia] Onibus` e `[Fatia] Posto`) é a fatia vertical, montada só com Inspector e roteiro (#21).
+A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste] Mecanicas.unity`. O percurso do jogador (as salas `[Fatia] Onibus`, `[Fatia] Posto` e `[Fatia] Loja`) é a fatia vertical, montada só com Inspector e roteiro (#21; o pátio e a loja da Cena 2 do prólogo, #130).
 
 ---
 
