@@ -25,13 +25,14 @@ A fatia vertical é este percurso funcionando de ponta a ponta, em um build de d
 
 1. O jogo abre no **menu principal**.
 2. **Novo Jogo** leva à primeira sala (o ônibus). O prólogo abre sozinho ao chegar no ônibus, sem clique (#127), e o jogador escreve o **nome do protagonista** dentro da história, ao assinar a lista de passageiros no fim dele (#26).
-3. O jogador explora **duas salas**, ligadas por uma porta: o interior do ônibus e o pátio do posto, onde a porta do ônibus só abre depois do prólogo (#21).
-4. Conversa com personagens que aparecem como **sprites atrás da caixa de diálogo**, com destaque para quem fala, e texto revelado aos poucos; uma **escolha altera a afinidade** e um trecho do diálogo só aparece com afinidade suficiente. Durante a conversa, o jogador abre o **histórico** e relê o que foi dito.
-5. Resolve um **puzzle de item**: algo obtido numa sala abre algo na outra (a moeda do ônibus abre a máquina de café do posto).
-6. O jogo **salva** ao trocar de sala; o jogador fecha o jogo.
-7. **Continuar** devolve o jogador à sala em que estava, com tudo como deixou.
+3. O jogador explora **três salas**, ligadas por saídas: o interior do ônibus, o pátio do posto e a loja de conveniência. A porta do ônibus só abre depois do prólogo (#21). Ao chegar no pátio e na loja, uma **narração abre sozinha** (#127), e o que o roteiro não manda repetir não se repete.
+4. No pátio, as opções da Cena 2 do prólogo são **objetos clicáveis**: o motorista, a porta da loja, os caminhoneiros e a cadeira (esperar o mecânico). A estrada (ir andando até a cidade) **só aparece depois de falar com o motorista** (#128). Na loja estão o atendente, a máquina de café e o banheiro (#130).
+5. Conversa com personagens que aparecem como **sprites atrás da caixa de diálogo**, com destaque para quem fala, e texto revelado aos poucos. Durante a conversa, o jogador abre o **histórico** e relê o que foi dito.
+6. **Compra** um item com o atendente (o item é dado pelo roteiro) e tenta entrar no banheiro trancado. Não há mais a escolha de afinidade nem o puzzle de item da primeira versão da fatia (a Luna, a moeda e a máquina de café com moeda saíram na #130, por decisão do programador no planejamento de 2026-11-13: o roteiro é fiel ao texto e não muda para caber na fatia; a afinidade virá dos roteiristas).
+7. O jogo **salva** ao trocar de sala; o jogador fecha o jogo.
+8. **Continuar** devolve o jogador à sala em que estava, com tudo como deixou.
 
-O conteúdo da fatia é provisório. O que ela prova é que os sistemas funcionam juntos e que conteúdo novo se faz sem código.
+O conteúdo da fatia é provisório (arte provisória, e o motorista, os caminhoneiros e o atendente são só uma área clicável sobre o fundo, sem sprite de personagem no cenário). O que ela prova é que os sistemas funcionam juntos e que conteúdo novo se faz sem código.
 
 O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado na #22.
 
