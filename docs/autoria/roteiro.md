@@ -856,7 +856,7 @@ As regras:
 | `freada_batida` | Uma freada forte seguida de uma batida (provisório) |
 | `passos_cascalho` | Passos no cascalho do pátio do posto (provisório) |
 | `porta_sininho` | A porta da loja do posto abrindo, com um sininho (provisório) |
-| `porta_trancada` | A maçaneta de uma porta trancada, sem abrir |
+| `porta_trancada` | A maçaneta de uma porta trancada, sem abrir (provisório) |
 
 Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela da sua lista. Copie o id daqui, sempre igual.
 
