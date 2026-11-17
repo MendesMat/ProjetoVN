@@ -4,6 +4,8 @@ Este módulo guarda os testes automatizados do projeto (Unity Test Framework), e
 
 > **Antes de escrever testes:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisão D-24, sobre testes](../../../docs/arquitetura/decisoes.md#d-24--testes) · [como a TDD se aplica aqui](../../../docs/agentes/skills.md#como-a-tdd-se-aplica-aqui)
 
+**Antes de rodar qualquer suíte, confira as cenas abertas** com `unity command list_open_scenes`: uma cena aberta suja, ativa ou aditiva, faz o Test Runner abrir um diálogo que trava o Editor e o CLI. O que fazer com cada caso: [receita](../../../docs/agentes/unity-cli.md#rodar-a-suíte-playmode), parágrafo "Antes de cada `run_tests`".
+
 Os testes EditMode vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*, ou pelo Unity CLI:
 
 ```bash

@@ -75,6 +75,12 @@ unity command recompile
 ```
 
 ```bash
+unity command list_open_scenes
+```
+
+Todas as cenas com `isDirty: false`? Siga. A revisão não altera cena, então uma cena suja **não é sua**: pare e avise o programador, sem gravar e sem rodar a suíte. O motivo e a receita estão no parágrafo "Antes de cada `run_tests`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`.
+
+```bash
 unity command run_tests --mode EditMode --timeout 180
 ```
 
