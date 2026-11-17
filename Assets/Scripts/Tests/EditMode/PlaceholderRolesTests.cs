@@ -91,7 +91,7 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [Test]
-        public void ColorOf_NoRole_UsesTheOpenDoorGreen()
+        public void ColorOf_IsNeverTheOpenDoorGreen()
         {
             IEnumerable<PlaceholderRole> greenRoles = AllRoles()
                 .Where(role => PlaceholderRoles.ColorOf(role) == Color.green);
