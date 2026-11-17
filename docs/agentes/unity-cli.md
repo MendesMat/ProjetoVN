@@ -478,6 +478,7 @@ A `[Fatia] Posto` foi remontada por um agente que só tinha o `salas.md` e esta 
   | Interactable Item | `ProjetoVN.PointNClick.InteractableItem` | evento público `OnInteract` |
   | Interactable Dialogue Trigger | `ProjetoVN.GameFlow.InteractableDialogueTrigger` | `nodeName`; método `TriggerDialogue` |
   | Locked Action Behaviour | `ProjetoVN.GameFlow.LockedActionBehaviour` | `requiredItem`, `requiredFlagId`, `unlockedFlagId`; eventos públicos `OnLocked`, `OnUnlocked`, `OnOpened`, `OnAlreadyUnlocked`; método `Interact` |
+  | Hidden Until Story Flag | `ProjetoVN.GameFlow.HiddenUntilStoryFlag` | `requiredFlagId` (a variável que mostra o objeto; sem eventos nem métodos) |
   | Room Entry Point | `ProjetoVN.GameFlow.Rooms.RoomEntryPoint` | `id` |
   | Room Exit | `ProjetoVN.GameFlow.Rooms.RoomExit` | `destinationRoom`, `entryPointId`; método `Leave` |
   | Room Music | `ProjetoVN.Audio.RoomMusic` | `music` |

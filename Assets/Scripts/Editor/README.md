@@ -30,7 +30,7 @@ Como funciona:
 
 - `DeclaredStoryFlags` acha o único `YarnProject` por `AssetDatabase.FindAssets("t:YarnProject")` e lê `YarnProjectImporter.ImportData.serializedDeclarations` **a cada vez que o Inspector é montado**. Não usa `YarnProject.InitialValues` nem `Program`, que guardam cache até o próximo `Awake`.
 - Depois de editar `variaveis.yarn`, o Unity reimporta o `YarnProject`; a lista se atualiza na próxima vez que o Inspector é montado (selecionar outro objeto e voltar basta). Um **arquivo** `.yarn` novo é diferente: só entra no projeto com o Editor em foco, e com o Editor sem foco (sessão de agente pelo CLI) é preciso reimportar o `Roteiro.yarnproject` ([a armadilha, #34](../../../docs/agentes/unity-cli.md#armadilhas-do-yarn-spinner)).
-- `CreatePropertyGUI` só é usado quando o Inspector do componente é de UI Toolkit, que é o caso do `LockedActionBehaviour` (sem editor customizado). Não crie um `Editor` IMGUI para um componente que usa `[StoryFlag]`.
+- `CreatePropertyGUI` só é usado quando o Inspector do componente é de UI Toolkit, que é o caso do `LockedActionBehaviour` e do `HiddenUntilStoryFlag` (sem editor customizado). Não crie um `Editor` IMGUI para um componente que usa `[StoryFlag]`.
 
 ## O seletor de nó do roteiro
 

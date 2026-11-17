@@ -101,6 +101,27 @@ Um objeto que só libera uma ação com um item, uma flag ou os dois, e que lemb
 
 O componente `PlaceholderTint`, que pinta a porta de verde, é provisório: troque pela arte de porta aberta.
 
+## Objeto que aparece depois (#128)
+
+Um objeto interativo que **não existe para o jogador** até uma variável de história ligar: invisível, sem destaque ao passar o mouse e sem clique. É o caso de uma saída secreta, que só aparece depois de uma conversa.
+
+1. No objeto interativo, acrescente o componente **Hidden Until Story Flag**.
+2. Em **Required Flag Id**, escolha a variável que o mostra. O campo é a mesma lista do portão: as variáveis **booleanas** declaradas em `Assets/Roteiro/variaveis.yarn`, mais **(nenhuma)**. Uma variável nova entra antes em `variaveis.yarn` (veja [roteiro.md](roteiro.md#variáveis-e-afinidade)). Campo vazio = o objeto **nunca** aparece, e o componente avisa no console. Um valor fora do formato ou não declarado é avisado do mesmo modo que no portão (`StoryFlagFieldsTests`).
+3. Ligue o que o objeto faz normalmente em **On Interact** do Interactable Item (por exemplo, `RoomExit.Leave`). O componente não precisa de ligação.
+
+**Quando o objeto aparece:**
+- Ao carregar a sala com a variável já ligada: voltar à sala, carregar um save. O valor está no estado da história, então ele continua visível. O Novo Jogo zera o estado e volta a escondê-lo.
+- Quando uma conversa **desta mesma sala** liga a variável (`<<set $falou_com_motorista to true>>`): o objeto aparece **ao fim da conversa**, nunca no meio dela, e fica dali em diante, sem trocar de sala.
+
+**Cuidados:**
+- Ele só **aparece**; não some de novo quando a variável desliga.
+- Um **portão sem conversa** que ligue a variável de um objeto escondido na mesma sala só o mostra quando o jogador sai e volta. Se o portão abre uma conversa (**On Unlocked**), o objeto aparece ao fim dela.
+- **Não combine no mesmo objeto** um portão cujo **On Opened** liga ou desliga o renderer ou o collider: os dois disputariam o mesmo componente.
+- Um coletável já recolhido continua sumido: o componente de coleta desativa o objeto, e isso vence.
+- O componente esconde o `Sprite Renderer` e o `Box Collider 2D` (e os dos filhos) **que estão ligados**; o que a arte deixou desligado de propósito continua desligado.
+
+Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo, à direita da porta) só aparece depois de falar com a Luna e escolher "Sim" (`$falou_com_luna`); clicar nele leva à `[Teste] Sala B`.
+
 ## Pan do cenário
 
 O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda. **Min X** e **Max X** são até onde o cenário anda. Para a tela nunca passar do fundo:
