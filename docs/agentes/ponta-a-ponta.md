@@ -45,7 +45,7 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 - o som de estrada entra, some na lembrança, volta e some na freada com batida;
 - personagens atrás da caixa, quem fala em destaque; a placa do protagonista mostra `???`.
 
-**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com a Luna.
+**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com o motorista, no pátio (passo 9).
 
 **6. A poltrona.** Clique na poltrona. Esperado: só o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta.", sem repetir o prólogo. (A fala "A porta do ônibus está fechada" deixou de ser alcançável na fatia: antes de o prólogo acabar o jogador está na conversa e não pode clicar na porta, e depois a porta já abre. O portão trancado continua coberto na `[Teste] Mecanicas`.) Não há mais moeda no corredor (saiu na #130).
 
