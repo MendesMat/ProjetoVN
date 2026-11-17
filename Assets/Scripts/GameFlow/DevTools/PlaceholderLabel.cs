@@ -17,6 +17,7 @@ namespace ProjetoVN.GameFlow.DevTools
     /// </para>
     /// Ferramenta de desenvolvimento: quando a arte definitiva chegar, remova o componente e o filho <c>Label</c>.
     /// </summary>
+    [ExecuteAlways]
     public sealed class PlaceholderLabel : MonoBehaviour
     {
         [Tooltip("O nome legível que o rótulo mostra sob o tipo, em português (ex.: Motorista; numa saída, para onde ela leva: Loja). " +
@@ -26,9 +27,13 @@ namespace ProjetoVN.GameFlow.DevTools
         [Tooltip("O filho Label do prefab Interactable, o texto do rótulo. Vazio = o objeto fica sem rótulo, com erro no console.")]
         [SerializeField] private TextMeshPro label;
 
+        // ExecuteAlways: ao abrir a sala no Editor o OnValidate não aplica o rótulo, e a Scene view ficaria com o
+        // texto e a cor do prefab (OBJETO, quadrado preto) até o Play. Em Edit Mode o aviso de nome vazio é do
+        // OnValidate, que não avisa no asset do prefab.
         private void Awake()
         {
-            WarnIfNameMissing();
+            if (Application.isPlaying) WarnIfNameMissing();
+
             Refresh();
         }
 
