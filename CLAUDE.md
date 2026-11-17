@@ -43,24 +43,24 @@ unity status
 ```
 
 ```bash
-unity command list_open_scenes
+unity command scene list_open
 ```
 
 ```bash
-unity command run_tests --mode EditMode --timeout 180
+unity command test run --mode editor --timeout 180
 ```
 
 ```bash
-unity command run_tests --mode playmode --async_tests true --timeout 300
+unity command test run --mode playmode --async-tests true --timeout 300
 ```
 
 ```bash
-unity command test_status
+unity command test status
 ```
 
-A suíte PlayMode só roda de forma assíncrona: repita o `test_status` até `completed`. Rode as duas suítes em toda issue.
+A suíte PlayMode só roda de forma assíncrona: repita o `test status` até `completed`. Rode as duas suítes em toda issue.
 
-Antes do primeiro `run_tests`, toda cena aberta, ativa ou aditiva, precisa estar com `isDirty: false`: com uma cena suja o Test Runner abre um diálogo que trava o Editor e o CLI até o Unity ser reiniciado. Cena suja por alteração sua, grave; cena suja que você não sabe de quem é, pare e avise o programador. Receita completa, parágrafo "Antes de cada `run_tests`": [Rodar a suíte PlayMode](docs/agentes/unity-cli.md#rodar-a-suíte-playmode).
+Antes do primeiro `test run`, toda cena aberta, ativa ou aditiva, precisa estar com `isDirty: false`: com uma cena suja o Test Runner abre um diálogo que trava o Editor e o CLI até o Unity ser reiniciado. Cena suja por alteração sua, grave; cena suja que você não sabe de quem é, pare e avise o programador. Receita completa, parágrafo "Antes de cada `test run`": [Rodar a suíte PlayMode](docs/agentes/unity-cli.md#rodar-a-suíte-playmode).
 
 Verificação em Play Mode, receitas e armadilhas: [docs/agentes/unity-cli.md](docs/agentes/unity-cli.md). Leia a seção "O Play Mode e o Editor sem foco" antes de confiar em qualquer verificação que dependa de frames: confirme que o jogo avança e nunca atribua `Application.runInBackground`.
 

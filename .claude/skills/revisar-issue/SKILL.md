@@ -66,7 +66,7 @@ Com o Editor aberto na troca, confira também as cenas (passo 4 da receita):
 git diff --name-only HEAD origin/<headRefName do PR> -- '*.unity'
 ```
 
-Nenhuma cena aberta (`unity command list_open_scenes`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch. Depois do checkout e do `unity command recompile` abaixo, abra uma cena com `unity command open_scene` (o `Menu`, se nenhuma em particular): a cena sem título não deve ficar aberta para as suítes.
+Nenhuma cena aberta (`unity command scene list_open`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch. Depois do checkout e do `unity command script recompile` abaixo, abra uma cena com `unity command scene open` (o `Menu`, se nenhuma em particular): a cena sem título não deve ficar aberta para as suítes.
 
 Então faça checkout da branch do PR e rode de verdade:
 
@@ -79,28 +79,28 @@ unity status
 ```
 
 ```bash
-unity command recompile
+unity command script recompile
 ```
 
 ```bash
-unity command list_open_scenes
+unity command scene list_open
 ```
 
-Todas as cenas com `isDirty: false`? Siga. A revisão não altera cena, então uma cena suja **não é sua**: pare e avise o programador, sem gravar e sem rodar a suíte. O motivo e a receita estão no parágrafo "Antes de cada `run_tests`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`.
+Todas as cenas com `isDirty: false`? Siga. A revisão não altera cena, então uma cena suja **não é sua**: pare e avise o programador, sem gravar e sem rodar a suíte. O motivo e a receita estão no parágrafo "Antes de cada `test run`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`.
 
 ```bash
-unity command run_tests --mode EditMode --timeout 180
-```
-
-```bash
-unity command run_tests --mode playmode --async_tests true --timeout 300
+unity command test run --mode editor --timeout 180
 ```
 
 ```bash
-unity command test_status
+unity command test run --mode playmode --async-tests true --timeout 300
 ```
 
-A PlayMode só roda assíncrona: repita o `test_status` até `completed` (receita em `docs/agentes/unity-cli.md`).
+```bash
+unity command test status
+```
+
+A PlayMode só roda assíncrona: repita o `test status` até `completed` (receita em `docs/agentes/unity-cli.md`).
 
 Depois, execute o **roteiro de verificação em Play Mode** do levantamento, passo a passo, seguindo `docs/agentes/unity-cli.md` (se algum passo depender de frames, confira antes que o jogo avança: `Time.frameCount` lido duas vezes; não atribua `Application.runInBackground`, que grava o `ProjectSettings`). Guarde a saída de cada passo: ela é a evidência do parecer.
 
@@ -192,13 +192,13 @@ Saída `0`, ou `1` com o Editor fechado: pode voltar. Com o Editor aberto, confi
 git diff --name-only HEAD main -- '*.unity'
 ```
 
-Alguma cena aberta (`unity command list_open_scenes`) na lista: confira o `isDirty` de todas (a revisão não altera cena, então uma suja não é sua: pare e avise o programador) e troque a cena por uma vazia sem título (`NewScene`, comando na receita). Só então troque:
+Alguma cena aberta (`unity command scene list_open`) na lista: confira o `isDirty` de todas (a revisão não altera cena, então uma suja não é sua: pare e avise o programador) e troque a cena por uma vazia sem título (`NewScene`, comando na receita). Só então troque:
 
 ```bash
 git checkout main
 ```
 
-Se a cena foi trocada pela vazia, rode depois `unity command recompile` e `open_scene` do `Menu`, para não deixar o Editor na cena sem título.
+Se a cena foi trocada pela vazia, rode depois `unity command script recompile` e `scene open` do `Menu`, para não deixar o Editor na cena sem título.
 
 ## 7. Encerrar
 
