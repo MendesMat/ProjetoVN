@@ -12,6 +12,8 @@ namespace ProjetoVN.GameFlow
         [ScriptNode]
         [SerializeField] private string nodeName;
 
+        public bool HasNode => !string.IsNullOrWhiteSpace(nodeName);
+
         public void TriggerDialogue()
         {
             if (string.IsNullOrWhiteSpace(nodeName))

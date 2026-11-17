@@ -943,6 +943,10 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.Rooms.RoomExit, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Sala B (janela)
+      objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x
       value: 20
@@ -1836,17 +1840,9 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.Rooms.RoomExit, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.b
-      value: 0.9
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.g
-      value: 0.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.r
-      value: 0.8
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Sala B (passagem)
       objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1887,6 +1883,10 @@ PrefabInstance:
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
@@ -2045,17 +2045,9 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.g
-      value: 0.65001845
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.r
-      value: 1
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Chave
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
@@ -2100,6 +2092,10 @@ PrefabInstance:
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
@@ -2402,17 +2398,9 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.g
-      value: 0.10196579
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610264906688883528, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
-      propertyPath: m_Color.r
-      value: 0.3018868
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Porta da Sala B
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
@@ -2457,6 +2445,10 @@ PrefabInstance:
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4584047051500110873, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: m_Mesh
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4927568511473781550, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_Name
@@ -3246,6 +3238,10 @@ PrefabInstance:
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Luna
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName

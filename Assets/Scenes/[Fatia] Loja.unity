@@ -346,6 +346,10 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.InteractableDialogueTrigger, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: "M\xE1quina de caf\xE9"
+      objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
       value: loja_maquina_cafe
@@ -479,6 +483,10 @@ PrefabInstance:
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.InteractableDialogueTrigger, ProjetoVN.GameFlow
       objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Banheiro
+      objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
       value: loja_banheiro
@@ -579,6 +587,10 @@ PrefabInstance:
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.InteractableDialogueTrigger, ProjetoVN.GameFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: Atendente
       objectReference: {fileID: 0}
     - target: {fileID: 3767635908661548701, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: nodeName
@@ -817,6 +829,10 @@ PrefabInstance:
     - target: {fileID: 750652041598132640, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: ProjetoVN.GameFlow.Rooms.RoomExit, ProjetoVN.GameFlow
+      objectReference: {fileID: 0}
+    - target: {fileID: 3653295715336794080, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
+      propertyPath: displayName
+      value: "P\xE1tio"
       objectReference: {fileID: 0}
     - target: {fileID: 4254228175898647759, guid: 8f2f771bee673824db759bbd2e07e0af, type: 3}
       propertyPath: m_LocalPosition.x
