@@ -72,7 +72,7 @@ git diff --name-only HEAD main -- '*.unity'
 git diff --name-only HEAD origin/main -- '*.unity'
 ```
 
-Nenhuma cena aberta (`unity command list_open_scenes`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch; depois, `unity command recompile` e `open_scene` da cena que vai usar.
+Nenhuma cena aberta (`unity command list_open_scenes`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch; depois do `git pull --ff-only` (não entre o `checkout` e o `pull`: o `pull` pode mudar a cena reaberta), `unity command recompile` e `open_scene` da cena que vai usar.
 
 ```bash
 git checkout main

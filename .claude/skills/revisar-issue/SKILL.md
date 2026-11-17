@@ -184,21 +184,21 @@ Volte para `main` ao terminar, depois da mesma conferência:
 git diff --quiet HEAD main -- Packages/
 ```
 
-Saída `0`, ou `1` com o Editor fechado:
-
-```bash
-git checkout main
-```
-
 Saída `1` com o Editor aberto (ou qualquer outra saída): **não troque**. Deixe a branch do PR em checkout e avise o programador no encerramento (passo 7) que a volta para a `main` ficou para ele, com o Unity fechado. Aqui a sessão já terminou o trabalho, e não vale parar esperando resposta: foi este checkout que travou a sessão seguinte na primeira revisão da #5.
 
-Com o Editor aberto, confira também as cenas antes do `git checkout main` (passo 4 da receita, contra a `main`). Esta conferência a sessão resolve sozinha, sem esperar o programador: foi a volta para a `main` com a `[Fatia] Onibus` aberta que travou o CLI na revisão da #130.
+Saída `0`, ou `1` com o Editor fechado: pode voltar. Com o Editor aberto, confira antes as cenas (passo 4 da receita, contra a `main`). Esta conferência a sessão resolve sozinha, sem esperar o programador: foi a volta para a `main` com a `[Fatia] Onibus` aberta que travou o CLI na revisão da #130.
 
 ```bash
 git diff --name-only HEAD main -- '*.unity'
 ```
 
-Alguma cena aberta (`unity command list_open_scenes`) na lista: confira o `isDirty` de todas (a revisão não altera cena, então uma suja não é sua: pare e avise o programador), troque a cena por uma vazia sem título e faça o `git checkout main`; depois, `unity command recompile` e `open_scene` do `Menu`, para não deixar o Editor na cena sem título.
+Alguma cena aberta (`unity command list_open_scenes`) na lista: confira o `isDirty` de todas (a revisão não altera cena, então uma suja não é sua: pare e avise o programador) e troque a cena por uma vazia sem título (`NewScene`, comando na receita). Só então troque:
+
+```bash
+git checkout main
+```
+
+Se a cena foi trocada pela vazia, rode depois `unity command recompile` e `open_scene` do `Menu`, para não deixar o Editor na cena sem título.
 
 ## 7. Encerrar
 

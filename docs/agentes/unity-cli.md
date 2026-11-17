@@ -261,7 +261,7 @@ Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pac
 
 Se a troca de branch altera, cria ou apaga o `.unity` de uma cena que **está aberta** no Editor, o Editor fica com a versão da outra branch na memória e o disco com a desta. O que acontece depende de quem chama o `AssetDatabase.Refresh()` primeiro:
 
-- **Com um `Refresh`, o diálogo trava o CLI.** O Editor abre "The open scene(s) have been modified externally … Do you want to reload the scene(s)?", com **Reload** e **Ignore**, e a thread principal para. Todo comando do CLI expira com `Main thread operation timed out`, o `unity status` segue dizendo `ready` e o console enche de erros do CLI (73 na #187), nenhum do jogo. O agente não vê o diálogo, e o sintoma é igual ao do Test Runner e do Package Manager. Visto na revisão da #130, com a `[Fatia] Onibus` aberta e limpa, na volta da branch do PR para a `main`; só se fechou quando o programador clicou em **Reload**.
+- **Com um `Refresh`, o diálogo trava o CLI.** O Editor abre "The open scene(s) have been modified externally … Do you want to reload the scene(s)?", com **Reload** e **Ignore**, e a thread principal para. Todo comando do CLI expira com `Main thread operation timed out`, o `unity status` segue dizendo `ready` e o console enche de erros do CLI (73 na revisão da #130), nenhum do jogo. O agente não vê o diálogo, e o sintoma é igual ao do Test Runner e do Package Manager. Visto na revisão da #130, com a `[Fatia] Onibus` aberta e limpa, na volta da branch do PR para a `main`; só se fechou quando o programador clicou em **Reload**.
 - **Sem `Refresh`, o estrago é silencioso.** Nada abre, os comandos respondem, a cena segue `isDirty: false` e o Editor continua com a versão antiga na memória (medido: o `Item_Moeda`, que a branch nova não tem, continuou na cena). A próxima gravação da cena a escreve no disco por cima da versão da branch.
 
 **Quem chama o `Refresh` sem ninguém pedir** (lido no código do `com.unity.pipeline` 0.7.0-exp.1, `Library/PackageCache/com.unity.pipeline@ab05e9cd7f74/Editor/`; não medido):
@@ -302,12 +302,12 @@ Os comandos de trabalho (`/executar-issue`, `/revisar-issue`) fazem esta confer�
    git diff --quiet HEAD <destino> -- Packages/
    ```
 
+   A comparação cobre a pasta `Packages/` inteira, não só o `manifest.json`: o `manifest.json` e o `packages-lock.json` mudam juntos (a #5 mexeu nos dois) e a pasta guarda também o pacote embutido `com.merry-yellow.code-assist`. Uma diferença só no lock é rara e custa, no máximo, um fechar e reabrir à toa.
+
 3. Leia a saída (`echo $?` logo depois, no Git Bash):
    - **`0`:** `Packages/` é igual nas duas pontas. Siga para o passo 4 (cenas abertas) e troque de branch com o Editor aberto.
    - **`1`:** os pacotes mudam. Se o `unity status` lista um Editor com este projeto, **pare**: diga ao programador qual troca vai fazer e por quê (citando esta seção) e peça para ele fechar o Unity. Continue quando ele confirmar e o `unity status` não listar mais o projeto. Troque de branch e reabra com `unity open .` (sem pipe, como em [O Editor está conectado?](#o-editor-está-conectado)), repetindo `unity status` até `ready`. Se o Editor já estava fechado, troque direto. Nos dois casos o passo 4 não se aplica: sem Editor aberto não há cena na memória nem diálogo.
    - **Qualquer outra saída (`128` é a mais comum, de uma referência que não existe):** não é seguro. Faça o `git fetch origin`, confira o nome do destino e repita; não troque de branch antes de ter `0` ou `1`.
-
-A comparação cobre a pasta `Packages/` inteira, não só o `manifest.json`: o `manifest.json` e o `packages-lock.json` mudam juntos (a #5 mexeu nos dois) e a pasta guarda também o pacote embutido `com.merry-yellow.code-assist`. Uma diferença só no lock é rara e custa, no máximo, um fechar e reabrir à toa.
 
 4. **Cenas abertas (#187).** Só vale se a troca segue com o Editor aberto (com o Editor fechado, ou depois de o programador fechá-lo no passo 3, não há diálogo nem cena na memória). Use o **mesmo destino** do passo 2; na primeira execução, `main` **e** `origin/main`, por causa do `git pull`.
    1. Liste as cenas que mudam até o destino:
