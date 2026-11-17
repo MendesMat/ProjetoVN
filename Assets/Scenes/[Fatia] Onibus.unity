@@ -941,6 +941,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: ProjetoVN.GameFlow::ProjetoVN.GameFlow.Rooms.RoomArrivalDialogue
   nodeName: onibus_chegada
+  startsDark: 1
 --- !u!4 &1483160650
 Transform:
   m_ObjectHideFlags: 0

@@ -603,6 +603,7 @@ Na primeira chegada o jogador lê o pensamento; nas seguintes o nó para na prim
 - **Quando a conversa de chegada termina**, o jogador volta a explorar a sala, como depois de qualquer conversa. A pausa e o histórico funcionam nela.
 - **Só a chegada abre.** Para abrir uma conversa por outro motivo (tempo, uma variável, um item), peça pela [seção de pedidos](#como-pedir-o-que-ainda-não-existe): hoje não existe.
 - Dar **Play direto** numa sala no Editor, sem passar por uma troca de sala, não conta como chegada.
+- **Começar com a tela escura.** Uma sala pode chegar já com a tela preta, para o seu nó clarear aos poucos (o prólogo no ônibus é assim). **Quem liga isso é quem monta a cena**, no campo **Starts Dark** da sala ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)): peça no envio ("o nó `onibus_chegada` abre no ônibus **com a tela escura**"). Do seu lado, o nó começa por `<<clarear>>` (veja [Tela e imagens](#tela-e-imagens)). Se o seu nó não clarear a tela, ela clareia sozinha, em menos de meio segundo, quando a conversa termina.
 
 ### Mostrar um valor no texto
 
@@ -672,6 +673,17 @@ As tabelas abaixo são a lista completa. Cada linha aponta para a seção que ex
 | `<<tocar_efeito id>>` | Toca um som curto, uma vez, sem esperar ele acabar | [Música e sons](#música-e-sons) |
 | `<<tocar_ambiente id>>` | Começa um som de fundo que se repete, por baixo da música | [Música e sons](#música-e-sons) |
 | `<<parar_ambiente>>` | Faz o som de fundo sumir aos poucos | [Música e sons](#música-e-sons) |
+
+**Tela e imagens**
+
+Todos levam, no fim, a duração em segundos (opcional: sem ela, 1 segundo; `0` é na hora). O roteiro espera o efeito terminar antes da linha seguinte.
+
+| Comando | O que faz | Explicado em |
+|---|---|---|
+| `<<escurecer>>` ou `<<escurecer segundos>>` | Escurece a tela até o preto | [Tela e imagens](#tela-e-imagens) |
+| `<<clarear>>` ou `<<clarear segundos>>` | Tira o preto da tela, aos poucos | [Tela e imagens](#tela-e-imagens) |
+| `<<mostrar_imagem id>>` ou `<<mostrar_imagem id segundos>>` | Mostra uma imagem de tela cheia por cima da sala | [Tela e imagens](#tela-e-imagens) |
+| `<<esconder_imagem>>` ou `<<esconder_imagem segundos>>` | Faz a imagem sumir aos poucos e a sala voltar | [Tela e imagens](#tela-e-imagens) |
 
 **Perguntas para usar em uma condição**
 
@@ -837,6 +849,67 @@ As regras:
 
 Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela da sua lista. Copie o id daqui, sempre igual.
 
+### Tela e imagens
+
+Quatro comandos mexem no que aparece na tela durante a conversa: dois **escurecem e clareiam** a tela (um preto por cima da sala) e dois **mostram e escondem uma imagem de tela cheia** (uma lembrança, uma passagem de tempo, uma imagem de evento). A sala continua a mesma por baixo: o jogo não troca de cena no meio da conversa.
+
+Todos levam a **duração em segundos como último parâmetro, e ela é opcional**: sem ela, o efeito dura 1 segundo. Com `0`, acontece na hora. **Use ponto decimal, nunca vírgula**: `1.5` é um segundo e meio; `1,5` o jogo lê como **15**, sem avisar.
+
+**Clarear aos poucos uma sala que chegou escura** (o começo do prólogo; a sala precisa ter **Starts Dark** ligado, veja [Conversa de chegada](#conversa-de-chegada-a-sala-abre-o-nó-e-o-nó-decide)):
+
+```
+<<tocar_ambiente onibus_estrada>>
+<<clarear 3>>
+Pensamento: Em qualquer outro dia, esse cenário me deixaria mais calmo...
+```
+
+**Entrar numa lembrança:** escureça, mostre a imagem **com duração `0`** (ela entra por baixo do preto, sem o jogador ver) e clareie:
+
+```
+<<parar_ambiente>>
+<<escurecer 1.5>>
+<<mostrar_imagem lembranca_pais 0>>
+<<clarear 1.5>>
+Pai: Veja só o seu primo, sustentando a família!
+```
+
+**Voltar da lembrança:** esconda a imagem. A sala reaparece por baixo, enquanto a imagem some:
+
+```
+<<tocar_ambiente onibus_estrada>>
+<<esconder_imagem 2>>
+Pensamento: Espero ter feito a escolha certa, mãe...
+```
+
+**Trocar uma imagem por outra** com transição: passe pelo preto, como na lembrança (`<<escurecer>>`, `<<mostrar_imagem outra_imagem 0>>`, `<<clarear>>`). Pedir `<<mostrar_imagem>>` com outra imagem já na tela troca **na hora**, num corte seco.
+
+As regras:
+
+| Regra | Certo | Errado | O que acontece com o errado |
+|---|---|---|---|
+| A duração usa **ponto** | `<<clarear 1.5>>` | `<<clarear 1,5>>` | O jogo lê **15** segundos, sem erro. A verificação do jogo reprova o número com vírgula escrito no roteiro. |
+| A duração é um **número**, no fim | `<<clarear 3>>` | `<<clarear dois>>` | A verificação reprova; no jogo, a conversa **trava**. |
+| `<<mostrar_imagem>>` leva o **id**, e só ele antes da duração | `<<mostrar_imagem lembranca_pais 0>>` | `<<mostrar_imagem>>` | A verificação reprova; no jogo, a conversa **trava**. |
+| O id é escrito por extenso | `<<mostrar_imagem lembranca_pais>>` | `<<mostrar_imagem {$qual}>>` | A verificação do jogo reprova. |
+| O id está na [tabela abaixo](#imagens-que-existem) | `<<mostrar_imagem lembranca_pais>>` | `<<mostrar_imagem lembranca>>` | A verificação reprova. |
+| Duração **negativa** | `<<clarear 0>>` | `<<clarear -1>>` | O jogo avisa no console, trata como `0` e a conversa segue. |
+
+- **O clique não pula o efeito.** Enquanto a tela escurece ou clareia, a caixa fica com a última fala (e o `>>`), como num `<<wait>>`, e clicar não faz nada: o roteiro espera o efeito acabar.
+- **A pausa congela o efeito** e ele continua de onde parou quando o jogador retoma.
+- **O escuro e a imagem ficam atrás dos personagens e da caixa de diálogo**, e na frente da sala e do inventário. Dá para falar sobre o preto ou sobre a imagem.
+- **No fim da conversa, o que você deixou na tela some aos poucos**, em menos de meio segundo (escuro e imagem), mesmo que o seu nó não tenha clareado. Se a conversa for fechada no meio de um efeito, o mesmo vale. Mesmo assim, **termine o que começou**: o jogador que lê o roteiro espera o `<<clarear>>`.
+- **Nada disso entra no save nem no histórico de falas.** Salvar é recusado durante a conversa, então o jogo nunca guarda uma tela escura.
+- **Uma imagem por vez**, e a cor do escuro é sempre preta. Não existe, hoje, tirar um personagem de cena nem comandar a tela **fora** de uma conversa: se precisar, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
+- **O jogador não vê a imagem no VS Code:** a pré-visualização não mostra a tela. O programador confere no jogo.
+
+#### Imagens que existem
+
+| Id | O que é |
+|---|---|
+| `lembranca_pais` | A lembrança dos pais: fundo escuro com fumaça e as silhuetas do Pai e da Mãe (provisória; a arte definitiva vem depois, com o mesmo id) |
+
+Quando uma imagem nova entrar no jogo, o programador acrescenta uma linha a esta tabela. Copie o id daqui, sempre igual. Para pedir uma imagem nova, descreva o que deve aparecer num `// PEDIDO` (veja [Como pedir](#como-pedir-o-que-ainda-não-existe)).
+
 ## Convenções de nome
 
 | O quê | Formato | Exemplo |
@@ -849,6 +922,7 @@ Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela 
 | Variável | `$` + minúsculas, sem acento, dígitos e `_` | `$afinidade_luna` |
 | Id de item | minúsculas, sem acento, dígitos e `_` | `chave_teste` |
 | Id de som | minúsculas, sem acento, dígitos e `_` | `onibus_estrada` |
+| Id de imagem | minúsculas, sem acento, dígitos e `_` | `lembranca_pais` |
 | Quem fala | como na tabela [Quem fala](#quem-fala), com a mesma letra maiúscula ou minúscula | `Luna` |
 | Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
 | Opção de ação | `#acao` no fim da opção, depois do `<<if>>` se houver | `-> Abrir a porta <<if $x>> #acao` |
@@ -856,7 +930,7 @@ Quando um som novo entrar no jogo, o programador acrescenta uma linha à tabela 
 
 ## Como pedir o que ainda não existe
 
-Um item novo, uma música, um som, uma expressão, uma personagem nova: enquanto o jogo não tiver, **não invente o comando**. Um comando que não existe é ignorado pelo jogo (e a verificação o reprova), e um comando que existe mas foi escrito com o número errado de parâmetros trava a conversa.
+Um item novo, uma música, um som, uma imagem, uma expressão, uma personagem nova: enquanto o jogo não tiver, **não invente o comando**. Um comando que não existe é ignorado pelo jogo (e a verificação o reprova), e um comando que existe mas foi escrito com o número errado de parâmetros trava a conversa.
 
 Deixe um comentário `// PEDIDO:` no ponto exato do roteiro, dizendo o que deve acontecer ali:
 
@@ -929,6 +1003,8 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | O comando de item tem um id, e só um? | `<<dar_item>>`, `<<dar_item chave_teste mapa>>` | A verificação reprova; no jogo, a conversa **trava**. |
 | O id do som existe na [tabela de sons](#música-e-sons), na lista do comando? | `<<tocar_efeito chuva>>`, `<<tocar_efeito onibus_estrada>>` | A verificação do jogo reprova. |
 | Os comandos de som têm o que precisam? | `<<tocar_efeito>>`, `<<tocar_efeito a b>>`, `<<parar_ambiente x>>` | A verificação reprova; no jogo, a conversa **trava**. |
+| O id da imagem existe na [tabela de imagens](#imagens-que-existem)? | `<<mostrar_imagem lembranca>>`, `<<mostrar_imagem {$qual}>>` | A verificação do jogo reprova. |
+| A duração dos comandos de tela é um número com ponto, no fim? | `<<clarear 1,5>>` (vira 15), `<<clarear dois>>`, `<<mostrar_imagem>>` | A verificação reprova; com o tipo ou o número errado, no jogo a conversa **trava**. |
 | Todo comando existe e tem o número certo de parâmetros? | `<<dar_iten chave_teste>>`, `<<assinar_lista x>>`, `<<remover_item a b>>` | A verificação reprova; com o número errado de parâmetros, no jogo a conversa **trava**. |
 | `tem_item` está escrito certo? | `tem_itm("chave_teste")` | O jogo falha na hora da conversa. |
 | O nome do nó é minúsculo e sem acento? | `title: Luna_Oi` | A verificação reprova. |

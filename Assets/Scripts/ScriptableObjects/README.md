@@ -27,6 +27,11 @@ As definições das classes e a lógica desses objetos (como `ItemDataSO`) resid
   - Um som que o roteiro cita precisa estar na lista certa do comando (um id de efeito não vale em `<<tocar_ambiente>>`). Um teste EditMode acusa o id que não está lá, com o nó.
   - **Quem cria um som acrescenta a linha dele na tabela "Sons que existem" de [roteiro.md](../../../docs/autoria/roteiro.md#música-e-sons)** (id e uma frase). É dali que o roteirista copia o id. Passo a passo em [salas.md](../../../docs/autoria/salas.md#sons-para-o-roteiro-20).
 
+- **`Pictures/`** (#71): o `PictureRegistry.asset`, uma lista de `PictureEntry` (um **id** e um `Sprite`). A classe mora no módulo `GameFlow` (`GameFlow/ScreenEffects`). O roteiro pede a imagem de tela cheia pelo id (`<<mostrar_imagem id>>`). Os PNGs ficam em `Assets/Sprites/Imagens/<id>.png`.
+  - O **id** de uma imagem é em minúsculas sem acento, com dígitos e `_` (`lembranca_pais`), único no registro (D-22). O registro avisa id vazio, fora do formato ou repetido, e sprite vazio, e um teste EditMode reprova os três.
+  - Uma imagem que o roteiro cita precisa estar no registro. Um teste EditMode acusa o id que não está lá, com o nó.
+  - **Quem cria uma imagem acrescenta a linha dela na tabela "Imagens que existem" de [roteiro.md](../../../docs/autoria/roteiro.md#imagens-que-existem)** (id e uma frase). É dali que o roteirista copia o id. Passo a passo em [salas.md](../../../docs/autoria/salas.md#imagens-para-o-roteiro-71).
+
 ---
 
 ## Fluxo e Boas Práticas

@@ -93,6 +93,7 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Scripts/<Módulo>/` | Código, um asmdef por módulo |
 | `Assets/Scripts/ScriptableObjects/` | Assets de conteúdo (itens, personagens) |
 | `Assets/Sprites/Personagens/<personagem>/` | Arte de personagem, `<personagem>_<expressão>.png` |
+| `Assets/Sprites/Imagens/` | Imagens de tela cheia que o roteiro pede (`<<mostrar_imagem id>>`), `<id>.png`, 16:9, registradas no `PictureRegistry` |
 | `Assets/Scenes/[Teste] Mecanicas.unity` | Cena de referência, com todas as mecânicas atuais |
 | `Assets/Scenes/[Fatia] Onibus.unity`, `[Fatia] Posto.unity` | As duas salas provisórias da fatia vertical; o Novo Jogo começa no ônibus |
 | `Assets/Fonts/<família>/` | Fontes `.ttf`, licenças e font assets do TextMeshPro (atlas dinâmico; Atkinson Hyperlegible Next e Cinzel) |
