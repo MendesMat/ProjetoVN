@@ -4,22 +4,22 @@ Este módulo guarda os testes automatizados do projeto (Unity Test Framework), e
 
 > **Antes de escrever testes:** [regras de comunicação](../../../docs/arquitetura/visao-geral.md#regras-de-comunicação) · [decisão D-24, sobre testes](../../../docs/arquitetura/decisoes.md#d-24--testes) · [como a TDD se aplica aqui](../../../docs/agentes/skills.md#como-a-tdd-se-aplica-aqui)
 
-**Antes de rodar qualquer suíte, confira as cenas abertas** com `unity command list_open_scenes`: uma cena aberta suja, ativa ou aditiva, faz o Test Runner abrir um diálogo que trava o Editor e o CLI. O que fazer com cada caso: [receita](../../../docs/agentes/unity-cli.md#rodar-a-suíte-playmode), parágrafo "Antes de cada `run_tests`".
+**Antes de rodar qualquer suíte, confira as cenas abertas** com `unity command scene list_open`: uma cena aberta suja, ativa ou aditiva, faz o Test Runner abrir um diálogo que trava o Editor e o CLI. O que fazer com cada caso: [receita](../../../docs/agentes/unity-cli.md#rodar-a-suíte-playmode), parágrafo "Antes de cada `test run`".
 
 Os testes EditMode vivem em `EditMode/` e rodam pela janela **Window → General → Test Runner**, aba *EditMode*, ou pelo Unity CLI:
 
 ```bash
-unity command run_tests --mode EditMode --timeout 180
+unity command test run --mode editor --timeout 180
 ```
 
 Os testes PlayMode vivem em `PlayMode/`, aba *PlayMode*, e pelo CLI só rodam de forma assíncrona ([receita](../../../docs/agentes/unity-cli.md#rodar-a-suíte-playmode)):
 
 ```bash
-unity command run_tests --mode playmode --async_tests true --timeout 300
+unity command test run --mode playmode --async-tests true --timeout 300
 ```
 
 ```bash
-unity command test_status
+unity command test status
 ```
 
 ### Suíte EditMode
@@ -152,7 +152,7 @@ Desde a #80 a classe é uma fixture parametrizada que roda **duas vezes**: a **1
 
 **Não clique no Editor durante a suíte PlayMode** (#81): com a Game view sem foco o `UnfocusedFrameRateLimiter` limita o jogo a 30 FPS e desliga o VSync; uma fixture a 10 FPS guardaria `(0, 10)`, receberia `(0, 30)` e reprovaria o `FrameRate_IsTheOneThisFixtureAsked`. Sob o CLI a Game view fica com o foco e isso não acontece ([detalhes](../../../docs/agentes/unity-cli.md#o-limite-de-fps-sem-foco-81)).
 
-**Um teste que pausa e esquece de retomar trava os seguintes:** o `TearDown` do `PauseTests`, o do `MusicTests` e o do `SoundTests` retomam a pausa e conferem o `timeScale`. O tamanho da suíte é o que o `test_status` informa; cada teste do `RoomChangeTests` conta duas vezes, um caso por modo de FPS.
+**Um teste que pausa e esquece de retomar trava os seguintes:** o `TearDown` do `PauseTests`, o do `MusicTests` e o do `SoundTests` retomam a pausa e conferem o `timeScale`. O tamanho da suíte é o que o `test status` informa; cada teste do `RoomChangeTests` conta duas vezes, um caso por modo de FPS.
 
 Regras próprias (D-24): o `SetUp` zera o inventário e os consumidos **pelos donos**, nunca por `MessageBroker.Clear()` (apagaria as assinaturas dos managers vivos); o teste só lê o `PlayerInputGate` (D-28); a espera de uma troca tem limite de 10 s e falha dizendo em que sala parou; o `TearDown` espera uma troca pendente acabar **e zera o `StoryState`** (`StoryState.ClearAll()`: ele é o próprio dono do estado estático, e os testes do `StartNewGame` escrevem nele; por isso o `Tests.PlayMode.asmdef` referencia o `ProjetoVN.Core`, autorizado na #17). **FPS e VSync:** o `SetUp` os aplica como **última instrução** (se um `SetUp` falha, o NUnit não roda o `TearDown`, e um FPS aplicado antes ficaria para o teste seguinte); o `TearDown` os devolve **primeiro**, antes da espera (um `Assert.Fail` na espera interromperia o resto do método). Não chame `AssetDatabase.SaveAssets()` com o `vSyncCount` alterado: no Editor, `QualitySettings` é um asset de `ProjectSettings/`. A fase vermelha de cada teste é uma sabotagem temporária do código de jogo (descrita no PR), nunca commitada.
 

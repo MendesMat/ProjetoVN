@@ -72,7 +72,7 @@ git diff --name-only HEAD main -- '*.unity'
 git diff --name-only HEAD origin/main -- '*.unity'
 ```
 
-Nenhuma cena aberta (`unity command list_open_scenes`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch; depois do `git pull --ff-only` (não entre o `checkout` e o `pull`: o `pull` pode mudar a cena reaberta), `unity command recompile` e `open_scene` da cena que vai usar.
+Nenhuma cena aberta (`unity command scene list_open`) na lista: siga. Alguma na lista: confira o `isDirty` de todas, troque a cena por uma vazia sem título (`NewScene`, comando na receita) e só então troque de branch; depois do `git pull --ff-only` (não entre o `checkout` e o `pull`: o `pull` pode mudar a cena reaberta), `unity command script recompile` e `scene open` da cena que vai usar.
 
 ```bash
 git checkout main
@@ -111,24 +111,24 @@ unity status
 ```
 
 ```bash
-unity command list_open_scenes
+unity command scene list_open
 ```
 
-Todas as cenas com `isDirty: false`? Siga. Na linha de base você ainda não alterou nada, então uma cena suja **não é sua**: pare e avise o programador, sem gravar e sem rodar a suíte. O motivo e a receita estão no parágrafo "Antes de cada `run_tests`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`.
+Todas as cenas com `isDirty: false`? Siga. Na linha de base você ainda não alterou nada, então uma cena suja **não é sua**: pare e avise o programador, sem gravar e sem rodar a suíte. O motivo e a receita estão no parágrafo "Antes de cada `test run`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`.
 
 ```bash
-unity command run_tests --mode EditMode --timeout 180
-```
-
-```bash
-unity command run_tests --mode playmode --async_tests true --timeout 300
+unity command test run --mode editor --timeout 180
 ```
 
 ```bash
-unity command test_status
+unity command test run --mode playmode --async-tests true --timeout 300
 ```
 
-A PlayMode só roda assíncrona: repita o `test_status` até `completed` (receita em `docs/agentes/unity-cli.md`).
+```bash
+unity command test status
+```
+
+A PlayMode só roda assíncrona: repita o `test status` até `completed` (receita em `docs/agentes/unity-cli.md`).
 
 Se a linha de base já falha, pare e avise o programador.
 
@@ -159,8 +159,8 @@ Regras:
 
 Faça de verdade; não declare sem executar.
 
-1. Recompile e confira que não há erro: `unity command recompile`, depois `unity command recompile_status`.
-2. Confira as cenas abertas: `unity command list_open_scenes`, com `isDirty: false` em todas. Cena suja por alteração sua, grave com `unity command save_scene --path <cena>` (ou `save_all`; sem `--path`, o `save_scene` grava só a cena ativa) e confira o `.unity` por `grep`; cena suja que você não sabe de quem é, pare e avise o programador (parágrafo "Antes de cada `run_tests`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`). Depois rode as duas suítes inteiras: `unity command run_tests --mode EditMode --timeout 180` e, depois, `unity command run_tests --mode playmode --async_tests true --timeout 300`, repetindo `unity command test_status` até `completed`.
+1. Recompile e confira que não há erro: `unity command script recompile`, depois `unity command script recompile_status`.
+2. Confira as cenas abertas: `unity command scene list_open`, com `isDirty: false` em todas. Cena suja por alteração sua, grave com `unity command scene save --path <cena>` (ou `editor save_all`; sem `--path`, o `scene save` grava só a cena ativa) e confira o `.unity` por `grep`; cena suja que você não sabe de quem é, pare e avise o programador (parágrafo "Antes de cada `test run`" da seção "Rodar a suíte PlayMode" de `docs/agentes/unity-cli.md`). Depois rode as duas suítes inteiras: `unity command test run --mode editor --timeout 180` e, depois, `unity command test run --mode playmode --async-tests true --timeout 300`, repetindo `unity command test status` até `completed`.
 3. Execute o roteiro de verificação em Play Mode do levantamento, passo a passo. Se algum passo depender de frames, confira antes que o jogo avança (`Time.frameCount` lido duas vezes, ver `docs/agentes/unity-cli.md`); não atribua `Application.runInBackground`, que grava o `ProjectSettings`.
 4. Confira cada critério de aceite da issue, um por um.
 5. Confira `git status`: todo arquivo novo em `Assets/` tem o seu `.meta`, e nenhum arquivo alterado pelo Editor sem relação com a issue entra no commit.
