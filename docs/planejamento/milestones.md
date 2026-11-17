@@ -34,9 +34,10 @@ M0 Fundação
 
                                                                                M14 Arte pendente (portão, sem dependência)
                                                                                M15 Comandos de roteiro com lista (portão, sem dependência)
+                                                                               M16 Roteiro pendente (portão, sem dependência)
 ```
 
-**A M8 foi reaberta em 2026-11-17** para a #175 e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua quando a M8 fechar de novo.
+**A M8 foi reaberta duas vezes em 2026-11-17,** primeiro para a #175 e depois para a #187, e volta a ser a milestone em andamento: ela vem antes da M11 na sequência, então a M11 só continua (com a #186) quando a M8 fechar de novo.
 
 M4 e M5 dependem ambas de M3 e não uma da outra. Pela regra de uma milestone por vez, M4 vem antes.
 
@@ -45,6 +46,8 @@ A M13 depende só da M9 e tem um portão: **abre quando um roteiro pedir a camad
 A M14 não depende de nenhuma milestone e também tem portão: **abre quando a arte entregar o que as issues dela pedem.** Ela guarda o que espera arte e não exige código; quando a entrega chegar, entra na fila na posição que o programador escolher.
 
 A M15 também não depende de nenhuma milestone aberta e tem portão de roteiro: **abre quando um roteiro pedir um comando que receba uma lista de números ou de booleanos** (um `params` de tipo diferente de `string`), pela D-27. Quando o pedido chegar, ela entra na fila antes da issue que criar esse comando.
+
+A M16 também não depende de nenhuma milestone aberta e tem portão de roteiro, de outro tipo: **abre quando o roteirista entregar o texto que as issues dela pedem.** É a M14 do roteiro: guarda o que espera uma entrega de fora e não exige código. Quando o texto chegar, entra na fila na posição que o programador escolher.
 
 A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloqueada por" entre as issues abertas: a página de cada issue mostra o que precisa fechar antes dela.
 
@@ -78,6 +81,7 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
     - **A #162** fecha os dois furos do teste de guarda da regra 8 (classe `[Serializable]` de outro módulo e a base dela). É do mesmo tipo da #105 e da #37, e a M10 e a M11 criam componentes novos que o teste deve cobrir por inteiro.
   - **A #171 fecha a milestone,** pela triagem pedida pelo programador em 2026-11-16, depois do PR #172. Veio da revisão da #166: a receita da suíte em `unity-cli.md` confere só a cena ativa antes do `run_tests`, enquanto a receita de "Abrir e salvar cena", escrita pela #166, confere todas as cenas abertas. A receita da suíte é seguida em toda issue, e um diálogo do Test Runner trava o Editor dirigido pelo CLI. É só documentação, com uma medição antes, e não disputa arquivo com nada aberto.
   - **A #175 reabre a milestone,** pela reorganização de 2026-11-17, em que o programador pediu de novo que nenhuma issue ficasse sem milestone. Veio da revisão da #171: a conferência das cenas abertas antes da suíte está só em `unity-cli.md`, e as portas de entrada que mandam rodar o `run_tests` (`CLAUDE.md` e as skills `executar-issue` e `revisar-issue`) não falam dela. A suíte roda duas vezes por sessão, e um diálogo do Test Runner obriga a reiniciar o Unity: é o tipo de ferramenta que custa tempo a cada sessão, por isso entra na M8 e vem antes do resto da M11. O levantamento começa por uma decisão do programador: pôr a conferência nas três portas de entrada ou só apontar para `unity-cli.md`, como hoje.
+  - **A #187 reabre a milestone de novo,** pela reorganização pedida pelo programador em 2026-11-17, depois do PR #185. Veio da revisão da #130: trocar de branch com uma cena aberta que muda entre as duas pontas abre o diálogo "reload the scene(s)" do Editor, que trava o CLI até o programador clicar, e a receita "Antes de trocar de branch" de `unity-cli.md` só confere `Packages/`. Toda revisão termina trocando de branch e toda issue que monta sala muda uma cena, então é o mesmo tipo da #175: custa uma ida e volta com o programador a cada vez que acontece. Vem antes da #186 (M11), cuja revisão também troca de branch. As duas mexem em `unity-cli.md`, em seções diferentes ("Antes de trocar de branch" e "Jogar a build por script"), e a ordem das milestones já as põe uma depois da outra.
 - **O acabamento da fatia (M9) vem em seguida** porque é o que o jogador e quem monta sala veem de errado hoje.
   - **A #108 abre a milestone:** é o defeito mais visível (o pan do posto mostra o vazio preto) e corrige os limites que o passo a passo de `salas.md` manda copiar.
   - **A #96 e a #56** mexem no menu, na pausa e na placa de nome. A #56 decidiu a placa com uma cor só.
@@ -90,13 +94,19 @@ A coluna "Depende de" das tabelas também está registrada no GitHub, como "bloq
 - **O prólogo do ato 1 (M11) vem depois dos efeitos e antes da entrega.** O roteirista mandou um texto novo do prólogo em 2026-11-13: a Cena 1 é a que já está no jogo, e a Cena 2 (o pátio do posto e a loja de conveniência) substitui o conteúdo provisório do posto (#21). Ela usa a conversa de chegada (#127), e a entrega sai melhor com o prólogo de verdade do que com a Luna e a moeda provisórias. Decisões do programador no planejamento: as opções do roteiro são objetos clicáveis no cenário, e não opções de diálogo (são cinco, e uma é secreta, o que a D-11 não permite); a compra na loja é um bloco de opções com `<<dar_item>>`, sem tela de loja; e **o roteiro é fiel ao texto**, então a fatia deixa de ter a escolha de afinidade e o puzzle de item, que os roteiristas vão tratar depois. Priorizadas pelo programador em 2026-11-13.
   - **A #128 abre a milestone** porque é código sem portão: o objeto que aparece quando uma variável liga, para a ida a pé, liberada por falar com o motorista. Ela depende da #134 (M8), para o campo de variável dela nascer coberto pelo teste de conteúdo.
   - **A #129 tem portão:** o roteirista envia o texto final ao programador, que o passa ao agente, e o `.yarn` é organizado a partir dele (esse texto entra pela issue, não por um PR de roteiro). Ela cria também os personagens, os sons e os itens que o roteiro cita, porque os testes dos roteiros reprovam o que não existe.
-  - **A #130 fecha a milestone:** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
+  - **A #130** monta as salas com os nós da #129, o objeto da #128 e a conversa de chegada da #127, tira o conteúdo provisório do posto e atualiza a fatia vertical e o roteiro de ponta a ponta. Depende também da #108 (M9), para o pan das salas não mostrar o vazio preto.
+  - **A #186 fecha a milestone.** Veio da revisão da #130 (PR #185), que pediu mudanças porque o percurso novo foi medido só no Editor, por `eval`, e não foi jogado numa build. Nela, um agente gera a build de Windows e joga o roteiro de `ponta-a-ponta.md` inteiro por script. Fica na M11, e não na M12, porque é a verificação que fecha o prólogo: o que ela achar vira issue antes de a primeira entrega começar.
+  - **O texto que o roteirista ainda não mandou (#182 e #183)** fica fora da M11, na M16, pelo mesmo motivo da #131: a #129 entregou nós provisórios com `// PEDIDO` no lugar das três conversas do pátio e dos produtos da loja, o percurso funciona com eles, e a M11 não deve esperar uma entrega de fora para fechar.
   - **A fonte de caneta da lista de passageiros (#131)** fica fora da M11, na M14, até a arte entregar a fonte: ela não muda nada do percurso, e a M11 não deve esperar uma entrega de fora para fechar.
 - **A primeira entrega (M12) vem por último** porque só faz sentido entregar a fatia a alguém de fora depois de ela estar limpa (M9), com a abertura completa (M10) e com o prólogo de verdade (M11). A #89 vem antes da #109: com o jogo nas mãos de outra pessoa, o save passa a ter progresso a perder. A #89 parte do `GameSaveManager` já com o reset da #36; a #109 parte da receita de build corrigida na #124 e do pan corrigido na #108.
   - **A #157 abre a milestone,** pela triagem de 2026-11-16. Em telas mais largas que 16:9 (um monitor 21:9, comum no desktop) o fundo das salas não cobre a tela, e o jogador vê o vazio preto que a #108 corrigiu só para 16:9. Ela começa por uma decisão de política do programador (aceitar só 16:9, tarjas fixas ou arte para 21:9) e pode mudar a câmera de todas as salas. Por isso vem antes da #109: a build entregue já sai com a política escolhida.
 - **A camada de horror (M13) tem portão,** como a M1 teve: ela abre só quando um roteiro pedir (D-27). Depende da M9, porque a placa de nome tem variantes de horror e a #56 decidiu que o nome na placa normal tem uma cor só (`#FFF3FB`).
 - **A arte pendente (M14) tem portão de arte,** e não de roteiro: ela guarda as issues que esperam um arquivo da arte e não exigem código. Nasceu na reorganização de 2026-11-15 para a #131, que antes era a única issue do backlog sem portão próprio. A #177 entrou nela na reorganização de 2026-11-17: veio da execução da #71, que pôs no prólogo uma lembrança dos pais desenhada por script e deixou o ônibus com o fundo provisório (uma sala de aula). Trocar a imagem mantém o id e o roteiro, e trocar o fundo do `[Fatia] Onibus` é montagem de sala pelo agente; nenhuma das duas exige código. As duas issues da M14 não dependem uma da outra: entra primeiro a que tiver a arte entregue antes. Se a arte da #177 chegar antes da primeira entrega (M12), vale pô-la antes da #109, para a build entregue já abrir com a arte definitiva.
 - **Os comandos de roteiro com lista (M15) têm portão de roteiro (D-27).** Guardam a #155 e a #156, que mexem no teste dos comandos de roteiro e saíram da M10 sem milestone. A #155 só faz diferença quando existir um comando com `params` de tipo diferente de `string`; a #156 é uma condição repetida no mesmo arquivo e, pela relação registrada no GitHub, vem depois da #155, no mesmo PR ou logo em seguida. Elas não ganharam uma milestone sem portão porque a decisão do levantamento da #71, confirmada pelo programador em 2026-11-16, foi esperar o primeiro comando assim.
+- **O roteiro pendente (M16) tem portão de roteiro,** como a M14 tem o de arte: guarda as issues que esperam um texto do roteirista e não exigem código. Nasceu na reorganização de 2026-11-17, quando o programador decidiu que a primeira entrega (M12) não espera o texto final do prólogo. As duas issues vieram da #129, que escreveu em `.yarn` a Cena 2 do prólogo com o que o roteirista tinha mandado e marcou o que faltava com `// PEDIDO`.
+  - **A #182** é o texto das três opções do pátio (os caminhoneiros, esperar o mecânico e ir andando) e **onde a Cena 2 termina.** A resposta pode pedir sala nova, fim de capítulo ou mecânica nova, e cada uma vira issue própria, com `triagem`, para o programador priorizar. Com as falas, os caminhoneiros viram `CharacterSO` (D-27).
+  - **A #183** é a lista de produtos da loja, que hoje são três provisórios (`salgadinho`, `refrigerante` e `chocolate`). A arte dos ícones fica para a etapa de arte.
+  - As duas não dependem uma da outra nem disputam arquivo: entra primeiro a que tiver o texto entregue antes. Se o texto chegar antes da #109 (M12), vale pô-lo antes dela, para a build entregue já ter o prólogo final. Se a #183 trocar o `salgadinho`, os passos de `ponta-a-ponta.md` que o citam (11, 13 e 15) mudam junto.
 
 ## M0 — Fundação
 
@@ -204,6 +214,7 @@ O que custa tempo a cada sessão e o que protege quem produz conteúdo. Nada mud
 | #162 | Teste de guarda dos tooltips não olha classe [Serializable] de outro módulo nem a base dela | #52 |
 | #171 | unity-cli.md: a conferência antes da suíte olha só a cena ativa, não as aditivas | #166 |
 | #175 | CLAUDE.md e as skills de trabalho rodam a suíte sem conferir as cenas abertas antes | #171 |
+| #187 | Trocar de branch com uma cena aberta que muda trava o CLI no diálogo de recarregar a cena | — |
 
 ## M9 — Acabamento da fatia
 
@@ -235,6 +246,7 @@ O prólogo do ato 1 no texto novo do roteirista: a Cena 1 conferida e a Cena 2, 
 | #128 | Objeto de cena que aparece quando uma variável da história liga | #134 |
 | #129 | Prólogo do ato 1: o texto novo do roteirista em .yarn, com personagens, sons e itens | Portão: o texto final do roteirista |
 | #130 | Prólogo do ato 1: montar o pátio do posto e a loja de conveniência, e tirar o conteúdo provisório do posto | #127, #128, #129, #108 |
+| #186 | Jogar a fatia vertical numa build de Windows com um agente, por script | #130 |
 
 ## M12 — Primeira entrega
 
@@ -271,6 +283,15 @@ A fatia vertical, já com o prólogo do ato 1, pronta para ir a alguém de fora,
 |---|---|---|
 | #155 | Teste dos comandos: num params, o problema de tipo cita o número do parâmetro, não a posição da palavra | Portão: o primeiro comando com `params` de tipo diferente de `string` |
 | #156 | ScriptCommandParameter: a condição da vírgula decimal está escrita duas vezes | #155 |
+
+## M16 — Roteiro pendente
+
+**Portão:** abre quando o roteirista entregar o texto que a issue pede. O que espera roteiro e não exige código. As issues ficam com `triagem` até lá; o que o texto pedir de novo (sala, personagem, mecânica) vira issue própria.
+
+| Issue | Título | Depende de |
+|---|---|---|
+| #182 | Prólogo: o texto final dos caminhoneiros, de esperar o mecânico e de ir andando, e o fim da Cena 2 | Portão: o texto do roteirista |
+| #183 | Prólogo: os produtos da loja de conveniência do posto | Portão: a lista de produtos do roteirista |
 
 ## Riscos conhecidos
 
