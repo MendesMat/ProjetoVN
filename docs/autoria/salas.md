@@ -24,6 +24,42 @@ O objeto cresce um pouco no hover (**Highlight Scale Multiplier**: 1 = não cres
 
 Todo campo do componente tem tooltip: passe o mouse sobre o nome do campo no Inspector para ver o que ele é, um exemplo e o que acontece vazio.
 
+## Rótulo de placeholder (#191)
+
+Enquanto um objeto interativo ainda é o quadrado do prefab `Interactable`, ele mostra sobre si um **rótulo sempre visível, de duas linhas**: o **tipo** (`CONVERSA`, `SAÍDA`, `ITEM`, `PORTA TRANCADA`, `OBJETO`) e um **nome** legível (`Motorista`, `Loja`). Quem testa uma build sabe o que existe na sala e o que cada clique faz, sem passar o mouse em cada quadrado. O prefab já traz o componente **Placeholder Label** e o filho `Label` (um `TextMeshPro` de mundo, Atkinson Hyperlegible Next, com contorno escuro): uma sala nova **já nasce com o rótulo**, e quem monta só escreve o nome.
+
+- **Display Name** é o único campo que você preenche, **à mão e em português**. Numa saída, escreva **para onde ela leva** (`Loja`, `Pátio`). Vazio: o rótulo mostra `(sem nome)`, o console avisa e o teste `PlaceholderLabelsTests` reprova a sala (a cena e o caminho do objeto). O campo **Label** (o filho de texto) já vem ligado no prefab; vazio = objeto sem rótulo, com erro no console.
+- **O tipo vem dos componentes que o objeto já tem**, não de um campo, para nunca ficar desatualizado. Um objeto com mais de um papel mostra **um tipo só**, o primeiro desta ordem (a ordem em que o clique decide: o portão confere a tranca antes de tudo):
+
+  | Ordem | Componente no objeto | Tipo | Cor do quadrado |
+  |---|---|---|---|
+  | 1 | **Locked Action Behaviour** | `PORTA TRANCADA` | vermelho `#E04A4A` |
+  | 2 | **Room Exit** | `SAÍDA` | roxo `#9B51E0` |
+  | 3 | **Collectable Item Behaviour** | `ITEM` | amarelo `#F2C230` |
+  | 4 | **Interactable Dialogue Trigger** com **Node Name** preenchido | `CONVERSA` | azul `#2F80ED` |
+  | 5 | nenhum dos quatro | `OBJETO` | cinza `#9E9E9E` |
+
+  O gatilho só conta **com nó**, porque todo objeto feito do prefab traz um gatilho vazio (sem isso, toda saída e todo objeto novo seriam `CONVERSA`). Uma saída que leva a outra sala por uma porta trancada (`Porta_Onibus`) é `PORTA TRANCADA`; um item com fala de reação (`Item_Chave`) é `ITEM`.
+- **O quadrado muda para a cor do tipo** quando a sala carrega, e a cor que estiver gravada na instância não conta (o `Item_Chave`, a `Door_PortaTrancada` e o `Exit_Passagem` da `[Teste] Mecanicas` tinham cor própria e voltaram à do prefab). **O verde é do `PlaceholderTint`** e quer dizer "porta aberta": nenhum tipo usa verde, e a porta aberta continua mostrando `PORTA TRANCADA` (quem diz que abriu é o verde; o tipo não muda com o estado). Para quem não distingue vermelho de verde, a diferença entre trancada e aberta fica fraca: aceito por ser provisório.
+- **Sem seta no nome.** `→` e `←` **não existem** na Atkinson Hyperlegible Next (têm `› » · •` e os acentos). Um caractere que a fonte não tem faria o TextMeshPro criar, em tempo de execução, um filho de reserva que o **Hidden Until Story Flag** não esconde. O `PlaceholderLabelsTests` reprova o nome com um caractere assim.
+- **Objeto escondido e coletável recolhido:** nada a fazer. O rótulo é um **filho do prefab**, não criado em tempo de execução: o **Hidden Until Story Flag** o esconde e o mostra junto com o quadrado, e o coletável recolhido desativa o objeto inteiro, rótulo incluso.
+- **Hover:** o objeto cresce 15% e o rótulo cresce junto; o destaque (`Highlight`) continua atrás do quadrado e o rótulo na frente (ordem de desenho 0, 1 e 2).
+- **Tirar o placeholder quando a arte chegar**, objeto a objeto: (1) na instância, remova o componente **Placeholder Label** e o filho `Label`; (2) troque o sprite; (3) volte a **Color** do **Sprite Renderer** para branco (o componente pintava o quadrado). O clique, o hover, o portão e o escondido não conhecem o rótulo e seguem funcionando. O teste deixa de cobrar o objeto porque o sprite deixou de ser o quadrado.
+- **O que o teste confere:** em toda cena do build, todo objeto com collider cujo sprite é o quadrado de placeholder tem o rótulo (componente e filho), um **Display Name** preenchido e só com caracteres que a fonte desenha. Collider é o critério porque é por ele que o mouse acha o objeto: o contorno e o fundo da `[Teste] Sala B` usam o mesmo sprite sem collider.
+
+Os nomes das salas de teste (as da fatia estão nas tabelas de [Passo a passo: a fatia vertical](#passo-a-passo-a-fatia-vertical)):
+
+| Cena | Objeto | Tipo | Display Name |
+|---|---|---|---|
+| `[Teste] Mecanicas` | `NPC_Luna` | `CONVERSA` | `Luna` |
+| | `Item_Chave` | `ITEM` | `Chave` |
+| | `Door_PortaTrancada` | `PORTA TRANCADA` | `Porta da Sala B` |
+| | `Exit_Passagem` | `SAÍDA` | `Sala B (passagem)` |
+| | `Exit_Janela` | `SAÍDA` | `Sala B (janela)` |
+| `[Teste] Sala B` | `Porta_Trancada` | `CONVERSA` | `Porta` |
+| | `Exit_Porta` | `SAÍDA` | `Mecânicas (porta)` |
+| | `Exit_Janela` | `SAÍDA` | `Mecânicas (janela)` |
+
 ## Coletável
 
 Um objeto que vira item do inventário ao ser clicado.
@@ -120,7 +156,7 @@ Um objeto interativo que **não existe para o jogador** até uma variável de hi
 - Um coletável já recolhido continua sumido: o componente de coleta desativa o objeto, e isso vence.
 - O componente esconde o `Sprite Renderer` e o `Box Collider 2D` (e os dos filhos) **que estão ligados**; o que a arte deixou desligado de propósito continua desligado.
 
-Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo, à direita da porta) só aparece depois de falar com a Luna e escolher "Sim" (`$falou_com_luna`); clicar nele leva à `[Teste] Sala B`. Outro exemplo é a `Estrada` do pátio, em `[Fatia] Posto`: só aparece ao fim da conversa com o motorista (`$falou_com_motorista`, ligada pelo roteiro), e clicar nela abre a narração `posto_ir_andando`.
+Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo `SAÍDA / Sala B (passagem)`, à direita da porta) só aparece depois de falar com a Luna e escolher "Sim" (`$falou_com_luna`); clicar nele leva à `[Teste] Sala B`. Outro exemplo é a `Estrada` do pátio, em `[Fatia] Posto`: só aparece ao fim da conversa com o motorista (`$falou_com_motorista`, ligada pelo roteiro), e clicar nela abre a narração `posto_ir_andando`.
 
 ## Pan do cenário
 
@@ -313,9 +349,9 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints`, `Room Music` e, se a sala abre uma conversa ao chegar, `Room Arrival` (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)). Onde `Interactables` e `EntryPoints` ficam depende do pan: **sem pan** são irmãos de `Environment`, na raiz (`[Fatia] Onibus`); **com pan** são filhos do `ScrollingBackground`, para andarem com ele (`[Fatia] Posto`).
    - **Comece pela cena vazia.** No Editor, **File → New Scene** com o modelo do projeto (**Lit 2D (URP)**) traz uma `Main Camera` com fundo azul, fora de `Systems`, e um **Global Light 2D**; nenhuma sala do projeto tem esse objeto de luz, então apague os dois e monte a câmera como em [Criar uma sala nova](#criar-uma-sala-nova). Por script, `EditorSceneManager.NewScene` com `NewSceneSetup.EmptyScene` já devolve a cena sem nada. Antes dele, confira que nenhuma cena aberta tem alteração não salva: o `NewScene` fecha todas e descarta o que não foi gravado, sem perguntar (receita em [unity-cli.md](../agentes/unity-cli.md#abrir-e-salvar-cena)).
    - **Sem `Canvas`, sem `EventSystem`, sem manager:** o modelo não traz nenhum dos três, mas outro modelo pode trazer.
-4. **Os objetos**, um a um, a partir do prefab `Interactable`: ele já traz o sprite (um quadrado preto de 1 × 1, provisório), o **Box Collider 2D** de 0,8 × 0,8 marcado como trigger, o **Highlight Scale Multiplier** 1,15, o **Outline Object** (o filho `Highlight`) e um **Interactable Dialogue Trigger** vazio. Esses valores **ficam como estão**, e o objeto entra na cena com escala 1.
+4. **Os objetos**, um a um, a partir do prefab `Interactable`: ele já traz o sprite (um quadrado de 1 × 1, provisório, que o **Placeholder Label** pinta na cor do tipo), o **Box Collider 2D** de 0,8 × 0,8 marcado como trigger, o **Highlight Scale Multiplier** 1,15, o **Outline Object** (o filho `Highlight`), um **Interactable Dialogue Trigger** vazio e o **Placeholder Label** com o filho `Label` ([Rótulo de placeholder](#rótulo-de-placeholder-191)). Esses valores **ficam como estão**, e o objeto entra na cena com escala 1. **Escreva o Display Name de cada objeto** (as tabelas abaixo têm os da fatia); sem ele o teste reprova a sala.
 5. **A lista de cenas do build** e, no `Menu.unity`, o **Start Room** do `Main Menu`.
-6. **Rodar a suíte de EditMode**: ela reprova gatilho ou conversa de chegada com nó inexistente (`ScriptNodeFieldsTests`), saída para sala ou ponto que não existe, id de coletável repetido, mais de um `Room Music` e mais de um `Room Arrival` por cena. **A suíte lê toda cena e todo prefab de `Assets/`, esteja a cena na lista do build ou não** (a #107 provou: com a cena fora da lista, um nó e um ponto errados foram reprovados), então dá para conferir uma sala antes do passo 5. A lista do build continua necessária para a sala ser **destino** de uma troca, e o `RoomLinksTests` reprova a saída que cita uma sala fora dela.
+6. **Rodar a suíte de EditMode**: ela reprova gatilho ou conversa de chegada com nó inexistente (`ScriptNodeFieldsTests`), saída para sala ou ponto que não existe, id de coletável repetido, mais de um `Room Music` e mais de um `Room Arrival` por cena, e (`PlaceholderLabelsTests`, #191) objeto interativo de uma sala do build que usa o quadrado de placeholder sem rótulo, sem **Display Name** ou com um caractere que a fonte não tem. **A suíte lê toda cena e todo prefab de `Assets/`, esteja a cena na lista do build ou não** (a #107 provou: com a cena fora da lista, um nó e um ponto errados foram reprovados), então dá para conferir uma sala antes do passo 5. A lista do build continua necessária para a sala ser **destino** de uma troca, e o `RoomLinksTests` reprova a saída que cita uma sala fora dela.
 
 ### `[Fatia] Onibus` (sem pan)
 
@@ -324,8 +360,8 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **`Room Music`:** um objeto na raiz com o componente **Room Music** e `teste_musica_a`.
 - **`Room Arrival`:** um objeto na raiz com o componente **Room Arrival Dialogue**, **Node Name** `onibus_chegada` e **Starts Dark** ligado (#71: o prólogo começa no preto e clareia). É ele que abre o prólogo sozinho no Novo Jogo (e a cada chegada no ônibus, com o nó decidindo se repete).
 - **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`. Sem pan, o X dele não move nada; só precisa existir.
-- **`Interactables/Poltrona`:** o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). Depois da #127 ela só mostra o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta."; o prólogo abre pelo `Room Arrival`.
-- **`Interactables/Porta_Onibus`:** um portão **só de flag**, com **Locked Action Behaviour** e **Room Exit**:
+- **`Interactables/Poltrona`** (`CONVERSA`, **Display Name** `Poltrona`): o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). Depois da #127 ela só mostra o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta."; o prólogo abre pelo `Room Arrival`.
+- **`Interactables/Porta_Onibus`** (`PORTA TRANCADA`, **Display Name** `Porta do ônibus`): um portão **só de flag**, com **Locked Action Behaviour** e **Room Exit**:
   - **Required Flag Id** `$prologo_concluido` e **Unlocked Flag Id** `$porta_onibus_aberta`, **sem item**. As duas variáveis precisam ser **diferentes**, senão o **On Unlocked** nunca dispara.
   - **Room Exit:** destino `[Fatia] Posto`, ponto `onibus`.
   - **On Interact** → `LockedActionBehaviour.Interact`.
@@ -342,18 +378,18 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 - **`Room Arrival`:** um objeto na raiz da cena, ao lado do `Room Music`, com **Room Arrival Dialogue**, **Node Name** `posto_chegada` e **Starts Dark** **desligado** (a sala chega com a tela clara). É a narração da chegada; o nó decide se se repete (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)).
 - **Os objetos da Cena 2** (#130) nascem do prefab `Interactable`, como filhos de `Interactables`, em y 0 e escala 1, e cada um liga o próprio nó em **On Interact**. As posições são locais ao `ScrollingBackground`, na ordem da estrada (esquerda) até o ônibus (direita):
 
-  | Objeto | X | Componentes e ligação |
-  |---|---|---|
-  | `Estrada` | -24 | **Interactable Dialogue Trigger** `posto_ir_andando` (`TriggerDialogue`); **Hidden Until Story Flag** com **Required Flag Id** `$falou_com_motorista`: só aparece ao fim da conversa com o motorista |
-  | `Cadeira` | -14 | gatilho `posto_esperar_mecanico` |
-  | `Caminhoneiros` | -6 | gatilho `posto_caminhoneiros` |
-  | `Exit_Loja` | 4 | **Room Exit**, destino `[Fatia] Loja`, ponto `patio`, com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica |
-  | `Motorista` | 12 | gatilho `posto_motorista` |
-  | `Exit_Onibus` | 20 | a saída descrita acima |
+  | Objeto | X | Display Name | Componentes e ligação |
+  |---|---|---|---|
+  | `Estrada` | -24 | `Estrada` | **Interactable Dialogue Trigger** `posto_ir_andando` (`TriggerDialogue`); **Hidden Until Story Flag** com **Required Flag Id** `$falou_com_motorista`: só aparece ao fim da conversa com o motorista (o rótulo some e volta junto) |
+  | `Cadeira` | -14 | `Cadeira` | gatilho `posto_esperar_mecanico` |
+  | `Caminhoneiros` | -6 | `Caminhoneiros` | gatilho `posto_caminhoneiros` |
+  | `Exit_Loja` | 4 | `Loja` | **Room Exit**, destino `[Fatia] Loja`, ponto `patio`, com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica |
+  | `Motorista` | 12 | `Motorista` | gatilho `posto_motorista` |
+  | `Exit_Onibus` | 20 | `Ônibus` | a saída descrita acima |
 
   Por que essas posições: chegando do ônibus (centro em 20) a tela mostra de 11,1 a 28,9, então o motorista e a porta do ônibus aparecem juntos; chegando da loja (centro em 4), a porta da loja e os caminhoneiros; com o pan no limite (+22,4) a tela mostra de -31,3 a -13,5, e a estrada (-24) e a cadeira (-14) cabem. **O pan não mudou:** os três painéis continuam e os limites ±22,4 também.
 
-Os objetos são o quadrado preto do prefab, na escala 1: o motorista, os caminhoneiros e o atendente são só a área clicável sobre o fundo provisório, sem sprite de personagem (fora do escopo, [visao-geral.md](../jogo/visao-geral.md#fora-do-escopo-atual)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
+Os objetos são o quadrado do prefab, na cor do tipo e com o rótulo, na escala 1: o motorista, os caminhoneiros e o atendente são só a área clicável sobre o fundo provisório, sem sprite de personagem (fora do escopo, [visao-geral.md](../jogo/visao-geral.md#fora-do-escopo-atual)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
 
 ### `[Fatia] Loja` (sem pan)
 
@@ -364,12 +400,12 @@ Uma sala só de objetos, como o ônibus: o fundo é o mesmo `testebckg_0`, em es
 - **`EntryPoints/EntryPoint_Patio`:** id `patio`, em x -7. Sem pan não move nada, mas precisa existir.
 - **`Interactables`**, do prefab, y 0, escala 1:
 
-  | Objeto | X | Ligação |
-  |---|---|---|
-  | `Exit_Patio` | -7 | **Room Exit**, destino `[Fatia] Posto`, ponto `loja`, com `RoomExit.Leave` em **On Interact** |
-  | `Atendente` | -3 | gatilho `loja_atendente` |
-  | `Maquina_Cafe` | 1 | gatilho `loja_maquina_cafe` |
-  | `Banheiro` | 5 | gatilho `loja_banheiro` (o som da porta trancada vem do roteiro, `<<tocar_efeito porta_trancada>>`: nenhum **Sound Effect** na cena) |
+  | Objeto | X | Display Name | Ligação |
+  |---|---|---|---|
+  | `Exit_Patio` | -7 | `Pátio` | **Room Exit**, destino `[Fatia] Posto`, ponto `loja`, com `RoomExit.Leave` em **On Interact** |
+  | `Atendente` | -3 | `Atendente` | gatilho `loja_atendente` |
+  | `Maquina_Cafe` | 1 | `Máquina de café` | gatilho `loja_maquina_cafe` |
+  | `Banheiro` | 5 | `Banheiro` | gatilho `loja_banheiro` (o som da porta trancada vem do roteiro, `<<tocar_efeito porta_trancada>>`: nenhum **Sound Effect** na cena) |
 
 A `[Fatia] Loja` está na lista de cenas do build, depois do `[Fatia] Posto`.
 

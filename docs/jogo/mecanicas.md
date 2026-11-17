@@ -32,6 +32,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Pan de borda com limites mínimo e máximo.
 - Cliques e pan param durante diálogos, e um clique sobre a interface não atinge o mundo.
 - Um objeto pode ficar escondido (invisível e sem resposta) até uma variável booleana da história ligar (#128): ele aparece ao fim da conversa que a liga e continua visível depois de sair, salvar e carregar.
+- Todo objeto ainda sem arte (o quadrado do prefab) mostra um **rótulo provisório** com o tipo e o nome (`CONVERSA / Motorista`, `SAÍDA / Loja`), e o quadrado tem a cor do tipo (#191). O tipo vem dos componentes do objeto, o nome é escrito à mão, e o rótulo some e volta junto com o objeto escondido. É placeholder: sai objeto a objeto quando a arte chega ([salas.md](../autoria/salas.md#rótulo-de-placeholder-191)).
 
 **Regras:**
 - O clique que encerra um diálogo não aciona o objeto que está sob o cursor.

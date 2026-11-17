@@ -55,7 +55,7 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 
 Conferência do agente: o `savegame.json` passa a existir, com `currentScene` `[Fatia] Posto`, `currentEntryPointId` `onibus`, o nome escolhido em `storyTexts` e `ownedItemIds` vazio.
 
-**9. Os objetos do pátio.** Passe o mouse pelo cenário (o pan anda nas bordas): há quadrados pretos para o motorista, os caminhoneiros, a cadeira e a porta da loja, e **não** há a estrada. Clique no **motorista**: som de passos no cascalho e a conversa; ao **fim** dela (não no meio), um quadrado novo, a estrada, aparece na ponta esquerda do cenário. Clique nos **caminhoneiros**, na **cadeira** e na **estrada**: cada um mostra a narração do roteiro e devolve o jogador ao pátio.
+**9. Os objetos do pátio.** Passe o mouse pelo cenário (o pan anda nas bordas): há quadrados com rótulo (#191): azuis `CONVERSA` para o motorista, os caminhoneiros e a cadeira, e um roxo `SAÍDA / Loja` para a porta da loja, e **não** há a estrada. Clique no **motorista**: som de passos no cascalho e a conversa; ao **fim** dela (não no meio), um quadrado novo, a estrada (azul, `CONVERSA / Estrada`), aparece na ponta esquerda do cenário, **com o rótulo junto**. Clique nos **caminhoneiros**, na **cadeira** e na **estrada**: cada um mostra a narração do roteiro e devolve o jogador ao pátio.
 
 **10. A loja.** Clique na porta da loja. Esperado: fade para `[Fatia] Loja`, a música **não reinicia** (é a mesma do pátio), e a narração de chegada abre depois de clarear: "Indo até a loja…" e, ao avançar, o sininho da porta e "Só consigo ver um homem em frente à máquina de café…".
 
