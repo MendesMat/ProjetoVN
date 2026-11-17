@@ -244,7 +244,11 @@ Failed to handle /api/exec request: Main thread operation timed out after 5000ms
 
 Esse erro não vem do jogo. Espere uns dez segundos depois do `editor_play` antes do primeiro `eval`. Se o erro aparecer mesmo assim, ele não conta como falha de "console sem erro"; para uma leitura limpa, saia do Play Mode, rode `clear_console` e repita.
 
-### Trocar de branch com o Editor aberto quando os pacotes mudam
+### Trocar de branch com o Editor aberto
+
+Duas coisas que mudam no disco numa troca de branch travam o Editor aberto ou o enganam: os **pacotes** e uma **cena aberta** (#187). A receita [Antes de trocar de branch](#antes-de-trocar-de-branch) cobre as duas, e os comandos de trabalho (`/executar-issue`, `/revisar-issue`) a seguem.
+
+#### Quando os pacotes mudam
 
 Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pacote que a outra não tem), **feche o Unity antes de trocar de branch** (`git checkout`, `gh pr checkout`) **ou de atualizar a atual** (`git pull`, quando o que chega muda os pacotes) e reabra depois. O que trava é o `manifest.json` mudar no disco com o Editor aberto, seja qual for o comando git. Com o Editor aberto, ele pode ficar preso no diálogo "Package Manager (busy for …) Resolving packages…": a thread principal para, todo `eval` falha com `Main thread operation timed out`, o `run_tests` expira e a janela do Package Manager não lista nada. Aconteceu duas vezes na issue #5, entre `main` e a branch que instalava o Yarn Spinner.
 
@@ -252,6 +256,32 @@ Se as duas branches têm `Packages/manifest.json` diferentes (uma instala um pac
 - **Como sair:** finalize o `Unity.exe` pelo Gerenciador de Tarefas e reabra o projeto já na branch certa. Não é preciso reiniciar o computador. Ao reabrir, responda **No** ao diálogo "Recovering Scene Backups" (a cena válida é a do git) e apague `Assets/_Recovery/` se ela existir.
 - **Não chame `UnityEditor.PackageManager.Client.Resolve()` por `eval`** para forçar a resolução com o Editor aberto: foi logo depois disso, seguido de um `AssetDatabase.Refresh()`, que o Editor travou na segunda vez.
 - Enquanto o pacote não é resolvido, o console mostra erros de compilação que não são do código (`The type or namespace name 'Yarn' could not be found`), e um `run_tests` roda os assemblies antigos e devolve um resultado que não vale para a branch.
+
+#### Quando uma cena aberta muda (#187)
+
+Se a troca de branch altera, cria ou apaga o `.unity` de uma cena que **está aberta** no Editor, o Editor fica com a versão da outra branch na memória e o disco com a desta. O que acontece depende de quem chama o `AssetDatabase.Refresh()` primeiro:
+
+- **Com um `Refresh`, o diálogo trava o CLI.** O Editor abre "The open scene(s) have been modified externally … Do you want to reload the scene(s)?", com **Reload** e **Ignore**, e a thread principal para. Todo comando do CLI expira com `Main thread operation timed out`, o `unity status` segue dizendo `ready` e o console enche de erros do CLI (73 na #187), nenhum do jogo. O agente não vê o diálogo, e o sintoma é igual ao do Test Runner e do Package Manager. Visto na revisão da #130, com a `[Fatia] Onibus` aberta e limpa, na volta da branch do PR para a `main`; só se fechou quando o programador clicou em **Reload**.
+- **Sem `Refresh`, o estrago é silencioso.** Nada abre, os comandos respondem, a cena segue `isDirty: false` e o Editor continua com a versão antiga na memória (medido: o `Item_Moeda`, que a branch nova não tem, continuou na cena). A próxima gravação da cena a escreve no disco por cima da versão da branch.
+
+**Quem chama o `Refresh` sem ninguém pedir** (lido no código do `com.unity.pipeline` 0.7.0-exp.1, `Library/PackageCache/com.unity.pipeline@ab05e9cd7f74/Editor/`; não medido):
+
+- `recompile` (`Commands/RecompileCommand.cs:95`): é o **primeiro comando** da `/revisar-issue` depois do `gh pr checkout`, e é ali que o diálogo abre.
+- `save_scene`, `save_all` e `create_scene` (`Commands/Scenes/SceneCommands.cs:65`, `:115`, `:141`). O `save_scene` **grava a cena da memória e só depois** chama o `Refresh` (linhas 112 a 115): com a cena antiga na memória, ele sobrescreve no disco a versão da branch **sem diálogo nenhum**. É o mesmo estrago do **Ignore**, por outro caminho.
+- `eval` e `eval_file` **não** chamam (`Commands/Scripts/RunScriptCommand.cs:119`).
+- O `Auto Refresh` do Editor (`EditorPrefs kAutoRefreshMode` = 1) age quando a janela ganha foco: se o programador clicar no Unity depois de uma troca, o diálogo pode abrir sem comando nenhum (não medido).
+
+**O que a #187 mediu** (2026-11-17, Editor 6000.3.9f1, `com.unity.pipeline` 0.7.0-exp.1, Editor sem foco). Para imitar no disco o que um `git checkout` faz, o `[Fatia] Onibus.unity` foi sobrescrito pela versão de `1001a75` (a de antes da #130, com o `Item_Moeda`) e devolvido com `git checkout --` no fim:
+
+| # | Situação | Chamada | Resultado |
+|---|---|---|---|
+| 1 | `[Fatia] Onibus` aberta e limpa; arquivo trocado no disco | `eval` e `list_open_scenes`, cinco vezes em ~80 s, **sem `Refresh`** | Todos responderam, **sem diálogo**. `GameObject.Find("Item_Moeda")` deu `False` e `isDirty: false`: o Editor segue com a versão antiga na memória enquanto o disco tem a outra |
+| 2 | Continuação do 1 | `open_scene` do `Menu`, `git checkout --` do arquivo, `eval` com `AssetDatabase.Refresh()` | Sem diálogo; `list_open_scenes` respondeu |
+| 3 | Só o `Menu` aberto; arquivo trocado no disco | `Refresh`, depois `open_scene` do `[Fatia] Onibus` | Sem diálogo; `Item_Moeda` deu `True` (o Editor importou a versão do disco) |
+| 4 | Continuação do 3 | `open_scene` do `Menu`, `git checkout --`, `Refresh` | Sem diálogo; o `git status` voltou ao de antes |
+| 5 | `Menu` aberto | `EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single)` por `eval` | Cena sem título, `path` vazio, `isDirty: false`, `sceneCount` 1; o `open_scene` do `Menu` em seguida voltou normalmente |
+
+O caso "cena aberta + `Refresh`" não foi repetido de propósito: o diálogo foi o da revisão da #130, e provocá-lo trava o CLI até alguém clicar. A conclusão é que o diálogo **não depende do `Refresh` explícito**: abre no primeiro `Refresh`, de quem for. Por isso a conferência tem de acontecer **antes** da troca, e a defesa é não ter aberta nenhuma cena que a troca altere. Uma cena sem título não tem arquivo, então nenhuma troca de branch a altera.
 
 #### Antes de trocar de branch
 
@@ -273,13 +303,37 @@ Os comandos de trabalho (`/executar-issue`, `/revisar-issue`) fazem esta confer�
    ```
 
 3. Leia a saída (`echo $?` logo depois, no Git Bash):
-   - **`0`:** `Packages/` é igual nas duas pontas. Troque de branch normalmente, com o Editor aberto.
-   - **`1`:** os pacotes mudam. Se o `unity status` lista um Editor com este projeto, **pare**: diga ao programador qual troca vai fazer e por quê (citando esta seção) e peça para ele fechar o Unity. Continue quando ele confirmar e o `unity status` não listar mais o projeto. Troque de branch e reabra com `unity open .` (sem pipe, como em [O Editor está conectado?](#o-editor-está-conectado)), repetindo `unity status` até `ready`. Se o Editor já estava fechado, troque direto.
+   - **`0`:** `Packages/` é igual nas duas pontas. Siga para o passo 4 (cenas abertas) e troque de branch com o Editor aberto.
+   - **`1`:** os pacotes mudam. Se o `unity status` lista um Editor com este projeto, **pare**: diga ao programador qual troca vai fazer e por quê (citando esta seção) e peça para ele fechar o Unity. Continue quando ele confirmar e o `unity status` não listar mais o projeto. Troque de branch e reabra com `unity open .` (sem pipe, como em [O Editor está conectado?](#o-editor-está-conectado)), repetindo `unity status` até `ready`. Se o Editor já estava fechado, troque direto. Nos dois casos o passo 4 não se aplica: sem Editor aberto não há cena na memória nem diálogo.
    - **Qualquer outra saída (`128` é a mais comum, de uma referência que não existe):** não é seguro. Faça o `git fetch origin`, confira o nome do destino e repita; não troque de branch antes de ter `0` ou `1`.
 
 A comparação cobre a pasta `Packages/` inteira, não só o `manifest.json`: o `manifest.json` e o `packages-lock.json` mudam juntos (a #5 mexeu nos dois) e a pasta guarda também o pacote embutido `com.merry-yellow.code-assist`. Uma diferença só no lock é rara e custa, no máximo, um fechar e reabrir à toa.
 
-**A volta para a `main` no fim de uma revisão** é o caso que já travou uma sessão (a primeira revisão da #5). Se a conferência der `1` com o Editor aberto, a sessão **não troca**: deixa a branch do PR em checkout e avisa o programador, no encerramento, que a volta para a `main` ficou para ele, com o Unity fechado. A sessão já terminou o trabalho, então não vale parar esperando a resposta.
+4. **Cenas abertas (#187).** Só vale se a troca segue com o Editor aberto (com o Editor fechado, ou depois de o programador fechá-lo no passo 3, não há diálogo nem cena na memória). Use o **mesmo destino** do passo 2; na primeira execução, `main` **e** `origin/main`, por causa do `git pull`.
+   1. Liste as cenas que mudam até o destino:
+
+      ```bash
+      git diff --name-only HEAD <destino> -- '*.unity'
+      ```
+
+      A lista cobre cena alterada, criada e apagada (de `1001a75` até a `main` ela devolve o `[Fatia] Loja`, que nasce, e o `[Fatia] Onibus` e o `[Fatia] Posto`, que mudam); os `.meta` ficam de fora. Lista vazia: nenhuma cena muda, e a troca não precisa de mais nada.
+   2. Rode `unity command list_open_scenes`. Nenhuma cena aberta está na lista: troque de branch. Alguma está: confira o `isDirty` de **todas** as cenas abertas, pelos três casos de [Abrir e salvar cena](#abrir-e-salvar-cena) (limpa, sua, de outra pessoa), porque o passo seguinte descarta sem diálogo o que não foi salvo (#166).
+   3. Com todas limpas, troque a cena aberta por uma vazia e sem título:
+
+      ```bash
+      unity command eval 'UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene, UnityEditor.SceneManagement.NewSceneMode.Single); return "ok";'
+      ```
+
+      Confira com `unity command list_open_scenes`: uma cena, `path` vazio, `isDirty: false`. O `NewScene` em modo `Single` fecha **todas** as cenas abertas, as aditivas inclusive.
+   4. Troque de branch. Depois, `unity command recompile` (ou o `Refresh` por `eval`) e abra a cena que a sessão vai usar com `unity command open_scene` (o `Menu`, se nenhuma em particular). **Não deixe a cena sem título aberta para a suíte:** o caso dela com o Test Runner não foi medido.
+
+   Por que a cena vazia e não o `Menu`: abrir o `Menu` também funciona (casos 2 a 4 da medição), mas só quando o próprio `Menu` não está na lista, e ele muda de vez em quando (a #21, a #96 e a #116 o alteraram). A cena sem título funciona sempre, sem ramo a mais na receita.
+
+**Se o diálogo já abriu** (todo comando expira, `unity status` diz `ready` e o console tem `Main thread operation timed out`): **pare** e peça ao programador que clique em **Reload**. A cena estava limpa, então nada se perde. **Ignore**, não: deixa a versão da outra branch na memória, e a próxima gravação desfaz no disco o que a branch atual tem. Depois do Reload, confirme com `unity command list_open_scenes`; se os comandos seguirem expirando, é o caso do Cancel da #171 ([Rodar a suíte PlayMode](#rodar-a-suíte-playmode)): feche e reabra o Unity (`unity open .`).
+
+**Troca já feita sem a receita e sem travar:** não grave a cena aberta. O `save_scene` escreve a versão da memória no disco, que pode ser a da outra branch (caso 1). Abra a cena de novo com `open_scene` só depois de um `Refresh`, ou peça ao programador.
+
+**A volta para a `main` no fim de uma revisão** é o caso que já travou uma sessão (a primeira revisão da #5). Se a conferência de pacotes der `1` com o Editor aberto, a sessão **não troca**: deixa a branch do PR em checkout e avisa o programador, no encerramento, que a volta para a `main` ficou para ele, com o Unity fechado. A sessão já terminou o trabalho, então não vale parar esperando a resposta. A conferência das cenas, ao contrário, a sessão resolve sozinha (passo 4), mesmo na volta.
 
 ### O que não dá para simular
 
@@ -699,7 +753,7 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 
 Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
 
-1. Faça checkout da branch `roteiro/<nome>-<assunto>`, depois da conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/`). Num PR de roteiro ela costuma dar `0`, porque o roteirista não mexe em `Packages/`, e então a troca com o Editor aberto é segura.
+1. Faça checkout da branch `roteiro/<nome>-<assunto>`, depois da conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/` e a lista de cenas que mudam, `git diff --name-only HEAD origin/<branch> -- '*.unity'`). Num PR de roteiro a primeira costuma dar `0` e a segunda vir vazia, porque o roteirista não mexe em `Packages/` nem em cena, e então a troca com o Editor aberto é segura. Se a lista trouxer uma cena que está aberta, siga o passo 4 da receita.
 2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
 
    ```bash
