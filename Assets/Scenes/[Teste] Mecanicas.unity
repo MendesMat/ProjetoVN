@@ -2828,9 +2828,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: ProjetoVN.PointNClick::ProjetoVN.PointNClick.ScreenPanController
   panSpeed: 10
   edgeThreshold: 80
-  minX: -22.4
-  maxX: 22.4
   environmentContainer: {fileID: 1862411468}
+  background: {fileID: 315637483}
 --- !u!1 &1879503873
 GameObject:
   m_ObjectHideFlags: 0
