@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using ProjetoVN.Core.State;
@@ -140,6 +141,20 @@ namespace ProjetoVN.Tests.PlayMode
             Assert.AreEqual(EntryPointId, RoomNavigator.Instance.CurrentEntryPointId);
             Assert.AreEqual(1, InventoryManager.Instance.Items.Count, "O save da chegada não guardou o inventário.");
             Assert.AreSame(collectedItem, InventoryManager.Instance.Items[0]);
+        }
+
+        [UnityTest]
+        public IEnumerator RoomChange_SavesWithoutLeavingTheTemporaryFile()
+        {
+            string savePath = Path.Combine(Application.persistentDataPath, "savegame.json");
+
+            yield return ChangeRoomAndWait(OtherRoom);
+
+            Assert.IsTrue(File.Exists(savePath), "A chegada não gravou o savegame.json.");
+            Assert.IsTrue(GameStateJson.TryRead(File.ReadAllText(savePath), out GameState saved),
+                "O savegame.json ficou ilegível depois da gravação.");
+            Assert.AreEqual(OtherRoom, saved.currentScene);
+            Assert.IsFalse(File.Exists(savePath + ".tmp"), "A gravação deixou o savegame.json.tmp para trás.");
         }
 
         [UnityTest]
