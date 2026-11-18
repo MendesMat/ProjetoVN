@@ -78,8 +78,8 @@ namespace ProjetoVN.GameFlow.Persistence
         }
 
         // O save anterior só é trocado depois de o novo estar inteiro no disco: se o jogo morrer no meio, sobra o
-        // anterior. O backup é null de propósito: no Unix, com backup, o File.Replace vira dois rename seguidos e
-        // abre uma janela em que o save não existe.
+        // anterior. O backup é null de propósito: com ele sobraria no disco um segundo arquivo que nada lê (slot
+        // único, D-20).
         private static void WriteSaveFile(string json)
         {
             WriteTemporarySaveFile(json);
