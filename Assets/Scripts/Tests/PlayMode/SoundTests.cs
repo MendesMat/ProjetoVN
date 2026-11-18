@@ -243,12 +243,15 @@ namespace ProjetoVN.Tests.PlayMode
         {
             Assert.IsTrue(DialogueManager.Instance.StartDialogue(ConversationWithOptions));
             yield return WaitUntil(() => GameObject.Find(ChoiceButtonName) != null, "as opções aparecerem");
+
+            // Sem yield entre a leitura e a conferência: o som do avanço é síncrono, e o hover de uma opção
+            // que apareceu sob o ponteiro cai em outro quadro e também soma no EffectCount (#197).
             int effectsBefore = AudioManager.Instance.EffectCount;
-
             DialogueManager.Instance.AdvanceDialogue();
-            yield return new WaitForSecondsRealtime(LongerThanAnAudioBlockSeconds);
+            Assert.AreEqual(effectsBefore, AudioManager.Instance.EffectCount,
+                $"O avanço de fala soou com as opções na tela (último efeito: {LastEffectName()}).");
 
-            Assert.AreEqual(effectsBefore, AudioManager.Instance.EffectCount, "O avanço de fala soou com as opções na tela.");
+            yield return new WaitForSecondsRealtime(LongerThanAnAudioBlockSeconds);
             Assert.IsNotNull(GameObject.Find(ChoiceButtonName), "O avanço fechou as opções.");
         }
 
@@ -295,6 +298,12 @@ namespace ProjetoVN.Tests.PlayMode
             }
 
             Assert.AreEqual(effectsBefore + 1, AudioManager.Instance.EffectCount, "Um avanço tocou mais de um som.");
+        }
+
+        private static string LastEffectName()
+        {
+            AudioClip lastEffect = AudioManager.Instance.LastEffect;
+            return lastEffect == null ? "nenhum" : lastEffect.name;
         }
 
         private Button ContinueButton() => _pauseMenu.transform.Find(ContinueButtonPath).GetComponent<Button>();
