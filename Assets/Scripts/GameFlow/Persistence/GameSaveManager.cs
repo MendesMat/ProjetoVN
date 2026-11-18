@@ -19,6 +19,8 @@ namespace ProjetoVN.GameFlow.Persistence
 
         private static string SavePath => Path.Combine(Application.persistentDataPath, "savegame.json");
 
+        private static string TemporarySavePath => SavePath + ".tmp";
+
         public bool HasSave => File.Exists(SavePath) && GameStateJson.TryRead(File.ReadAllText(SavePath), out _);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -71,8 +73,32 @@ namespace ProjetoVN.GameFlow.Persistence
             };
             StoryStatePersistence.Capture(state);
 
-            File.WriteAllText(SavePath, JsonUtility.ToJson(state, prettyPrint: true));
+            WriteSaveFile(JsonUtility.ToJson(state, prettyPrint: true));
             return true;
+        }
+
+        // O save anterior só é trocado depois de o novo estar inteiro no disco: se o jogo morrer no meio, sobra o
+        // anterior. O backup é null de propósito: com ele sobraria no disco um segundo arquivo que nada lê (slot
+        // único, D-20).
+        private static void WriteSaveFile(string json)
+        {
+            WriteTemporarySaveFile(json);
+
+            if (File.Exists(SavePath))
+                File.Replace(TemporarySavePath, SavePath, null);
+            else
+                File.Move(TemporarySavePath, SavePath);
+        }
+
+        // O Flush(true) pede ao sistema que grave no disco antes da troca: sem ele, uma queda de energia logo
+        // depois da troca pode deixar o save novo com o conteúdo ainda no cache do sistema, ou seja, vazio.
+        private static void WriteTemporarySaveFile(string json)
+        {
+            using var stream = new FileStream(TemporarySavePath, FileMode.Create, FileAccess.Write, FileShare.None);
+            using var writer = new StreamWriter(stream);
+            writer.Write(json);
+            writer.Flush();
+            stream.Flush(flushToDisk: true);
         }
 
         public bool Load()

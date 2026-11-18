@@ -112,7 +112,7 @@ Cada estado é dono dos seus efeitos colaterais, ligados no `Enter()` e desfeito
 | Cena atual | `SceneManager` | Sim; ao carregar, o `GameSaveManager` pede a troca para ela ao `RoomNavigator` |
 | Ponto de entrada da sala atual | `RoomNavigator` (`CurrentEntryPointId`) | Sim; vazio se a sala não foi alcançada por uma saída com ponto |
 
-`GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`, **ao entrar em cada sala** (chamado pelo `RoomNavigator`, #16), e o lê no `Load()`. Itens são resolvidos por id pelo `ItemRegistry`. O texto do arquivo é convertido em `GameState` pelo `GameStateJson`, que devolve `false` para um save corrompido em vez de lançar.
+`GameSaveManager` grava um `GameState` em JSON em `Application.persistentDataPath/savegame.json`, **ao entrar em cada sala** (chamado pelo `RoomNavigator`, #16), e o lê no `Load()`. A gravação passa por um arquivo temporário (`savegame.json.tmp`) trocado pelo save no fim (#89), então uma queda no meio deixa o save anterior inteiro. Itens são resolvidos por id pelo `ItemRegistry`. O texto do arquivo é convertido em `GameState` pelo `GameStateJson`, que devolve `false` para um save corrompido em vez de lançar.
 
 ## Fluxos principais
 
