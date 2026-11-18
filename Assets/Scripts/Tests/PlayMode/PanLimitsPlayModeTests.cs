@@ -61,7 +61,7 @@ namespace ProjetoVN.Tests.PlayMode
 
             yield return null;
 
-            Assert.That(BackgroundBounds(pan).min.x, Is.LessThanOrEqualTo(LeftEdgeOfScreen() + Tolerance));
+            Assert.That(BackgroundBounds(pan).min.x, Is.EqualTo(LeftEdgeOfScreen()).Within(Tolerance));
         }
 
         private static ScreenPanController FindPan()
