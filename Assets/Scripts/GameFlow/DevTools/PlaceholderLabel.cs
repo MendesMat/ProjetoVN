@@ -29,10 +29,18 @@ namespace ProjetoVN.GameFlow.DevTools
 
         // ExecuteAlways: ao abrir a sala no Editor o OnValidate não aplica o rótulo, e a Scene view ficaria com o
         // texto e a cor do prefab (OBJETO, quadrado preto) até o Play. Em Edit Mode o aviso de nome vazio é do
-        // OnValidate, que não avisa no asset do prefab.
+        // OnValidate. O próprio prefab, no asset ou aberto no Prefab Mode, fica como foi gravado: repintá-lo
+        // levaria o cinza do tipo OBJETO para o arquivo no primeiro save.
         private void Awake()
         {
-            if (Application.isPlaying) WarnIfNameMissing();
+            if (Application.isPlaying)
+            {
+                WarnIfNameMissing();
+                Refresh();
+                return;
+            }
+
+            if (IsThePrefabItself()) return;
 
             Refresh();
         }
@@ -80,11 +88,22 @@ namespace ProjetoVN.GameFlow.DevTools
             Debug.LogWarning("[PlaceholderLabel] O campo Display Name está vazio: o rótulo mostra '(sem nome)'.", this);
         }
 
+        private bool IsThePrefabItself()
+        {
 #if UNITY_EDITOR
-        // O prefab nasce com o nome vazio de propósito; quem preenche é cada instância na sala.
+            return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)
+                   || UnityEditor.SceneManagement.PrefabStageUtility.GetPrefabStage(gameObject) != null;
+#else
+            return false;
+#endif
+        }
+
+#if UNITY_EDITOR
+        // O prefab nasce com o nome vazio de propósito; quem preenche é cada instância na sala. No Prefab Mode o
+        // objeto mora numa cena de pré-visualização, e IsPartOfPrefabAsset não o reconhece.
         private void OnValidate()
         {
-            if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this)) return;
+            if (IsThePrefabItself()) return;
 
             WarnIfNameMissing();
 
@@ -95,7 +114,7 @@ namespace ProjetoVN.GameFlow.DevTools
         // Em Play o Awake já aplicou o rótulo; repintar depois do Start apagaria o verde do PlaceholderTint.
         private void RefreshInEditor()
         {
-            if (this == null || Application.isPlaying) return;
+            if (this == null || Application.isPlaying || IsThePrefabItself()) return;
 
             Refresh();
         }
