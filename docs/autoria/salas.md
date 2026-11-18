@@ -367,7 +367,7 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
   - **Room Exit:** destino `[Fatia] Posto`, ponto `onibus`.
   - **On Interact** → `LockedActionBehaviour.Interact`.
   - **On Locked** → o gatilho com `onibus_porta_fechada` e o `Som Trancada` (filho com **Sound Effect**).
-  - **On Unlocked** → o `Som Abrindo` e `RoomExit.Leave`. **On Already Unlocked** → `RoomExit.Leave`. **On Opened** fica vazio.
+  - **On Unlocked** → o `Som Abrindo` e `RoomExit.Leave`. **On Already Unlocked** → `RoomExit.Leave`. **On Opened** → `PlaceholderTint.Apply`, com o componente **Placeholder Tint** na própria porta (**Target** vazio, **Tint** verde). A porta só fica verde depois do primeiro clique, porque é ele que abre o portão: depois do prólogo ela segue vermelha até ali (o **Unlocked Flag Id** só é gravado no clique, que já leva ao pátio) e, ao voltar ao ônibus ou carregar um save lá, chega verde (#198).
 
 ### `[Fatia] Posto` (com pan)
 
