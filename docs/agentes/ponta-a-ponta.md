@@ -54,7 +54,7 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 - o som de estrada entra, some na lembrança, volta e some na freada com batida;
 - personagens atrás da caixa, quem fala em destaque; a placa do protagonista mostra `???`.
 
-**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico (na #186, por script, foram 35 cliques do Novo Jogo até elas; um clique em fala ainda em revelação só a completa). Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com o motorista, no pátio (passo 9).
+**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico (na #186, por script, foram 35 cliques do Novo Jogo até elas; um clique em fala ainda em revelação só a completa). Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. **A porta continua vermelha, com `PORTA TRANCADA / Porta do ônibus`:** o portão só abre no primeiro clique (passo 8), e é ali que ela fica verde (#198). O nome aparece na placa de quem fala a partir da conversa com o motorista, no pátio (passo 9).
 
 **6. A poltrona.** Clique na poltrona. Esperado: só o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta.", sem repetir o prólogo. (A fala "A porta do ônibus está fechada" deixou de ser alcançável na fatia: antes de o prólogo acabar o jogador está na conversa e não pode clicar na porta, e depois a porta já abre. O portão trancado continua coberto na `[Teste] Mecanicas`.) Não há mais moeda no corredor (saiu na #130).
 
@@ -74,7 +74,7 @@ Conferência do agente: `currentScene` `[Fatia] Loja`, `currentEntryPointId` `pa
 
 **12. A máquina e o banheiro.** Clique na máquina de café: as duas narrações, a fala do `???` ("Caafé... Caaféé...") e o pensamento. Clique no banheiro **duas vezes**: o som da porta trancada nas duas, "Tem gente..." na primeira e "Pô, cara, já falei que tem gente!" na segunda.
 
-**13. Ida e volta.** Pela saída da loja, volte ao pátio: a narração de chegada **não** repete nada (a conversa abre e fecha sem caixa) e a estrada continua visível. Entre na loja de novo: sem narração e sem o sininho. Pela porta do ônibus, volte ao ônibus e pela porta volte ao pátio. Esperado: cada chegada salva, e o ônibus não repete o prólogo.
+**13. Ida e volta.** Pela saída da loja, volte ao pátio: a narração de chegada **não** repete nada (a conversa abre e fecha sem caixa) e a estrada continua visível. Entre na loja de novo: sem narração e sem o sininho. Pela porta do ônibus, volte ao ônibus e pela porta volte ao pátio. Esperado: cada chegada salva, e o ônibus não repete o prólogo. **Ao voltar ao ônibus, a porta do ônibus está verde** (aberta), ainda com o rótulo `PORTA TRANCADA / Porta do ônibus`: o rótulo não muda com o estado (#198).
 
 Conferência do agente: `currentScene` `[Fatia] Posto`, `currentEntryPointId` `onibus`, `salgadinho` em `ownedItemIds`, `tentativas_banheiro` em `storyNumbers`.
 
