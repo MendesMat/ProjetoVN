@@ -196,6 +196,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 - Carregar leva à sala salva, no ponto de entrada por onde o jogador chegou, e recarrega a cena, então portões e coletáveis aparecem no estado certo sem intervenção (#16). É tudo ou nada: se a troca de sala é recusada (conversa aberta, sala que não existe mais), nada é restaurado.
 - Salvar manual pela pausa (#18): grava a sala atual e o ponto de entrada por onde o jogador chegou nela (não o lugar onde ele estava no cenário), e a janela mostra "Jogo salvo." até fechar.
 - Salvar fica bloqueado durante uma conversa: o botão SALVAR da pausa fica desabilitado. Um save corrompido ou ilegível é avisado no console e o jogo segue como estava.
+- O save não fica pela metade se o jogo fechar no meio da gravação: o jogo grava num arquivo temporário e só então o troca pelo save, então o que sobra é o save anterior, inteiro (#89).
 - Voltar ao menu pela pausa **não grava** o save: o Continuar abre a sala do último save, não o menu.
 - O painel de debug da cena de teste ainda tem os botões Save e Load.
 
