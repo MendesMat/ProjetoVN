@@ -34,7 +34,7 @@ A fatia vertical é este percurso funcionando de ponta a ponta, em um build de d
 
 O conteúdo da fatia é provisório (arte provisória, e o motorista, os caminhoneiros e o atendente são só uma área clicável sobre o fundo, sem sprite de personagem no cenário). O que ela prova é que os sistemas funcionam juntos e que conteúdo novo se faz sem código.
 
-O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado na #22.
+O percurso é verificado numa build de Windows pelo roteiro de [ponta-a-ponta.md](../agentes/ponta-a-ponta.md), executado por último na #186.
 
 Depois da fatia, a milestone M7 troca a arte provisória da interface (caixa de diálogo, botões de escolha, histórico e menu principal) pela entrega da arte, sem mudar o percurso. Em seguida vêm as ferramentas e a dívida interna (M8), o acabamento da fatia (M9: o pan que mostra o vazio preto no posto, a navegação por teclado, a placa de nome, os tooltips), os efeitos de tela que o prólogo pede e a conversa que abre sozinha ao chegar na sala (M10), o prólogo do ato 1 no texto novo do roteirista, que troca o conteúdo provisório do posto pelo pátio e pela loja de conveniência (M11), e a preparação da primeira entrega no itch.io (M12). A camada de horror da interface (M13) só abre quando um roteiro pedir. A sequência está em [milestones.md](../planejamento/milestones.md).
 

@@ -4,7 +4,9 @@ Roteiro para provar, numa **build de Windows** (não no Editor), o percurso desc
 
 Quem joga é o programador, com mouse, teclado e fone. O agente prepara e devolve o save, gera a build, faz o aquecimento, confere o `savegame.json` nos passos 8, 10 e 13 e lê os logs. O Unity CLI não alcança a build (o pacote Pipeline é desligado no Player), então não há `eval` dentro do jogo: o que se confere é a tela, o som, o `Player.log` e o `savegame.json`.
 
-Quando o programador não puder jogar, o agente pode percorrer o roteiro por script, com cliques, teclas e capturas da janela do jogo ([receita em unity-cli.md](unity-cli.md#jogar-a-build-por-script-22)). Isso cobre tudo menos o que exige ouvido ou o alt-tab real (os sons e a música dos passos 4 a 13, e o passo 7); o registro do resultado diz o que ficou sem verificar.
+Quando o programador não puder jogar, o agente pode percorrer o roteiro por script, com cliques, teclas e capturas da janela do jogo ([receita em unity-cli.md](unity-cli.md#jogar-a-build-por-script-22)). Isso cobre tudo menos o que exige ouvido (os sons e a música dos passos 4 a 13): o alt-tab real do passo 7 também se faz por script. O registro do resultado diz o que ficou sem verificar.
+
+**Executado por último na #186**, por script, pelo agente, sem o programador, na build de Windows gerada nela: os passos 0 a 18, com uma corrida extra para o Histórico da compra (passo 11). A tabela do resultado, os logs filtrados e as issues abertas estão no PR da #186; as capturas e o script ficaram em `Builds/PontaAPonta/issue-186/` (fora do git). Ao refazer o roteiro, troque este número pelo da nova execução.
 
 Refaça o roteiro sempre que uma issue mudar a fatia (sala, conversa, puzzle, menu, save). O que muda de uma execução para a outra é o conteúdo provisório; o percurso é o mesmo.
 
@@ -45,7 +47,7 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 - o som de estrada entra, some na lembrança, volta e some na freada com batida;
 - personagens atrás da caixa, quem fala em destaque; a placa do protagonista mostra `???`.
 
-**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico. Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com o motorista, no pátio (passo 9).
+**No meio da conversa:** abra o HISTÓRICO e feche; aperte Esc (a pausa abre, o texto para) e CONTINUAR. Nas opções do motorista, "Assinar e sair" aparece em itálico (na #186, por script, foram 35 cliques do Novo Jogo até elas; um clique em fala ainda em revelação só a completa). Na folha, escreva um nome e clique em ASSINAR. Esperado: a conversa termina (a assinatura é a última linha do prólogo), o jogador volta a explorar o ônibus e a porta do ônibus passa a abrir. O nome aparece na placa de quem fala a partir da conversa com o motorista, no pátio (passo 9).
 
 **6. A poltrona.** Clique na poltrona. Esperado: só o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta.", sem repetir o prólogo. (A fala "A porta do ônibus está fechada" deixou de ser alcançável na fatia: antes de o prólogo acabar o jogador está na conversa e não pode clicar na porta, e depois a porta já abre. O portão trancado continua coberto na `[Teste] Mecanicas`.) Não há mais moeda no corredor (saiu na #130).
 
@@ -61,7 +63,7 @@ Conferência do agente: o `savegame.json` passa a existir, com `currentScene` `[
 
 Conferência do agente: `currentScene` `[Fatia] Loja`, `currentEntryPointId` `patio` e `falou_com_motorista` em `storyBools`.
 
-**11. A atendente.** Clique na atendente: "Boa noite, quer o quê?" com quatro opções em itálico (são gestos). Escolha "Comprar um salgadinho": som de coleta, o salgadinho no inventário e, no HISTÓRICO, o item recebido; depois a resposta do ramo do motorista ("O cara atropelou uma anta." e "Caraca... Que papelão, hein..."). Clique de novo: "Comprar um salgadinho" aparece **desabilitada**, e a conversa termina sem repetir a pergunta do acidente.
+**11. A atendente.** Clique na atendente: "Boa noite, quer o quê?" com quatro opções em itálico (são gestos). Escolha "Comprar um salgadinho": som de coleta, o salgadinho no inventário e, no HISTÓRICO, o item recebido; depois a resposta do ramo do motorista ("O cara atropelou uma anta." e "Caraca... Que papelão, hein..."). Clique de novo: "Comprar um salgadinho" aparece **desabilitada**, e a conversa termina sem repetir a pergunta do acidente. **O histórico é o da conversa em curso:** confira nele `Comprar um salgadinho` e `Você recebeu: Salgadinho` (sem colchetes na tela) **durante a compra**, não na segunda conversa, onde só há a pergunta "Boa noite, quer o quê?".
 
 **12. A máquina e o banheiro.** Clique na máquina de café: as duas narrações, a fala do `???` ("Caafé... Caaféé...") e o pensamento. Clique no banheiro **duas vezes**: o som da porta trancada nas duas, "Tem gente..." na primeira e "Pô, cara, já falei que tem gente!" na segunda.
 
