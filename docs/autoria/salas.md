@@ -161,18 +161,18 @@ Exemplo na `[Teste] Mecanicas`: o `Exit_Passagem` (o quadrado roxo `SAÍDA / Sal
 
 ## Pan do cenário
 
-O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda. **Min X** e **Max X** são até onde o cenário anda. Para a tela nunca passar do fundo:
+O componente **Screen Pan Controller** desloca o objeto apontado em **Environment Container** quando o mouse encosta na borda da tela. **Ninguém digita limite nem faz conta:** o componente mede a imagem de fundo apontada em **Background** e a largura que a câmera mostra naquela tela, e para o cenário quando a borda da imagem encosta na borda da tela, **em qualquer formato de tela** (#157).
 
-- **Max X** = a borda esquerda do fundo, sem o sinal, menos a metade da largura da tela;
-- **Min X** = a metade da largura da tela menos a borda direita do fundo.
+- **Background** é o objeto com as imagens de fundo da sala (`Environment/ScrollingBackground/Backgrounds`), e precisa estar **dentro** do **Environment Container**, para o fundo andar junto com o pan. O componente usa todos os **Sprite Renderer** dele e dos filhos como uma imagem só: serve a uma panorâmica de um sprite ou a painéis lado a lado.
+- **Numa tela mais larga o jogador vê mais da panorâmica** (e anda menos); numa mais estreita, vê menos e anda mais. A câmera tem sempre a mesma altura (**Size** 5, 10 unidades); só a largura acompanha a tela: a metade da largura é 5 × a proporção, **8,89** em 16:9, **11,85** em 21:9 e **6,67** em 4:3.
+- **Imagem mais estreita que a tela** (a largura dela é menor que a largura visível): o cenário não anda e a imagem fica **centralizada**, com o fundo preto da câmera dos lados.
+- O limite é recalculado a cada quadro. Se a janela mudar de tamanho (Alt+Enter), o cenário volta para dentro do limite novo sem o jogador mexer.
 
-A metade da largura da tela é o **Size** da câmera vezes 16/9: **8,89** com Size 5. As bordas do fundo são medidas com a câmera e o **Environment Container** em x 0, como as salas são salvas. O **Max X** é ligado à borda **esquerda** porque o cenário anda para a direita quando o jogador olha para a esquerda.
+A conta, para quem quiser conferir: com o fundo medido com o **Environment Container** em x 0 e a câmera em x 0, o cenário vai de `metade da largura − borda direita do fundo` até `−metade da largura − borda esquerda do fundo`. Exemplo, a `[Teste] Mecanicas` e o `[Fatia] Posto`: três painéis de 20,9 de largura (sprite de 16,72 em escala 1,25) em x -20,9, 0 e 20,9 cobrem de -31,35 a 31,35, então o cenário anda de -22,46 a 22,46 em 16:9 e de -19,50 a 19,50 em 21:9. O `ScreenPanController` faz essa conta (`PanLimits`, testada no EditMode).
 
-Exemplo, a `[Teste] Mecanicas`: três painéis de 20,9 de largura (sprite de 16,72 em escala 1,25) em x -20,9, 0 e 20,9 cobrem de -31,35 a 31,35. Então **Max X** = 31,35 − 8,89 = 22,46 e **Min X** = 8,89 − 31,35 = -22,46; a cena usa **22,4** e **-22,4**, arredondados para dentro.
+**Largura recomendada da panorâmica:** pelo menos a de uma tela 21:9, **2,39 × a altura** (com 2160 px de altura, ~5160 px), para não aparecer preto num monitor ultrawide. O limite do Unity é de 16384 px por lado, e o **Max Size** do importador precisa subir acima do padrão (2048), senão a imagem entra reduzida.
 
-A conta vale para telas 16:9. Uma tela mais larga mostra mais cenário e pode ver a borda (#157).
-
-Os valores das salas são **Pan Speed** 10 (unidades do mundo por segundo; também é o padrão de um componente novo) e **Edge Threshold** 80 (pixels da faixa junto à borda). Nenhum dos dois aceita negativo. O componente avisa no Inspector quando **Min X** é maior que **Max X** (o pan pularia entre os dois limites) e quando **Environment Container** está vazio; **Min X** igual a **Max X** vale e é a sala sem pan.
+Os valores das salas são **Pan Speed** 10 (unidades do mundo por segundo; também é o padrão de um componente novo) e **Edge Threshold** 80 (pixels da faixa junto à borda). Nenhum dos dois aceita negativo. O componente avisa no Inspector quando **Environment Container** ou **Background** está vazio, quando o **Background** não tem nenhum **Sprite Renderer** e quando ele não está dentro do **Environment Container**; em qualquer um desses casos o cenário não anda.
 
 ## Criar uma sala nova
 
@@ -189,7 +189,8 @@ Uma cena de sala contém **só o mundo**:
   **Não copie a câmera da `[Teste] Mecanicas`:** ela usa **Depth** -1 e fundo azul (**Skybox**), e as salas da fatia não. Copiar a câmera de teste dá uma sala com o fundo e o **Depth** diferentes dos das outras salas.
 - **O fundo** (um ou mais sprites), na **ordem de desenho 0** (o padrão do **Sprite Renderer**) ou abaixo, nunca na 1 ou acima: os objetos interativos usam 1 (contorno), 2 (quadrado) e 3 (rótulo), e um fundo na 1 ou acima cobre o contorno (#196).
 - **Os objetos interativos**, montados como descrito em [Objeto interativo](#objeto-interativo).
-- Opcional: o **Screen Pan Controller**, se o fundo for mais largo que a tela.
+- O **Screen Pan Controller**, no `Environment/ScrollingBackground`, com o fundo e os objetos dentro dele (veja [Pan do cenário](#pan-do-cenário)). Toda sala tem pan: o limite sai da imagem, então uma sala de fundo estreito só fica parada.
+- **Não mexa no tamanho nem na proporção da câmera:** o pan conta com a metade da largura que ela mostra.
 - Um **Room Entry Point** para cada lugar em que o jogador pode chegar vindo de outra sala, e um **Room Exit** em cada saída (veja [Saídas e pontos de entrada](#saídas-e-pontos-de-entrada)).
 
 E **não** contém: managers, `Canvas` de jogo (diálogo, inventário) nem `EventSystem`. Dê Play direto na cena nova: a interface aparece sozinha e um objeto com **Interactable Dialogue Trigger** já abre a conversa.
@@ -219,9 +220,9 @@ A navegação do jogo é só por saídas no cenário: não há mapa. Uma **saíd
 2. Preencha **Id**: o nome do ponto, **único nesta sala**, em minúsculas e sem espaços (por exemplo `porta_biblioteca`). As saídas o citam por esse nome.
 3. Posicione o objeto. **O que importa é o X:** o lugar do cenário que fica **no centro da tela** quando o jogador chega, medido com o cenário na posição em que a cena foi salva. Na Scene view o ponto aparece como uma linha vertical ciano.
 
-Se a sala não tem **Screen Pan Controller** (o fundo tem a largura da tela), o ponto não move nada: ele só existe para a saída achar onde chegar. Mesmo assim ele precisa existir, com id.
+Se o fundo é mais estreito que a tela, o pan não anda e o ponto não move nada: ele só existe para a saída achar onde chegar. Mesmo assim ele precisa existir, com id.
 
-Se o pan limita o movimento (**Min X** e **Max X**), um ponto fora dos limites faz o jogador chegar na borda mais próxima.
+Como o pan para na borda da imagem, um ponto perto da borda faz o jogador chegar com a borda da imagem na borda da tela, e não com o ponto no centro. Em telas diferentes o limite é diferente: numa tela mais larga o ponto pode ficar mais longe do centro.
 
 ### Criar uma saída
 
@@ -333,7 +334,7 @@ O teste `ScriptContentTests` reprova um id do roteiro que não esteja na lista c
 
 O roteiro cita a imagem de tela cheia por um **id** (`<<mostrar_imagem lembranca_pais>>`; ver [roteiro.md](roteiro.md#tela-e-imagens)). Para uma imagem nova ficar disponível:
 
-1. Ponha o PNG em `Assets/Sprites/Imagens/<id>.png`, em **16:9** (3840×2160 é o tamanho da arte de referência; a imagem é esticada para a tela inteira). No Inspector do arquivo, **Texture Type** = `Sprite (2D and UI)` e **Sprite Mode** = `Single` (o padrão é `Multiple`, e sem fatias o Unity não gera sprite nenhum), **Generate Mip Maps** desligado. **Max Size** fica no padrão, `2048`: uma arte de 3840×2160 entra reduzida a 2048×1152, sem aviso. Isso basta para Full HD (a tela tem 1920 de largura) e perde detalhe em telas maiores, de 1440p ou 4K. Ao contrário do personagem (tabela de importação em [Criar um personagem](#criar-um-personagem)), a imagem é desenhada na tela inteira, não na metade; se a arte precisar ficar nítida acima de Full HD, o Max Size passa a `4096`, que pesa cerca de quatro vezes mais na memória. Clique em **Apply**.
+1. Ponha o PNG em `Assets/Sprites/Imagens/<id>.png`, em **16:9** (3840×2160 é o tamanho da arte de referência; a imagem **cobre a tela sem deformar** e a sobra é cortada fora de 16:9: em 21:9 perde ~12% em cima e embaixo, em 4:3 perde as laterais, então deixe o importante no centro, #157). No Inspector do arquivo, **Texture Type** = `Sprite (2D and UI)` e **Sprite Mode** = `Single` (o padrão é `Multiple`, e sem fatias o Unity não gera sprite nenhum), **Generate Mip Maps** desligado. **Max Size** fica no padrão, `2048`: uma arte de 3840×2160 entra reduzida a 2048×1152, sem aviso. Isso basta para Full HD (a tela tem 1920 de largura) e perde detalhe em telas maiores, de 1440p ou 4K. Ao contrário do personagem (tabela de importação em [Criar um personagem](#criar-um-personagem)), a imagem é desenhada na tela inteira, não na metade; se a arte precisar ficar nítida acima de Full HD, o Max Size passa a `4096`, que pesa cerca de quatro vezes mais na memória. Clique em **Apply**.
 2. Abra `Assets/Scripts/ScriptableObjects/Pictures/PictureRegistry.asset` e acrescente uma linha: o **Id** (minúsculas sem acento, dígitos e `_`, único no registro) e o **Sprite**. O registro avisa id vazio, fora do formato ou repetido, e sprite vazio.
 3. Acrescente uma linha à tabela [Imagens que existem](roteiro.md#imagens-que-existem) do guia de roteiro.
 
@@ -347,20 +348,20 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 1. **O roteiro primeiro.** Os nós vêm de `ato_1/prologo/episodio_2/` (o pátio e a loja) e de `fatia_vertical.yarn` (o ônibus); declare em `variaveis.yarn` cada variável nova (`$prologo_concluido`, `$porta_onibus_aberta`, `$falou_com_motorista`), com a linha `///`. Reimporte o `Roteiro.yarnproject`, senão os nós novos não aparecem na lista do gatilho. O prólogo (`onibus_viagem`) **não é alterado por quem monta a sala** (é um roteiro; os efeitos de tela dele vieram na #71): o nó `onibus_chegada`, que o `Room Arrival` do ônibus abre na chegada, o chama com `<<detour onibus_viagem>>` e, quando ele termina, liga `$prologo_concluido` com `<<set>>`; isso impede repetir o prólogo e a folha do nome, e o `<<if not $prologo_concluido>>` do nó deixa a conversa de chegada vazia nas chegadas seguintes. O `onibus_poltrona` é só o pensamento do protagonista.
 2. **O item, só se a sala tem um coletável.** `Create → Items → Item` e uma linha no `ItemRegistry.asset` (ver [Coletável](#coletável)). A fatia não tem nenhum: o `salgadinho` que a atendente dá vem do roteiro (`<<dar_item>>`), e o item já está no registro.
-3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints`, `Room Music` e, se a sala abre uma conversa ao chegar, `Room Arrival` (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)). Onde `Interactables` e `EntryPoints` ficam depende do pan: **sem pan** são irmãos de `Environment`, na raiz (`[Fatia] Onibus`); **com pan** são filhos do `ScrollingBackground`, para andarem com ele (`[Fatia] Posto`).
+3. **Cena nova** salva em `Assets/Scenes/`. Dentro dela, na ordem: `Systems/Main Camera`, `Environment` (o fundo), `Interactables`, `EntryPoints`, `Room Music` e, se a sala abre uma conversa ao chegar, `Room Arrival` (ver [Conversa ao chegar na sala](#conversa-ao-chegar-na-sala-127)). `Interactables` e `EntryPoints` são filhos do `Environment/ScrollingBackground` (junto com o fundo, em `Backgrounds`), para andarem com o pan, como em `[Fatia] Posto`.
    - **Comece pela cena vazia.** No Editor, **File → New Scene** com o modelo do projeto (**Lit 2D (URP)**) traz uma `Main Camera` com fundo azul, fora de `Systems`, e um **Global Light 2D**; nenhuma sala do projeto tem esse objeto de luz, então apague os dois e monte a câmera como em [Criar uma sala nova](#criar-uma-sala-nova). Por script, `EditorSceneManager.NewScene` com `NewSceneSetup.EmptyScene` já devolve a cena sem nada. Antes dele, confira que nenhuma cena aberta tem alteração não salva: o `NewScene` fecha todas e descarta o que não foi gravado, sem perguntar (receita em [unity-cli.md](../agentes/unity-cli.md#abrir-e-salvar-cena)).
    - **Sem `Canvas`, sem `EventSystem`, sem manager:** o modelo não traz nenhum dos três, mas outro modelo pode trazer.
 4. **Os objetos**, um a um, a partir do prefab `Interactable`: ele já traz o sprite (um quadrado de 1 × 1, provisório, que o **Placeholder Label** pinta na cor do tipo), o **Box Collider 2D** de 0,8 × 0,8 marcado como trigger, o **Highlight Scale Multiplier** 1,15, o **Outline Object** (o filho `Highlight`), um **Interactable Dialogue Trigger** vazio e o **Placeholder Label** com o filho `Label` ([Rótulo de placeholder](#rótulo-de-placeholder-191)). Esses valores **ficam como estão**, e o objeto entra na cena com escala 1. **Escreva o Display Name de cada objeto** (as tabelas abaixo têm os da fatia); sem ele o teste reprova a sala.
 5. **A lista de cenas do build** e, no `Menu.unity`, o **Start Room** do `Main Menu`.
 6. **Rodar a suíte de EditMode**: ela reprova gatilho ou conversa de chegada com nó inexistente (`ScriptNodeFieldsTests`), saída para sala ou ponto que não existe, id de coletável repetido, mais de um `Room Music` e mais de um `Room Arrival` por cena, e (`PlaceholderLabelsTests`, #191) objeto interativo de uma sala do build que usa o quadrado de placeholder sem rótulo, sem **Display Name** ou com um caractere que a fonte não tem. **A suíte lê toda cena e todo prefab de `Assets/`, esteja a cena na lista do build ou não** (a #107 provou: com a cena fora da lista, um nó e um ponto errados foram reprovados), então dá para conferir uma sala antes do passo 5. A lista do build continua necessária para a sala ser **destino** de uma troca, e o `RoomLinksTests` reprova a saída que cita uma sala fora dela.
 
-### `[Fatia] Onibus` (sem pan)
+### `[Fatia] Onibus` (com pan)
 
 - **Câmera:** a descrita em [Criar uma sala nova](#criar-uma-sala-nova) (`Systems/Main Camera`, **Background Type** `Solid Color` preto, **Depth** 0). Não é a câmera da cena de teste.
-- **Fundo:** um objeto `Environment/Background` com um **Sprite Renderer**. O sprite é `testebckg_0`, o único sprite de `Assets/_Tests/Background/testebckg.png` (a textura está em `Sprite Mode: Multiple`: arraste o sprite, não a textura), em escala 1,25. Sem **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz da cena.
+- **Fundo e pan:** a hierarquia é a do `[Fatia] Posto`: `Environment/ScrollingBackground` (em 0, 0, 0, com o **Screen Pan Controller**: **Environment Container** = ele mesmo, **Background** = `Backgrounds`, **Pan Speed** 10, **Edge Threshold** 80) com `Backgrounds`, `Interactables` e `EntryPoints` como filhos. Dentro de `Backgrounds` está o objeto `Background` com um **Sprite Renderer**. O sprite é `testebckg_0`, o único sprite de `Assets/_Tests/Background/testebckg.png` (a textura está em `Sprite Mode: Multiple`: arraste o sprite, não a textura), em escala 1,25 (cobre de -10,45 a 10,45). Essa imagem provisória é mais larga que a tela de 16:9 (17,78), então o cenário anda ±1,56; numa tela 21:9 (23,7 de largura) ela é mais estreita que a tela e fica centralizada, com preto dos lados. Chegando pela porta (ponto em 5), o cenário fica em -1,56.
 - **`Room Music`:** um objeto na raiz com o componente **Room Music** e `teste_musica_a`.
 - **`Room Arrival`:** um objeto na raiz com o componente **Room Arrival Dialogue**, **Node Name** `onibus_chegada` e **Starts Dark** ligado (#71: o prólogo começa no preto e clareia). É ele que abre o prólogo sozinho no Novo Jogo (e a cada chegada no ônibus, com o nó decidindo se repete).
-- **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`. Sem pan, o X dele não move nada; só precisa existir.
+- **`EntryPoints/EntryPoint_Porta`:** **Room Entry Point** de id `porta`, em x 5.
 - **`Interactables/Poltrona`** (`CONVERSA`, **Display Name** `Poltrona`): o gatilho com o nó `onibus_poltrona`, ligado em **On Interact** (`InteractableDialogueTrigger.TriggerDialogue`). Depois da #127 ela só mostra o pensamento "O motorista mandou todo mundo descer. Melhor ir até a porta."; o prólogo abre pelo `Room Arrival`.
 - **`Interactables/Porta_Onibus`** (`PORTA TRANCADA`, **Display Name** `Porta do ônibus`): um portão **só de flag**, com **Locked Action Behaviour** e **Room Exit**:
   - **Required Flag Id** `$prologo_concluido` e **Unlocked Flag Id** `$porta_onibus_aberta`, **sem item**. As duas variáveis precisam ser **diferentes**, senão o **On Unlocked** nunca dispara.
@@ -371,7 +372,7 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
 
 ### `[Fatia] Posto` (com pan)
 
-- **Fundo e pan:** a hierarquia é `Environment/ScrollingBackground`, com `Backgrounds`, `Interactables` e `EntryPoints` como filhos. O `ScrollingBackground` fica em (0, 0, 0) e leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Pan Speed** 10, **Edge Threshold** 80, **Min X** -22,4, **Max X** 22,4; a conta está em [Pan do cenário](#pan-do-cenário) e vale para estes três painéis de 20,9 de largura). `Backgrounds` é um objeto vazio só para agrupar os três painéis, que têm o mesmo sprite (`testebckg_0`) e escala Y 1,25: `LeftPanel` (x -20,9, escala X -1,25, o sprite espelhado), `MiddlePanel` (x 0, escala X 1,25) e `RightPanel` (x 20,9, escala X -1,25). O agrupamento em `Backgrounds` e a escala em Z são escolha de quem monta: nada depende deles. `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan, e as posições abaixo são **locais** a ele (como ele está em 0, valem também como posição no mundo).
+- **Fundo e pan:** a hierarquia é `Environment/ScrollingBackground`, com `Backgrounds`, `Interactables` e `EntryPoints` como filhos. O `ScrollingBackground` fica em (0, 0, 0) e leva o **Screen Pan Controller** (**Environment Container** = ele mesmo, **Background** = `Backgrounds`, **Pan Speed** 10, **Edge Threshold** 80; o limite sai dos três painéis de 20,9 de largura, como em [Pan do cenário](#pan-do-cenário)). `Backgrounds` é um objeto vazio só para agrupar os três painéis, que têm o mesmo sprite (`testebckg_0`) e escala Y 1,25: `LeftPanel` (x -20,9, escala X -1,25, o sprite espelhado), `MiddlePanel` (x 0, escala X 1,25) e `RightPanel` (x 20,9, escala X -1,25). O agrupamento em `Backgrounds` e a escala em Z são escolha de quem monta: nada depende deles. `Interactables` e `EntryPoints` são **filhos do `ScrollingBackground`**, para andarem com o pan, e as posições abaixo são **locais** a ele (como ele está em 0, valem também como posição no mundo).
 - **`Room Music`:** um objeto na raiz da cena (não dentro do `ScrollingBackground`), com **Room Music** e `teste_musica_b`.
 - **`EntryPoints/EntryPoint_Onibus`:** id `onibus`, em x 20 (o mesmo X do `Exit_Onibus`), y 0: é o lugar que fica no centro da tela quando o jogador chega do ônibus.
 - **`Interactables/Exit_Onibus`:** em x 20, y 0, escala 1. Uma saída comum (**Room Exit**, destino `[Fatia] Onibus`, ponto `porta`), com `RoomExit.Leave` em **On Interact**; o gatilho vazio do prefab fica. É a porta do ônibus vista de fora, que já está aberta.
@@ -388,17 +389,17 @@ A fatia vertical é o conteúdo provisório que exercita todos os sistemas junto
   | `Motorista` | 12 | `Motorista` | gatilho `posto_motorista` |
   | `Exit_Onibus` | 20 | `Ônibus` | a saída descrita acima |
 
-  Por que essas posições: chegando do ônibus (centro em 20) a tela mostra de 11,1 a 28,9, então o motorista e a porta do ônibus aparecem juntos; chegando da loja (centro em 4), a porta da loja e os caminhoneiros; com o pan no limite (+22,4) a tela mostra de -31,3 a -13,5, e a estrada (-24) e a cadeira (-14) cabem. **O pan não mudou:** os três painéis continuam e os limites ±22,4 também.
+  Por que essas posições: chegando do ônibus (centro em 20) a tela mostra de 11,1 a 28,9, então o motorista e a porta do ônibus aparecem juntos; chegando da loja (centro em 4), a porta da loja e os caminhoneiros; com o pan no limite (+22,46 em 16:9) a tela mostra de -31,35 a -13,57, e a estrada (-24) e a cadeira (-14) cabem. Numa tela 21:9 o limite é +19,50 e a tela mostra de -31,35 a -7,65.
 
 Os objetos são o quadrado do prefab, na cor do tipo e com o rótulo, na escala 1: o motorista, os caminhoneiros e o atendente são só a área clicável sobre o fundo provisório, sem sprite de personagem (fora do escopo, [visao-geral.md](../jogo/visao-geral.md#fora-do-escopo-atual)). Um objeto maior que isso precisa de escala **e** de collider acompanhando; o **Box Collider 2D** do prefab segue a escala do objeto.
 
-### `[Fatia] Loja` (sem pan)
+### `[Fatia] Loja` (com pan)
 
-Uma sala só de objetos, como o ônibus: o fundo é o mesmo `testebckg_0`, em escala 1,25 (cobre de -10,45 a 10,45, mais largo que a tela de 17,78), então não há **Screen Pan Controller**, e `Interactables` e `EntryPoints` ficam na raiz. Câmera e fundo como em [`[Fatia] Onibus`](#fatia-onibus-sem-pan).
+Uma sala só de objetos, como o ônibus: o fundo é o mesmo `testebckg_0`, em escala 1,25 (cobre de -10,45 a 10,45), com a mesma hierarquia de pan do ônibus. Câmera e fundo como em [`[Fatia] Onibus`](#fatia-onibus-com-pan). O pan é o que garante que, numa tela estreita (4:3 mostra só ±6,67), a saída `Exit_Patio` (x -7) seja alcançável: chegando pelo pátio (ponto em -7), o cenário fica em +1,56 em 16:9 e a saída aparece em x -5,44.
 
 - **`Room Music`:** `teste_musica_b`, **a mesma do pátio**: entre as duas salas a música não reinicia, o que se espera de entrar numa loja do mesmo posto.
 - **`Room Arrival`:** **Node Name** `loja_chegada`, **Starts Dark** desligado.
-- **`EntryPoints/EntryPoint_Patio`:** id `patio`, em x -7. Sem pan não move nada, mas precisa existir.
+- **`EntryPoints/EntryPoint_Patio`:** id `patio`, em x -7.
 - **`Interactables`**, do prefab, y 0, escala 1:
 
   | Objeto | X | Display Name | Ligação |
@@ -421,6 +422,6 @@ A `[Fatia] Loja` está na lista de cenas do build, depois do `[Fatia] Posto`.
 - **Um portão tem de ser ligado ao próprio clique** (#107): **On Interact** do **Interactable Item** → `LockedActionBehaviour.Interact`, também no portão só de item (o `Door_PortaTrancada` da `[Teste] Mecanicas`, que tem dois gatilhos e é portão). Sem isso o clique não chega ao portão.
 - **O que a remontagem da #107 achou** (despejo das duas cenas e `diff`): a `[Fatia] Posto` montada por script a partir só deste guia ficou igual à real em tudo o que o guia dizia. As diferenças que sobraram eram o que ele não dizia (**Depth** da câmera, posição e escala dos três objetos, ordem dos eventos do **On Unlocked** da máquina, o objeto `Backgrounds`), e agora diz. A remontagem foi por script: montar pelo Inspector não foi testado.
 - **Ao montar por script, o console avisa de campo vazio** (`Id`, **Destination Room**, **Clip**, **Environment Container**) a cada `AddComponent`, porque o componente se valida antes de o script preenchê-lo. Os avisos somem quando o campo é preenchido e a cena é salva; confira o console no fim, não no meio da montagem (receita em [unity-cli.md](../agentes/unity-cli.md)).
-- **Uma sala sem pan não precisa do `ScrollingBackground`**, mas o ponto de entrada precisa existir mesmo assim, com id.
+- **Toda sala tem o `ScrollingBackground` e o Screen Pan Controller** (#157), mesmo que o fundo seja mais estreito que a tela: o pan simplesmente não anda. Se `Interactables` e `EntryPoints` ficarem fora dele, não andam com o fundo.
 - **Item novo, flag nova e nó novo** têm uma ordem: o item no registro, a variável em `variaveis.yarn` e o nó no `.yarn` **antes** de preencher o campo que os usa, porque as listas do Inspector só mostram o que o Unity já importou.
 - **Salve as cenas antes de rodar a suíte.** Com uma cena suja, o Test Runner abre um diálogo e trava o Editor.

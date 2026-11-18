@@ -29,7 +29,7 @@ A cena de referência, que exercita tudo o que existe, é `Assets/Scenes/[Teste]
 
 **Existe:**
 - Detecção por `Physics2D.OverlapPoint` sob o cursor; destaque por escala e contorno.
-- Pan de borda com limites mínimo e máximo.
+- Pan de borda até a borda da imagem de fundo, em qualquer formato de tela (#157): numa tela mais larga o jogador vê mais da panorâmica. Toda sala tem pan; uma imagem mais estreita que a tela fica centralizada.
 - Cliques e pan param durante diálogos, e um clique sobre a interface não atinge o mundo.
 - Um objeto pode ficar escondido (invisível e sem resposta) até uma variável booleana da história ligar (#128): ele aparece ao fim da conversa que a liga e continua visível depois de sair, salvar e carregar.
 - Todo objeto ainda sem arte (o quadrado do prefab) mostra um **rótulo provisório** com o tipo e o nome (`CONVERSA / Motorista`, `SAÍDA / Loja`), e o quadrado tem a cor do tipo (#191). O tipo vem dos componentes do objeto, o nome é escrito à mão, e o rótulo some e volta junto com o objeto escondido. É placeholder: sai objeto a objeto quando a arte chega ([salas.md](../autoria/salas.md#rótulo-de-placeholder-191)).
