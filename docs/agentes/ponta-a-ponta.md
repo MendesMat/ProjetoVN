@@ -26,6 +26,13 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 
 - Rode as duas suítes **antes** deste passo ou **depois** do passo 18, nunca no meio do roteiro: elas sobrescrevem o `savegame.json`.
 - Copie o `savegame.json` para fora do repositório e apague-o do lugar, para o jogador ser novo. Se a pasta nunca recebeu um save, não há o que copiar.
+- Exporte as preferências de tela **antes** de apagar qualquer valor, para devolvê-las no passo 18 (a chave pertence ao programador e guarda a resolução e o modo de tela da última abertura). Guarde o arquivo fora do repositório, junto do `savegame.json` copiado:
+
+  ```powershell
+  reg export 'HKCU\Software\NoxStudios\ProjetoVN' '<pasta>\registro-antes.reg' /y
+  ```
+
+  Se a chave não existe (a build nunca foi aberta), o `reg export` falha e não há o que devolver.
 - Apague as preferências de tela que uma abertura anterior tenha gravado, para a build abrir como para um jogador novo (os valores `… Default_h…` ficam):
 
   ```powershell
@@ -91,7 +98,12 @@ Esperado: **nenhuma ocorrência** de erro, aviso ou exceção de script. No `Pla
 
 Linhas do motor gráfico não contam como defeito do jogo, mas são registradas à parte no resultado. Só a `D3D12PipelineLibrary must be recreated…` (que tem `ERROR`, na primeira abertura de uma build nova) aparece no filtro acima. A `d3d12: failed to query info queue interface (0x80004002).` aparece em toda execução (é do driver), mas não tem `ERROR` nem `Exception`: **só se vê lendo o log inteiro**, então registre-a depois de conferir o log, não pelo filtro.
 
-**18. Devolva o save.** Devolva o `savegame.json` copiado no passo 0 e confira que `git status` está limpo.
+**18. Devolva o save e as preferências de tela.**
+
+- Devolva o `savegame.json` copiado no passo 0 e confira que ele ficou igual ao original (`cmp`).
+- Apague os valores `Screenmanager …` (sem `Default_h`) que as aberturas gravaram, com o comando do passo 0, e reimporte o que foi exportado: `reg import '<pasta>\registro-antes.reg'`. Sem apagar antes, o `reg import` soma valores em vez de restaurar.
+- Confira que a chave ficou como estava: um novo `reg export` para outro arquivo tem de dar `diff` vazio contra `registro-antes.reg`.
+- Confira que `git status` está limpo (só o que já estava sem rastrear antes do passo 0).
 
 ## Registrar o resultado
 
