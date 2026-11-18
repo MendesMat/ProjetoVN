@@ -51,7 +51,7 @@ Fora do escopo não quer dizer proibido para sempre: quer dizer que nenhuma issu
 | **Sala** | Um ambiente explorável. Cada sala é uma cena Unity |
 | **Saída** | Objeto clicável que leva a outra sala |
 | **Ponto de entrada** | Onde o jogador "chega" em uma sala, que define a posição inicial do pan |
-| **Pan** | Deslocamento lateral do cenário quando o mouse encosta na borda da tela |
+| **Pan** | Deslocamento lateral do cenário quando o mouse encosta na borda da tela, até a borda da imagem de fundo |
 | **Objeto interativo** | Objeto do cenário com `InteractableItem`: reage a hover e a clique |
 | **Coletável** | Objeto interativo que vira item do inventário ao ser clicado |
 | **Portão** | Objeto que só libera uma ação com um item, uma flag ou os dois (`LockedActionBehaviour`). Uma porta trancada é um portão |

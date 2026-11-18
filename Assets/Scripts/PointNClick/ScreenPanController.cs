@@ -16,26 +16,32 @@ namespace ProjetoVN.PointNClick
         [Min(0f)]
         [SerializeField] private float edgeThreshold = 80f;
 
-        [Header("Boundaries")]
-        [Tooltip("Menor posição X que o Environment Container alcança: o limite do pan de um lado. A conta está em docs/autoria/salas.md, " +
-                 "seção \"Pan do cenário\" (a [Teste] Mecanicas usa -22.4). Maior que Max X = aviso no console, e o pan pula entre os dois limites.")]
-        [SerializeField] private float minX = -5f;
-
-        [Tooltip("Maior posição X que o Environment Container alcança: o limite do pan do outro lado. A conta está em docs/autoria/salas.md, " +
-                 "seção \"Pan do cenário\" (a [Teste] Mecanicas usa 22.4). Menor que Min X = aviso no console, e o pan pula entre os dois limites.")]
-        [SerializeField] private float maxX = 5f;
-
         [Header("References")]
         [Tooltip("O objeto que o pan desloca: pai do fundo, dos objetos interativos e dos pontos de entrada (ex.: Environment/ScrollingBackground). " +
                  "Vazio = o cenário não anda, com aviso no Inspector e erro ao entrar na sala.")]
         [SerializeField] private Transform environmentContainer;
 
+        [Tooltip("O objeto com as imagens de fundo da sala (ex.: Environment/ScrollingBackground/Backgrounds), dentro do Environment Container. " +
+                 "O pan para quando a borda da imagem encosta na borda da tela, em qualquer formato de tela; todas as imagens filhas contam como uma só " +
+                 "(uma panorâmica ou painéis lado a lado). Imagem mais estreita que a tela fica centralizada. " +
+                 "Vazio, ou sem nenhum SpriteRenderer = o cenário não anda, com aviso no Inspector e erro ao entrar na sala.")]
+        [SerializeField] private Transform background;
+
         private enum PanDirection { None, Left, Right }
+
+        private bool _hasBackgroundEdges;
+        private float _backgroundLeft;
+        private float _backgroundRight;
 
         private void Awake()
         {
             if (environmentContainer == null)
+            {
                 Debug.LogError("[ScreenPanController] 'environmentContainer' não foi atribuído. O cenário não vai se mover.", this);
+                return;
+            }
+
+            MeasureBackground();
         }
 
 #if UNITY_EDITOR
@@ -44,34 +50,32 @@ namespace ProjetoVN.PointNClick
             if (environmentContainer == null)
                 Debug.LogWarning("[ScreenPanController] O campo 'Environment Container' está vazio: o cenário não anda. Atribua o objeto pai do fundo e dos interativos.", this);
 
-            if (minX > maxX)
-                Debug.LogWarning($"[ScreenPanController] 'Min X' ({minX}) é maior que 'Max X' ({maxX}): o pan pula entre os dois limites. Veja a conta em docs/autoria/salas.md, seção \"Pan do cenário\".", this);
+            if (background == null)
+            {
+                Debug.LogWarning("[ScreenPanController] O campo 'Background' está vazio: o cenário não anda. Atribua o objeto com as imagens de fundo da sala.", this);
+                return;
+            }
+
+            if (background.GetComponentInChildren<SpriteRenderer>() == null)
+                Debug.LogWarning("[ScreenPanController] O 'Background' não tem nenhum SpriteRenderer nele nem nos filhos: o cenário não anda.", this);
+
+            if (environmentContainer != null && !background.IsChildOf(environmentContainer))
+                Debug.LogWarning("[ScreenPanController] O 'Background' precisa estar dentro do 'Environment Container': senão o fundo não anda com o pan e o limite sai errado.", this);
         }
 #endif
 
         private void Update()
         {
-            if (environmentContainer == null) return;
+            if (environmentContainer == null || !_hasBackgroundEdges) return;
+
+            KeepContainerInsideLimits();
+
             if (!PlayerInputGate.IsEnabled) return;
 
             PanDirection direction = DetectPanDirection();
             if (direction == PanDirection.None) return;
 
             ApplyPan(direction);
-        }
-
-        private PanDirection DetectPanDirection()
-        {
-            Mouse mouse = Mouse.current;
-            if (mouse == null) return PanDirection.None;
-
-            float mouseX = mouse.position.ReadValue().x;
-            if (!IsMouseInsideScreen(mouseX)) return PanDirection.None;
-
-            if (mouseX < edgeThreshold) return PanDirection.Right;
-            if (mouseX > Screen.width - edgeThreshold) return PanDirection.Left;
-
-            return PanDirection.None;
         }
 
         public void CenterOn(float worldX)
@@ -88,15 +92,79 @@ namespace ProjetoVN.PointNClick
             MoveContainerToX(environmentContainer.position.x + camera.transform.position.x - worldX);
         }
 
+        private void MeasureBackground()
+        {
+            if (background == null)
+            {
+                Debug.LogError("[ScreenPanController] 'background' não foi atribuído. O cenário não vai se mover.", this);
+                return;
+            }
+
+            SpriteRenderer[] renderers = background.GetComponentsInChildren<SpriteRenderer>();
+            if (renderers.Length == 0)
+            {
+                Debug.LogError("[ScreenPanController] 'background' não tem nenhum SpriteRenderer. O cenário não vai se mover.", this);
+                return;
+            }
+
+            Bounds union = renderers[0].bounds;
+            foreach (SpriteRenderer renderer in renderers)
+                union.Encapsulate(renderer.bounds);
+
+            float containerX = environmentContainer.position.x;
+            _backgroundLeft = union.min.x - containerX;
+            _backgroundRight = union.max.x - containerX;
+            _hasBackgroundEdges = true;
+        }
+
+        private PanDirection DetectPanDirection()
+        {
+            Mouse mouse = Mouse.current;
+            if (mouse == null) return PanDirection.None;
+
+            float mouseX = mouse.position.ReadValue().x;
+            if (!IsMouseInsideScreen(mouseX)) return PanDirection.None;
+
+            if (mouseX < edgeThreshold) return PanDirection.Right;
+            if (mouseX > Screen.width - edgeThreshold) return PanDirection.Left;
+
+            return PanDirection.None;
+        }
+
         private void ApplyPan(PanDirection direction)
         {
             MoveContainerToX(environmentContainer.position.x + CalculateDisplacement(direction));
         }
 
+        private void KeepContainerInsideLimits()
+        {
+            MoveContainerToX(environmentContainer.position.x);
+        }
+
         private void MoveContainerToX(float x)
         {
+            if (!_hasBackgroundEdges) return;
+            if (!TryCalculateRange(out PanRange range)) return;
+
             Vector3 position = environmentContainer.position;
-            environmentContainer.position = new Vector3(Mathf.Clamp(x, minX, maxX), position.y, position.z);
+            float clampedX = range.Clamp(x);
+            if (Mathf.Approximately(clampedX, position.x)) return;
+
+            environmentContainer.position = new Vector3(clampedX, position.y, position.z);
+        }
+
+        private bool TryCalculateRange(out PanRange range)
+        {
+            Camera camera = Camera.main;
+            if (camera == null)
+            {
+                range = default;
+                return false;
+            }
+
+            float halfViewWidth = camera.orthographicSize * camera.aspect;
+            range = PanLimits.For(_backgroundLeft, _backgroundRight, camera.transform.position.x, halfViewWidth);
+            return true;
         }
 
         private float CalculateDisplacement(PanDirection direction)
