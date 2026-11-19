@@ -15,10 +15,10 @@ Refaça o roteiro sempre que uma issue mudar a fatia (sala, conversa, puzzle, me
 | O quê | Onde |
 |---|---|
 | A build | `Builds/Windows/ProjetoVN.exe` (receita em [unity-cli.md](unity-cli.md#gerar-a-build-de-windows-22)) |
-| O save e o `Player.log` | `%USERPROFILE%\AppData\LocalLow\NoxStudios\ProjetoVN` |
-| As preferências de tela da build | `HKCU\Software\NoxStudios\ProjetoVN` |
+| O save e o `Player.log` | `%USERPROFILE%\AppData\LocalLow\NoxStudios\Noturna` |
+| As preferências de tela da build | `HKCU\Software\NoxStudios\Noturna` |
 
-O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.json`. A pasta antiga `LocalLow\DefaultCompany\ProjetoVN` (de antes de o nome da empresa mudar) e a chave `HKCU\Software\DefaultCompany\ProjetoVN` não são mais usadas; não apague.
+O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.json`. A pasta antiga `LocalLow\DefaultCompany\ProjetoVN` (de antes de o nome da empresa mudar) e a chave `HKCU\Software\DefaultCompany\ProjetoVN` não são mais usadas; não apague. O mesmo vale para `LocalLow\NoxStudios\ProjetoVN` e `HKCU\Software\NoxStudios\ProjetoVN`, de antes de o nome do produto virar `Noturna` (#109): o save que estiver ali fica órfão, sem migração (D-20).
 
 ## Preparação
 
@@ -29,14 +29,14 @@ O Editor e a build usam **a mesma pasta de dados**, então dividem o `savegame.j
 - Exporte as preferências de tela **antes** de apagar qualquer valor, para devolvê-las no passo 18 (a chave pertence ao programador e guarda a resolução e o modo de tela da última abertura). Guarde o arquivo fora do repositório, junto do `savegame.json` copiado:
 
   ```powershell
-  reg export 'HKCU\Software\NoxStudios\ProjetoVN' '<pasta>\registro-antes.reg' /y
+  reg export 'HKCU\Software\NoxStudios\Noturna' '<pasta>\registro-antes.reg' /y
   ```
 
   Se a chave não existe (a build nunca foi aberta), o `reg export` falha e não há o que devolver.
 - Apague as preferências de tela que uma abertura anterior tenha gravado, para a build abrir como para um jogador novo (os valores `… Default_h…` ficam):
 
   ```powershell
-  $k = 'HKCU:\Software\NoxStudios\ProjetoVN'; Get-Item $k | Select-Object -ExpandProperty Property | Where-Object { $_ -like 'Screenmanager*' -and $_ -notlike '*Default_h*' } | ForEach-Object { Remove-ItemProperty -Path $k -Name $_ }
+  $k = 'HKCU:\Software\NoxStudios\Noturna'; Get-Item $k | Select-Object -ExpandProperty Property | Where-Object { $_ -like 'Screenmanager*' -and $_ -notlike '*Default_h*' } | ForEach-Object { Remove-ItemProperty -Path $k -Name $_ }
   ```
 
 **1. Gere a build** pela receita de [unity-cli.md](unity-cli.md#gerar-a-build-de-windows-22). Esperado: `Succeeded`, 0 erros, e `git status` limpo depois de reverter os quatro arquivos que a build regrava.

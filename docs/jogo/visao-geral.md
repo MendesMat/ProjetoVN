@@ -2,7 +2,7 @@
 
 ## O que é
 
-Um híbrido de **visual novel** e **point-and-click** em 2D, de tema escolar. O jogador explora salas clicando em objetos e personagens, conversa em diálogos com escolhas, coleta itens e resolve travas com eles. As escolhas alteram a **afinidade** com os personagens, e a afinidade bloqueia ou libera trechos do roteiro.
+**Noturna** é um híbrido de **visual novel** e **point-and-click** em 2D, de tema escolar. O jogador explora salas clicando em objetos e personagens, conversa em diálogos com escolhas, coleta itens e resolve travas com eles. As escolhas alteram a **afinidade** com os personagens, e a afinidade bloqueia ou libera trechos do roteiro.
 
 - **Plataforma:** desktop (Windows, Mac, Linux), distribuído por download no itch.io. Jogar no navegador é uma possibilidade futura, não um alvo (decisão D-23).
 - **Idioma:** português brasileiro. Localização está fora do escopo atual.
