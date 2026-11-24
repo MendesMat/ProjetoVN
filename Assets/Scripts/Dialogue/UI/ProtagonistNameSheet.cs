@@ -10,8 +10,8 @@ namespace ProjetoVN.Dialogue.UI
     /// <summary>
     /// A folha da lista de passageiros (#26): o jogador escreve o nome do protagonista e assina. Fica inativa no
     /// <c>GameUI.prefab</c> e só abre por <see cref="AskAsync"/>. O campo recusa o caractere que a regra do nome não
-    /// aceita, que a fonte não tem, o espaço que a normalização descartaria ou com que o nome deixaria de caber na placa
-    /// de nome. Quem grava o nome é o <see cref="DialogueManager"/>; a folha só devolve o texto.
+    /// aceita, que a fonte não tem ou com que o nome deixaria de caber na placa de nome. Quem grava o nome é o
+    /// <see cref="DialogueManager"/>; a folha só devolve o texto.
     /// </summary>
     public sealed class ProtagonistNameSheet : MonoBehaviour
     {
@@ -30,7 +30,7 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O texto da placa de nome da caixa de diálogo: a largura dele é o limite do nome. Vazio: o nome não tem limite de largura.")]
         [SerializeField] private TMP_Text nameplateText;
 
-        [Tooltip("O nome que aparece no campo quando o jogador ainda não assinou. Precisa ser aceito pela regra do nome (letras, espaço, hífen e apóstrofo) e caber na placa.")]
+        [Tooltip("O nome que aparece no campo quando o jogador ainda não assinou. Precisa ser aceito pela regra do nome (só letras do português, sem espaço) e caber na placa.")]
         [SerializeField] private string defaultName = "Lucas";
 
         private YarnTaskCompletionSource<string> _signing;
@@ -126,10 +126,7 @@ namespace ProjetoVN.Dialogue.UI
             if (!ProtagonistName.IsAllowedCharacter(character)) return RefusedCharacter;
             if (!FontHasGlyph(character)) return RefusedCharacter;
 
-            int insertAt = Mathf.Clamp(position, 0, text.Length);
-            if (character == ' ' && ProtagonistName.IsRedundantSpace(text, insertAt)) return RefusedCharacter;
-
-            string withCharacter = text.Insert(insertAt, character.ToString());
+            string withCharacter = text.Insert(Mathf.Clamp(position, 0, text.Length), character.ToString());
             return FitsOnNameplate(withCharacter) ? character : RefusedCharacter;
         }
 
@@ -168,7 +165,7 @@ namespace ProjetoVN.Dialogue.UI
                 Debug.LogWarning("[ProtagonistNameSheet] Name Field e Sign Button precisam estar atribuídos: a folha não funciona sem eles.", this);
 
             if (!ProtagonistName.TryNormalize(defaultName, out _))
-                Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não é aceito pela regra do nome: use letras, espaço, hífen e apóstrofo.", this);
+                Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não é aceito pela regra do nome: use só letras do português, sem espaço.", this);
 
             if (DefaultNameExceedsNameplate())
                 Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não cabe na placa de nome: ele apareceria cortado com \"…\". Use um nome mais curto.", this);
