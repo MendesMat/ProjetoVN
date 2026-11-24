@@ -1,25 +1,22 @@
 # Guia de autoria: roteiro
 
-**Para quem:** roteiristas. Você não precisa do Unity, nem de saber programar, nem de ter usado Git antes.
+**Para quem:** quem escreve os arquivos `.yarn` do jogo, que é o agente de IA a quem o programador passa o texto do roteirista (ver [Como o roteiro chega ao jogo](#como-o-roteiro-chega-ao-jogo)). O roteirista não mexe no repositório, mas pode ler este guia pelo GitHub, sem clonar nada, para saber o que o jogo já faz e [como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe).
 
 Este guia ensina três coisas, nesta ordem:
 
 1. **[Como organizar a história](#como-organizar-a-história)**: em que pasta fica cada texto e como intitulá-lo.
 2. **Como escrever**: de [Estrutura de um arquivo](#estrutura-de-um-arquivo) até [Como pedir o que ainda não existe](#como-pedir-o-que-ainda-não-existe). Cada regra vem com um exemplo.
-3. **[Como conferir](#como-conferir)** o que você escreveu e **[como enviar](#como-enviar)** para o jogo.
+3. **[Como conferir](#como-conferir)** o que você escreveu e **[como o roteiro chega ao jogo](#como-o-roteiro-chega-ao-jogo)**.
 
 No fim há um [exemplo de roteiro](#exemplo-de-roteiro) completo, com uma história curta do começo ao fim.
-
-Se é a sua primeira vez, comece instalando os programas: [Na primeira vez: prepare o computador](#na-primeira-vez-prepare-o-computador).
 
 ## O que você precisa saber antes
 
 - **O roteiro é texto puro.** Cada conversa é escrita em um arquivo que termina em `.yarn`, dentro da pasta `Assets/Roteiro/` do projeto.
-- **Você escreve no VS Code**, um editor de texto gratuito, com a extensão **Yarn Spinner**. Ela colore o texto e aponta erros enquanto você digita.
-- **Você envia pelo GitHub Desktop**, um programa que manda os seus arquivos para o projeto. O programador confere e junta ao jogo.
+- **O texto vem do roteirista.** Ele escreve na ferramenta que preferir e manda ao programador. Quem escreve o `.yarn` organiza esse texto pelas regras deste guia, sem mudar a história: uma dúvida sobre o que o roteirista quis dizer vai ao programador.
 - **Nomes técnicos são em minúsculas, sem acento, com `_` no lugar do espaço.** Isso vale para nome de arquivo, de pasta, de conversa e de variável: `luna_chave_perdida`, nunca `Luna Chave Perdida`. **O texto que o jogador lê é português normal**, com acento, maiúscula e pontuação.
 - **Uma conversa não é salva pela metade.** Se o jogador fechar o jogo no meio de um diálogo, ele volta ao começo da sala.
-- **O editor não é o jogo.** Um texto sem erro no editor ainda pode ser recusado pela verificação do jogo. A seção [O que o editor não confere](#o-que-o-editor-não-confere) lista esses casos.
+- **Compilar não é o bastante.** Um texto que o compilador do Yarn Spinner aceita ainda pode ser recusado pela verificação do jogo, ou travar no jogo. A seção [O que o compilador não confere](#o-que-o-compilador-não-confere) lista esses casos.
 
 ## Como organizar a história
 
@@ -108,7 +105,7 @@ Luna: Então senta, que a aula já vai começar.
 | `title: luna_primeiro_oi` | O **nome do nó**. É por esse nome que o jogo encontra a conversa. |
 | `---` (três hífens) | Separa o nome do texto. |
 | as linhas do meio | A conversa. |
-| `===` (três sinais de igual) | Fecha o nó. Sem ele, o editor acusa `Missing node delimiter`. |
+| `===` (três sinais de igual) | Fecha o nó. Sem ele, o compilador acusa `Missing node delimiter`. |
 
 Um arquivo completo, então, fica assim:
 
@@ -126,7 +123,7 @@ Luna: Então senta, que a aula já vai começar.
 Duas regras de digitação que valem para o arquivo inteiro:
 
 - **Comentário:** tudo o que vem depois de `//` em uma linha é comentário. Use para deixar recados para você e para o programador.
-- **Recuo:** algumas linhas ficam "para dentro" (você vai ver em [Opções](#opções) e em [Condicionar uma fala](#condicionar-uma-fala)). O recuo é sempre de **quatro espaços**. O editor já está configurado: a tecla Tab insere os quatro espaços.
+- **Recuo:** algumas linhas ficam "para dentro" (você vai ver em [Opções](#opções) e em [Condicionar uma fala](#condicionar-uma-fala)). O recuo é sempre de **quatro espaços**, nunca tabulação.
 
 ### O nome do nó
 
@@ -178,7 +175,7 @@ Quando as linhas acabam, a conversa termina sozinha: o último nó não precisa 
 
 **Mudar de nó não muda quem está na tela.** `<<detour>>` e `<<jump>>` andam dentro da mesma conversa, e o jogador não percebe a fronteira: quem já apareceu continua ali, escurecido ou em destaque, até a conversa terminar. A tela de personagens só é limpa no fim. Cuidado ao emendar dois encontros diferentes com um `<<jump>>` (a Luna se despede e o protagonista fala com um professor): a Luna continua na tela, escurecida, até alguém tomar o lugar dela. Ainda não há comando para tirar alguém de cena; se isso fizer falta, peça com [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
 
-**Copie o nome do nó, não redigite.** Um `<<jump>>` ou `<<detour>>` para um nó que não existe aparece só como aviso amarelo no editor, mas a verificação do jogo reprova.
+**Copie o nome do nó, não redigite.** Um `<<jump>>` ou `<<detour>>` para um nó que não existe aparece só como aviso do compilador, mas a verificação do jogo reprova.
 
 ## Falas e narração
 
@@ -227,7 +224,7 @@ Linhas em branco entre as falas não fazem diferença para o jogo: use para orga
 | `LUNA: Oi.` | Uma personagem "LUNA", que não existe. |
 | `Luna : Oi.` | Uma personagem "Luna " (com um espaço no fim), que não existe. |
 
-O editor não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, a personagem não apareceria na tela e a conversa não travaria.
+O compilador não acusa o engano, mas **a verificação do jogo reprova** e diz o nó, a linha e o nome errado. Se o engano chegasse ao jogo, o nome apareceria em texto puro, a personagem não apareceria na tela e a conversa não travaria.
 
 Os nomes que existem hoje (uma linha por personagem cadastrada no jogo):
 
@@ -408,7 +405,7 @@ As regras:
 
 | Regra | Por quê |
 |---|---|
-| **De duas a quatro opções por bloco.** | O jogo tem quatro botões. Com cinco opções, a quinta some, e o editor não avisa. |
+| **De duas a quatro opções por bloco.** | O jogo tem quatro botões. Com cinco opções, a quinta some, e o compilador não avisa. |
 | **Nunca uma opção só.** | Se o protagonista só tem uma resposta, ela é uma linha `Protagonista:`. |
 | **Nada entre a pergunta e a primeira opção.** | Um comando ali separa a pergunta dos botões, e o jogador precisa de um clique a mais. |
 
@@ -444,7 +441,7 @@ Luna: O que você achou da escola?
 - **Escreva o texto como o nome do gesto**, curto, como em qualquer botão (escreva até cerca de 35 caracteres, veja [Quanto cabe](#quanto-cabe)): `Assinar e sair`, `Pegar a mochila e sair`.
 - **Um bloco pode misturar falas e ações**, mas cada opção é uma coisa ou outra. Uma opção que é gesto e fala ao mesmo tempo não existe: escolha uma, e ponha a outra logo abaixo da opção (`Protagonista: ...`).
 - **O protagonista entra na tela em destaque** quando o bloco abre, como em qualquer bloco de opções, haja ou não opção de ação.
-- **Com condição, a etiqueta vem depois do `<<if>>`:** `-> Abrir a porta <<if $porta_destrancada>> #acao`. Ao contrário, o editor acusa erro de sintaxe ([Deu erro, e agora?](#deu-erro-e-agora)).
+- **Com condição, a etiqueta vem depois do `<<if>>`:** `-> Abrir a porta <<if $porta_destrancada>> #acao`. Ao contrário, o compilador acusa erro de sintaxe ([Deu erro, e agora?](#deu-erro-e-agora)).
 - **`#acao` só vale em opção.** Em fala, narração ou pensamento, a verificação do jogo reprova. E uma opção aceita só essa etiqueta: `-> Sim #feliz` é reprovado, porque opção não leva [expressão](#expressões).
 
 ## Variáveis e afinidade
@@ -572,7 +569,7 @@ Luna: Vou ensaiar no auditório. A banda toca na sexta.
 
 ### Conversa de chegada: a sala abre o nó e o nó decide
 
-Uma sala pode abrir uma conversa **sozinha** quando o jogador chega nela, sem clique (o prólogo no ônibus é assim). Quem liga a sala ao nó é quem monta a cena ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)); você escreve o nó e diz, no envio, qual é o nome dele e em que sala ele abre.
+Uma sala pode abrir uma conversa **sozinha** quando o jogador chega nela, sem clique (o prólogo no ônibus é assim). Quem liga a sala ao nó é quem monta a cena ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)); você escreve o nó e diz, na issue e no PR, qual é o nome dele e em que sala ele abre.
 
 **A sala abre o nó em toda chegada**: no Novo Jogo, ao atravessar uma saída e também ao continuar um jogo salvo. A sala não sabe se o jogador já viu a conversa. **Quem impede a repetição é o seu nó**, de um destes dois jeitos.
 
@@ -608,7 +605,7 @@ Na primeira chegada o jogador lê o pensamento; nas seguintes o nó para na prim
 - **Quando a conversa de chegada termina**, o jogador volta a explorar a sala, como depois de qualquer conversa. A pausa e o histórico funcionam nela.
 - **Só a chegada abre.** Para abrir uma conversa por outro motivo (tempo, uma variável, um item), peça pela [seção de pedidos](#como-pedir-o-que-ainda-não-existe): hoje não existe.
 - Dar **Play direto** numa sala no Editor, sem passar por uma troca de sala, não conta como chegada.
-- **Começar com a tela escura.** Uma sala pode chegar já com a tela preta, para o seu nó clarear aos poucos (o prólogo no ônibus é assim). **Quem liga isso é quem monta a cena**, no campo **Starts Dark** da sala ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)): peça no envio ("o nó `onibus_chegada` abre no ônibus **com a tela escura**"). Do seu lado, o nó começa por `<<clarear>>` (veja [Tela e imagens](#tela-e-imagens)). Se o seu nó não clarear a tela, ela clareia sozinha, em menos de meio segundo, quando a conversa termina.
+- **Começar com a tela escura.** Uma sala pode chegar já com a tela preta, para o seu nó clarear aos poucos (o prólogo no ônibus é assim). **Quem liga isso é quem monta a cena**, no campo **Starts Dark** da sala ([salas.md](salas.md#conversa-ao-chegar-na-sala-127)): peça na issue ("o nó `onibus_chegada` abre no ônibus **com a tela escura**"). Do seu lado, o nó começa por `<<clarear>>` (veja [Tela e imagens](#tela-e-imagens)). Se o seu nó não clarear a tela, ela clareia sozinha, em menos de meio segundo, quando a conversa termina.
 
 ### Mostrar um valor no texto
 
@@ -745,8 +742,8 @@ As regras:
 | Regra | Certo | Errado | O que acontece com o errado |
 |---|---|---|---|
 | No comando, o id vai **sem aspas** | `<<dar_item chave_teste>>` | `<<dar_item "chave_teste">>` | Funciona, mas escreva sempre sem aspas, para o roteiro ficar igual do começo ao fim. |
-| Em `tem_item`, o id vai **com aspas** | `tem_item("chave_teste")` | `tem_item(chave_teste)` | O painel mostra um erro vermelho. |
-| Cada comando leva **um** id | `<<dar_item chave_teste>>` | `<<dar_item>>` ou `<<dar_item chave_teste mapa>>` | O editor não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
+| Em `tem_item`, o id vai **com aspas** | `tem_item("chave_teste")` | `tem_item(chave_teste)` | O compilador acusa erro. |
+| Cada comando leva **um** id | `<<dar_item chave_teste>>` | `<<dar_item>>` ou `<<dar_item chave_teste mapa>>` | O compilador não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
 | O id é escrito por extenso | `<<dar_item chave_teste>>` | `<<dar_item {$qual}>>` | A verificação do jogo reprova. |
 
 - **Os itens são únicos.** Dar um item que o jogador já tem não faz nada; tirar um que ele não tem também não. Nenhum dos dois é erro.
@@ -821,7 +818,7 @@ As regras:
 | Regra | Certo | Errado | O que acontece com o errado |
 |---|---|---|---|
 | O id vai **sem aspas** | `<<tocar_efeito freada_batida>>` | `<<tocar_efeito "freada_batida">>` | Funciona, mas escreva sempre sem aspas. |
-| Cada comando de tocar leva **um** id | `<<tocar_efeito freada_batida>>` | `<<tocar_efeito>>` ou `<<tocar_efeito freada_batida buzina>>` | O editor não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
+| Cada comando de tocar leva **um** id | `<<tocar_efeito freada_batida>>` | `<<tocar_efeito>>` ou `<<tocar_efeito freada_batida buzina>>` | O compilador não acusa. A verificação do jogo reprova, e a conversa **trava** se ele chegar ao jogo. |
 | `<<parar_ambiente>>` **não leva id** | `<<parar_ambiente>>` | `<<parar_ambiente onibus_estrada>>` | O mesmo: a verificação reprova e a conversa trava. |
 | O id é escrito por extenso | `<<tocar_ambiente onibus_estrada>>` | `<<tocar_ambiente {$qual}>>` | A verificação do jogo reprova. |
 | O id está na **tabela certa** abaixo | `<<tocar_ambiente onibus_estrada>>` | `<<tocar_efeito onibus_estrada>>` | A verificação reprova: cada id vale só no comando da sua tabela. |
@@ -830,7 +827,7 @@ As regras:
 - **A música e o som de fundo duram até outro comando ou até a troca de sala.** Na sala seguinte (inclusive ao voltar ao menu), a música volta a ser a da sala e o som de fundo some. Dentro da mesma sala, para voltar à música dela, escreva `<<tocar_musica id_dela>>` (a música da sala precisa estar na tabela de músicas).
 - **Pedir a mesma música ou o mesmo som de fundo que já toca não reinicia** o som.
 - **Não existe `<<parar_musica>>`.** Para calar a música, peça uma faixa de silêncio ou a troca de sala.
-- **O jogador não escuta o roteiro rodar no VS Code:** o som só toca no jogo. O programador confere com fone.
+- **O som só se ouve no jogo:** nem o compilador nem a suíte o tocam. Quem confere com fone é o programador.
 - **Os sons de botão, de avançar fala, de coletar item e de porta são do jogo**: não se pede no roteiro.
 
 **Sons que existem:**
@@ -910,7 +907,7 @@ As regras:
 - **No fim da conversa, o que você deixou na tela some aos poucos**, em menos de meio segundo (escuro e imagem), mesmo que o seu nó não tenha clareado. Se a conversa for fechada no meio de um efeito, o mesmo vale. Mesmo assim, **termine o que começou**: o jogador que lê o roteiro espera o `<<clarear>>`.
 - **Nada disso entra no save nem no histórico de falas.** Salvar é recusado durante a conversa, então o jogo nunca guarda uma tela escura.
 - **Uma imagem por vez**, e a cor do escuro é sempre preta. Não existe, hoje, tirar um personagem de cena nem comandar a tela **fora** de uma conversa: se precisar, use [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe).
-- **O jogador não vê a imagem no VS Code:** a pré-visualização não mostra a tela. O programador confere no jogo.
+- **A imagem só se vê no jogo:** confira em Play Mode, com uma captura de tela.
 
 #### Imagens que existem
 
@@ -936,7 +933,6 @@ Quando uma imagem nova entrar no jogo, o programador acrescenta uma linha a esta
 | Quem fala | como na tabela [Quem fala](#quem-fala), com a mesma letra maiúscula ou minúscula | `Luna` |
 | Expressão | `#` + minúsculas, sem acento, dígitos e `_`, no fim da fala | `#raiva` |
 | Opção de ação | `#acao` no fim da opção, depois do `<<if>>` se houver | `-> Abrir a porta <<if $x>> #acao` |
-| Branch | `roteiro/<seu-nome>-<assunto>` | `roteiro/ana-chave-perdida` |
 
 ## Como pedir o que ainda não existe
 
@@ -956,23 +952,15 @@ Luna: Você não devia ter visto isso.
 // PEDIDO: tocar uma música tensa a partir daqui.
 ```
 
-Repita os pedidos no texto do envio (veja [A cada entrega](#a-cada-entrega)). O programador cria o que falta, acrescenta à tabela do guia e troca o comentário pelo comando.
+Cada pedido vira uma issue com a label `triagem` (ver [fluxo-de-trabalho.md](../agentes/fluxo-de-trabalho.md#roteiro-novo)), e o PR do roteiro os lista. A issue que cria o que falta acrescenta a linha à tabela deste guia e troca o comentário pelo comando.
 
 ## Como conferir
 
-Antes de enviar, confira o texto em dois passos.
+Antes de abrir o PR, confira o texto em dois passos, com o Unity aberto.
 
-**1. O painel de problemas.** No VS Code, salve o arquivo (Ctrl+S) e abra o painel *Problems* (*View → Problems*, ou Ctrl+Shift+M). As mensagens vêm em inglês, com um código e uma cor:
+**1. A compilação e a suíte.** Integre os arquivos com a receita [Integrar um roteiro novo](../agentes/unity-cli.md#integrar-um-roteiro-novo): ela reimporta o `Roteiro.yarnproject` e roda a suíte EditMode. O `ScriptContentTests` compila todos os roteiros e reprova **erro e aviso** (o jogo trata aviso como erro); uma mensagem de informação, como o `YS0010`, não reprova. As mensagens vêm em inglês, com um código: procure-as em [Deu erro, e agora?](#deu-erro-e-agora). O mesmo teste confere boa parte da lista de [O que o compilador não confere](#o-que-o-compilador-não-confere).
 
-| Cor | Significa | O que fazer |
-|---|---|---|
-| Vermelho | Erro | Corrigir. |
-| Amarelo | Aviso | Corrigir também: o jogo trata aviso como erro. |
-| Azul | Informação | Pode ignorar. |
-
-O texto só está pronto com o painel **sem vermelho e sem amarelo**.
-
-**2. A pré-visualização (opcional).** Aperte Ctrl+Shift+P (Cmd+Shift+P no Mac), digite `Preview Dialogue` e escolha o comando: o editor mostra a conversa andando, para você ler o fluxo. `Show Project Graph` mostra o mapa de todas as conversas. A pré-visualização **não** mostra a caixa de diálogo, o tamanho do texto nem o efeito dos comandos de item.
+**2. O jogo.** Abra a conversa em Play Mode (a mesma receita) e confira as falas, as opções, o tamanho do texto e o efeito dos comandos. É só ali que aparecem o texto que vaza da caixa e os dois-pontos que viram personagem.
 
 ### Deu erro, e agora?
 
@@ -1001,11 +989,11 @@ Procure a mensagem nesta tabela.
 | `[Compilation Error] Index and length must refer to a location within the string`, em **todos** os arquivos | Um `[` sem fechar em alguma fala derrubou o projeto inteiro. | Procure `[` nas suas falas e escreva `\[`. |
 | `YS0010 Variable '$x' is declared but never used` (azul) | A variável existe e nenhuma conversa a usa ainda. | Pode ignorar. |
 
-Se a mensagem não está aqui, copie o texto dela e mande ao programador.
+Se a mensagem não está aqui, registre o texto dela na issue e avise o programador.
 
-### O que o editor não confere
+### O que o compilador não confere
 
-O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o editor deixa passar; releia o texto procurando por elas antes de enviar:
+Compilar sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o compilador deixa passar; releia o texto procurando por elas antes de abrir o PR:
 
 | O que conferir | Exemplo do erro | O que acontece |
 |---|---|---|
@@ -1027,105 +1015,19 @@ O painel sem erro **não garante** que o jogo aceita o roteiro. Estas coisas o e
 | As falas cabem na caixa? | uma fala de 400 caracteres | O texto vaza ([Quanto cabe](#quanto-cabe)). |
 | Há dois-pontos em alguma narração? | `Eram 10:30 da manhã.` | Vira nome de personagem ([Dois-pontos na narração](#dois-pontos-na-narração)). |
 
-O programador roda a verificação do jogo em todo envio e devolve o que ela acusar.
+"A verificação do jogo reprova" quer dizer que a suíte EditMode (`ScriptContentTests`) acusa o erro, com o nó e a linha. O resto só aparece no jogo, no passo 2 de [Como conferir](#como-conferir).
 
-## Como enviar
+## Como o roteiro chega ao jogo
 
-Os textos chegam ao jogo pelo **GitHub**, o lugar na internet onde o projeto fica guardado. Quatro palavras aparecem o tempo todo:
+1. O roteirista escreve o texto, na ferramenta que preferir, e o manda ao programador, por fora do repositório.
+2. O programador passa o texto a um agente de IA, que o planeja e o implementa pelo fluxo normal do projeto: o pedido pertence a uma issue, ou vira uma, e passa pelas três sessões ([fluxo-de-trabalho.md](../agentes/fluxo-de-trabalho.md#roteiro-novo)).
+3. A sessão de execução escreve os `.yarn` seguindo este guia, confere ([Como conferir](#como-conferir)) e abre o PR. O que o roteiro pede e o jogo não tem fica em [`// PEDIDO`](#como-pedir-o-que-ainda-não-existe), salvo quando a própria issue já inclui criá-lo.
+4. O programador confere o PR e faz o merge; a sala que abre a conversa é ligada por quem monta a cena ([salas.md](salas.md)).
 
-| Palavra | O que é |
-|---|---|
-| **Repositório** | A pasta do projeto inteiro, guardada no GitHub. Você tem uma cópia no seu computador. |
-| **Branch** | Uma cópia de trabalho só sua, com nome. Você escreve nela sem mexer no jogo de verdade. A versão oficial do jogo se chama `main`. |
-| **Commit** | Um "salvar" com descrição: registra o que você mudou e por quê. |
-| **PR** (*pull request*) | O pedido para juntar a sua branch à `main`. É o seu envio. |
+Dois cuidados ao escrever os arquivos:
 
-Você nunca envia direto para a `main`: ela é protegida. Se o GitHub Desktop recusar um envio para a `main`, isso é esperado.
-
-### Na primeira vez: prepare o computador
-
-Faça uma vez só.
-
-1. **Conta no GitHub.** Crie em [github.com](https://github.com) e mande o seu nome de usuário ao programador. Ele te convida para o repositório `MendesMat/ProjetoVN`. Aceite o convite pelo e-mail que o GitHub enviar.
-2. **GitHub Desktop.** Baixe e instale em [desktop.github.com](https://desktop.github.com) e entre com a sua conta (*Sign in to GitHub.com*).
-3. **VS Code.** Baixe e instale em [code.visualstudio.com](https://code.visualstudio.com).
-4. **Copie o projeto para o seu computador.** No GitHub Desktop: *File → Clone repository*, aba *GitHub.com*, escolha `MendesMat/ProjetoVN`, escolha uma pasta e clique em *Clone*. Demora um pouco: é o projeto inteiro do jogo.
-5. **Abra o projeto no VS Code.** *File → Open Folder* e escolha a pasta **raiz** do projeto: a que se chama `ProjetoVN` e tem a pasta `Assets` dentro. Abra sempre a raiz, não só `Assets/Roteiro`: é isso que faz o editor conhecer os comandos do jogo.
-6. **Instale a extensão.** Ao abrir a pasta, o VS Code oferece instalar as extensões recomendadas: clique em *Install*. Se não oferecer, abra *Extensions* (Ctrl+Shift+X; Cmd+Shift+X no Mac), procure **Yarn Spinner** e instale. Na primeira vez, a extensão pode baixar uma ferramenta chamada .NET: espere terminar. Precisa de internet.
-7. **Confira que funcionou.** Abra `Assets/Roteiro/exemplo_comentado.yarn`. O texto deve aparecer colorido, e o painel *Problems* (*View → Problems*) deve estar sem vermelho e sem amarelo. Se aparecer `Unknown command 'dar_item'`, confira que você abriu a raiz (passo 5) e que o download do passo 6 terminou; se continuar, avise o programador.
-
-Na lista de arquivos à esquerda do VS Code você vai ver várias pastas do jogo (`Assets`, `Packages` e outras). A única que importa para você é `Assets/Roteiro`.
-
-### A cada entrega
-
-O exemplo acompanha a Ana, que vai escrever a conversa da chave perdida.
-
-1. **Pegue a versão mais nova do jogo.** No GitHub Desktop, confira que a branch atual é `main` e clique em *Fetch origin*; se aparecer *Pull origin*, clique também.
-2. **Crie a sua branch.** *Current Branch → New Branch*. O nome é `roteiro/<seu-nome>-<assunto>`:
-
-   ```
-   roteiro/ana-chave-perdida
-   ```
-
-   Uma branch nova para cada entrega, sempre criada a partir da `main`.
-3. **Escreva.** No VS Code, crie o arquivo na pasta do episódio (botão direito na pasta → *New File*):
-
-   ```
-   Assets/Roteiro/ato_1/capitulo_1/episodio_2/luna_chave_perdida.yarn
-   ```
-
-   Comece pela [linha de título](#a-linha-de-título-de-cada-arquivo).
-4. **Confira.** Painel *Problems* sem vermelho e sem amarelo, e a lista de [O que o editor não confere](#o-que-o-editor-não-confere).
-5. **Faça o commit.** No GitHub Desktop, a lista à esquerda mostra os arquivos que mudaram. **Deixe marcados só os que estão em `Assets/Roteiro/`**; desmarque qualquer outro. No campo de resumo, escreva o ato, o capítulo, o episódio e o título:
-
-   ```
-   Ato 1, Cap. 1, Ep. 2: A chave perdida
-   ```
-
-   Clique em *Commit to roteiro/ana-chave-perdida*.
-6. **Publique a branch.** Clique em *Publish branch*.
-7. **Abra o PR.** Clique em *Create Pull Request*; ele abre o navegador. O título é o mesmo do commit. O GitHub traz um texto pronto, escrito para programadores: **apague tudo** e escreva o seu, neste formato:
-
-   ```
-   Arquivos: Assets/Roteiro/ato_1/capitulo_1/episodio_2/luna_chave_perdida.yarn
-   Nó de entrada: luna_chave_perdida
-   Onde entra: corredor, no intervalo. O jogador clica na Luna.
-   Variáveis novas: nenhuma
-   Pedidos: uma expressão de surpresa para a Luna quando recebe a chave
-   ```
-
-   Clique em *Create pull request*.
-8. **Espere a resposta.** O programador roda a verificação do jogo e responde no PR. Se ele pedir uma mudança: edite o arquivo, faça um novo commit (passo 5) e clique em *Push origin*. O PR se atualiza sozinho.
-9. **Depois que o programador juntar ao jogo.** Volte para a `main` no GitHub Desktop, clique em *Pull origin* e apague a sua branch (*Branch → Delete*).
-
-Outro exemplo de texto de PR, para uma entrega com dois arquivos e uma variável nova:
-
-```
-Arquivos:
-  Assets/Roteiro/ato_1/capitulo_2/episodio_1/biblioteca_porta.yarn
-  Assets/Roteiro/ato_1/capitulo_2/episodio_1/luna_biblioteca.yarn
-  Assets/Roteiro/variaveis.yarn
-Nós de entrada: biblioteca_porta, luna_biblioteca
-Onde entra: porta da biblioteca (clique na porta) e Luna ao lado dela.
-Variáveis novas: $luna_contou_da_biblioteca
-Pedidos: o item "chave_da_biblioteca"
-```
-
-### Regras do envio
-
-- **Mexa só em `Assets/Roteiro/`.** Nunca edite `Roteiro.yarnproject` nem a pasta `Testes/`.
-- **Não use estes comandos da extensão**, que alteram vários arquivos de uma vez: `Add Line Tags`, `Create New Yarn Project`, `Create New Yarn File`, `Set as Start Node`, `Open in Project Editor`. O jogo não precisa de nenhum deles.
-- **Conflito você não resolve.** Se o GitHub Desktop ou o PR avisarem de *conflict*, pare e chame o programador.
-- **Se o GitHub Desktop disser que não pode publicar na `main`,** você está na branch errada: crie a sua (passo 2).
-
-### O que acontece com o seu envio
-
-Para você saber o que esperar:
-
-1. O programador baixa a sua branch e abre o projeto no Unity. O Unity cria arquivos `.meta` para cada `.yarn` novo; o programador os acrescenta ao seu PR.
-2. Ele roda a verificação do jogo. Se algo falhar, ele explica no PR o que corrigir.
-3. Ele abre a conversa no jogo e confere as falas, as opções e o tamanho do texto.
-4. Com tudo certo, ele junta a sua branch à `main` e liga a conversa à cena.
+- **Não edite o `Roteiro.yarnproject`, a pasta `Testes/` nem o `exemplo_comentado.yarn`.** A exceção é o campo `definitions` do `Roteiro.yarnproject`, quando um asmdef novo ganha comandos ([unity-cli.md](../agentes/unity-cli.md#armadilhas-do-yarn-spinner)).
+- **Não use estes comandos da extensão do Yarn Spinner no VS Code**, que alteram vários arquivos de uma vez: `Add Line Tags`, `Create New Yarn Project`, `Create New Yarn File`, `Set as Start Node`, `Open in Project Editor`. O jogo não precisa de nenhum deles.
 
 ## Exemplo de roteiro
 

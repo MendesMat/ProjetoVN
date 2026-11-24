@@ -12,7 +12,7 @@ Cada função da equipe tem um ponto de entrada próprio. Não é preciso ler o 
 
 | Você é… | Comece por | Ferramentas |
 |---|---|---|
-| **Roteirista** | [Guia de autoria: roteiro](docs/autoria/roteiro.md), a partir de [Na primeira vez: prepare o computador](docs/autoria/roteiro.md#na-primeira-vez-prepare-o-computador) | VS Code com a extensão Yarn Spinner, GitHub Desktop. Não precisa do Unity |
+| **Roteirista** | [Guia de autoria: roteiro](docs/autoria/roteiro.md), para saber o que o jogo faz e [como pedir o que ainda não existe](docs/autoria/roteiro.md#como-pedir-o-que-ainda-não-existe) | A ferramenta de texto que preferir. Não precisa do Unity nem de clonar o repositório: o texto vai ao programador, e um agente o organiza em `.yarn` |
 | **Game designer** | [O jogo: visão geral](docs/jogo/visao-geral.md) e [Mecânicas](docs/jogo/mecanicas.md) | Não precisa do Unity: as salas são montadas pelo agente, com o desenho que você entrega ao programador |
 | **Programador** | [Arquitetura: visão geral](docs/arquitetura/visao-geral.md) e [Decisões](docs/arquitetura/decisoes.md) | Unity, Claude Code |
 | **Agente de IA** | [CLAUDE.md](CLAUDE.md), depois o [fluxo de trabalho](docs/agentes/fluxo-de-trabalho.md) | Claude Code, Unity CLI |
@@ -67,7 +67,7 @@ Como os módulos se enxergam e conversam está em [docs/arquitetura/visao-geral.
 
 - **Planejamento:** o trabalho é dividido em milestones, feitas uma por vez, na ordem de [docs/planejamento/milestones.md](docs/planejamento/milestones.md). O andamento de cada issue vive só no GitHub, nas [issues](https://github.com/MendesMat/ProjetoVN/issues) e nas [milestones](https://github.com/MendesMat/ProjetoVN/milestones).
 - **Código:** cada issue passa por três sessões (levantamento, execução e revisão) e chega à `main` por um único PR. O processo está em [docs/agentes/fluxo-de-trabalho.md](docs/agentes/fluxo-de-trabalho.md).
-- **Roteiro:** o roteirista envia por um PR próprio, sem issue, como descrito em [Como enviar](docs/autoria/roteiro.md#como-enviar). O programador confere e junta ao jogo.
+- **Roteiro:** o roteirista manda o texto ao programador, por fora do git, e o programador o passa a um agente, que o implementa em `.yarn` pelas três sessões de uma issue. Como, em [Como o roteiro chega ao jogo](docs/autoria/roteiro.md#como-o-roteiro-chega-ao-jogo).
 - **Ideias e problemas novos** viram uma issue com a label `triagem`, e o programador decide quando entram.
 
 ## Mapa da documentação

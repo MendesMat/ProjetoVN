@@ -78,15 +78,13 @@ O agente lê a issue, os comentários, a documentação citada e o diff do PR, e
 
 O parecer vai como comentário no PR, com veredito **aprovado** ou **mudanças pedidas**, e os achados em ordem de gravidade, cada um com arquivo e linha. A label da issue é trocada conforme o veredito. O merge é do programador.
 
-## PR de roteiro
+## Roteiro novo
 
-Quem escreve roteiro entrega por um fluxo à parte, descrito para o roteirista em [roteiro.md](../autoria/roteiro.md). Um agente que encontrar um PR assim deve saber que:
+Os roteiristas não trabalham no repositório. O roteirista manda o texto ao programador, por fora do git; o programador o passa a um agente, que planeja e implementa o roteiro em `.yarn` pelo fluxo normal:
 
-- Ele vem de um roteirista (colaborador do repositório), em uma branch `roteiro/<nome>-<assunto>`, **sem issue e sem as três sessões**. O título do PR traz ato, capítulo, episódio e o título do episódio (`Ato 1, Cap. 1, Ep. 2: A chave perdida`); o texto lista os arquivos, os nós de entrada, onde a conversa entra na história, as variáveis novas e os pedidos.
-- A regra "uma issue por vez" **não conta** PR de roteiro: ele não disputa lugar com a issue em andamento.
-- Quem integra é o programador: gera os `.meta`, reimporta o `Roteiro.yarnproject`, roda os testes e abre a conversa no jogo (receita em [unity-cli.md](unity-cli.md#receber-um-roteiro-pr-de-roteirista)), e faz o merge por *squash* com a branch apagada. O agente só faz o que o programador pedir.
-- O PR de roteiro mexe só em `Assets/Roteiro/` (e nos `.meta`), em pastas `ato_N/capitulo_N/episodio_N/` (ou `ato_N/prologo/episodio_N/`), um arquivo por conversa, cada um começando pela linha de título descrita no guia (`// ATO 1 · CAPÍTULO 1 · EPISÓDIO 2 · A chave perdida`). Se tocar em qualquer outra coisa, não é PR de roteiro: devolva ao roteirista.
-- Um pedido de comando, item, personagem ou som que o roteirista deixou em `// PEDIDO` vira issue (com a label `triagem`), não é feito no PR de roteiro.
+- O pedido pertence a uma issue, ou o agente oferece criar uma (regra do [CLAUDE.md](../../CLAUDE.md)). O roteiro passa pelas três sessões e conta na regra "uma issue por vez", como qualquer outra issue.
+- A sessão de execução escreve os arquivos seguindo o [guia de roteiro](../autoria/roteiro.md) (pastas, linha de título, nomes, comandos que existem) e integra com a receita de [unity-cli.md](unity-cli.md#integrar-um-roteiro-novo): `.meta`, reimportação do `Roteiro.yarnproject`, suíte e conversa aberta em Play Mode.
+- Um comando, item, personagem ou som que o roteiro pede e o jogo ainda não tem fica em `// PEDIDO` no `.yarn` e vira issue (com a label `triagem`), salvo quando a própria issue do roteiro já o inclui no escopo.
 
 ## Regras de foco
 
@@ -127,7 +125,8 @@ Uma issue pode conceder uma autorização específica no próprio texto (a #3 au
 - **PR:** um por issue, com o modelo de `.github/PULL_REQUEST_TEMPLATE.md`. O corpo cita `Closes #N`.
 - **Merge:** sempre **squash and merge**, com a branch apagada em seguida. Cada issue vira um único commit em `main`, com o título `#N: <título da issue> (#<número do PR>)`. Os commits intermediários (inclusive os da fase vermelha da TDD) ficam só no PR.
 - **Arquivos do Unity:** todo arquivo novo dentro de `Assets/` tem um `.meta` que precisa ser commitado junto. Antes de commitar, confira `git status` por `.meta` sem par e por arquivos que o Editor alterou sem relação com a issue (esses não entram no commit).
-- **Trocar de branch:** antes de um `git checkout`, `gh pr checkout` ou `git pull`, confira duas coisas entre as duas pontas. (1) Se `Packages/` difere: se difere e o Unity está aberto, ele precisa ser fechado antes, senão o Editor pode travar. (2) Se alguma cena **aberta** no Editor muda (`git diff --name-only HEAD <destino> -- '*.unity'`): se muda, ela é trocada por uma cena vazia sem título antes, senão o Editor abre o diálogo de recarregar a cena e trava o CLI, ou fica com a versão antiga na memória. Receita em [unity-cli.md](unity-cli.md#antes-de-trocar-de-branch); `/executar-issue` e `/revisar-issue` já a seguem.
+- **Trocar de branch:** antes de um `git checkout`, `gh pr checkout` ou `git pull`, confira duas coisas entre as duas pontas. (1) Se `Packages/` difere: se difere e o Unity está aberto, ele precisa ser fechado antes, senão o Editor pode travar. (2) Se alguma cena **aberta** no Editor muda (`git diff --name-only HEAD <destino> -- '*.unity'`): se muda, ela é trocada por uma cena vazia sem título antes, senão o Editor abre o diálogo de recarregar a cena e trava o CLI, ou fica com a versão antiga na memória. Receita em [unity-cli.md](unity-cli.md#antes-de-trocar-de-branch), que também cobre os arquivos só desta máquina (item abaixo); `/executar-issue` e `/revisar-issue` já a seguem.
+- **Arquivos só desta máquina:** `.claude/` (os comandos de trabalho), `.vscode/`, `.vsconfig`, `Directory.Build.props`, a pasta `Adicionar/` e a lista de comandos que o Yarn Spinner gera em `ProjectSettings/Packages/dev.yarnspinner/` ficam fora do git, no `.gitignore` (#217): são configuração da máquina do programador, saída de ferramenta ou material que ele mantém só no disco. Como os commits anteriores à #217 rastreiam os quatro primeiros, uma troca de branch entre um commit desses e um posterior apaga ou sobrescreve a cópia do disco. Antes de uma troca assim, guarde uma cópia e restaure depois: passo 0 de [Antes de trocar de branch](unity-cli.md#antes-de-trocar-de-branch).
 - **Cenas:** arquivos `.unity` não se mesclam bem. Trabalhar uma issue por vez é o que evita o conflito.
 
 ## Documentação é parte da entrega

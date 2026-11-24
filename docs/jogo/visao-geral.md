@@ -13,7 +13,7 @@
 | Papel | Pessoa | Ferramenta | Entrega |
 |---|---|---|---|
 | Programação | Programador, com agentes de IA | Unity, Claude Code | Sistemas e ferramentas de autoria |
-| Roteiro | Roteiristas (não usam o Unity) | VS Code com a extensão do Yarn Spinner, GitHub Desktop | Arquivos `.yarn` em `Assets/Roteiro/` |
+| Roteiro | Roteiristas (não usam o Unity nem o repositório) | A ferramenta de texto que preferirem | O texto do roteiro, entregue ao programador; um agente o organiza em arquivos `.yarn` em `Assets/Roteiro/` |
 | Design de jogo | Game designer (não usa o Unity) | — | O desenho das salas, dos puzzles, dos itens e dos personagens, entregue ao programador |
 | Montagem de salas, itens e personagens | Agentes de IA, com o material do programador | Unity CLI; o programador confere pelo Inspector | Cenas, itens, personagens, sons |
 
