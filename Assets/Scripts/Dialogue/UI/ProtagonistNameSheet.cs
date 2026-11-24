@@ -30,7 +30,7 @@ namespace ProjetoVN.Dialogue.UI
         [Tooltip("O texto da placa de nome da caixa de diálogo: a largura dele é o limite do nome. Vazio: o nome não tem limite de largura.")]
         [SerializeField] private TMP_Text nameplateText;
 
-        [Tooltip("O nome que aparece no campo quando o jogador ainda não assinou. Precisa ser aceito pela regra do nome (letras, espaço, hífen e apóstrofo) e caber na placa.")]
+        [Tooltip("O nome que aparece no campo quando o jogador ainda não assinou. Precisa ser aceito pela regra do nome (só letras do português, sem espaço) e caber na placa.")]
         [SerializeField] private string defaultName = "Lucas";
 
         private YarnTaskCompletionSource<string> _signing;
@@ -165,7 +165,7 @@ namespace ProjetoVN.Dialogue.UI
                 Debug.LogWarning("[ProtagonistNameSheet] Name Field e Sign Button precisam estar atribuídos: a folha não funciona sem eles.", this);
 
             if (!ProtagonistName.TryNormalize(defaultName, out _))
-                Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não é aceito pela regra do nome: use letras, espaço, hífen e apóstrofo.", this);
+                Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não é aceito pela regra do nome: use só letras do português, sem espaço.", this);
 
             if (DefaultNameExceedsNameplate())
                 Debug.LogWarning($"[ProtagonistNameSheet] Default Name ('{defaultName}') não cabe na placa de nome: ele apareceria cortado com \"…\". Use um nome mais curto.", this);

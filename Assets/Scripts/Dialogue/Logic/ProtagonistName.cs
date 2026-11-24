@@ -12,6 +12,8 @@ namespace ProjetoVN.Dialogue.Logic
         public const string VariableName = "$nome_protagonista";
         public const string Unknown = "???";
 
+        private const string AccentedPortugueseLetters = "áàâãéêíóôõúüçÁÀÂÃÉÊÍÓÔÕÚÜÇ";
+
         public static string ToDisplay(string stored) => string.IsNullOrWhiteSpace(stored) ? Unknown : stored;
 
         public static string Normalize(string typed)
@@ -34,9 +36,13 @@ namespace ProjetoVN.Dialogue.Logic
             return name.Any(char.IsLetter) && name.All(IsAllowedCharacter);
         }
 
-        // Fica de fora de propósito o que quebra o texto ou o roteiro: [ ] são marcação do Yarn aplicada depois da troca de
-        // {$nome_protagonista}, < > são rich text do TMP (o histórico escreve o nome dentro de <b>), e { } # : \ são sintaxe do Yarn.
+        // Só as letras do português, e nenhum espaço, hífen ou apóstrofo (decidido na #213). Como a lista é fechada, nada
+        // que quebre o texto ou o roteiro entra. As duas caixas estão escritas, sem ToLower/ToUpper, para a regra não
+        // depender de cultura.
         public static bool IsAllowedCharacter(char character) =>
-            char.IsLetter(character) || character == ' ' || character == '-' || character == '\'';
+            IsUnaccentedLetter(character) || AccentedPortugueseLetters.IndexOf(character) >= 0;
+
+        private static bool IsUnaccentedLetter(char character) =>
+            character is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
     }
 }
