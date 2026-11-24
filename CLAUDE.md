@@ -107,5 +107,5 @@ READMEs dos módulos, em `Assets/Scripts/`:
 | `Assets/Audio/` | O `AudioMixer` do projeto (grupos `Music` e `SFX`) e os sons, nas pastas `Ambiente/` e `Efeitos/` (a pasta `Musica/` nasce com a primeira música definitiva; as músicas de teste, `teste_musica_a` e `teste_musica_b`, ficam em `Assets/_Tests/Audio/`) |
 | `Assets/Roteiro/` | Roteiros `.yarn` e o `Roteiro.yarnproject` |
 | `docs/` | Documentação transversal; `docs/arte/` guarda as cenas de referência da arte e `docs/arte/interface/` o guia da interface nova, o da camada de horror e as referências em 4K |
-| `.claude/skills/` | Os três comandos de trabalho |
+| `.claude/skills/` | Os três comandos de trabalho, fora do git (só no disco desta máquina, com cópia em `../ProjetoVN-local/` nas trocas de branch; ver [Antes de trocar de branch](docs/agentes/unity-cli.md#antes-de-trocar-de-branch)) |
 | `.github/` | Modelos de issue e de PR |

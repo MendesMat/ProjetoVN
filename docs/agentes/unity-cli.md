@@ -108,7 +108,7 @@ unity command script eval 'UnityEditor.AssetDatabase.Refresh(); return "ok";'
 
 É isso que faz o Editor gerar o `.meta` de um arquivo criado direto no disco, como um README novo dentro de `Assets/`.
 
-Depois de criar um **`.yarn`**, o `Refresh` não basta: com o Editor sem foco o arquivo não entra no `Roteiro.yarnproject`. Reimporte também o projeto de roteiro (passo 3 de [Receber um roteiro](#receber-um-roteiro-pr-de-roteirista); causa na [armadilha do Yarn Spinner](#armadilhas-do-yarn-spinner), #34).
+Depois de criar um **`.yarn`**, o `Refresh` não basta: com o Editor sem foco o arquivo não entra no `Roteiro.yarnproject`. Reimporte também o projeto de roteiro (passo 2 de [Integrar um roteiro novo](#integrar-um-roteiro-novo); causa na [armadilha do Yarn Spinner](#armadilhas-do-yarn-spinner), #34).
 
 ### Abrir e salvar cena
 
@@ -333,6 +333,35 @@ O caso "cena aberta + `Refresh`" não foi repetido de propósito: o diálogo foi
 #### Antes de trocar de branch
 
 Os comandos de trabalho (`/executar-issue`, `/revisar-issue`) fazem esta conferência antes de todo `git checkout`, `gh pr checkout` e `git pull`. O `git checkout -b` não precisa dela: ele cria a branch no commit em que se está, e nenhum arquivo muda no disco.
+
+0. **Os arquivos só desta máquina (#217).** `.claude/` (os comandos de trabalho), `.vscode/`, `.vsconfig` e `Directory.Build.props` ficam fora do git, só no disco, mas os commits anteriores à #217 os rastreiam. Numa troca entre um commit que os rastreia e um que não, o git mexe neles mesmo com o `.gitignore`: indo para onde não são rastreados, **apaga** os arquivos do disco; indo para onde são, **sobrescreve** a cópia do disco com a versão commitada, sem aviso; e, se a cópia do disco difere da commitada, recusa a troca (`Your local changes to the following files would be overwritten`). Medido num repositório descartável na #217, com `git checkout` e `git pull`.
+   1. **Quando vale:** depois do `git fetch origin` do passo 1, se um dos dois comandos imprime `.claude`, com o mesmo destino do passo 2:
+
+      ```bash
+      git ls-tree --name-only HEAD .claude
+      ```
+
+      ```bash
+      git ls-tree --name-only <destino> .claude
+      ```
+
+      Nenhum dos dois imprime nada: os dois lados são posteriores à #217, e este passo não se aplica.
+   2. **Guardar, antes da troca.** Copia os arquivos para `../ProjetoVN-local/`, ao lado do repositório, e devolve à versão commitada os que o `HEAD` rastreia, para que o git não recuse a troca:
+
+      ```bash
+      test -d .claude/skills && rm -rf ../ProjetoVN-local && mkdir ../ProjetoVN-local && cp -a .claude .vscode .vsconfig Directory.Build.props ../ProjetoVN-local/ && git ls-files -z .claude .vscode .vsconfig Directory.Build.props | xargs -0 -r git checkout --
+      ```
+
+      O `test -d` para a linha quando a `.claude/skills/` já sumiu do disco: assim uma cópia boa, de antes, não é apagada. Nesse caso (saída `1`), não troque de branch antes de restaurar a cópia (o comando do item 3) e repetir o guardar.
+   3. **Restaurar, depois da troca:**
+
+      ```bash
+      cp -a ../ProjetoVN-local/. .
+      ```
+
+      Num commit posterior à #217, o `git status` fica limpo. Num anterior, os arquivos aparecem como modificados (` M`) sempre que a cópia difere da commitada: é esperado, e o guardar da próxima troca os devolve antes de trocar.
+
+   O `ProjetoVN.GameFlow-generated.ysls.json` não entra na cópia: o Unity o recria na próxima compilação. Para ler um arquivo de um commit antigo, use `git show <commit>:<arquivo>` ou um `git worktree add` fora do repositório, e não um `checkout` na cópia de trabalho. Uma sessão em worktree ou na nuvem não recebe a `.claude/`: o programador aceitou isso na #217.
 
 1. Atualize as referências remotas, para que `origin/...` exista e esteja em dia:
 
@@ -826,8 +855,8 @@ Descobertas nas issues #5 e #6. A prova de conceito (#3) e o código do pacote e
 - **Comando e função novos: C# primeiro, `.yarn` depois.** O comando novo já nasce coberto na contagem e no tipo dos parâmetros pelo teste genérico (#37, #142); o teste dos ids (item, som) continua sendo trabalho de quem cria o comando. Um comando com parâmetro numérico pede, no guia do roteirista, a regra "ponto decimal, nunca vírgula" (escrita em `roteiro.md`, seção "Tela e imagens", pela #71, a primeira issue com comando numérico). O gerador de código do pacote acha métodos **estáticos** com `[YarnCommand]` e `[YarnFunction]` sem registro nosso; o asmdef do módulo precisa referenciar `YarnSpinner.Unity`. Para executar um roteiro fora do runner (o `ScriptRun` dos testes), a função precisa estar registrada na `Library` do `Yarn.Dialogue`, senão a VM lança `Function tem_item is not present in the library`. Em um roteiro em memória no Play Mode, passe `runner.Dialogue.Library` ao `CompilationJob`.
 - **`<<jump>>` para nó inexistente compila com aviso.** O compilador dá só o aviso `YS0012`, e em runtime o Yarn lança e para sem chamar o fim da conversa. A rede de segurança no `Update` do `DialogueManager` encerra a conversa com um erro. O `ScriptContentTests` reprova qualquer aviso nos roteiros, o que pega o erro antes do Play.
 - **Um `.yarn` só vira conteúdo dentro de um `.yarnproject`.** Os roteiros ficam em `Assets/Roteiro/`, cobertos por `Assets/Roteiro/Roteiro.yarnproject` (`**/*.yarn`). Um `.yarn` fora dessa pasta não é importado.
-- **Um `.yarn` novo só entra no `Roteiro.yarnproject` com o Editor em foco (#34).** O `YarnImporter` do pacote agenda a reimportação do projeto num `EditorApplication.delayCall`, e o `delayCall` não roda com o Editor sem foco (o `EditorApplication.update` roda; o `delayCall` fica na fila). Depois de criar um `.yarn` por fora e dar `Refresh`, o arquivo é importado, mas o projeto continua com os arquivos de antes: o nó não existe para o `DialogueRunner` nem para o seletor do Inspector, e os erros de compilação do arquivo não aparecem. O `ScriptContentTests` lê os `.yarn` do disco e vê o arquivo, então os testes passam enquanto o Play Mode discorda deles. **Reimporte o projeto** (o `ImportAsset` do passo 3 de [Receber um roteiro](#receber-um-roteiro-pr-de-roteirista); com ou sem `ForceUpdate`, os dois funcionam). Apagar ou editar um `.yarn` que o projeto já conhece não tem o problema: o projeto depende de cada arquivo (`DependsOnSourceAsset`), e o Unity o reimporta na hora. Com o Editor em foco (o programador usando o Unity), a reimportação acontece sozinha em poucos segundos. Não tente destravar o `delayCall` com `RepaintAllViews` (não adianta) nem com `Application.runInBackground` (a opção já é `1`, D-31, e a atribuição suja o `ProjectSettings`). Para conferir, leia `YarnProjectImporter.ImportData.yarnFiles.Count`, se `AssetDatabase.GetDependencies` do projeto lista o arquivo e se o nó está em `Yarn.Program.Parser.ParseFrom(project.compiledYarnProgram).Nodes`; confira também `UnityEditorInternal.InternalEditorUtility.isApplicationActive == False`, porque um clique no Unity durante a verificação libera a fila e esconde o defeito.
-- **Arquivos criados pelo pacote em `ProjectSettings/Packages/dev.yarnspinner/`.** O `YarnSpinnerProjectSettings.json` é commitado (a #5 foi autorizada a isso). O `ProjetoVN.GameFlow-generated.ysls.json` também é commitado desde a #8: o Unity o **regenera a cada compilação** (lista os comandos e funções de C#: `dar_item`, `remover_item`, `tem_item`, com parâmetros, arquivo e linha) e é ele que faz a extensão do VS Code conhecer os comandos do jogo. **Quem criar ou alterar um `[YarnCommand]` ou `[YarnFunction]` (#10, #20) commita o arquivo regenerado no mesmo PR** (qualquer mudança em `ItemScriptActions.cs` já o altera, por causa da linha). A extensão só usa um `.ysls.json` listado no campo `definitions` do `Roteiro.yarnproject`; um arquivo solto na pasta é "não rastreado" e `dar_item` aparece como `Unknown command`. O campo aponta para o arquivo gerado (`../../ProjectSettings/Packages/dev.yarnspinner/ProjetoVN.GameFlow-generated.ysls.json`) e o Unity reimporta o projeto sem reclamar dele. Se um novo asmdef do projeto ganhar comandos, o Unity gera um `<Assembly>-generated.ysls.json` novo: acrescente-o ao `definitions`. O pacote também abre a janela "About Yarn Spinner" na primeira carga.
+- **Um `.yarn` novo só entra no `Roteiro.yarnproject` com o Editor em foco (#34).** O `YarnImporter` do pacote agenda a reimportação do projeto num `EditorApplication.delayCall`, e o `delayCall` não roda com o Editor sem foco (o `EditorApplication.update` roda; o `delayCall` fica na fila). Depois de criar um `.yarn` por fora e dar `Refresh`, o arquivo é importado, mas o projeto continua com os arquivos de antes: o nó não existe para o `DialogueRunner` nem para o seletor do Inspector, e os erros de compilação do arquivo não aparecem. O `ScriptContentTests` lê os `.yarn` do disco e vê o arquivo, então os testes passam enquanto o Play Mode discorda deles. **Reimporte o projeto** (o `ImportAsset` do passo 2 de [Integrar um roteiro novo](#integrar-um-roteiro-novo); com ou sem `ForceUpdate`, os dois funcionam). Apagar ou editar um `.yarn` que o projeto já conhece não tem o problema: o projeto depende de cada arquivo (`DependsOnSourceAsset`), e o Unity o reimporta na hora. Com o Editor em foco (o programador usando o Unity), a reimportação acontece sozinha em poucos segundos. Não tente destravar o `delayCall` com `RepaintAllViews` (não adianta) nem com `Application.runInBackground` (a opção já é `1`, D-31, e a atribuição suja o `ProjectSettings`). Para conferir, leia `YarnProjectImporter.ImportData.yarnFiles.Count`, se `AssetDatabase.GetDependencies` do projeto lista o arquivo e se o nó está em `Yarn.Program.Parser.ParseFrom(project.compiledYarnProgram).Nodes`; confira também `UnityEditorInternal.InternalEditorUtility.isApplicationActive == False`, porque um clique no Unity durante a verificação libera a fila e esconde o defeito.
+- **Arquivos criados pelo pacote em `ProjectSettings/Packages/dev.yarnspinner/`.** O `YarnSpinnerProjectSettings.json` é commitado (a #5 foi autorizada a isso). O `ProjetoVN.GameFlow-generated.ysls.json` é **gerado e fica fora do git** (`.gitignore`, padrão `*generated.ysls.json`, #217): o Unity o **regenera a cada compilação** (`generateYSLSFile: true` no `YarnSpinnerProjectSettings.json`; lista os comandos e funções de C#, como `dar_item`, `remover_item` e `tem_item`, com parâmetros, arquivo e linha). Ele serve só à extensão do Yarn Spinner no VS Code do programador, para conhecer os comandos do jogo; o importador do Unity não o lê (compila o roteiro com as declarações registradas em C#), e o `Roteiro.yarnproject` importa sem ele (medido na #217: com o arquivo apagado, `ImportStatus` `Succeeded` e 16 arquivos). Não é commitado, nem quando um `[YarnCommand]` ou `[YarnFunction]` muda. A extensão só usa um `.ysls.json` listado no campo `definitions` do `Roteiro.yarnproject`; um arquivo solto na pasta é "não rastreado" e `dar_item` aparece como `Unknown command`. O campo aponta para o arquivo gerado (`../../ProjectSettings/Packages/dev.yarnspinner/ProjetoVN.GameFlow-generated.ysls.json`) e o Unity reimporta o projeto sem reclamar dele. Se um novo asmdef do projeto ganhar comandos, o Unity gera um `<Assembly>-generated.ysls.json` novo: acrescente-o ao `definitions`. O pacote também abre a janela "About Yarn Spinner" na primeira carga.
 - **O choque de nome `Dialogue`.** Dentro de `ProjetoVN.*`, `Dialogue` resolve para o namespace `ProjetoVN.Dialogue`, não para a classe do Yarn. Escreva `Yarn.Dialogue` por extenso.
 - **`lastline`.** O compilador etiqueta com `lastline` a fala que é o comando **imediatamente anterior** a um bloco de opções, e o apresentador usa isso para mostrar fala e opções juntas. Um `<<set>>` entre a fala e as opções tira a etiqueta, e o jogador passa a precisar de um clique a mais.
 - **Narração com dois-pontos vira personagem.** `Atenção: a porta fechou.` é lida como a personagem "Atenção", e `Eram 10:30 da manhã.` como a personagem "Eram 10": **qualquer** dois-pontos numa linha de narração faz o que vem antes virar o nome. Evite-os ou escape com `\:` (`Eram 10\:30 da manhã.`).
@@ -848,31 +877,29 @@ Criar um `.yarn` quebrado em `Assets/Roteiro/` suja o projeto e obriga a apagá-
 - **Pare a conversa em curso antes de trocar o projeto** (`FindFirstObjectByType<Yarn.Unity.DialogueRunner>().Stop()`). Com uma conversa aberta, `StartDialogue` devolve `false` e a interface continua mostrando a fala antiga.
 - Para medir como o texto fica na interface (medições da #8), leia os componentes TMP do `DialogueUIController` por `SerializedObject` (`dialogueText`, `speakerNameText`, `choiceTexts`): `preferredHeight` e `preferredWidth` valem, mas **`textInfo.lineCount` devolve 1** em texto que quebra, então não use.
 
-### Receber um roteiro (PR de roteirista)
+### Integrar um roteiro novo
 
-Um PR de roteirista não tem issue nem as três sessões (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#pr-de-roteiro)). O que o programador (ou o agente, a pedido dele) faz antes do merge:
+O roteiro chega como texto do roteirista, que o programador passa a um agente; a sessão de execução da issue escreve os `.yarn` seguindo o [guia de roteiro](../autoria/roteiro.md) (ver [fluxo-de-trabalho.md](fluxo-de-trabalho.md#roteiro-novo)). Depois de criar ou alterar os arquivos em `Assets/Roteiro/`:
 
-1. Faça checkout da branch `roteiro/<nome>-<assunto>`, depois da conferência de [Antes de trocar de branch](#antes-de-trocar-de-branch) (`git diff --quiet HEAD origin/<branch> -- Packages/` e a lista de cenas que mudam, `git diff --name-only HEAD origin/<branch> -- '*.unity'`). Num PR de roteiro a primeira costuma dar `0` e a segunda vir vazia, porque o roteirista não mexe em `Packages/` nem em cena, e então a troca com o Editor aberto é segura. Se a lista trouxer uma cena que está aberta, siga o passo 4 da receita.
-2. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, e commite os `.meta` **na branch do roteirista**:
+1. Atualize o banco de assets para o Unity gerar o `.meta` de cada `.yarn` novo, que vai no mesmo commit:
 
    ```bash
    unity command script eval 'UnityEditor.AssetDatabase.Refresh(); return "ok";'
    ```
 
-3. Reimporte o projeto de roteiro (com o Editor sem foco, um `.yarn` novo não entra sem isso; causa na [armadilha do Yarn Spinner](#armadilhas-do-yarn-spinner), #34):
+2. Reimporte o projeto de roteiro (com o Editor sem foco, um `.yarn` novo não entra sem isso; causa na [armadilha do Yarn Spinner](#armadilhas-do-yarn-spinner), #34):
 
    ```bash
    unity command script eval 'UnityEditor.AssetDatabase.ImportAsset("Assets/Roteiro/Roteiro.yarnproject", UnityEditor.ImportAssetOptions.ForceUpdate); return "ok";'
    ```
 
-4. Rode a suíte. O `ScriptContentTests` reprova aviso de compilação, id de item inexistente, nó fora da convenção e variável fora do `variaveis.yarn`:
+3. Rode a suíte. O `ScriptContentTests` reprova aviso de compilação, id de item inexistente, nó fora da convenção e variável fora do `variaveis.yarn`:
 
    ```bash
    unity command test run --mode editor --timeout 180
    ```
 
-5. Abra a conversa em Play Mode (receita acima) e confira falas, opções e tamanho do texto.
-6. Confira o `git status`: só `Assets/Roteiro/` e os `.meta`. O merge, por *squash*, é do programador.
+4. Abra a conversa em Play Mode (receita acima) e confira falas, opções e tamanho do texto.
 
 ## Outras armadilhas do projeto
 

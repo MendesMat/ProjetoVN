@@ -111,3 +111,11 @@ InitTestScene*.unity*
 
 # User Settings
 .agents
+
+# Só desta máquina, gerado ou mantido só no disco (#217)
+/.claude/
+/.vscode/
+/.vsconfig
+/Directory.Build.props
+/ProjectSettings/Packages/dev.yarnspinner/*generated.ysls.json
+/Adicionar/
