@@ -34,7 +34,12 @@ namespace ProjetoVN.Dialogue.Logic
             return name.Any(char.IsLetter) && name.All(IsAllowedCharacter);
         }
 
-        public static bool IsRedundantSpace(string text, int position) => false;
+        // O espaço que o Normalize descartaria: o do começo e o que fica ao lado de outro espaço. O espaço único no fim
+        // não conta, porque é com ele que o jogador começa a próxima palavra. Contrato: position entre 0 e text.Length.
+        public static bool IsRedundantSpace(string text, int position) =>
+            position == 0
+            || char.IsWhiteSpace(text[position - 1])
+            || (position < text.Length && char.IsWhiteSpace(text[position]));
 
         // Fica de fora de propósito o que quebra o texto ou o roteiro: [ ] são marcação do Yarn aplicada depois da troca de
         // {$nome_protagonista}, < > são rich text do TMP (o histórico escreve o nome dentro de <b>), e { } # : \ são sintaxe do Yarn.

@@ -10,8 +10,8 @@ namespace ProjetoVN.Dialogue.UI
     /// <summary>
     /// A folha da lista de passageiros (#26): o jogador escreve o nome do protagonista e assina. Fica inativa no
     /// <c>GameUI.prefab</c> e só abre por <see cref="AskAsync"/>. O campo recusa o caractere que a regra do nome não
-    /// aceita, que a fonte não tem ou com que o nome deixaria de caber na placa de nome. Quem grava o nome é o
-    /// <see cref="DialogueManager"/>; a folha só devolve o texto.
+    /// aceita, que a fonte não tem, o espaço que a normalização descartaria ou com que o nome deixaria de caber na placa
+    /// de nome. Quem grava o nome é o <see cref="DialogueManager"/>; a folha só devolve o texto.
     /// </summary>
     public sealed class ProtagonistNameSheet : MonoBehaviour
     {
@@ -126,7 +126,10 @@ namespace ProjetoVN.Dialogue.UI
             if (!ProtagonistName.IsAllowedCharacter(character)) return RefusedCharacter;
             if (!FontHasGlyph(character)) return RefusedCharacter;
 
-            string withCharacter = text.Insert(Mathf.Clamp(position, 0, text.Length), character.ToString());
+            int insertAt = Mathf.Clamp(position, 0, text.Length);
+            if (character == ' ' && ProtagonistName.IsRedundantSpace(text, insertAt)) return RefusedCharacter;
+
+            string withCharacter = text.Insert(insertAt, character.ToString());
             return FitsOnNameplate(withCharacter) ? character : RefusedCharacter;
         }
 
