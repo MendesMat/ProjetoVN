@@ -46,20 +46,21 @@ namespace ProjetoVN.Tests.EditMode
         [TestCase("João")]
         [TestCase("Conceição")]
         [TestCase("Ângela")]
-        [TestCase("Zoë")]
+        [TestCase("Lúcia")]
+        [TestCase("Müller")]
         public void TryNormalize_AcceptsAccentedLetters(string typed)
         {
             Assert.IsTrue(ProtagonistName.TryNormalize(typed, out string name));
             Assert.AreEqual(typed, name);
         }
 
-        [TestCase("Ana-Luísa", "Ana-Luísa")]
-        [TestCase("D'Ávila", "D'Ávila")]
-        [TestCase("  Ana   Clara ", "Ana Clara")]
-        public void TryNormalize_AcceptsHyphenApostropheAndInnerSpace_ReturningTheNormalizedName(string typed, string expected)
+        [TestCase("Ana-Luísa")]
+        [TestCase("D'Ávila")]
+        [TestCase("  Ana   Clara ")]
+        [TestCase("Zoë")]
+        public void TryNormalize_RejectsWhatIsNotAPortugueseLetter(string typed)
         {
-            Assert.IsTrue(ProtagonistName.TryNormalize(typed, out string name));
-            Assert.AreEqual(expected, name);
+            Assert.IsFalse(ProtagonistName.TryNormalize(typed, out _));
         }
 
         [TestCase("[b]")]
@@ -83,12 +84,16 @@ namespace ProjetoVN.Tests.EditMode
         }
 
         [TestCase('a')]
+        [TestCase('Z')]
         [TestCase('ç')]
-        [TestCase('Ã')]
-        [TestCase(' ')]
-        [TestCase('-')]
-        [TestCase('\'')]
-        public void IsAllowedCharacter_AcceptsLettersSpaceHyphenAndApostrophe(char character)
+        [TestCase('Ç')]
+        [TestCase('ã')]
+        [TestCase('Õ')]
+        [TestCase('ü')]
+        [TestCase('À')]
+        [TestCase('ê')]
+        [TestCase('í')]
+        public void IsAllowedCharacter_AcceptsThePortugueseLetters(char character)
         {
             Assert.IsTrue(ProtagonistName.IsAllowedCharacter(character));
         }
@@ -105,52 +110,18 @@ namespace ProjetoVN.Tests.EditMode
         [TestCase('\\')]
         [TestCase('\t')]
         [TestCase('\uD83D')]
-        public void IsAllowedCharacter_RejectsDigitsMarkupAndHalfASurrogatePair(char character)
+        [TestCase(' ')]
+        [TestCase('-')]
+        [TestCase('\'')]
+        [TestCase('ë')]
+        [TestCase('ñ')]
+        [TestCase('ß')]
+        [TestCase('α')]
+        [TestCase('Ж')]
+        [TestCase('ア')]
+        public void IsAllowedCharacter_RejectsWhatIsNotAPortugueseLetter(char character)
         {
             Assert.IsFalse(ProtagonistName.IsAllowedCharacter(character));
-        }
-
-        [TestCase("", 0)]
-        [TestCase("Ana", 0)]
-        public void IsRedundantSpace_AtTheStart_IsTrue(string text, int position)
-        {
-            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
-        }
-
-        [TestCase("Ana ", 4)]
-        [TestCase("Ana Clara", 4)]
-        public void IsRedundantSpace_AfterASpace_IsTrue(string text, int position)
-        {
-            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
-        }
-
-        [TestCase("Ana Clara", 3)]
-        [TestCase(" Ana", 0)]
-        [TestCase("Ana  ", 3)]
-        public void IsRedundantSpace_BeforeASpace_IsTrue(string text, int position)
-        {
-            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
-        }
-
-        [Test]
-        public void IsRedundantSpace_NextToATab_IsTrue()
-        {
-            Assert.IsTrue(ProtagonistName.IsRedundantSpace("Ana\t", 4));
-        }
-
-        [TestCase("Ana", 3)]
-        [TestCase("Ana-", 4)]
-        [TestCase("D'Ávila", 7)]
-        public void IsRedundantSpace_AtTheEndAfterAWord_IsFalse(string text, int position)
-        {
-            Assert.IsFalse(ProtagonistName.IsRedundantSpace(text, position));
-        }
-
-        [TestCase("AnaClara", 3)]
-        [TestCase("Ana", 1)]
-        public void IsRedundantSpace_InsideAWord_IsFalse(string text, int position)
-        {
-            Assert.IsFalse(ProtagonistName.IsRedundantSpace(text, position));
         }
     }
 }
