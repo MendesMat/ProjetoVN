@@ -109,5 +109,48 @@ namespace ProjetoVN.Tests.EditMode
         {
             Assert.IsFalse(ProtagonistName.IsAllowedCharacter(character));
         }
+
+        [TestCase("", 0)]
+        [TestCase("Ana", 0)]
+        public void IsRedundantSpace_AtTheStart_IsTrue(string text, int position)
+        {
+            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
+        }
+
+        [TestCase("Ana ", 4)]
+        [TestCase("Ana Clara", 4)]
+        public void IsRedundantSpace_AfterASpace_IsTrue(string text, int position)
+        {
+            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
+        }
+
+        [TestCase("Ana Clara", 3)]
+        [TestCase(" Ana", 0)]
+        [TestCase("Ana  ", 3)]
+        public void IsRedundantSpace_BeforeASpace_IsTrue(string text, int position)
+        {
+            Assert.IsTrue(ProtagonistName.IsRedundantSpace(text, position));
+        }
+
+        [Test]
+        public void IsRedundantSpace_NextToATab_IsTrue()
+        {
+            Assert.IsTrue(ProtagonistName.IsRedundantSpace("Ana\t", 4));
+        }
+
+        [TestCase("Ana", 3)]
+        [TestCase("Ana-", 4)]
+        [TestCase("D'Ávila", 7)]
+        public void IsRedundantSpace_AtTheEndAfterAWord_IsFalse(string text, int position)
+        {
+            Assert.IsFalse(ProtagonistName.IsRedundantSpace(text, position));
+        }
+
+        [TestCase("AnaClara", 3)]
+        [TestCase("Ana", 1)]
+        public void IsRedundantSpace_InsideAWord_IsFalse(string text, int position)
+        {
+            Assert.IsFalse(ProtagonistName.IsRedundantSpace(text, position));
+        }
     }
 }

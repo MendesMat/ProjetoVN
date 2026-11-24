@@ -34,6 +34,8 @@ namespace ProjetoVN.Dialogue.Logic
             return name.Any(char.IsLetter) && name.All(IsAllowedCharacter);
         }
 
+        public static bool IsRedundantSpace(string text, int position) => false;
+
         // Fica de fora de propósito o que quebra o texto ou o roteiro: [ ] são marcação do Yarn aplicada depois da troca de
         // {$nome_protagonista}, < > são rich text do TMP (o histórico escreve o nome dentro de <b>), e { } # : \ são sintaxe do Yarn.
         public static bool IsAllowedCharacter(char character) =>
