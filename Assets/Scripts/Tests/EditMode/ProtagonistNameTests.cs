@@ -1,3 +1,4 @@
+using System.Text;
 using NUnit.Framework;
 using ProjetoVN.Dialogue.Logic;
 
@@ -5,6 +6,14 @@ namespace ProjetoVN.Tests.EditMode
 {
     public sealed class ProtagonistNameTests
     {
+        // Escrita à mão, em ordem de código, a partir da regra da D-21 (#213). Não pode vir da constante de
+        // ProtagonistName: um teste que confere a constante contra ela mesma nunca reprova.
+        private const string PortugueseLettersInCodeOrder =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            "ÀÁÂÃÇÉÊÍÓÔÕÚÜ" +
+            "àáâãçéêíóôõúü";
+
         [Test]
         public void VariableAndUnknownMark_AreTheOnesTheScriptDeclares()
         {
@@ -96,6 +105,18 @@ namespace ProjetoVN.Tests.EditMode
         public void IsAllowedCharacter_AcceptsThePortugueseLetters(char character)
         {
             Assert.IsTrue(ProtagonistName.IsAllowedCharacter(character));
+        }
+
+        [Test]
+        public void IsAllowedCharacter_AcceptsExactlyThePortugueseLetters()
+        {
+            var accepted = new StringBuilder();
+            for (int code = char.MinValue; code <= char.MaxValue; code++)
+            {
+                if (ProtagonistName.IsAllowedCharacter((char)code)) accepted.Append((char)code);
+            }
+
+            Assert.AreEqual(PortugueseLettersInCodeOrder, accepted.ToString());
         }
 
         [TestCase('1')]
